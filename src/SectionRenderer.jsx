@@ -6,6 +6,8 @@ import OurStory from "./components/OurStory";
 import Menu from "./components/Menu";
 import Accommodation from "./components/Accommodation";
 import Transport from "./components/Transport";
+import PadresPadrinos from "./components/PadresPadrinos";
+import ListaRegalos from "./components/ListaRegalos";
 import CapaDecorativa from "./components/CapaDecorativa";
 import { useEditor } from "./editor/EditorContext";
 
@@ -25,6 +27,14 @@ const REGISTRO = {
   informacion_boda: (c, { novios }) => (
     <InformacionBoda
       info={{
+        // Los tres de aquí abajo dejan que un baby shower, unos XV o un
+        // evento corporativo reusen esta misma sección sin decir "Ceremonia
+        // civil": si no vienen en el contenido (como en la boda real, de
+        // antes de que existiera este campo), se ven exactamente igual que
+        // siempre.
+        overline: c.overline || "Ceremonia civil",
+        tituloSeccion: c.tituloSeccion || "Información de la boda",
+        tituloItinerario: c.tituloItinerario || "Itinerario",
         lugar: c.lugar,
         direccion: c.direccion,
         fecha: c.fecha,
@@ -53,6 +63,18 @@ const REGISTRO = {
   transporte: (c) => <Transport opciones={c.opciones || []} />,
   info_importante: (c) => <ImportantInfo items={c.items || []} nota={c.nota} />,
   faq: (c) => <Faq items={c.items || []} />,
+  // Módulos pequeños reutilizables entre tipos de evento (XV años, baby
+  // shower, cumpleaños, bautizos...), con el mismo mecanismo de "sección con
+  // contenido JSON libre" que ya usa todo lo de arriba.
+  padrinos: (c) => <PadresPadrinos titulo={c.titulo} grupos={c.grupos || []} />,
+  regalos: (c) => (
+    <ListaRegalos
+      titulo={c.titulo}
+      texto={c.texto}
+      enlaces={c.enlaces || []}
+      datosTransferencia={c.datosTransferencia}
+    />
+  ),
 };
 
 function Seccion({ seccion, contexto, render }) {

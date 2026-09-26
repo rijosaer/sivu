@@ -17,6 +17,25 @@ function useInvitationCode() {
   return useMemo(() => new URLSearchParams(window.location.search).get("i") || "", []);
 }
 
+// El sistema aloja muchas invitaciones (multi-invitación): cada una vive en
+// su propio slug, "dominio.com/slug-del-evento". El slug es el primer tramo
+// de la ruta; "?i=codigo", "?anuncio=1" y "?servidores=..." siguen siendo
+// aparte, porque identifican al INVITADO dentro de esa invitación, no a la
+// invitación en sí.
+//
+// Si no hay ningún tramo (la raíz del dominio) se usa DEFAULT_SLUG: son los
+// enlaces que ya se repartieron para la boda de Maite y Ricardo antes de que
+// existiera el multi-invitación, y tienen que seguir abriendo exactamente lo
+// mismo que abrían.
+const DEFAULT_SLUG = "maite-y-ricardo";
+
+function useInvitacionSlug() {
+  return useMemo(() => {
+    const tramo = window.location.pathname.split("/").filter(Boolean)[0];
+    return tramo ? decodeURIComponent(tramo) : DEFAULT_SLUG;
+  }, []);
+}
+
 export default function App() {
   const enEditor = useMemo(editorActivo, []);
   const enPortada = useMemo(editandoPortada, []);
@@ -40,6 +59,7 @@ export default function App() {
   // justo lo contrario (?portada=1) para poder decorar la portada.
   const [opened, setOpened] = useState(enEditor && !enPortada);
   const codigo = useInvitationCode();
+  const slug = useInvitacionSlug();
   const [site, setSite] = useState(null);
   const [invitacion, setInvitacion] = useState(null);
   const [error, setError] = useState(null);
@@ -51,19 +71,19 @@ export default function App() {
   const cargar = useCallback(async () => {
     try {
       const [siteData, invitadoData] = await Promise.all([
-        getSite(),
-        codigo ? getInvitado(codigo) : Promise.resolve(null),
+        getSite(slug),
+        codigo ? getInvitado(slug, codigo) : Promise.resolve(null),
       ]);
       setSite(siteData);
       setInvitacion(invitadoData);
       applyTema(siteData.tema);
       // Registrar la apertura solo cuando es un invitado real abriendo su
       // enlace: con código válido y fuera del editor del panel.
-      if (invitadoData && codigo && !enEditor) registrarApertura(codigo);
+      if (invitadoData && codigo && !enEditor) registrarApertura(slug, codigo);
     } catch {
       setError(true);
     }
-  }, [codigo, enEditor]);
+  }, [codigo, slug, enEditor]);
 
   useEffect(() => {
     cargar();
@@ -232,7 +252,7 @@ export default function App() {
                       mostrarObservaciones: infoBoda.mostrarObservaciones !== false,
                     }}
                     onSubmit={(respuestas, acompanantes) =>
-                      submitRSVP(codigo, respuestas, acompanantes)
+                      submitRSVP(slug, codigo, respuestas, acompanantes)
                     }
                   />
                 )}

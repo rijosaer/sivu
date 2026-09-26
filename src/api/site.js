@@ -6,8 +6,16 @@ function absoluta(ruta) {
   return ruta ? `${API_URL}${ruta}` : ruta;
 }
 
-export async function getSite() {
-  const res = await fetch(`${API_URL}/api/public/site`);
+// Todo lo público cuelga de la invitación a la que pertenece el enlace
+// (multi-invitación: el sistema aloja muchos eventos, no solo uno). "slug"
+// identifica cuál — ver useInvitacionSlug() en App.jsx.
+function base(slug) {
+  return `${API_URL}/api/public/invitaciones/${encodeURIComponent(slug)}`;
+}
+
+export async function getSite(slug) {
+  const res = await fetch(`${base(slug)}/site`);
+  if (res.status === 404) throw new Error("Invitación no encontrada");
   if (!res.ok) throw new Error("No se pudo cargar el sitio");
   const site = await res.json();
 
@@ -22,8 +30,8 @@ export async function getSite() {
   };
 }
 
-export async function getInvitado(codigo) {
-  const res = await fetch(`${API_URL}/api/public/invitado/${encodeURIComponent(codigo)}`);
+export async function getInvitado(slug, codigo) {
+  const res = await fetch(`${base(slug)}/invitado/${encodeURIComponent(codigo)}`);
   if (res.status === 404) return null;
   if (!res.ok) throw new Error("No se pudo cargar la invitación");
   return res.json();
@@ -31,9 +39,9 @@ export async function getInvitado(codigo) {
 
 // Avisa al servidor que se abrió esta invitación. Silencioso: si falla, no
 // pasa nada (es solo para las estadísticas del panel).
-export async function registrarApertura(codigo) {
+export async function registrarApertura(slug, codigo) {
   try {
-    await fetch(`${API_URL}/api/public/visto`, {
+    await fetch(`${base(slug)}/visto`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ codigo }),
@@ -47,8 +55,8 @@ export async function registrarApertura(codigo) {
 // respuestas: [{ id, estado, restriccion, comentario }] — una por persona.
 // acompanantes: [{ nombre, restriccion }] — solo en invitaciones por cupos,
 // donde los nombres los escribe el propio invitado al confirmar.
-export async function submitRSVP(codigo, respuestas, acompanantes) {
-  const res = await fetch(`${API_URL}/api/public/rsvp`, {
+export async function submitRSVP(slug, codigo, respuestas, acompanantes) {
+  const res = await fetch(`${base(slug)}/rsvp`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ codigo, respuestas, ...(acompanantes ? { acompanantes } : {}) }),
