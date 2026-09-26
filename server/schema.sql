@@ -77,8 +77,8 @@ ON CONFLICT (clave) DO NOTHING;
 INSERT INTO secciones (tipo, titulo_panel, orden, activo, contenido) VALUES
   ('welcome', 'Bienvenida y nombres', 1, true, '{
     "bienvenidaTexto": "Bienvenidos a nuestra boda civil",
-    "novioEl": "Mariana",
-    "novioElla": "Andrés",
+    "novioEl": "Maite",
+    "novioElla": "Ricardo",
     "padresTexto": "Con la bendición de nuestros padres",
     "padreElPadre": "Sr. Carlos Vega",
     "padreElMadre": "Sra. Rosa Martínez",
