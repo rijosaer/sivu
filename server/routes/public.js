@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { pool } from "../db.js";
 import { capturar } from "../errores.js";
+import { resolverInvitacionPublica } from "../middlewareInvitacion.js";
 
 export const publicRouter = Router();
 
@@ -12,38 +13,52 @@ function partirDataUrl(dataUrl) {
   return { mime: m[1], buffer: Buffer.from(m[2], "base64") };
 }
 
+// Todo lo de una invitación puntual cuelga de su slug:
+// /api/public/invitaciones/:slug/... . resolverInvitacionPublica ya validó
+// que el slug existe y que la invitación está activa antes de llegar aquí.
+const invitacionRouter = Router({ mergeParams: true });
+publicRouter.use("/invitaciones/:slug", resolverInvitacionPublica, invitacionRouter);
+
 // Todo el sitio: tema, decoraciones, dónde va cada una y las secciones activas.
 // Ojo: aquí NO viajan imágenes ni audio, solo las URLs para pedirlos aparte.
-publicRouter.get(
+invitacionRouter.get(
   "/site",
-  capturar(async (_req, res) => {
+  capturar(async (req, res) => {
+    const id = req.invitacionId;
     const [tema, decoraciones, ubicaciones, secciones, fotos, audio, fondo, limite] = await Promise.all([
       // Solo los colores: la tabla "tema" también guarda ajustes del panel
       // (como la plantilla de WhatsApp) que no tienen por qué viajar al
       // navegador de cada invitado.
-      pool.query("SELECT clave, valor FROM tema WHERE clave LIKE 'color-%'"),
+      pool.query("SELECT clave, valor FROM tema WHERE invitacion_id = $1 AND clave LIKE 'color-%'", [id]),
       pool.query(
-        "SELECT clave, (datos IS NOT NULL) AS tiene, extract(epoch FROM actualizado_en)::bigint AS v FROM decoraciones"
+        "SELECT clave, (datos IS NOT NULL) AS tiene, extract(epoch FROM actualizado_en)::bigint AS v FROM decoraciones WHERE invitacion_id = $1",
+        [id]
       ),
       pool.query(
         `SELECT id, clave, seccion_tipo, x::float, y::float, ancho::float,
                 rotacion::float, opacidad::float, capa
-         FROM decoracion_ubicaciones ORDER BY id`
+         FROM decoracion_ubicaciones WHERE invitacion_id = $1 ORDER BY id`,
+        [id]
       ),
       pool.query(
-        "SELECT id, tipo, contenido FROM secciones WHERE activo = true ORDER BY orden ASC"
+        "SELECT id, tipo, contenido FROM secciones WHERE invitacion_id = $1 AND activo = true ORDER BY orden ASC",
+        [id]
       ),
-      pool.query("SELECT id FROM medios WHERE tipo = 'foto' ORDER BY orden, id"),
-      pool.query("SELECT id FROM medios WHERE tipo = 'audio' ORDER BY id DESC LIMIT 1"),
-      pool.query("SELECT id FROM medios WHERE tipo = 'fondo' ORDER BY id DESC LIMIT 1"),
-      pool.query(SQL_LIMITE),
+      pool.query("SELECT id FROM medios WHERE invitacion_id = $1 AND tipo = 'foto' ORDER BY orden, id", [id]),
+      pool.query("SELECT id FROM medios WHERE invitacion_id = $1 AND tipo = 'audio' ORDER BY id DESC LIMIT 1", [id]),
+      pool.query("SELECT id FROM medios WHERE invitacion_id = $1 AND tipo = 'fondo' ORDER BY id DESC LIMIT 1", [id]),
+      pool.query(sqlLimite(), [id]),
     ]);
 
     res.json({
+      invitacion: { slug: req.invitacion.slug, nombre: req.invitacion.nombre, tipoEvento: req.invitacion.tipo_evento },
       tema: Object.fromEntries(tema.rows.map((r) => [r.clave, r.valor])),
       // null = usar la imagen de fábrica que trae el sitio.
       decoraciones: Object.fromEntries(
-        decoraciones.rows.map((r) => [r.clave, r.tiene ? `/api/public/decoracion/${r.clave}?v=${r.v}` : null])
+        decoraciones.rows.map((r) => [
+          r.clave,
+          r.tiene ? `/api/public/invitaciones/${req.invitacion.slug}/decoracion/${r.clave}?v=${r.v}` : null,
+        ])
       ),
       ubicaciones: ubicaciones.rows,
       secciones: secciones.rows,
@@ -61,12 +76,13 @@ publicRouter.get(
 );
 
 // Imagen de una decoración. Lleva ?v= en la URL, así que se puede cachear.
-publicRouter.get(
+invitacionRouter.get(
   "/decoracion/:clave",
   capturar(async (req, res) => {
-    const { rows } = await pool.query("SELECT datos FROM decoraciones WHERE clave = $1", [
-      req.params.clave,
-    ]);
+    const { rows } = await pool.query(
+      "SELECT datos FROM decoraciones WHERE clave = $1 AND invitacion_id = $2",
+      [req.params.clave, req.invitacionId]
+    );
     const partes = rows.length ? partirDataUrl(rows[0].datos) : null;
     if (!partes) return res.status(404).json({ error: "Decoración no encontrada" });
     res.set("Cache-Control", "public, max-age=31536000, immutable");
@@ -74,27 +90,13 @@ publicRouter.get(
   })
 );
 
-// Foto de la galería o audio de fondo. El id cambia al reemplazar el archivo,
-// así que se puede cachear para siempre sin quedar desactualizado.
-publicRouter.get(
-  "/medio/:id",
-  capturar(async (req, res) => {
-    const { rows } = await pool.query("SELECT mime, datos FROM medios WHERE id = $1", [
-      req.params.id,
-    ]);
-    if (!rows.length) return res.status(404).json({ error: "Archivo no encontrado" });
-    res.set("Cache-Control", "public, max-age=31536000, immutable");
-    res.type(rows[0].mime).send(rows[0].datos);
-  })
-);
-
 // La invitación de un código, con todas las personas que cubre.
-publicRouter.get(
+invitacionRouter.get(
   "/invitado/:codigo",
   capturar(async (req, res) => {
     const { rows } = await pool.query(
-      "SELECT id, codigo, tipo, nombre, familia, mensaje, cupos FROM invitados WHERE codigo = $1",
-      [req.params.codigo]
+      "SELECT id, codigo, tipo, nombre, familia, mensaje, cupos FROM invitados WHERE codigo = $1 AND invitacion_id = $2",
+      [req.params.codigo, req.invitacionId]
     );
     if (!rows.length) return res.status(404).json({ error: "Invitación no encontrada" });
 
@@ -136,11 +138,13 @@ function hoyEnBogota() {
 // El ORDER BY no sobra: "secciones" no tiene ninguna columna única, y ya pasó
 // una vez que se duplicaran todas al re-ejecutar schema.sql. Sin él, un
 // duplicado viejo podía decidir el plazo de forma arbitraria.
-const SQL_LIMITE = `SELECT contenido ->> 'fechaLimiteConfirmacion' AS limite
-   FROM secciones WHERE tipo = 'informacion_boda' ORDER BY id LIMIT 1`;
+function sqlLimite() {
+  return `SELECT contenido ->> 'fechaLimiteConfirmacion' AS limite
+     FROM secciones WHERE invitacion_id = $1 AND tipo = 'informacion_boda' ORDER BY id LIMIT 1`;
+}
 
-async function plazoVencido() {
-  const { rows } = await pool.query(SQL_LIMITE);
+async function plazoVencido(invitacionId) {
+  const { rows } = await pool.query(sqlLimite(), [invitacionId]);
   const limite = rows[0]?.limite;
   if (!limite || !/^\d{4}-\d{2}-\d{2}$/.test(limite)) return null; // sin plazo configurado
   // Las dos fechas están en el mismo formato, así que comparar el texto
@@ -153,7 +157,7 @@ async function plazoVencido() {
 //         acompanantes?: [{ nombre, restriccion }] }
 // "acompanantes" solo lo manda una invitación por cupos: son las personas que
 // el invitado escribe para ocupar los cupos que se le dieron.
-publicRouter.post(
+invitacionRouter.post(
   "/rsvp",
   capturar(async (req, res) => {
     const { codigo, respuestas, acompanantes } = req.body;
@@ -164,16 +168,17 @@ publicRouter.post(
     // Se comprueba aquí, en el servidor: que el sitio esconda el formulario
     // no impide que alguien con la pestaña abierta desde antes, o llamando la
     // API directo, siga cambiando su respuesta pasado el cierre.
-    const vencido = await plazoVencido();
+    const vencido = await plazoVencido(req.invitacionId);
     if (vencido) {
       return res.status(403).json({
         error: `El plazo para confirmar terminó el ${vencido}. Escríbeles a los novios si necesitas cambiar tu respuesta.`,
       });
     }
 
-    const inv = await pool.query("SELECT id, tipo, cupos FROM invitados WHERE codigo = $1", [
-      codigo,
-    ]);
+    const inv = await pool.query(
+      "SELECT id, tipo, cupos FROM invitados WHERE codigo = $1 AND invitacion_id = $2",
+      [codigo, req.invitacionId]
+    );
     if (!inv.rows.length) return res.status(404).json({ error: "Código no encontrado" });
     const { id: invitadoId, tipo, cupos } = inv.rows[0];
 
@@ -280,7 +285,7 @@ publicRouter.post(
 
 // Registra que se abrió una invitación. Lo llama el sitio al cargar con un
 // código válido. Guarda la primera apertura y cuenta las veces.
-publicRouter.post(
+invitacionRouter.post(
   "/visto",
   capturar(async (req, res) => {
     const { codigo } = req.body;
@@ -295,10 +300,26 @@ publicRouter.post(
            ultima_apertura = CASE
              WHEN ultima_apertura IS NULL OR now() - ultima_apertura > interval '15 minutes'
              THEN now() ELSE ultima_apertura END
-       WHERE codigo = $1`,
-      [codigo]
+       WHERE codigo = $1 AND invitacion_id = $2`,
+      [codigo, req.invitacionId]
     );
     // Se responde ok siempre: si el código no existe, no se revela.
     res.json({ ok: true });
+  })
+);
+
+// Foto de la galería o audio de fondo. El id cambia al reemplazar el archivo,
+// así que se puede cachear para siempre sin quedar desactualizado. No hace
+// falta el slug: el id de un medio ya identifica un archivo sin ambigüedad,
+// y sirve tal cual desde antes de que existiera el multi-invitación.
+publicRouter.get(
+  "/medio/:id",
+  capturar(async (req, res) => {
+    const { rows } = await pool.query("SELECT mime, datos FROM medios WHERE id = $1", [
+      req.params.id,
+    ]);
+    if (!rows.length) return res.status(404).json({ error: "Archivo no encontrado" });
+    res.set("Cache-Control", "public, max-age=31536000, immutable");
+    res.type(rows[0].mime).send(rows[0].datos);
   })
 );
