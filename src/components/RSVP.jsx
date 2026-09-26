@@ -270,7 +270,7 @@ export default function RSVP({ invitacion, fechaLimite, opciones = {}, onSubmit 
                     onChange={(e) => setRestriccion(p.id, e.target.value)}
                     placeholder="Restricción alimentaria (opcional)"
                     aria-label={`Restricción alimentaria de ${p.nombre}`}
-                    className="mt-3 w-full border border-ink/20 bg-transparent px-3 py-2 text-sm focus:outline-none focus:border-gold"
+                    className="mt-3 w-full border-b border-ink/25 bg-transparent px-1 py-2 text-sm focus:outline-none focus:border-gold transition-colors"
                   />
                 )}
               </div>
@@ -303,7 +303,7 @@ export default function RSVP({ invitacion, fechaLimite, opciones = {}, onSubmit 
                       onChange={(e) => cambiarAcompanante(a.k, "nombre", e.target.value)}
                       placeholder={`Nombre del acompañante ${i + 1}`}
                       aria-label={`Nombre del acompañante ${i + 1}`}
-                      className="flex-1 min-w-0 border border-ink/20 bg-transparent px-3 py-2 text-sm focus:outline-none focus:border-gold"
+                      className="flex-1 min-w-0 border-b border-ink/25 bg-transparent px-1 py-2 text-sm focus:outline-none focus:border-gold transition-colors"
                     />
                     <button
                       type="button"
@@ -322,7 +322,7 @@ export default function RSVP({ invitacion, fechaLimite, opciones = {}, onSubmit 
                       onChange={(e) => cambiarAcompanante(a.k, "restriccion", e.target.value)}
                       placeholder="Restricción alimentaria (opcional)"
                       aria-label={`Restricción alimentaria del acompañante ${i + 1}`}
-                      className="mt-2 w-full border border-ink/20 bg-transparent px-3 py-2 text-sm focus:outline-none focus:border-gold"
+                      className="mt-2 w-full border-b border-ink/25 bg-transparent px-1 py-2 text-sm focus:outline-none focus:border-gold transition-colors"
                     />
                   )}
                 </div>
@@ -350,7 +350,7 @@ export default function RSVP({ invitacion, fechaLimite, opciones = {}, onSubmit 
                 value={observaciones}
                 onChange={(e) => setObservaciones(e.target.value)}
                 rows={3}
-                className="mt-2 w-full border border-ink/20 bg-transparent px-3 py-2 text-sm focus:outline-none focus:border-gold resize-none"
+                className="mt-2 w-full border-b border-ink/25 bg-transparent px-1 py-2 text-sm focus:outline-none focus:border-gold transition-colors resize-none"
               />
             </label>
           )}

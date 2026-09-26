@@ -9,16 +9,16 @@ export default function DressCode({ dressCode }) {
   const evitar = dressCode.evitar || [];
 
   return (
-    <section className="relative px-6 py-16 max-w-xl mx-auto text-center overflow-hidden">
+    <section className="relative px-6 py-20 max-w-xl mx-auto text-center overflow-hidden">
       <p className="font-mono text-xs tracking-widest2 uppercase text-gold-dark mb-4">
         Código de vestimenta
       </p>
       <h2 className="font-display text-3xl mb-4 text-gold-dark">{dressCode.titulo}</h2>
-      <Divider className="mb-10" />
+      <Divider className="mb-12" />
 
-      <div className="grid grid-cols-2 gap-8">
-        <div>
-          <p className="font-mono text-[10px] tracking-widest2 uppercase text-gold-dark mb-3">
+      <div className="grid grid-cols-2">
+        <div className="pr-6 sm:pr-10 border-r border-gold/20">
+          <p className="font-mono text-[10px] tracking-widest2 uppercase text-gold-dark mb-4">
             Permitidos
           </p>
           <div className="flex justify-center gap-3 flex-wrap">
@@ -27,8 +27,8 @@ export default function DressCode({ dressCode }) {
             ))}
           </div>
         </div>
-        <div>
-          <p className="font-mono text-[10px] tracking-widest2 uppercase text-seal mb-3">Evitar</p>
+        <div className="pl-6 sm:pl-10">
+          <p className="font-mono text-[10px] tracking-widest2 uppercase text-seal mb-4">Evitar</p>
           <div className="flex justify-center gap-3 flex-wrap">
             {evitar.map((c, i) => (
               <Swatch key={`${c.nombre}-${i}`} {...c} />

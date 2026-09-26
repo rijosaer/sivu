@@ -23,15 +23,19 @@ function getRemaining(targetDate) {
   };
 }
 
-function Unit({ value, label }) {
+// Numerales grandes separados por una regla fina en vez de una "caja de app"
+// con sombra: la jerarquía la da el tamaño y el espaciado, no un recuadro.
+function Unit({ value, label, ultimo }) {
   return (
-    <div className="flex flex-col items-center">
-      <div className="w-16 sm:w-20 py-3 sm:py-4 text-center border border-gold/50 bg-marble shadow-[3px_3px_0_0_rgba(184,146,74,0.18)]">
-        <span className="font-mono text-2xl sm:text-3xl tabular-nums text-gold-dark">
-          {String(value).padStart(2, "0")}
-        </span>
-      </div>
-      <span className="mt-2 text-[10px] tracking-widest2 uppercase text-gold-dark/70">
+    <div
+      className={`flex flex-col items-center px-4 sm:px-6 ${
+        !ultimo ? "border-r border-gold/25" : ""
+      }`}
+    >
+      <span className="font-display text-4xl sm:text-5xl tabular-nums text-gold-dark leading-none">
+        {String(value).padStart(2, "0")}
+      </span>
+      <span className="mt-3 text-[10px] tracking-widest2 uppercase text-gold-dark/60">
         {label}
       </span>
     </div>
@@ -82,24 +86,26 @@ export default function InformacionBoda({ info, novios }) {
   }, [info.fecha]);
 
   return (
-    <section className="relative px-6 sm:px-10 py-20 text-ink overflow-hidden">
+    <section className="relative px-6 sm:px-10 py-24 text-ink overflow-hidden">
       <p className="font-mono text-xs tracking-widest2 uppercase mb-4 text-center text-gold-dark">
-        Ceremonia civil
+        {info.overline || "Ceremonia civil"}
       </p>
-      <h2 className="font-display text-3xl text-center mb-8 text-gold-dark">Información de la boda</h2>
+      <h2 className="font-display text-3xl sm:text-4xl text-center mb-10 text-gold-dark">
+        {info.tituloSeccion || "Información de la boda"}
+      </h2>
 
       {/* Cuenta regresiva */}
-      <p className="text-center font-mono text-xs tracking-widest2 uppercase text-gold-dark/80 mb-3">
+      <p className="text-center font-mono text-xs tracking-widest2 uppercase text-gold-dark/80 mb-4">
         Faltan
       </p>
-      <div className="mb-8">
+      <div className="mb-10">
         <Divider />
       </div>
-      <div className="flex justify-center gap-3 sm:gap-5 mb-14">
+      <div className="flex justify-center mb-16">
         <Unit value={remaining.dias} label="Días" />
         <Unit value={remaining.horas} label="Horas" />
         <Unit value={remaining.minutos} label="Min" />
-        <Unit value={remaining.segundos} label="Seg" />
+        <Unit value={remaining.segundos} label="Seg" ultimo />
       </div>
 
       {/* Fecha, hora, lugar */}
@@ -112,8 +118,8 @@ export default function InformacionBoda({ info, novios }) {
 
       {/* Mapa */}
       {mapa && (
-        <div className="max-w-lg mx-auto mt-10">
-          <div className="border border-gold/40 overflow-hidden shadow-[4px_4px_0_0_rgba(184,146,74,0.15)]">
+        <div className="max-w-lg mx-auto mt-12">
+          <div className="border border-gold/30 overflow-hidden">
             <iframe
               src={mapa}
               title={`Ubicación: ${info.lugar || "el lugar de la boda"}`}
@@ -145,19 +151,21 @@ export default function InformacionBoda({ info, novios }) {
           "detallado" con la hora de cada momento, "mensaje" con un texto
           suelto para cuando el orden todavía no está cerrado, u "oculto". */}
       {info.cronogramaModo !== "oculto" && (
-        <div className="max-w-lg mx-auto mt-16">
-          <h3 className="font-display text-xl text-center mb-6 text-gold-dark">Itinerario</h3>
+        <div className="max-w-lg mx-auto mt-20">
+          <h3 className="font-display text-2xl text-center mb-8 text-gold-dark">
+            {info.tituloItinerario || "Itinerario"}
+          </h3>
 
           {info.cronogramaModo === "mensaje" ? (
-            <div className="border border-gold/40 bg-gold/5 px-6 py-7 text-center">
+            <div className="border-y border-gold/30 py-7 text-center">
               <p className="font-body italic text-ink-light leading-relaxed whitespace-pre-line">
                 {info.cronogramaMensaje}
               </p>
             </div>
           ) : (
-            <ol className="space-y-0">
+            <ol className="space-y-0 border-t border-gold/25">
               {info.cronograma.map((item, i) => (
-                <li key={i} className="flex items-start gap-4 py-3 border-b border-gold/25">
+                <li key={i} className="flex items-start gap-4 py-3.5 border-b border-gold/25">
                   <span className="font-mono text-xs text-gold-dark w-16 shrink-0 pt-0.5">
                     {item.hora}
                   </span>
