@@ -43,6 +43,16 @@ const ETIQUETAS = {
   padreEllaPadre: "Padre de 2",
   padreEllaMadre: "Madre de 2",
   src: "Enlace de audio externo",
+  overline: "Texto pequeño de arriba (ej. «Ceremonia civil», «Baby shower»)",
+  tituloSeccion: "Título de la sección",
+  tituloItinerario: "Título del itinerario/agenda",
+  grupos: "Grupos (padres, padrinos...)",
+  etiqueta: "Etiqueta del grupo",
+  personas: "Personas",
+  enlaces: "Enlaces a tiendas",
+  tienda: "Tienda",
+  url: "Enlace",
+  datosTransferencia: "Datos para transferencia (opcional)",
 };
 
 export function etiquetaDe(clave) {

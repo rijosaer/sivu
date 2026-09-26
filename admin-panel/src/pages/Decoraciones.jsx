@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api, urlMedia, SITIO_URL } from "../api";
+import { api, urlMedia, SITIO_BASE } from "../api";
 import { comprimirDecoracion } from "../archivos";
 import GestorFondo from "./GestorFondo";
 
@@ -109,7 +109,7 @@ export default function Decoraciones() {
   // previa tiene que recargarse al pasar de una a otra. Como el src solo
   // cambia al cruzar esa frontera, moverse entre secciones del cuerpo no
   // recarga nada.
-  const srcPrevia = `${SITIO_URL}/?editor=1${seccionActiva === PORTADA ? "&portada=1" : ""}`;
+  const srcPrevia = `${SITIO_BASE}?editor=1${seccionActiva === PORTADA ? "&portada=1" : ""}`;
 
   // Los deslizadores se mueven muy seguido: se refleja al instante en la
   // previa y se guarda una sola vez cuando el usuario se detiene.

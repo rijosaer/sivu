@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { api, SITIO_URL } from "../api";
+import { api, SITIO_BASE } from "../api";
 import { useToast } from "../ui/Toast";
 import Icono from "../ui/Icono";
 import {
@@ -53,7 +53,7 @@ const MARCADORES_SERVIDORES = [
 // propósito: es el único caso donde se ven todos los marcadores a la vez.
 const EJEMPLO = {
   nombre: "Carlos Rodríguez",
-  enlace: `${SITIO_URL}/?i=ABC123`,
+  enlace: `${SITIO_BASE}?i=ABC123`,
   cupos: 3,
 };
 
@@ -222,7 +222,7 @@ function EnlacePublico({ titulo, ayuda, enlace, plantilla, cuenta }) {
 // cada tarjeta está escrita para quien la abre.
 function Servidor({ persona, plantilla, cuenta }) {
   const [copiado, setCopiado] = useState(false);
-  const enlace = `${SITIO_URL}/?servidores=${comoEnlace(persona.nombre)}`;
+  const enlace = `${SITIO_BASE}?servidores=${comoEnlace(persona.nombre)}`;
   const mensaje = armarMensaje(plantilla, { nombre: persona.nombre, enlace, ...cuenta });
 
   return (
@@ -339,7 +339,7 @@ export default function Mensajes() {
   const primero = personas.find((p) => p?.nombre);
   const ejemploServidor = {
     nombre: primero?.nombre || "María José",
-    enlace: `${SITIO_URL}/?servidores=${comoEnlace(primero?.nombre || "María José")}`,
+    enlace: `${SITIO_BASE}?servidores=${comoEnlace(primero?.nombre || "María José")}`,
     ...cuenta,
   };
 
@@ -408,7 +408,7 @@ export default function Mensajes() {
         descripcion="Para quienes no van a la boda civil: solo la noticia, sin confirmación."
         valor={noticia}
         marcadores={MARCADORES_NOTICIA}
-        ejemplo={{ enlace: `${SITIO_URL}/?anuncio=1`, ...cuenta }}
+        ejemplo={{ enlace: `${SITIO_BASE}?anuncio=1`, ...cuenta }}
         onGuardar={(t) => guardar("whatsapp-noticia", t, setNoticia, "Mensaje de la noticia guardado")}
       />
 
@@ -426,7 +426,7 @@ export default function Mensajes() {
       <EnlacePublico
         titulo="Dar la noticia a quienes no van"
         ayuda="Página pública con la noticia y la fecha, sin lugar ni confirmación. Su texto se edita en Contenido → Bienvenida (campos «Participación»)."
-        enlace={`${SITIO_URL}/?anuncio=1`}
+        enlace={`${SITIO_BASE}?anuncio=1`}
         plantilla={noticia}
         cuenta={cuenta}
       />

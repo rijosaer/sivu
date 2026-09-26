@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { SITIO_URL } from "../api";
+import { SITIO_BASE } from "../api";
 import { comoEnlace } from "../servidores";
 
 // El editor propio de la tarjeta de los servidores. Las demás secciones se
@@ -76,7 +76,7 @@ const btnChico =
   "text-[11px] px-2 py-1 rounded-md border border-borde-fuerte text-ink-suave hover:border-[#aeb5aa] hover:text-ink transition-colors";
 
 function Persona({ persona, indice, total, onCambiar, onMover, onQuitar }) {
-  const enlace = persona.nombre ? `${SITIO_URL}/?servidores=${comoEnlace(persona.nombre)}` : "";
+  const enlace = persona.nombre ? `${SITIO_BASE}?servidores=${comoEnlace(persona.nombre)}` : "";
 
   return (
     <div className="border border-borde rounded-lg p-3">
@@ -256,7 +256,7 @@ export default function EditorServidores({ contenido, onCambiar }) {
       <div className="pt-5 separador space-y-4">
         <span className="etiqueta mb-0">Enlace común</span>
         <p className="ayuda -mt-1">
-          {`${SITIO_URL}/?servidores=1`} muestra a todos en una sola tarjeta. Es el respaldo de
+          {`${SITIO_BASE}?servidores=1`} muestra a todos en una sola tarjeta. Es el respaldo de
           cuando alguien copia mal su enlace.
         </p>
         <Campo etiqueta="Título de la tarjeta común">

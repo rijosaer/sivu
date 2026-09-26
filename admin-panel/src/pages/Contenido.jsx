@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { api, SITIO_URL } from "../api";
+import { api, SITIO_BASE } from "../api";
 import CampoValor, { etiquetaDe } from "./EditorCampos";
 import GestorFotos from "./GestorFotos";
 import EditorServidores from "./EditorServidores";
@@ -292,8 +292,8 @@ export default function Contenido() {
   // esa página en vez de la invitación.
   const previaSrc =
     actual?.tipo === "servidores"
-      ? `${SITIO_URL}/?editor=1&servidores=${PRIMERA}`
-      : `${SITIO_URL}/?editor=1`;
+      ? `${SITIO_BASE}?editor=1&servidores=${PRIMERA}`
+      : `${SITIO_BASE}?editor=1`;
 
   // Vista previa en vivo: se manda el contenido de la sección abierta al sitio
   // incrustado mientras se escribe (con un pequeño retardo para no saturar).

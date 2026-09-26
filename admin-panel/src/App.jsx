@@ -7,7 +7,16 @@ import Mensajes from "./pages/Mensajes";
 import Contenido from "./pages/Contenido";
 import Tema from "./pages/Tema";
 import Decoraciones from "./pages/Decoraciones";
-import { hasToken, clearToken, SITIO_URL } from "./api";
+import {
+  hasToken,
+  clearToken,
+  SITIO_BASE,
+  getInvitacionActual,
+  clearInvitacionActual,
+  actualizarSitioBase,
+} from "./api";
+import SelectorEventos from "./pages/SelectorEventos";
+import { NOMBRE_TIPO_EVENTO } from "./tiposEvento";
 import { PendientesProvider, usePendientes } from "./estado/Pendientes";
 import { ToastProvider } from "./ui/Toast";
 import { useAvisos } from "./notificaciones/useAvisos";
@@ -128,7 +137,7 @@ function Navegacion({ tab, onCambiar, hayPendientes }) {
   );
 }
 
-function Cascara({ onSalir }) {
+function Cascara({ onSalir, evento, onCambiarEvento }) {
   const [tab, setTab] = useState("resumen");
   const { hayPendientes, seccionesPendientes } = usePendientes();
   const avisos = useAvisos();
@@ -145,8 +154,13 @@ function Cascara({ onSalir }) {
           <p className="text-[10px] uppercase tracking-[.12em] text-ink-tenue mb-1.5">
             Evento actual
           </p>
-          <p className="text-xs font-semibold text-ink">Tu evento</p>
-          <p className="text-[11px] text-ink-suave mt-0.5">Administración activa</p>
+          <p className="text-xs font-semibold text-ink truncate">{evento.nombre}</p>
+          <p className="text-[11px] text-ink-suave mt-0.5">
+            {NOMBRE_TIPO_EVENTO[evento.tipo_evento] || "Evento"}
+          </p>
+          <button onClick={onCambiarEvento} className="mt-2 text-[11px] boton-texto">
+            Cambiar evento
+          </button>
         </div>
 
         <Navegacion tab={tab} onCambiar={setTab} hayPendientes={hayPendientes} />
@@ -199,7 +213,7 @@ function Cascara({ onSalir }) {
               <Icono nombre={avisos.activo ? "campana" : "campana-off"} className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Avisos</span>
             </button>
-            <a href={SITIO_URL} target="_blank" rel="noreferrer" className="enlace-vista">
+            <a href={SITIO_BASE} target="_blank" rel="noreferrer" className="enlace-vista">
               Ver invitación ↗
             </a>
           </div>
@@ -215,19 +229,44 @@ function Cascara({ onSalir }) {
 
 export default function App() {
   const [logueado, setLogueado] = useState(hasToken());
+  // El panel administra muchos eventos (multi-invitación): antes de entrar a
+  // "editar" hay que elegir cuál. Se recuerda entre sesiones (localStorage),
+  // así que quien entra todos los días a la misma boda no tiene que elegirla
+  // cada vez.
+  const [evento, setEvento] = useState(() => {
+    const actual = getInvitacionActual();
+    if (actual) actualizarSitioBase(actual.slug);
+    return actual;
+  });
+
+  function elegirEvento(inv) {
+    actualizarSitioBase(inv.slug);
+    setEvento(inv);
+  }
+
+  function cambiarEvento() {
+    clearInvitacionActual();
+    actualizarSitioBase(null);
+    setEvento(null);
+  }
+
   return (
     <ToastProvider>
-      {logueado ? (
+      {!logueado ? (
+        <Login onLogin={() => setLogueado(true)} />
+      ) : !evento ? (
+        <SelectorEventos onElegir={elegirEvento} onSalir={() => { clearToken(); setLogueado(false); }} />
+      ) : (
         <PendientesProvider>
           <Cascara
+            evento={evento}
+            onCambiarEvento={cambiarEvento}
             onSalir={() => {
               clearToken();
               setLogueado(false);
             }}
           />
         </PendientesProvider>
-      ) : (
-        <Login onLogin={() => setLogueado(true)} />
       )}
     </ToastProvider>
   );

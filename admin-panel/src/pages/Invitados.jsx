@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { api, SITIO_URL } from "../api";
+import { api, SITIO_BASE } from "../api";
 import { useToast } from "../ui/Toast";
 import Icono from "../ui/Icono";
 import {
@@ -381,7 +381,7 @@ function Tarjeta({ invitacion, plantilla, plantillaRecordatorio, cuenta, onCambi
   const [copiado, setCopiado] = useState("");
   const [telefono, setTelefono] = useState(invitacion.telefono || "");
 
-  const enlace = `${SITIO_URL}/?i=${invitacion.codigo}`;
+  const enlace = `${SITIO_BASE}?i=${invitacion.codigo}`;
   // "cupos" solo tiene valor en las invitaciones de tipo cupos; en el resto
   // {cupos} se queda vacío y su renglón desaparece del mensaje.
   const cupos = cuposDe(invitacion);
