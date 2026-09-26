@@ -1,0 +1,75 @@
+/* Tipografías propias, servidas desde el mismo dominio. Este @import es
+   local: Vite lo resuelve al compilar y todo termina en un solo archivo,
+   sin peticiones extra ni conexiones a terceros. */
+@import './assets/fuentes.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+/* Valores por defecto de las variables de tema. El sitio los sobrescribe
+   en tiempo de ejecución con lo que devuelva el panel de administración
+   (ver src/theme/applyTema.js), así que todo lo que use estas variables
+   (vía tailwind.config.js) cambia de color sin recompilar nada.
+
+   Van como canales sueltos ("184 146 74") y no como hex, para que Tailwind
+   pueda aplicarles opacidad (bg-gold/5, border-gold/40...). El panel las
+   sigue guardando en hex; la conversión ocurre en applyTema.js. */
+:root {
+  --color-paper: 248 244 238;   /* #F8F4EE */
+  --color-ink: 92 69 48;        /* #5C4530 */
+  --color-gold: 184 146 74;     /* #B8924A */
+  --color-gold-light: 217 190 135; /* #D9BE87 */
+  --color-gold-dark: 140 106 46;   /* #8C6A2E */
+  --color-marble: 239 234 225;  /* #EFEAE1 */
+  --color-seal: 138 90 52;      /* #8A5A34 */
+}
+
+body {
+  margin: 0;
+  background-color: rgb(var(--color-paper));
+  color: rgb(var(--color-ink));
+  font-family: 'Work Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+  outline: 2px solid #5C7889;
+  outline-offset: 3px;
+}
+
+.ledger-rule {
+  background-color: #B49A78;
+  height: 1px;
+  opacity: 0.6;
+}
+
+.seal-stamp { transform: rotate(-4deg); }
+
+.fade-up {
+  animation: fadeUp 0.9s ease forwards;
+  opacity: 0;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes petalFall {
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translateY(110vh) rotate(220deg); opacity: 0; }
+}

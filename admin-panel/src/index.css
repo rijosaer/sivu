@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root { color: #202321; background: #f7f7f4; }
+  body { background: #f7f7f4; color: #202321; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
+  button, input, textarea, select { border-radius: .45rem; }
+  input, textarea, select { background: #fff; }
+  input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 3px solid rgb(82 101 85 / .14); outline-offset: 0; border-color: #526555; }
+  /* Todo lo pulsable comparte el mismo foco visible: se navega con teclado sin
+     perder de vista dónde se está. */
+  button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline: 2px solid #526555; outline-offset: 2px; border-radius: .45rem; }
+  input[type="color"] { padding: 0; }
+}
+
+@layer components {
+  /* ---------- Cáscara ---------- */
+  .panel-lienzo { @apply bg-lienzo; }
+  .barra-lateral { @apply bg-white border-b lg:border-b-0 lg:border-r border-borde flex lg:flex-col min-h-0; }
+  .marca-sello { @apply w-8 h-8 rounded-full bg-ink text-white text-sm font-semibold grid place-items-center; }
+  .navegacion-panel { @apply flex lg:flex-col gap-1 px-3 lg:px-4 py-3 overflow-x-auto lg:overflow-visible; }
+  .grupo-nav { @apply hidden lg:block text-[10px] uppercase tracking-[.13em] text-ink-tenue px-3 pt-4 pb-1.5; }
+  .enlace-nav { @apply text-left text-sm px-3 py-2.5 rounded-md text-ink-suave whitespace-nowrap transition-colors hover:bg-lienzo hover:text-ink flex items-center gap-2.5; }
+  .enlace-nav-activo { @apply bg-[#eceee9] text-ink font-medium hover:bg-[#eceee9]; }
+  .icono-nav { @apply w-4 h-4 shrink-0 opacity-60; }
+  .cabecera-panel { @apply sticky top-0 z-30 min-h-[4.5rem] flex items-center justify-between gap-4 bg-lienzo/90 backdrop-blur border-b border-borde px-5 sm:px-10 py-3; }
+  .enlace-vista { @apply hidden sm:inline text-xs font-medium text-ink-suave underline underline-offset-4 decoration-borde-fuerte hover:text-ink; }
+
+  /* ---------- Superficies ---------- */
+  .tarjeta { @apply bg-white border border-borde rounded-xl shadow-tarjeta; }
+  .tarjeta-lista { @apply bg-white border border-borde rounded-xl shadow-tarjeta transition-colors hover:border-borde-fuerte; }
+  .panel-titulo { @apply text-[2rem] sm:text-[2.35rem] leading-[1.05] font-medium tracking-[-.045em] text-ink; }
+  .panel-subtitulo { @apply text-sm text-ink-suave mt-2; }
+  .bloque-titulo { @apply text-sm font-semibold text-ink; }
+  .ayuda { @apply text-xs text-ink-tenue leading-relaxed; }
+  .etiqueta { @apply block text-[11px] font-medium uppercase tracking-[.08em] text-ink-tenue mb-1.5; }
+  .separador { @apply border-t border-borde; }
+
+  /* Estado vacío: en vez de una línea suelta de texto gris. */
+  .vacio { @apply border border-dashed border-borde-fuerte rounded-xl px-6 py-10 text-center; }
+
+  /* ---------- Formularios ---------- */
+  .campo { @apply w-full border border-borde-fuerte px-3 py-2.5 text-sm text-ink placeholder:text-ink-tenue transition-colors hover:border-[#c9cbc3]; }
+  .campo-sm { @apply w-full border border-borde-fuerte px-2.5 py-1.5 text-xs text-ink placeholder:text-ink-tenue; }
+
+  /* ---------- Botones ---------- */
+  .boton-primario { @apply inline-flex items-center justify-center gap-2 bg-ink text-white px-4 py-2.5 text-xs font-medium hover:bg-[#3b443d] transition-colors disabled:opacity-40 disabled:cursor-not-allowed; }
+  .boton-secundario { @apply inline-flex items-center justify-center gap-2 border border-borde-fuerte bg-white text-ink-suave px-3 py-2 text-xs font-medium hover:border-[#aeb5aa] hover:text-ink transition-colors disabled:opacity-40 disabled:cursor-not-allowed; }
+  .boton-peligro { @apply inline-flex items-center justify-center gap-2 border border-borde-fuerte bg-white text-ink-suave px-3 py-2 text-xs font-medium hover:border-red-300 hover:text-red-600 transition-colors; }
+  .boton-texto { @apply text-xs font-medium text-ink-suave underline underline-offset-4 decoration-borde-fuerte hover:text-ink transition-colors; }
+  .boton-verde { @apply inline-flex items-center justify-center gap-2 bg-emerald-600 text-white px-3 py-2 text-xs font-medium hover:bg-emerald-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed; }
+
+  /* ---------- Chips y pestañas ---------- */
+  .chip-filtro { @apply inline-flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-md border border-borde bg-white text-ink-suave hover:border-borde-fuerte hover:text-ink transition-colors; }
+  .chip-filtro-activo { @apply bg-ink text-white border-ink hover:bg-ink hover:text-white; }
+  .chip-cuenta { @apply text-[10px] tabular-nums opacity-60; }
+  .pestana { @apply px-1 pb-2.5 -mb-px text-sm font-medium text-ink-tenue border-b-2 border-transparent hover:text-ink transition-colors; }
+  .pestana-activa { @apply text-ink border-ink; }
+
+  /* ---------- Insignias de estado ---------- */
+  .insignia { @apply inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full border whitespace-nowrap; }
+  .insignia-ok { @apply bg-emerald-50 text-emerald-700 border-emerald-200; }
+  .insignia-no { @apply bg-red-50 text-red-700 border-red-200; }
+  .insignia-aviso { @apply bg-amber-50 text-amber-700 border-amber-200; }
+  .insignia-info { @apply bg-marca-suave text-marca border-[#dbe2da]; }
+  .insignia-neutra { @apply bg-lienzo text-ink-tenue border-borde; }
+
+  /* ---------- Tablas ---------- */
+  .tabla { @apply w-full text-sm border-collapse; }
+  .tabla thead th { @apply text-left px-3 py-2 font-medium text-[11px] uppercase tracking-[.06em] text-ink-tenue bg-lienzo; }
+  .tabla tbody td { @apply px-3 py-2 border-t border-borde align-top; }
+}

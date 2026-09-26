@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invitación</title>
+
+    <!-- Que la invitación no salga en los buscadores: es personal y se comparte
+         por enlace directo. La tarjeta de vista previa de WhatsApp (og:*) sigue
+         funcionando, porque esa la piden los propios servidores de WhatsApp. -->
+    <meta name="robots" content="noindex, nofollow" />
+
+    <!-- La API va en otro dominio: abrir la conexión desde el HTML ahorra el
+         DNS y el TLS que si no se pagarían al pedir los datos. -->
+    <link rel="preconnect" href="%VITE_API_URL%" crossorigin />
+
+    <!-- Tarjeta que se ve al compartir el enlace por WhatsApp.
+         OJO: estos textos son fijos. El rastreador de WhatsApp no ejecuta
+         JavaScript, así que no puede leer los nombres desde la base de datos;
+         si cambian los novios o la fecha hay que actualizarlos aquí y volver
+         a desplegar el sitio. La imagen se genera aparte y vive en
+         public/preview.jpg. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Ricardo &amp; Maite — Nos casamos" />
+    <meta
+      property="og:description"
+      content="27 de agosto de 2026. Abre tu invitación y confirma tu asistencia."
+    />
+    <meta property="og:image" content="%VITE_SITIO_URL%/preview.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="es_CO" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#F8F4EE" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

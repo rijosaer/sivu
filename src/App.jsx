@@ -1,0 +1,258 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
+import PaperBackground from "./components/PaperBackground";
+import Welcome from "./components/Welcome";
+import RSVP from "./components/RSVP";
+import MusicToggle from "./components/MusicToggle";
+import FinalScreen from "./components/FinalScreen";
+import CapaDecorativa, { ZONA_LIBRE } from "./components/CapaDecorativa";
+import Anuncio from "./components/Anuncio";
+import Servidores, { personaDelEnlace } from "./components/Servidores";
+import { getSite, getInvitado, submitRSVP, registrarApertura } from "./api/site";
+import { DecorProvider } from "./theme/DecorContext";
+import { EditorProvider, editorActivo, editandoPortada } from "./editor/EditorContext";
+import { applyTema } from "./theme/applyTema";
+import { renderSeccion } from "./SectionRenderer";
+
+function useInvitationCode() {
+  return useMemo(() => new URLSearchParams(window.location.search).get("i") || "", []);
+}
+
+export default function App() {
+  const enEditor = useMemo(editorActivo, []);
+  const enPortada = useMemo(editandoPortada, []);
+  // Participación: página pública para no invitados, con ?anuncio=1. Es aparte
+  // por completo del flujo de la invitación con código, que no se toca.
+  const enAnuncio = useMemo(
+    () => new URLSearchParams(window.location.search).get("anuncio") === "1",
+    []
+  );
+  // Servidores: la tarjeta de agradecimiento para quienes acompañan sirviendo.
+  // El valor del parámetro dice de quién es: "?servidores=maria-jose-fragozo"
+  // trae la tarjeta de esa persona y "?servidores=1" la común con todas. Igual
+  // que la participación, vive fuera del flujo de la invitación con código.
+  const servidorEnlace = useMemo(
+    () => new URLSearchParams(window.location.search).get("servidores") || "",
+    []
+  );
+  const enServidores = Boolean(servidorEnlace);
+  // En modo editor la portada se salta, porque el panel necesita ver las
+  // secciones para colocar decoraciones sobre ellas. Salvo que el panel pida
+  // justo lo contrario (?portada=1) para poder decorar la portada.
+  const [opened, setOpened] = useState(enEditor && !enPortada);
+  const codigo = useInvitationCode();
+  const [site, setSite] = useState(null);
+  const [invitacion, setInvitacion] = useState(null);
+  const [error, setError] = useState(null);
+  // Vista previa en vivo: solo en modo editor, el panel manda por postMessage
+  // el contenido que se está editando y aquí se superpone al publicado. Los
+  // invitados nunca reciben estos mensajes, así que para ellos no cambia nada.
+  const [vistaPrevia, setVistaPrevia] = useState({});
+
+  const cargar = useCallback(async () => {
+    try {
+      const [siteData, invitadoData] = await Promise.all([
+        getSite(),
+        codigo ? getInvitado(codigo) : Promise.resolve(null),
+      ]);
+      setSite(siteData);
+      setInvitacion(invitadoData);
+      applyTema(siteData.tema);
+      // Registrar la apertura solo cuando es un invitado real abriendo su
+      // enlace: con código válido y fuera del editor del panel.
+      if (invitadoData && codigo && !enEditor) registrarApertura(codigo);
+    } catch {
+      setError(true);
+    }
+  }, [codigo, enEditor]);
+
+  useEffect(() => {
+    cargar();
+  }, [cargar]);
+
+  // Escucha del panel para la vista previa en vivo (solo en editor).
+  useEffect(() => {
+    if (!enEditor) return;
+    function alRecibir(e) {
+      const d = e.data;
+      if (!d || d.fuente !== "invitacion-editor") return;
+      if (d.tipo === "previsualizar" && d.seccionTipo) {
+        setVistaPrevia((prev) => ({
+          ...prev,
+          [d.seccionTipo]: { contenido: d.contenido, activo: d.activo },
+        }));
+      } else if (d.tipo === "recargar") {
+        // Tras publicar, el sitio recarga datos reales; se limpian las
+        // superposiciones para no quedar mostrando lo que ya se guardó.
+        setVistaPrevia({});
+      }
+    }
+    window.addEventListener("message", alRecibir);
+    return () => window.removeEventListener("message", alRecibir);
+  }, [enEditor]);
+
+  // Mientras se arrastra una decoración se actualiza solo en memoria; el
+  // guardado lo hace el panel cuando se suelta.
+  const cambiarUbicacion = useCallback((id, cambios) => {
+    setSite((prev) =>
+      prev
+        ? {
+            ...prev,
+            ubicaciones: prev.ubicaciones.map((u) => (u.id === id ? { ...u, ...cambios } : u)),
+          }
+        : prev
+    );
+  }, []);
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-center px-6 font-body text-ink/70">
+        No pudimos conectar con el servidor de la invitación. Vuelve a intentarlo en un momento.
+      </div>
+    );
+  }
+
+  if (!site) {
+    return (
+      <div className="min-h-screen flex items-center justify-center font-mono text-xs tracking-widest2 uppercase text-gold-dark/70">
+        Cargando invitación...
+      </div>
+    );
+  }
+
+  // Contenido efectivo de una sección: el publicado, con la superposición de
+  // la vista previa encima si la hay (solo pasa en editor).
+  const contenidoDe = (tipo) => {
+    const base = site.secciones.find((s) => s.tipo === tipo)?.contenido || {};
+    return vistaPrevia[tipo] ? { ...base, ...vistaPrevia[tipo].contenido } : base;
+  };
+
+  const welcome = contenidoDe("welcome");
+  const musica = contenidoDe("musica");
+  const servidores = contenidoDe("servidores");
+  const fotos = contenidoDe("fotos");
+  const infoBoda = contenidoDe("informacion_boda");
+  const novios = { el: welcome.novioEl, ella: welcome.novioElla };
+  const contexto = { novios, fotosSubidas: site.fotosSubidas };
+  const fotosNovios = [...(site.fotosSubidas || []), ...(fotos.urls || [])];
+
+  // Participación y servidores sustituyen a la invitación entera: cuando una
+  // de las dos está abierta no se dibuja ni la portada ni el cuerpo.
+  const enPaginaAparte = enAnuncio || enServidores;
+
+  // Secciones del cuerpo con las superposiciones aplicadas y respetando la
+  // visibilidad que se esté previsualizando.
+  const seccionesCuerpo = site.secciones
+    .map((s) => {
+      const ov = vistaPrevia[s.tipo];
+      return ov ? { ...s, contenido: { ...s.contenido, ...ov.contenido }, activo: ov.activo } : s;
+    })
+    .filter((s) => s.tipo !== "welcome" && s.tipo !== "musica")
+    .filter((s) => s.activo !== false);
+
+  return (
+    <EditorProvider
+      activo={enEditor}
+      ubicaciones={site.ubicaciones || []}
+      onCambioLocal={cambiarUbicacion}
+      onRecargar={cargar}
+    >
+      <DecorProvider overrides={site.decoraciones} ubicaciones={site.ubicaciones || []}>
+        <div className="font-body">
+          <PaperBackground src={site.fondoUrl} />
+
+          {enAnuncio && !enEditor && (
+            <Anuncio
+              novios={novios}
+              fecha={infoBoda.fecha}
+              titulo={welcome.anuncioTitulo}
+              texto={welcome.anuncioTexto}
+              fotos={fotosNovios}
+              tituloFotos={fotos.titulo}
+              subtituloFotos={fotos.subtitulo}
+            />
+          )}
+
+          {/* Sí se dibuja en el editor, al revés que la participación: es la
+              única forma de que el panel enseñe la vista previa de esta
+              tarjeta mientras se escribe, porque no vive dentro del cuerpo de
+              la invitación. */}
+          {enServidores && (
+            <Servidores
+              // Sin coincidencia cae en la tarjeta común: un enlace mal
+              // copiado enseña algo con sentido en vez de una página vacía.
+              persona={personaDelEnlace(servidores.personas, servidorEnlace)}
+              personas={servidores.personas || []}
+              novios={novios}
+              fecha={infoBoda.fecha}
+              titulo={servidores.titulo}
+              subtitulo={servidores.subtitulo}
+              texto={servidores.texto}
+              versiculo={servidores.versiculo}
+              cierre={servidores.cierre}
+            />
+          )}
+
+          {!enPaginaAparte && !opened && (
+            <Welcome
+              novios={novios}
+              padres={{
+                el: { padre: welcome.padreElPadre, madre: welcome.padreElMadre },
+                ella: { padre: welcome.padreEllaPadre, madre: welcome.padreEllaMadre },
+                texto: welcome.padresTexto,
+              }}
+              frase={welcome.fraseIntro}
+              bienvenidaTexto={welcome.bienvenidaTexto}
+              invitacion={invitacion}
+              onOpen={() => setOpened(true)}
+            />
+          )}
+
+          {!enPaginaAparte && opened && (
+            <main className="fade-up relative">
+              {/* Decoraciones de zona libre: sus coordenadas son porcentajes
+                  de toda la invitación, no de una sección, así que pueden
+                  quedar a caballo entre dos. */}
+              <CapaDecorativa seccionTipo={ZONA_LIBRE} capa="detras" />
+
+              <div className={`relative z-10 ${enEditor ? "pointer-events-none" : ""}`}>
+                {seccionesCuerpo.map((s) => renderSeccion(s, contexto))}
+
+                {/* El contenido de la sección manda para que la vista previa del
+                    editor se vea; site.fechaLimiteConfirmacion es el respaldo de
+                    cuando la sección está oculta, donde el servidor sigue
+                    aplicando el plazo igual y el sitio se quedaba sin saberlo. */}
+                {invitacion && (
+                  <RSVP
+                    invitacion={invitacion}
+                    fechaLimite={
+                      infoBoda.fechaLimiteConfirmacion || site.fechaLimiteConfirmacion
+                    }
+                    opciones={{
+                      mostrarRestriccion: infoBoda.mostrarRestriccion !== false,
+                      mostrarObservaciones: infoBoda.mostrarObservaciones !== false,
+                    }}
+                    onSubmit={(respuestas, acompanantes) =>
+                      submitRSVP(codigo, respuestas, acompanantes)
+                    }
+                  />
+                )}
+
+                <FinalScreen novios={novios} />
+              </div>
+
+              <CapaDecorativa seccionTipo={ZONA_LIBRE} capa="delante" />
+            </main>
+          )}
+
+          {/* Fuera de la portada y del cuerpo: el botón de música se ve desde
+              el primer momento (también sobre la portada) y la canción arranca
+              sola. Por eso vive aquí y no dentro de <main>. En la participación
+              no suena: es un enlace de difusión amplia y no conviene autoplay. */}
+          {!enEditor && (
+            <MusicToggle src={site.audioUrl || musica.src} titulo={musica.titulo} />
+          )}
+        </div>
+      </DecorProvider>
+    </EditorProvider>
+  );
+}

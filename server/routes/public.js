@@ -1,0 +1,304 @@
+import { Router } from "express";
+import { pool } from "../db.js";
+import { capturar } from "../errores.js";
+
+export const publicRouter = Router();
+
+// Convierte una data URL ("data:image/png;base64,AAA...") en bytes + mime.
+// Las decoraciones se guardan así desde antes; se decodifican al servirlas.
+function partirDataUrl(dataUrl) {
+  const m = /^data:([^;,]+);base64,(.*)$/s.exec(dataUrl || "");
+  if (!m) return null;
+  return { mime: m[1], buffer: Buffer.from(m[2], "base64") };
+}
+
+// Todo el sitio: tema, decoraciones, dónde va cada una y las secciones activas.
+// Ojo: aquí NO viajan imágenes ni audio, solo las URLs para pedirlos aparte.
+publicRouter.get(
+  "/site",
+  capturar(async (_req, res) => {
+    const [tema, decoraciones, ubicaciones, secciones, fotos, audio, fondo, limite] = await Promise.all([
+      // Solo los colores: la tabla "tema" también guarda ajustes del panel
+      // (como la plantilla de WhatsApp) que no tienen por qué viajar al
+      // navegador de cada invitado.
+      pool.query("SELECT clave, valor FROM tema WHERE clave LIKE 'color-%'"),
+      pool.query(
+        "SELECT clave, (datos IS NOT NULL) AS tiene, extract(epoch FROM actualizado_en)::bigint AS v FROM decoraciones"
+      ),
+      pool.query(
+        `SELECT id, clave, seccion_tipo, x::float, y::float, ancho::float,
+                rotacion::float, opacidad::float, capa
+         FROM decoracion_ubicaciones ORDER BY id`
+      ),
+      pool.query(
+        "SELECT id, tipo, contenido FROM secciones WHERE activo = true ORDER BY orden ASC"
+      ),
+      pool.query("SELECT id FROM medios WHERE tipo = 'foto' ORDER BY orden, id"),
+      pool.query("SELECT id FROM medios WHERE tipo = 'audio' ORDER BY id DESC LIMIT 1"),
+      pool.query("SELECT id FROM medios WHERE tipo = 'fondo' ORDER BY id DESC LIMIT 1"),
+      pool.query(SQL_LIMITE),
+    ]);
+
+    res.json({
+      tema: Object.fromEntries(tema.rows.map((r) => [r.clave, r.valor])),
+      // null = usar la imagen de fábrica que trae el sitio.
+      decoraciones: Object.fromEntries(
+        decoraciones.rows.map((r) => [r.clave, r.tiene ? `/api/public/decoracion/${r.clave}?v=${r.v}` : null])
+      ),
+      ubicaciones: ubicaciones.rows,
+      secciones: secciones.rows,
+      // Aparte de las secciones a propósito: el plazo se aplica en el servidor
+      // aunque "Información de la boda" esté oculta, así que el sitio también
+      // tiene que conocerlo en ese caso. Si no, el invitado vería el formulario
+      // abierto y recibiría un 403 al confirmar.
+      fechaLimiteConfirmacion: limite.rows[0]?.limite || null,
+      fotosSubidas: fotos.rows.map((r) => `/api/public/medio/${r.id}`),
+      audioUrl: audio.rows.length ? `/api/public/medio/${audio.rows[0].id}` : null,
+      // null = usar el papel dibujado por CSS que trae el sitio.
+      fondoUrl: fondo.rows.length ? `/api/public/medio/${fondo.rows[0].id}` : null,
+    });
+  })
+);
+
+// Imagen de una decoración. Lleva ?v= en la URL, así que se puede cachear.
+publicRouter.get(
+  "/decoracion/:clave",
+  capturar(async (req, res) => {
+    const { rows } = await pool.query("SELECT datos FROM decoraciones WHERE clave = $1", [
+      req.params.clave,
+    ]);
+    const partes = rows.length ? partirDataUrl(rows[0].datos) : null;
+    if (!partes) return res.status(404).json({ error: "Decoración no encontrada" });
+    res.set("Cache-Control", "public, max-age=31536000, immutable");
+    res.type(partes.mime).send(partes.buffer);
+  })
+);
+
+// Foto de la galería o audio de fondo. El id cambia al reemplazar el archivo,
+// así que se puede cachear para siempre sin quedar desactualizado.
+publicRouter.get(
+  "/medio/:id",
+  capturar(async (req, res) => {
+    const { rows } = await pool.query("SELECT mime, datos FROM medios WHERE id = $1", [
+      req.params.id,
+    ]);
+    if (!rows.length) return res.status(404).json({ error: "Archivo no encontrado" });
+    res.set("Cache-Control", "public, max-age=31536000, immutable");
+    res.type(rows[0].mime).send(rows[0].datos);
+  })
+);
+
+// La invitación de un código, con todas las personas que cubre.
+publicRouter.get(
+  "/invitado/:codigo",
+  capturar(async (req, res) => {
+    const { rows } = await pool.query(
+      "SELECT id, codigo, tipo, nombre, familia, mensaje, cupos FROM invitados WHERE codigo = $1",
+      [req.params.codigo]
+    );
+    if (!rows.length) return res.status(404).json({ error: "Invitación no encontrada" });
+
+    const invitacion = rows[0];
+    const miembros = await pool.query(
+      `SELECT id, nombre, estado, restriccion, comentario, es_acompanante
+       FROM invitado_miembros WHERE invitado_id = $1 ORDER BY orden, id`,
+      [invitacion.id]
+    );
+
+    res.json({
+      codigo: invitacion.codigo,
+      tipo: invitacion.tipo,
+      nombre: invitacion.nombre,
+      familia: invitacion.familia,
+      mensaje: invitacion.mensaje,
+      // Cuántos acompañantes puede traer, además del titular. Solo aplica al
+      // tipo "cupos"; en el resto es 0.
+      cupos: invitacion.cupos,
+      miembros: miembros.rows,
+    });
+  })
+);
+
+// Fecha de hoy en Bogotá como "YYYY-MM-DD". No sirve usar la del servidor:
+// Railway corre en UTC, así que entre las 7 p. m. y la medianoche de Colombia
+// ya estaría contando el día siguiente y cerraría las confirmaciones antes.
+function hoyEnBogota() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Bogota",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
+// El plazo se guarda como "2026-10-15" dentro del contenido de la sección de
+// información. Vence al terminar ese día, no al empezarlo.
+// El ORDER BY no sobra: "secciones" no tiene ninguna columna única, y ya pasó
+// una vez que se duplicaran todas al re-ejecutar schema.sql. Sin él, un
+// duplicado viejo podía decidir el plazo de forma arbitraria.
+const SQL_LIMITE = `SELECT contenido ->> 'fechaLimiteConfirmacion' AS limite
+   FROM secciones WHERE tipo = 'informacion_boda' ORDER BY id LIMIT 1`;
+
+async function plazoVencido() {
+  const { rows } = await pool.query(SQL_LIMITE);
+  const limite = rows[0]?.limite;
+  if (!limite || !/^\d{4}-\d{2}-\d{2}$/.test(limite)) return null; // sin plazo configurado
+  // Las dos fechas están en el mismo formato, así que comparar el texto
+  // equivale a comparar los días.
+  return hoyEnBogota() > limite ? limite : null;
+}
+
+// Respuesta del invitado: una entrada por persona.
+// Body: { codigo, respuestas: [{ id, estado, restriccion, comentario }],
+//         acompanantes?: [{ nombre, restriccion }] }
+// "acompanantes" solo lo manda una invitación por cupos: son las personas que
+// el invitado escribe para ocupar los cupos que se le dieron.
+publicRouter.post(
+  "/rsvp",
+  capturar(async (req, res) => {
+    const { codigo, respuestas, acompanantes } = req.body;
+    if (!codigo || !Array.isArray(respuestas) || !respuestas.length) {
+      return res.status(400).json({ error: "Faltan datos para confirmar" });
+    }
+
+    // Se comprueba aquí, en el servidor: que el sitio esconda el formulario
+    // no impide que alguien con la pestaña abierta desde antes, o llamando la
+    // API directo, siga cambiando su respuesta pasado el cierre.
+    const vencido = await plazoVencido();
+    if (vencido) {
+      return res.status(403).json({
+        error: `El plazo para confirmar terminó el ${vencido}. Escríbeles a los novios si necesitas cambiar tu respuesta.`,
+      });
+    }
+
+    const inv = await pool.query("SELECT id, tipo, cupos FROM invitados WHERE codigo = $1", [
+      codigo,
+    ]);
+    if (!inv.rows.length) return res.status(404).json({ error: "Código no encontrado" });
+    const { id: invitadoId, tipo, cupos } = inv.rows[0];
+
+    const estadosValidos = ["pendiente", "confirmado", "no_asistira"];
+    if (respuestas.some((r) => !estadosValidos.includes(r.estado))) {
+      return res.status(400).json({ error: "Estado de asistencia no válido" });
+    }
+
+    // Los acompañantes solo se aceptan donde hay cupos que ocupar, y la única
+    // condición es que cada uno venga con nombre.
+    let nuevosAcompanantes = null;
+    if (acompanantes !== undefined) {
+      if (!Array.isArray(acompanantes)) {
+        return res.status(400).json({ error: "Los acompañantes no llegaron bien" });
+      }
+      if (tipo !== "cupos") {
+        return res.status(400).json({ error: "Esta invitación no admite acompañantes" });
+      }
+      nuevosAcompanantes = acompanantes.map((a) => ({
+        nombre: String(a?.nombre || "").trim(),
+        restriccion: String(a?.restriccion || "").trim(),
+      }));
+      if (nuevosAcompanantes.some((a) => !a.nombre)) {
+        return res.status(400).json({ error: "Escribe el nombre de cada acompañante" });
+      }
+      if (nuevosAcompanantes.length > cupos) {
+        return res.status(400).json({
+          error: `Tu invitación tiene ${cupos} cupo(s) para acompañantes`,
+        });
+      }
+    }
+
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      for (const r of respuestas) {
+        // El WHERE con invitado_id impide que un código toque los miembros de otra invitación.
+        await client.query(
+          `UPDATE invitado_miembros
+           SET estado = $3, restriccion = $4, comentario = $5,
+               respondido_en = CASE WHEN $3 <> 'pendiente' THEN now() ELSE respondido_en END,
+               -- Si antes se había marcado a mano desde el panel, la respuesta
+               -- del propio invitado manda: vuelve a contar como novedad.
+               respondido_via = 'invitado'
+           WHERE id = $1 AND invitado_id = $2`,
+          [r.id, invitadoId, r.estado, r.restriccion || "", r.comentario || ""]
+        );
+      }
+
+      if (nuevosAcompanantes) {
+        // Se reemplaza la lista entera en vez de irla comparando fila por
+        // fila: el invitado puede renombrar, quitar o cambiar el orden de sus
+        // acompañantes, y así lo que quede guardado es exactamente lo que él
+        // ve en el formulario.
+        const actuales = await client.query(
+          `SELECT nombre, restriccion FROM invitado_miembros
+           WHERE invitado_id = $1 AND es_acompanante = true ORDER BY orden, id`,
+          [invitadoId]
+        );
+        // Si mandó lo mismo que ya estaba (por ejemplo, solo cambió su propia
+        // respuesta), no se toca nada: recrear las filas volvería a sonar el
+        // aviso del panel por gente que ya estaba confirmada.
+        const igual =
+          actuales.rows.length === nuevosAcompanantes.length &&
+          actuales.rows.every(
+            (a, i) =>
+              a.nombre === nuevosAcompanantes[i].nombre &&
+              a.restriccion === nuevosAcompanantes[i].restriccion
+          );
+
+        if (!igual) {
+          await client.query(
+            "DELETE FROM invitado_miembros WHERE invitado_id = $1 AND es_acompanante = true",
+            [invitadoId]
+          );
+          const base = await client.query(
+            "SELECT COALESCE(max(orden), 0) AS orden FROM invitado_miembros WHERE invitado_id = $1",
+            [invitadoId]
+          );
+          for (const [i, a] of nuevosAcompanantes.entries()) {
+            // Quien ocupa un cupo asiste por definición: el invitado no lo
+            // escribiría si no fuera a venir.
+            await client.query(
+              `INSERT INTO invitado_miembros
+                 (invitado_id, nombre, orden, es_acompanante, estado, restriccion,
+                  respondido_en, respondido_via)
+               VALUES ($1, $2, $3, true, 'confirmado', $4, now(), 'invitado')`,
+              [invitadoId, a.nombre, Number(base.rows[0].orden) + i + 1, a.restriccion]
+            );
+          }
+        }
+      }
+
+      await client.query("COMMIT");
+      res.json({ ok: true });
+    } catch (e) {
+      await client.query("ROLLBACK").catch(() => {});
+      throw e;
+    } finally {
+      client.release();
+    }
+  })
+);
+
+// Registra que se abrió una invitación. Lo llama el sitio al cargar con un
+// código válido. Guarda la primera apertura y cuenta las veces.
+publicRouter.post(
+  "/visto",
+  capturar(async (req, res) => {
+    const { codigo } = req.body;
+    if (!codigo) return res.status(400).json({ error: "Falta el código" });
+    // "ultima_apertura" solo se mueve cuando ha pasado un rato desde la última
+    // apertura (nueva visita), no en cada refresco. Así se avisa una vez por
+    // visita real y no una por cada recarga de la misma sesión.
+    await pool.query(
+      `UPDATE invitados
+       SET aperturas = aperturas + 1,
+           abierto_en = COALESCE(abierto_en, now()),
+           ultima_apertura = CASE
+             WHEN ultima_apertura IS NULL OR now() - ultima_apertura > interval '15 minutes'
+             THEN now() ELSE ultima_apertura END
+       WHERE codigo = $1`,
+      [codigo]
+    );
+    // Se responde ok siempre: si el código no existe, no se revela.
+    res.json({ ok: true });
+  })
+);
