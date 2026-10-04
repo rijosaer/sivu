@@ -2,6 +2,7 @@ import { Router } from "express";
 import { pool } from "../db.js";
 import { capturar } from "../errores.js";
 import { resolverInvitacionAdmin } from "../middlewareInvitacion.js";
+import { soloDueno } from "../auth.js";
 import { TIPOS_EVENTO, temaBase, decoracionesBase, plantillaSecciones } from "../plantillas.js";
 
 // CRUD de invitaciones (los "eventos" del sistema). Es lo que le permite al
@@ -54,10 +55,13 @@ async function conStats(rows) {
 
 invitacionesRouter.get(
   "/",
-  capturar(async (_req, res) => {
+  capturar(async (req, res) => {
+    // El dueño ve todos los eventos; un cliente, solo el suyo.
+    const soloUno = req.admin.invitacionId || null;
     const { rows } = await pool.query(
       `SELECT id, slug, nombre, tipo_evento, fecha_evento, activo, es_plantilla, creado_en
-       FROM invitaciones ORDER BY creado_en DESC`
+       FROM invitaciones WHERE ($1::int IS NULL OR id = $1) ORDER BY creado_en DESC`,
+      [soloUno]
     );
     res.json(await conStats(rows));
   })
@@ -65,6 +69,7 @@ invitacionesRouter.get(
 
 invitacionesRouter.post(
   "/",
+  soloDueno,
   capturar(async (req, res) => {
     const { nombre, tipo_evento = "boda", fecha_evento = null, slug: slugPedido } = req.body;
     if (!nombre?.trim()) return res.status(400).json({ error: "Ponle un nombre a la invitación" });
@@ -126,6 +131,7 @@ invitacionesRouter.get(
 
 invitacionesRouter.put(
   "/:invitacionId",
+  soloDueno,
   resolverInvitacionAdmin,
   capturar(async (req, res) => {
     const { nombre, slug: slugPedido, tipo_evento, fecha_evento, activo, es_plantilla } = req.body;
@@ -170,6 +176,7 @@ invitacionesRouter.put(
 
 invitacionesRouter.delete(
   "/:invitacionId",
+  soloDueno,
   resolverInvitacionAdmin,
   capturar(async (req, res) => {
     // Una invitación marcada como plantilla (empezando por la boda real de

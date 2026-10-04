@@ -165,6 +165,18 @@ export function setToken(token) {
 }
 export function clearToken() {
   localStorage.removeItem("admin_token");
+  localStorage.removeItem("evento_fijo");
+}
+
+// Un usuario cliente está amarrado a un solo evento: el panel no le ofrece
+// cambiar de evento. Es solo para la interfaz; quien lo hace cumplir es el
+// servidor, que rechaza cualquier otro evento aunque se pida a mano.
+export function setEventoFijo(fijo) {
+  if (fijo) localStorage.setItem("evento_fijo", "1");
+  else localStorage.removeItem("evento_fijo");
+}
+export function esEventoFijo() {
+  return localStorage.getItem("evento_fijo") === "1";
 }
 export function hasToken() {
   return Boolean(getToken());

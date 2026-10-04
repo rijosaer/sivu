@@ -10,6 +10,11 @@ export const resolverInvitacionAdmin = capturar(async (req, res, next) => {
   if (!Number.isInteger(id) || id <= 0) {
     return res.status(400).json({ error: "Invitación no válida" });
   }
+  // Un cliente solo existe para su propio evento: cualquier otro id responde
+  // igual que uno inexistente, para no revelar qué otros eventos hay.
+  if (req.admin?.invitacionId && req.admin.invitacionId !== id) {
+    return res.status(404).json({ error: "Invitación no encontrada" });
+  }
   const { rows } = await pool.query(
     "SELECT id, slug, nombre, tipo_evento, activo, es_plantilla FROM invitaciones WHERE id = $1",
     [id]

@@ -14,6 +14,7 @@ import {
   getInvitacionActual,
   clearInvitacionActual,
   actualizarSitioBase,
+  esEventoFijo,
 } from "./api";
 import SelectorEventos from "./pages/SelectorEventos";
 import { NOMBRE_TIPO_EVENTO } from "./tiposEvento";
@@ -95,11 +96,11 @@ const TABS = [
 function Marca() {
   return (
     <div className="flex items-center gap-3">
-      <span className="marca-sello">e.</span>
+      <span className="marca-sello">c.</span>
       <span>
-        <span className="block text-[15px] font-semibold tracking-[-.03em] text-ink">eventa</span>
-        <span className="block text-[10px] uppercase tracking-[.16em] text-ink-tenue mt-0.5">
-          event management
+        <span className="block text-[15px] font-semibold tracking-[-.03em] text-ink">Convite</span>
+        <span className="block text-[10px] uppercase tracking-[.1em] whitespace-nowrap text-ink-tenue mt-0.5">
+          invitaciones digitales
         </span>
       </span>
     </div>
@@ -158,9 +159,11 @@ function Cascara({ onSalir, evento, onCambiarEvento }) {
           <p className="text-[11px] text-ink-suave mt-0.5">
             {NOMBRE_TIPO_EVENTO[evento.tipo_evento] || "Evento"}
           </p>
-          <button onClick={onCambiarEvento} className="mt-2 text-[11px] boton-texto">
-            Cambiar evento
-          </button>
+          {!esEventoFijo() && (
+            <button onClick={onCambiarEvento} className="mt-2 text-[11px] boton-texto">
+              Cambiar evento
+            </button>
+          )}
         </div>
 
         <Navegacion tab={tab} onCambiar={setTab} hayPendientes={hayPendientes} />
@@ -253,7 +256,12 @@ export default function App() {
   return (
     <ToastProvider>
       {!logueado ? (
-        <Login onLogin={() => setLogueado(true)} />
+        <Login
+          onLogin={(inv) => {
+            if (inv) elegirEvento(inv);
+            setLogueado(true);
+          }}
+        />
       ) : !evento ? (
         <SelectorEventos onElegir={elegirEvento} onSalir={() => { clearToken(); setLogueado(false); }} />
       ) : (

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { api, setToken } from "../api";
+import { api, setToken, setInvitacionActual, setEventoFijo } from "../api";
 
 export default function Login({ onLogin }) {
   const [usuario, setUsuario] = useState("");
@@ -12,9 +12,12 @@ export default function Login({ onLogin }) {
     setError("");
     setCargando(true);
     try {
-      const { token } = await api.login(usuario, password);
+      const { token, invitacion } = await api.login(usuario, password);
       setToken(token);
-      onLogin();
+      // Un cliente entra directo a su evento; el dueño elige en "Tus eventos".
+      setEventoFijo(Boolean(invitacion));
+      if (invitacion) setInvitacionActual(invitacion);
+      onLogin(invitacion);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -26,13 +29,13 @@ export default function Login({ onLogin }) {
     <div className="min-h-screen flex items-center justify-center px-6 py-10">
       <div className="w-full max-w-sm">
         <div className="flex items-center gap-3 justify-center mb-7">
-          <span className="marca-sello">e.</span>
+          <span className="marca-sello">c.</span>
           <span>
             <span className="block text-[15px] font-semibold tracking-[-.03em] text-ink">
-              eventa
+              Convite
             </span>
             <span className="block text-[10px] uppercase tracking-[.16em] text-ink-tenue mt-0.5">
-              event management
+              invitaciones digitales
             </span>
           </span>
         </div>

@@ -127,7 +127,7 @@ function TarjetaEvento({ inv, onEntrar, onCambio, onBorrar }) {
         {inv.fecha_evento && (
           <span>
             ·{" "}
-            {new Date(`${inv.fecha_evento}T00:00:00`).toLocaleDateString("es-CO", {
+            {new Date(`${String(inv.fecha_evento).slice(0, 10)}T00:00:00`).toLocaleDateString("es-CO", {
               day: "numeric",
               month: "short",
               year: "numeric",
@@ -194,13 +194,13 @@ export default function SelectorEventos({ onElegir, onSalir }) {
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <span className="marca-sello">e.</span>
+            <span className="marca-sello">c.</span>
             <span>
               <span className="block text-[15px] font-semibold tracking-[-.03em] text-ink">
-                eventa
+                Convite
               </span>
               <span className="block text-[10px] uppercase tracking-[.16em] text-ink-tenue mt-0.5">
-                event management
+                invitaciones digitales
               </span>
             </span>
           </div>

@@ -6,6 +6,7 @@
     "start": "node index.js",
     "dev": "node --watch index.js",
     "seed-admin": "node seed-admin.js",
+    "seed-cliente": "node seed-cliente.js",
     "migrar": "node migrar.js"
   },
   "dependencies": {
