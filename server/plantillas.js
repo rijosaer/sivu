@@ -22,7 +22,7 @@ export const TIPOS_EVENTO = [
 
 // Diseños con los que el sitio puede dibujar una invitación (columna
 // invitaciones.diseno). Tiene que coincidir con src/disenos del sitio.
-export const DISENOS = ["clasico", "jardin"];
+export const DISENOS = ["clasico", "jardin", "ensueno", "gala"];
 
 export const NOMBRE_TIPO_EVENTO = {
   boda: "Boda",
@@ -53,8 +53,35 @@ const TEMA_JARDIN = [
   ["fuente-cuerpo", "Cormorant Garamond"],
 ];
 
+const TEMA_ENSUENO = [
+  ["color-paper", "#FBFCFB"],
+  ["color-ink", "#1F3A34"],
+  ["color-gold", "#2E6B5C"],
+  ["color-gold-light", "#A8DCC8"],
+  ["color-gold-dark", "#24564A"],
+  ["color-marble", "#FCE6DA"],
+  ["color-seal", "#A9512F"],
+  ["fuente-titulos", "Cormorant Garamond"],
+  ["fuente-cuerpo", "Nunito Sans"],
+];
+
+const TEMA_GALA = [
+  ["color-paper", "#0A0A0B"],
+  ["color-ink", "#F3F1EC"],
+  ["color-gold", "#D4FF3A"],
+  ["color-gold-light", "#E2FF78"],
+  ["color-gold-dark", "#141416"],
+  ["color-marble", "#1C1C1F"],
+  ["color-seal", "#A3A3AA"],
+  ["fuente-titulos", "Unbounded"],
+  ["fuente-cuerpo", "Manrope"],
+];
+
+const TEMAS_DISENO = { jardin: TEMA_JARDIN, ensueno: TEMA_ENSUENO, gala: TEMA_GALA };
+
 export function temaDeDiseno(diseno) {
-  return diseno === "jardin" ? TEMA_JARDIN.map((par) => [...par]) : temaBase();
+  const tema = TEMAS_DISENO[diseno];
+  return tema ? tema.map((par) => [...par]) : temaBase();
 }
 
 export function temaBase() {
@@ -367,7 +394,11 @@ const PLANTILLAS = {
         { hora: "9:00 am", titulo: "Apertura" },
       ],
     }),
-    s("faq", "Preguntas frecuentes", 3, { items: [] }),
+    // Una gala o una cena de empresa casi siempre pide código de vestimenta e
+    // indicaciones; arrancan ocultas para los eventos que no las necesitan.
+    s("vestimenta", "Código de vestimenta", 3, { titulo: "Elegante sport", nota: "", permitidos: [], evitar: [] }, false),
+    s("info_importante", "Información importante", 4, { items: [], nota: "" }, false),
+    s("faq", "Preguntas frecuentes", 5, { items: [] }),
   ],
 
   otro: (nombre) => [

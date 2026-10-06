@@ -15,7 +15,11 @@ import { renderSeccion } from "./SectionRenderer";
 
 // Diseños alternativos (columna invitaciones.diseno). Se cargan aparte para
 // que la boda clásica no descargue sus ilustraciones.
-const Jardin = lazy(() => import("./disenos/jardin/Jardin"));
+const DISENOS_ALTERNATIVOS = {
+  jardin: lazy(() => import("./disenos/jardin/Jardin")),
+  ensueno: lazy(() => import("./disenos/ensueno/Ensueno")),
+  gala: lazy(() => import("./disenos/gala/Gala")),
+};
 
 function useInvitationCode() {
   return useMemo(() => new URLSearchParams(window.location.search).get("i") || "", []);
@@ -173,10 +177,11 @@ export default function App() {
     .filter((s) => s.tipo !== "welcome" && s.tipo !== "musica")
     .filter((s) => s.activo !== false);
 
-  if (site.invitacion?.diseno === "jardin" && !enPaginaAparte) {
+  const Diseno = DISENOS_ALTERNATIVOS[site.invitacion?.diseno];
+  if (Diseno && !enPaginaAparte) {
     return (
       <Suspense fallback={null}>
-        <Jardin
+        <Diseno
           site={site}
           contenidoDe={contenidoDe}
           invitacion={invitacion}

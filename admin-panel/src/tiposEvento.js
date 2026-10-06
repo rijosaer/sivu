@@ -25,4 +25,6 @@ export const NOMBRE_TIPO_EVENTO = {
 export const DISENOS = [
   { key: "clasico", nombre: "Clásico (papel y dorado)" },
   { key: "jardin", nombre: "Jardín encantado (acuarela verde)" },
+  { key: "ensueno", nombre: "Ensueño (acuarela menta y durazno)" },
+  { key: "gala", nombre: "Gala (negro y lima neón)" },
 ];
