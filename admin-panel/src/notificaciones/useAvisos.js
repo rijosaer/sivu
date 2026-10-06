@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api } from "../api";
+import { api, getInvitacionActual } from "../api";
 import { useToast } from "../ui/Toast";
 
 // Un pequeño acorde de dos notas hecho con Web Audio, sin archivo de sonido.
@@ -107,7 +107,7 @@ export function useAvisos() {
           toast(`${icono} ${texto}`, tono);
           if ("Notification" in window && Notification.permission === "granted") {
             try {
-              new Notification("Invitación de boda", { body: texto });
+              new Notification(getInvitacionActual()?.nombre || "Convite", { body: texto });
             } catch {
               /* ignora */
             }

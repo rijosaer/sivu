@@ -98,6 +98,11 @@ export const api = {
   actualizarInvitacion: (id, datos) =>
     request(`/api/admin/invitaciones/${id}`, { method: "PUT", body: JSON.stringify(datos) }),
   borrarInvitacion: (id) => request(`/api/admin/invitaciones/${id}`, { method: "DELETE" }),
+  // Acceso del cliente a un evento: qué usuarios lo tienen y crear/restablecer
+  // usuario y contraseña (el servidor los amarra solo a ese evento).
+  obtenerAcceso: (id) => request(`/api/admin/invitaciones/${id}/acceso`),
+  crearUsuarioCliente: (id, datos) =>
+    request(`/api/admin/invitaciones/${id}/usuario`, { method: "POST", body: JSON.stringify(datos) }),
 
   // ---------- Todo lo de abajo es del evento seleccionado (scoped()) ----------
 

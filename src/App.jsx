@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
 import PaperBackground from "./components/PaperBackground";
 import Welcome from "./components/Welcome";
 import RSVP from "./components/RSVP";
@@ -12,6 +12,10 @@ import { DecorProvider } from "./theme/DecorContext";
 import { EditorProvider, editorActivo, editandoPortada } from "./editor/EditorContext";
 import { applyTema } from "./theme/applyTema";
 import { renderSeccion } from "./SectionRenderer";
+
+// Diseños alternativos (columna invitaciones.diseno). Se cargan aparte para
+// que la boda clásica no descargue sus ilustraciones.
+const Jardin = lazy(() => import("./disenos/jardin/Jardin"));
 
 function useInvitationCode() {
   return useMemo(() => new URLSearchParams(window.location.search).get("i") || "", []);
@@ -168,6 +172,20 @@ export default function App() {
     })
     .filter((s) => s.tipo !== "welcome" && s.tipo !== "musica")
     .filter((s) => s.activo !== false);
+
+  if (site.invitacion?.diseno === "jardin" && !enPaginaAparte) {
+    return (
+      <Suspense fallback={null}>
+        <Jardin
+          site={site}
+          contenidoDe={contenidoDe}
+          invitacion={invitacion}
+          enEditor={enEditor}
+          onEnviarRSVP={(respuestas, acompanantes) => submitRSVP(slug, codigo, respuestas, acompanantes)}
+        />
+      </Suspense>
+    );
+  }
 
   return (
     <EditorProvider

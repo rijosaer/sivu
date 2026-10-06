@@ -51,7 +51,12 @@ invitacionRouter.get(
     ]);
 
     res.json({
-      invitacion: { slug: req.invitacion.slug, nombre: req.invitacion.nombre, tipoEvento: req.invitacion.tipo_evento },
+      invitacion: {
+        slug: req.invitacion.slug,
+        nombre: req.invitacion.nombre,
+        tipoEvento: req.invitacion.tipo_evento,
+        diseno: req.invitacion.diseno || "clasico",
+      },
       tema: Object.fromEntries(tema.rows.map((r) => [r.clave, r.valor])),
       // null = usar la imagen de fábrica que trae el sitio.
       decoraciones: Object.fromEntries(

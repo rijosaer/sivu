@@ -16,7 +16,7 @@ export const resolverInvitacionAdmin = capturar(async (req, res, next) => {
     return res.status(404).json({ error: "Invitación no encontrada" });
   }
   const { rows } = await pool.query(
-    "SELECT id, slug, nombre, tipo_evento, activo, es_plantilla FROM invitaciones WHERE id = $1",
+    "SELECT id, slug, nombre, tipo_evento, diseno, activo, es_plantilla FROM invitaciones WHERE id = $1",
     [id]
   );
   if (!rows.length) return res.status(404).json({ error: "Invitación no encontrada" });
@@ -31,7 +31,7 @@ export const resolverInvitacionAdmin = capturar(async (req, res, next) => {
 // no revelar que hubo (o habrá) un evento con ese enlace.
 export const resolverInvitacionPublica = capturar(async (req, res, next) => {
   const { rows } = await pool.query(
-    "SELECT id, slug, nombre, tipo_evento FROM invitaciones WHERE slug = $1 AND activo = true",
+    "SELECT id, slug, nombre, tipo_evento, diseno FROM invitaciones WHERE slug = $1 AND activo = true",
     [req.params.slug]
   );
   if (!rows.length) return res.status(404).json({ error: "Invitación no encontrada" });

@@ -7,13 +7,13 @@ export function waLink(texto) {
   return `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(texto)}`;
 }
 
-// La landing se muestra en la raíz de un dominio de Convite cuando la URL no trae nada de una
-// invitación. El dominio de la boda de Maite y Ricardo sigue abriendo la boda en la raíz
-// (los enlaces ya repartidos no cambian), y cualquier ?i=, ?editor=, ?anuncio=, ?servidores=
-// o ?portada= siempre va a la invitación.
+// La landing se muestra en la raíz del dominio cuando la URL no trae nada de
+// una invitación: cualquier tramo de ruta (el slug del evento) o cualquier
+// ?i=, ?editor=, ?anuncio=, ?servidores= o ?portada= va a la invitación.
+// (La raíz con ?i=CODIGO sigue abriendo la boda de Maite y Ricardo por los
+// enlaces ya repartidos: ver DEFAULT_SLUG en App.jsx.)
 export function mostrarLanding() {
-  const { hostname, pathname, search } = window.location;
-  if (hostname.startsWith("maiteyricardo")) return false;
+  const { pathname, search } = window.location;
   if (pathname.split("/").filter(Boolean).length > 0) return false;
   const q = new URLSearchParams(search);
   return !["i", "editor", "anuncio", "servidores", "portada"].some((k) => q.has(k));

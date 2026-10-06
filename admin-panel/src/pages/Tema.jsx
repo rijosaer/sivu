@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
+import { vocabulario } from "../vocabulario";
 import { useToast } from "../ui/Toast";
 
 // Las claves de la base son técnicas ("color-gold-dark"). Aquí se les pone el
@@ -19,6 +20,7 @@ const COLORES = {
 // que se ve el resultado sin salir a la invitación.
 function Muestra({ valores }) {
   const c = (clave, respaldo) => valores[clave] || respaldo;
+  const { antetitulo, nombres } = vocabulario().muestra;
   return (
     <div
       className="rounded-xl border border-borde overflow-hidden"
@@ -29,13 +31,19 @@ function Muestra({ valores }) {
           className="text-[10px] uppercase tracking-[.2em]"
           style={{ color: c("color-gold-dark", "#8C6A2E") }}
         >
-          Nuestra boda
+          {antetitulo}
         </p>
         <p
           className="text-2xl mt-2 font-serif"
           style={{ color: c("color-gold-dark", "#8C6A2E") }}
         >
-          Maite <span style={{ color: c("color-ink", "#5C4530") }}>&</span> Ricardo
+          {nombres[0]}
+          {nombres[1] && (
+            <>
+              {" "}
+              <span style={{ color: c("color-ink", "#5C4530") }}>&</span> {nombres[1]}
+            </>
+          )}
         </p>
         <div className="flex items-center gap-2 justify-center my-3">
           <span className="h-px w-12" style={{ background: c("color-gold", "#B8924A") }} />

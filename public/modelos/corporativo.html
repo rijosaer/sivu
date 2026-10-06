@@ -1,0 +1,1410 @@
+<!doctype html>
+<!--
+  Invitación · Cena anual de fin de año — v2 «Editorial nocturna»
+  Prototipo móvil dentro del shell de teléfono neutral de Open Design (Apache-2.0).
+  Marcadores a reemplazar: [Nombre de la empresa], [Salón / dirección], [fecha límite], [contacto@empresa.com].
+  Colores, tipografías, espaciado y motion están centralizados en :root. Datos del evento: objeto EVENT en el script.
+-->
+<html lang="es">
+<head><script type="application/json" data-od-external-dependencies>["https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=Manrope:wght@400;500;600;700&family=Unbounded:wght@500;600;800&display=swap"]</script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0A0A0B" />
+  <title>Invitación · Cena anual de fin de año 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=Manrope:wght@400;500;600;700&family=Unbounded:wght@500;600;800&display=swap" rel="stylesheet" />
+  <style>
+    /* OD-LAYOUT-PRIMITIVES v1 — structure only: display, flex/grid, overflow, wrapping, ratio.
+       Put this @layer first; product CSS outside the layer always wins. */
+    @layer od-layout {
+      :where(.od-stack,.od-row,.od-row-top,.od-cluster,.od-grid,.od-field,.od-stat,.od-cell,.od-tile) > :where(*) { min-width: 0; }
+
+      /* containers */
+      .od-stack   { display: flex; flex-direction: column; gap: var(--od-gap, 8px); }
+      .od-row     { display: flex; align-items: center; gap: var(--od-gap, 8px); }
+      .od-row-top { display: flex; align-items: flex-start; gap: var(--od-gap, 8px); }
+      .od-cluster { display: flex; flex-wrap: wrap; align-items: center; gap: var(--od-gap, 8px); }
+      .od-fill    { flex: 1 1 0; min-width: 0; }
+      .od-fixed   { flex: none; }
+      .od-grid    { display: grid; gap: var(--od-gap, 12px); grid-template-columns: repeat(var(--od-cols, 3), minmax(0, 1fr)); }
+
+      /* stacked information: each piece is its own line — never sibling inline spans */
+      .od-stat, .od-field, .od-cell { display: grid; gap: var(--od-gap, 2px); }
+      :where(.od-stat,.od-field,.od-cell) > :where(*) { display: block; }
+      .od-tile { display: grid; grid-template-rows: auto 1fr; }
+      :where(.od-tile) > :where(*) { display: block; }
+
+      .od-media { display: block; width: 100%; height: auto; aspect-ratio: var(--od-ratio, auto); }
+      .od-media-cover { object-fit: cover; }
+
+      /* data text only — authored copy is rewritten to its budget instead */
+      .od-truncate { display: block; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+      .od-clamp-2, .od-clamp-3 { display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+      .od-clamp-2 { -webkit-line-clamp: 2; }
+      .od-clamp-3 { -webkit-line-clamp: 3; }
+      .od-lines-2 { min-height: calc(2 * 1.4em); }
+      .od-nowrap  { white-space: nowrap; }
+      .od-keep    { word-break: keep-all; overflow-wrap: anywhere; }
+
+      .od-screen { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; height: 100%; }
+      .od-scroll { overflow-y: auto; overscroll-behavior: contain; min-height: 0; }
+
+      .od-rail { display: flex; gap: var(--od-gap, 8px); overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none;
+                 padding-inline: var(--od-rail-pad, 16px); scroll-padding-inline: var(--od-rail-pad, 16px); }
+      .od-rail::-webkit-scrollbar { display: none; }
+      :where(.od-rail) > :where(*) { flex: none; scroll-snap-align: start; }
+      :where(.od-rail) > :where(:last-child) { margin-inline-end: var(--od-rail-pad, 16px); }
+
+      .od-spacer { flex: none; visibility: hidden; pointer-events: none; }
+      .od-touch  { min-width: 44px; min-height: 44px; }
+    }
+    /* /OD-LAYOUT-PRIMITIVES v1 */
+
+    :root {
+      /* ── Design Spec 2.0.0 · Editorial nocturna ── */
+      --bg: #0A0A0B;
+      --surface: #141416;
+      --raised: #1C1C1F;
+      --text: #F3F1EC;
+      --muted: #A3A3AA;
+      --accent: #D4FF3A;
+      --accent-hover: #E2FF78;
+      --on-accent: #0A0A0B;
+      --paper: #F3F1EC;
+      --on-paper-muted: #55555C;
+      --line: rgba(243, 241, 236, .14);
+      --line-strong: rgba(243, 241, 236, .26);
+      --wash: rgba(243, 241, 236, .06);
+      --accent-wash: rgba(212, 255, 58, .10);
+      --error: #FF8A7A;
+
+      --font-display: "Unbounded", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-serif: "Instrument Serif", Georgia, "Times New Roman", serif;
+      --font-body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+      --fs-12: 12px; --fs-14: 14px; --fs-16: 16px; --fs-20: 20px;
+      --fs-28: 28px; --fs-40: 40px;
+      --fs-mega: clamp(64px, 22vw, 88px);
+
+      --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px; --s8: 64px;
+
+      --r-card: 16px;
+      --r-field: 12px;
+      --r-pill: 999px;
+
+      --dur-fast: 180ms;
+      --dur: 240ms;
+      --dur-open: 360ms;
+      --dur-exit: 240ms;
+      --stagger: 40ms;
+      --ease-out: cubic-bezier(.16, 1, .3, 1);
+      --ease-in: cubic-bezier(.5, 0, .75, 0);
+
+      /* ── Handheld shell ── */
+      --phone-screen-width: 390px;
+      --phone-screen-height: 844px;
+      --phone-bezel: 10px;
+      --phone-outer-radius: 52px;
+      --phone-screen-radius: 42px;
+      --phone-safe-top: 50px;
+      --phone-safe-bottom: 29px;
+      --phone-system-fg: #F3F1EC;
+      --phone-screen-bg: #0A0A0B;
+      --phone-stage-bg: #e4e5e8;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: 32px;
+      background:
+        radial-gradient(circle at 50% 15%, rgba(255,255,255,.94), transparent 35%),
+        var(--phone-stage-bg);
+      color: #191a1d;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .phone-frame {
+      position: relative;
+      width: calc(var(--phone-screen-width) + var(--phone-bezel) * 2);
+      height: calc(var(--phone-screen-height) + var(--phone-bezel) * 2);
+      padding: var(--phone-bezel);
+      border-radius: var(--phone-outer-radius);
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.2), transparent 17%),
+        linear-gradient(160deg, #3f4146 0%, #202227 48%, #0b0c0f 100%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.13),
+        inset 0 0 0 2px rgba(0,0,0,.85),
+        0 32px 68px -20px rgba(10,12,16,.52),
+        0 10px 24px -10px rgba(10,12,16,.32);
+      isolation: isolate;
+    }
+    .phone-frame::before,
+    .phone-frame::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      top: 96px;
+      bottom: 96px;
+      width: 2px;
+      background: linear-gradient(to bottom, transparent, rgba(255,255,255,.13) 16%, transparent 30%, transparent 72%, rgba(255,255,255,.07) 88%, transparent);
+    }
+    .phone-frame::before { left: 0; }
+    .phone-frame::after { right: 0; }
+
+    .hardware-button {
+      position: absolute;
+      width: 4px;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #08090b, #2a2d33 60%, #08090b);
+      box-shadow: inset 0 1px rgba(255,255,255,.08);
+    }
+    .hardware-button.volume { left: -3px; top: 222px; height: 86px; }
+    .hardware-button.power { right: -3px; top: 270px; height: 82px; }
+
+    .phone-screen {
+      position: relative;
+      width: var(--phone-screen-width);
+      height: var(--phone-screen-height);
+      overflow: hidden;
+      border-radius: var(--phone-screen-radius);
+      background: var(--phone-screen-bg);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);
+    }
+
+    .phone-content {
+      position: absolute;
+      inset: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-top: var(--phone-safe-top);
+      padding-bottom: var(--phone-safe-bottom);
+      background: var(--phone-screen-bg);
+    }
+    .phone-content::-webkit-scrollbar { display: none; }
+
+    .camera-dot {
+      position: absolute;
+      z-index: 20;
+      top: 13px;
+      left: 50%;
+      width: 10px;
+      height: 10px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: radial-gradient(circle at 38% 35%, #344154 0 12%, #0a0c10 34%, #000 76%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.06);
+      pointer-events: none;
+    }
+
+    .status-bar {
+      position: absolute;
+      z-index: 15;
+      inset: 0 0 auto;
+      height: var(--phone-safe-top);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 56px minmax(0, 1fr);
+      align-items: start;
+      padding: 14px 20px 0;
+      color: var(--phone-system-fg);
+      opacity: .8;
+      pointer-events: none;
+      background: var(--bg);
+    }
+    .status-time {
+      justify-self: start;
+      display: flex;
+      align-items: center;
+      height: 15px;
+      font-size: 14px;
+      font-weight: 560;
+      line-height: 1;
+      letter-spacing: .01em;
+    }
+    .status-cutout-zone { width: 56px; }
+    .status-icons {
+      justify-self: end;
+      display: inline-flex;
+      align-items: center;
+      height: 15px;
+      gap: 6px;
+    }
+    .status-icons svg {
+      display: block;
+      flex: none;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.35;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .status-icons .connectivity { width: 15px; height: 12px; }
+    .status-icons .wifi { width: 15px; height: 12px; }
+    .status-icons .battery { width: 19px; height: 11px; }
+
+    .gesture-indicator {
+      position: absolute;
+      z-index: 20;
+      left: 50%;
+      bottom: 8px;
+      width: 96px;
+      height: 4px;
+      transform: translateX(-50%);
+      border-radius: 99px;
+      background: var(--phone-system-fg);
+      opacity: .86;
+      pointer-events: none;
+    }
+
+    @media (max-height: 927px) { .phone-frame { zoom: 0.9; } }
+    @media (max-height: 840px) { .phone-frame { zoom: 0.82; } }
+    @media (max-height: 771px) { .phone-frame { zoom: 0.74; } }
+    @media (max-height: 702px) { .phone-frame { zoom: 0.66; } }
+    @media (max-width: 480px) {
+      body { padding: 0; display: block; }
+      .phone-frame { width: 100%; height: 100dvh; padding: 0; border-radius: 0; background: none; box-shadow: none; zoom: 1; }
+      .phone-frame::before, .phone-frame::after, .hardware-button { display: none; }
+      .phone-screen { width: 100%; height: 100%; border-radius: 0; }
+    }
+
+    /* ══════════════ App ══════════════ */
+    .app {
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: var(--fs-16);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .app h1, .app h2, .app h3, .app p { margin: 0; }
+    .view { padding: var(--s4) var(--s5) var(--s7); }
+    .view[hidden] { display: none; }
+    .view.is-entering > * { animation: rise var(--dur) var(--ease-out) both; }
+    .view.is-entering > *:nth-child(2) { animation-delay: calc(var(--stagger) * 1); }
+    .view.is-entering > *:nth-child(3) { animation-delay: calc(var(--stagger) * 2); }
+    .view.is-entering > *:nth-child(4) { animation-delay: calc(var(--stagger) * 3); }
+    @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+    .js-reveal [data-reveal] { opacity: 0; transform: translateY(16px); transition: opacity var(--dur) var(--ease-out), transform var(--dur) var(--ease-out); }
+    .js-reveal [data-reveal].is-in { opacity: 1; transform: none; }
+
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+    [tabindex="-1"]:focus { outline: none; }
+
+    .eyebrow {
+      font-family: var(--font-display);
+      font-size: var(--fs-12);
+      font-weight: 500;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      line-height: 1.4;
+      color: var(--muted);
+    }
+    .serif { font-family: var(--font-serif); font-style: italic; font-weight: 400; letter-spacing: 0; }
+    .muted { color: var(--muted); }
+    .ph { text-decoration: underline dotted currentColor; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+    .h2 { font-family: var(--font-display); font-size: var(--fs-28); font-weight: 600; line-height: 1.1; letter-spacing: -.02em; }
+    .h2 .serif { font-size: 1.2em; color: var(--accent); }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: var(--s2);
+      width: 100%;
+      min-height: 52px;
+      padding: var(--s3) var(--s5);
+      border-radius: var(--r-pill);
+      border: 1px solid transparent;
+      font: 700 var(--fs-16)/1.2 var(--font-body);
+      text-decoration: none;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+    }
+    .btn svg { width: 20px; height: 20px; flex: none; }
+    .btn:active { transform: scale(.98); }
+    .btn-primary { background: var(--accent); color: var(--on-accent); }
+    .btn-secondary { background: transparent; color: var(--text); border-color: var(--line-strong); }
+    .btn-ghost { background: transparent; color: var(--text); text-decoration: underline; text-underline-offset: 4px; }
+    .btn-ink { background: var(--bg); color: var(--text); }
+    @media (hover: hover) {
+      .btn-primary:hover { background: var(--accent-hover); }
+      .btn-secondary:hover { background: var(--wash); border-color: var(--text); }
+      .btn-ghost:hover { background: var(--wash); }
+      .btn-ink:hover { background: var(--raised); }
+    }
+    .btn[disabled] { cursor: progress; }
+    .spinner {
+      width: 18px; height: 18px; flex: none;
+      border: 2px solid rgba(10,10,11,.25); border-top-color: var(--on-accent);
+      border-radius: 50%;
+      animation: spin 800ms linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Perforation shared by tickets */
+    .perf { position: relative; height: 24px; }
+    .perf::before, .perf::after {
+      content: ""; position: absolute; top: 0;
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--bg);
+    }
+    .perf::before { left: -12px; }
+    .perf::after { right: -12px; }
+    .perf span {
+      position: absolute; left: 20px; right: 20px; top: 11px;
+      border-top: 2px dashed currentColor; opacity: .3;
+    }
+
+    /* ───── Gate (apertura) ───── */
+    #view-gate { flex: 1; display: grid; place-items: center; padding-block: var(--s6); }
+    #view-gate[hidden] { display: none; }
+    .gate { width: 100%; --od-gap: var(--s5); align-items: center; }
+    .gate-kicker { text-align: center; }
+    .gticket { width: 100%; color: var(--on-accent); }
+    .gticket :focus-visible { outline-color: var(--bg); }
+    .gt-main, .gt-stub { background: var(--accent); }
+    .gt-main {
+      border-radius: var(--r-card) var(--r-card) 0 0;
+      padding: var(--s5) var(--s5) var(--s4);
+      --od-gap: var(--s4);
+      transition: transform var(--dur-exit) var(--ease-in), opacity var(--dur-exit) var(--ease-in);
+    }
+    .gt-top { justify-content: space-between; font-family: var(--font-display); font-size: var(--fs-12); font-weight: 600; letter-spacing: .12em; text-transform: uppercase; line-height: 1.4; }
+    .gt-title { font-family: var(--font-display); font-weight: 800; font-size: 48px; line-height: .95; letter-spacing: -.04em; text-transform: uppercase; }
+    .gt-title .line { display: block; }
+    .gt-sub { font-size: var(--fs-28); line-height: 1.1; }
+    .gt-meta { --od-cols: 2; --od-gap: var(--s4); padding-top: var(--s4); border-top: 1.5px solid rgba(10,10,11,.2); }
+    .gt-meta .od-stat { --od-gap: 0; }
+    .gt-meta .k { font-size: var(--fs-12); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; opacity: .7; }
+    .gt-meta .v { font-family: var(--font-display); font-size: var(--fs-20); font-weight: 600; line-height: 1.3; }
+    .gticket .perf { background: var(--accent); }
+    .gt-stub {
+      border-radius: 0 0 var(--r-card) var(--r-card);
+      padding: var(--s2) var(--s5) var(--s5);
+      --od-gap: var(--s3);
+      text-align: center;
+      transition: transform var(--dur-exit) var(--ease-in), opacity var(--dur-exit) var(--ease-in);
+    }
+    .gt-stub .hint { font-size: var(--fs-14); font-weight: 600; opacity: .75; }
+    .gt-stub .btn svg { transition: transform var(--dur-fast) var(--ease-out); }
+    @media (hover: hover) { .gt-stub .btn:hover svg { transform: translateX(4px); } }
+    .gticket .perf { transition: opacity var(--dur-exit) var(--ease-in); }
+    .is-opening .gt-main { transform: translateY(-32px) rotate(-3deg); opacity: 0; }
+    .is-opening .gt-stub { transform: translateY(32px) rotate(2deg); opacity: 0; }
+    .is-opening .perf { opacity: 0; }
+    .is-opening .gate-kicker { opacity: 0; transition: opacity var(--dur-exit) var(--ease-in); }
+
+    /* ───── Hero ───── */
+    .hero { --od-gap: var(--s5); padding-top: var(--s2); }
+    .hero-top { justify-content: space-between; --od-gap: var(--s4); }
+    .hero-top .host { font-family: var(--font-display); font-size: var(--fs-12); font-weight: 600; letter-spacing: .12em; text-transform: uppercase; line-height: 1.4; }
+    .tag {
+      display: inline-flex; align-items: center; gap: var(--s2);
+      padding: 4px var(--s3);
+      border: 1px solid var(--line-strong);
+      border-radius: var(--r-pill);
+      font-size: var(--fs-12); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; line-height: 1.5;
+      white-space: nowrap;
+    }
+    .tag .live { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: none; }
+    .mega {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: var(--fs-mega);
+      line-height: .88;
+      letter-spacing: -.05em;
+      white-space: nowrap;
+    }
+    .mega .dot { color: var(--accent); }
+    .hero-title { --od-gap: 0; }
+    .hero-title .a { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-28); line-height: 1.1; letter-spacing: -.02em; text-transform: uppercase; }
+    .hero-title .b { font-size: 44px; line-height: 1.05; color: var(--accent); }
+    .hero-meta { --od-gap: var(--s1); color: var(--muted); }
+    .hero-meta strong { color: var(--text); font-weight: 600; }
+
+    .status-pill {
+      display: inline-flex; align-self: flex-start; align-items: center; gap: var(--s2);
+      padding: 6px var(--s3) 6px var(--s2);
+      border-radius: var(--r-pill);
+      font-size: var(--fs-14); font-weight: 700; line-height: 1.3;
+    }
+    .status-pill[hidden] { display: none; }
+    .status-pill[data-state="yes"] { background: var(--accent); color: var(--on-accent); }
+    .status-pill[data-state="no"] { background: var(--raised); color: var(--text); border: 1px solid var(--line-strong); }
+    .status-pill svg { width: 18px; height: 18px; flex: none; }
+
+    .countdown { --od-cols: 4; --od-gap: var(--s2); }
+    .countdown .od-stat {
+      --od-gap: 0;
+      padding: var(--s3) var(--s2);
+      border: 1px solid var(--line);
+      border-radius: var(--r-field);
+      background: var(--surface);
+      text-align: center;
+    }
+    .countdown .n { font-family: var(--font-display); font-size: var(--fs-28); font-weight: 600; line-height: 1.15; font-variant-numeric: tabular-nums; }
+    .countdown .l { font-size: var(--fs-12); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .countdown-done { font-family: var(--font-display); font-size: var(--fs-20); font-weight: 600; color: var(--accent); }
+    .countdown-done[hidden] { display: none; }
+
+    .marquee {
+      margin: var(--s7) calc(var(--s5) * -1 - var(--s4)) 0;
+      padding: var(--s3) 0;
+      background: var(--accent);
+      color: var(--on-accent);
+      transform: rotate(-3deg);
+      overflow: hidden;
+    }
+    .marquee-track { display: flex; width: max-content; animation: marquee 22s linear infinite; }
+    .marquee-track span {
+      flex: none;
+      padding-right: var(--s4);
+      font-family: var(--font-display); font-weight: 800; font-size: var(--fs-20);
+      text-transform: uppercase; letter-spacing: -.01em; line-height: 1.2; white-space: nowrap;
+    }
+    @keyframes marquee { to { transform: translateX(-50%); } }
+
+    /* ───── Ticket de detalles ───── */
+    .section { margin-top: var(--s8); }
+    .section-head { --od-gap: var(--s2); margin-bottom: var(--s5); }
+    .ticket { color: var(--text); }
+    .ticket .perf { background: var(--surface); color: var(--text); }
+    .t-main, .t-stub { background: var(--surface); border: 1px solid var(--line); }
+    .t-main { border-bottom: 0; border-radius: var(--r-card) var(--r-card) 0 0; padding: var(--s5); }
+    .t-stub { border-top: 0; border-radius: 0 0 var(--r-card) var(--r-card); padding: var(--s2) var(--s5) var(--s5); --od-gap: var(--s3); }
+    .t-grid { --od-cols: 2; --od-gap: var(--s5) var(--s4); }
+    .t-grid .od-stat { --od-gap: var(--s1); }
+    .t-grid .wide { grid-column: 1 / -1; }
+    .k { font-size: var(--fs-12); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); line-height: 1.4; }
+    .v { font-family: var(--font-display); font-size: var(--fs-20); font-weight: 600; line-height: 1.3; letter-spacing: -.01em; }
+
+    /* ───── Agenda ───── */
+    .timeline { list-style: none; margin: 0; padding: 0; position: relative; }
+    .timeline::before {
+      content: ""; position: absolute; left: 7px; top: 12px; bottom: 12px;
+      border-left: 1px solid var(--line-strong);
+    }
+    .timeline li { --od-gap: var(--s4); padding-bottom: var(--s5); }
+    .timeline li:last-child { padding-bottom: 0; }
+    .timeline .node {
+      width: 15px; height: 15px; margin-top: 8px;
+      border-radius: 50%;
+      border: 1.5px solid var(--text);
+      background: var(--bg);
+      position: relative;
+    }
+    .timeline .body { --od-gap: 2px; }
+    .timeline time { font-family: var(--font-display); font-size: var(--fs-28); font-weight: 600; line-height: 1.15; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+    .timeline .title { font-weight: 700; }
+    .timeline .desc { color: var(--muted); font-size: var(--fs-14); line-height: 1.5; }
+    .timeline li.is-now .node { background: var(--accent); border-color: var(--accent); }
+    .timeline li.is-now time { color: var(--accent); }
+    .now-tag { display: none; }
+    .timeline li.is-now .now-tag { display: inline-flex; align-self: flex-start; margin-top: var(--s1); }
+    .note { margin-top: var(--s5); color: var(--muted); font-size: var(--fs-14); line-height: 1.5; }
+
+    /* ───── Ubicación ───── */
+    .map-card { border: 1px solid var(--line); border-radius: var(--r-card); overflow: hidden; background: var(--surface); }
+    /* Solo la ilustración del mapa (hija directa): si la regla alcanza a los
+       svg de los botones de abajo, los infla al 100% del ancho de la tarjeta. */
+    .map-card > svg { display: block; width: 100%; height: auto; aspect-ratio: 342 / 200; }
+    .pin-pulse { transform-origin: 196px 96px; transform-box: view-box; animation: pulse 2.4s var(--ease-out) infinite; }
+    @keyframes pulse { 0% { transform: scale(.4); opacity: .7; } 100% { transform: scale(1.6); opacity: 0; } }
+    .map-body { padding: var(--s5); --od-gap: var(--s4); }
+    .map-body .od-field { --od-gap: var(--s1); }
+    .map-body .venue { font-family: var(--font-display); font-size: var(--fs-20); font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; }
+    .helper { color: var(--muted); font-size: var(--fs-14); line-height: 1.5; }
+    .pair { --od-cols: 2; --od-gap: var(--s3); }
+    .pair .btn { min-height: 48px; padding-inline: var(--s3); font-size: var(--fs-14); }
+
+    /* ───── Cierre ───── */
+    .closing { margin-top: var(--s8); --od-gap: var(--s4); }
+    .closing .big { font-family: var(--font-display); font-weight: 800; font-size: 56px; line-height: .92; letter-spacing: -.05em; text-transform: uppercase; }
+    .closing .big .serif { display: block; color: var(--accent); text-transform: none; font-size: 60px; letter-spacing: 0; line-height: 1; }
+    .footer { margin-top: var(--s7); padding-top: var(--s5); border-top: 1px solid var(--line); color: var(--muted); font-size: var(--fs-14); }
+    .footer a { color: var(--text); }
+
+    /* ───── Subvistas ───── */
+    .topbar { --od-gap: var(--s2); margin: 0 calc(var(--s3) * -1) var(--s5); }
+    .icon-btn {
+      display: inline-grid; place-items: center;
+      width: 44px; height: 44px;
+      border: 1px solid var(--line); border-radius: 50%;
+      background: transparent; color: var(--text); cursor: pointer;
+    }
+    .icon-btn svg { width: 22px; height: 22px; }
+    @media (hover: hover) { .icon-btn:hover { background: var(--wash); border-color: var(--text); } }
+    .topbar-title { text-align: center; font-family: var(--font-display); font-size: var(--fs-12); font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+    .spacer-44 { width: 44px; height: 44px; }
+
+    /* ───── Formulario ───── */
+    .form { --od-gap: var(--s5); }
+    .form-intro { --od-gap: var(--s3); }
+    .form-intro h1 { font-family: var(--font-display); font-size: 36px; font-weight: 800; line-height: 1; letter-spacing: -.04em; text-transform: uppercase; }
+    .form-intro h1 .serif { display: block; text-transform: none; color: var(--accent); font-size: 44px; line-height: 1.05; letter-spacing: 0; }
+    .req { color: var(--accent); }
+    .field { --od-gap: var(--s2); }
+    .field > label, .field legend { font-weight: 700; line-height: 1.4; padding: 0; }
+    fieldset.field { border: 0; margin: 0; padding: 0; min-width: 0; }
+    fieldset.field legend { margin-bottom: var(--s2); }
+    .input {
+      width: 100%;
+      min-height: 52px;
+      padding: var(--s3) var(--s4);
+      border: 1px solid var(--line-strong);
+      border-radius: var(--r-field);
+      background: var(--surface);
+      color: var(--text);
+      font: 400 var(--fs-16)/1.4 var(--font-body);
+      transition: border-color var(--dur-fast) var(--ease-out);
+    }
+    textarea.input { min-height: 96px; resize: vertical; }
+    select.input {
+      appearance: none;
+      padding-right: var(--s7);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23D4FF3A' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      background-size: 20px 20px;
+    }
+    .input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+    .input[aria-invalid="true"] { border-color: var(--error); }
+    .error { color: var(--error); font-size: var(--fs-14); line-height: 1.5; font-weight: 600; }
+    .error[hidden] { display: none; }
+    .error::before { content: "⚠︎ "; }
+
+    .segmented { --od-cols: 2; --od-gap: var(--s2); padding: var(--s1); border: 1px solid var(--line-strong); border-radius: var(--r-pill); background: var(--surface); }
+    .seg {
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 44px;
+      padding: var(--s2) var(--s3);
+      border-radius: var(--r-pill);
+      font-weight: 700; font-size: var(--fs-14);
+      text-align: center;
+      cursor: pointer;
+      transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+    }
+    .seg input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+    .seg:has(input:checked) { background: var(--accent); color: var(--on-accent); }
+    .seg:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+    @media (hover: hover) { .seg:not(:has(input:checked)):hover { background: var(--wash); } }
+    fieldset[aria-invalid="true"] .segmented { border-color: var(--error); }
+
+    .conditional { --od-gap: var(--s5); }
+    .conditional[hidden], .field[hidden] { display: none; }
+
+    .error-summary {
+      padding: var(--s4);
+      border: 1px solid var(--error);
+      border-radius: var(--r-card);
+      background: rgba(255,138,122,.08);
+      --od-gap: var(--s2);
+    }
+    .error-summary[hidden] { display: none; }
+    .error-summary h2 { font-size: var(--fs-16); font-weight: 700; color: var(--error); }
+    .error-summary ul { margin: 0; padding-left: var(--s5); }
+    .error-summary a { color: var(--text); font-size: var(--fs-14); }
+
+    /* ───── Pase ───── */
+    .pass-wrap { --od-gap: var(--s5); }
+    .pass-intro { --od-gap: var(--s2); }
+    .pass-intro h1 { font-family: var(--font-display); font-size: var(--fs-28); font-weight: 800; line-height: 1.05; letter-spacing: -.03em; text-transform: uppercase; }
+    .pass { color: var(--bg); }
+    .pass .perf { background: var(--paper); color: var(--bg); }
+    .p-head { background: var(--accent); color: var(--on-accent); border-radius: var(--r-card) var(--r-card) 0 0; padding: var(--s4) var(--s5); justify-content: space-between; --od-gap: var(--s3); }
+    .p-head .eye { font-family: var(--font-display); font-size: var(--fs-12); font-weight: 600; letter-spacing: .12em; text-transform: uppercase; line-height: 1.4; }
+    .p-main { background: var(--paper); padding: var(--s5); --od-gap: var(--s5); }
+    .p-name { --od-gap: var(--s1); }
+    .p-name .k, .p-grid .k { color: var(--on-paper-muted); }
+    .p-name .who { font-family: var(--font-display); font-size: var(--fs-28); font-weight: 800; line-height: 1.1; letter-spacing: -.03em; overflow-wrap: anywhere; }
+    .p-grid { --od-cols: 2; --od-gap: var(--s4); }
+    .p-grid .od-stat { --od-gap: 2px; }
+    .p-grid .v { font-size: var(--fs-16); overflow-wrap: anywhere; }
+    .p-stub { background: var(--paper); border-radius: 0 0 var(--r-card) var(--r-card); padding: var(--s2) var(--s5) var(--s5); --od-gap: var(--s4); }
+    .p-code { width: 104px; height: 104px; flex: none; color: var(--bg); }
+    .p-code-text { --od-gap: var(--s1); }
+    .p-code-text .id { font-family: var(--font-display); font-size: var(--fs-16); font-weight: 600; letter-spacing: .04em; }
+    .p-code-text .helper { color: var(--on-paper-muted); }
+    .pass-actions { --od-gap: var(--s3); }
+    .decline { padding: var(--s5); border: 1px solid var(--line); border-radius: var(--r-card); background: var(--surface); --od-gap: var(--s3); }
+    .decline[hidden], .pass[hidden] { display: none; }
+    .summary-list { margin: 0; }
+    .summary-list .row { padding: var(--s3) 0; --od-gap: var(--s4); justify-content: space-between; border-top: 1px solid var(--line); }
+    .summary-list dt { color: var(--muted); font-size: var(--fs-14); }
+    .summary-list dd { margin: 0; font-weight: 700; text-align: right; overflow-wrap: anywhere; }
+
+    /* Toast */
+    .toast {
+      position: absolute;
+      z-index: 30;
+      left: var(--s4);
+      right: var(--s4);
+      bottom: calc(var(--phone-safe-bottom) + var(--s4));
+      padding: var(--s3) var(--s4);
+      border-radius: var(--r-field);
+      background: var(--paper);
+      color: var(--bg);
+      font: 700 var(--fs-14)/1.4 var(--font-body);
+      text-align: center;
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: opacity 160ms var(--ease-in), transform 160ms var(--ease-in);
+    }
+    .toast.is-visible { opacity: 1; transform: none; transition: opacity var(--dur) var(--ease-out), transform var(--dur) var(--ease-out); }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; animation-delay: 0ms !important; transition-duration: 1ms !important; }
+      .marquee-track, .pin-pulse { animation: none !important; }
+      .spinner { animation: none !important; border-top-color: rgba(10,10,11,.25); }
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame" data-phone-shell data-platform="neutral">
+    <span class="hardware-button volume" aria-hidden="true"></span>
+    <span class="hardware-button power" aria-hidden="true"></span>
+
+    <section class="phone-screen" data-phone-screen>
+      <main class="phone-content" data-phone-content id="scroller">
+        <!-- APP CONTENT START -->
+        <div class="app" id="app">
+
+          <!-- ───────── Apertura ───────── -->
+          <section class="view" id="view-gate" aria-labelledby="gate-title">
+            <div class="gate od-stack">
+              <p class="eyebrow gate-kicker">Tenés una invitación</p>
+              <div class="gticket">
+                <div class="gt-main od-stack">
+                  <div class="gt-top od-row">
+                    <span class="ph">[Nombre de la empresa]</span>
+                    <span class="od-nowrap">2026</span>
+                  </div>
+                  <h1 class="gt-title" id="gate-title" tabindex="-1"><span class="line">Fin</span><span class="line">de año</span></h1>
+                  <p class="gt-sub serif">Cena anual</p>
+                  <div class="gt-meta od-grid">
+                    <div class="od-stat"><span class="k">Fecha</span><span class="v od-nowrap">12.12.26</span></div>
+                    <div class="od-stat"><span class="k">Hora</span><span class="v od-nowrap">20:00 h</span></div>
+                  </div>
+                </div>
+                <div class="perf" aria-hidden="true"><span></span></div>
+                <div class="gt-stub od-stack">
+                  <button class="btn btn-ink" type="button" data-action="open-invite">
+                    Abrir invitación
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                  </button>
+                  <p class="hint">Pase personal e intransferible</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ───────── Invitación ───────── -->
+          <section class="view" id="view-invite" aria-labelledby="invite-title" hidden>
+            <header class="hero od-stack">
+              <div class="hero-top od-row">
+                <p class="host od-fill"><span class="ph">[Nombre de la empresa]</span></p>
+                <span class="tag od-fixed"><span class="live" aria-hidden="true"></span>Invitación</span>
+              </div>
+              <p class="mega" aria-hidden="true">12<span class="dot">.</span>12</p>
+              <h1 class="hero-title od-stack" id="invite-title" tabindex="-1">
+                <span class="a">Cena anual</span>
+                <span class="b serif">de fin de año</span>
+              </h1>
+              <div class="hero-meta od-stack">
+                <p><strong>Sábado 12 de diciembre, 2026</strong> · <span class="od-nowrap">20:00 h</span></p>
+                <p><span class="ph">[Salón / dirección]</span></p>
+              </div>
+              <span class="status-pill" id="status-pill" hidden></span>
+              <div class="od-stack" style="--od-gap: var(--s3)">
+                <p class="eyebrow" id="cd-label">Faltan</p>
+                <div class="countdown od-grid" id="countdown" role="timer" aria-labelledby="cd-label">
+                  <div class="od-stat"><span class="n" data-cd="d">--</span><span class="l">Días</span></div>
+                  <div class="od-stat"><span class="n" data-cd="h">--</span><span class="l">Horas</span></div>
+                  <div class="od-stat"><span class="n" data-cd="m">--</span><span class="l">Min</span></div>
+                  <div class="od-stat"><span class="n" data-cd="s">--</span><span class="l">Seg</span></div>
+                </div>
+                <p class="countdown-done" id="countdown-done" hidden></p>
+              </div>
+            </header>
+
+            <div class="marquee" aria-hidden="true">
+              <div class="marquee-track">
+                <span>Cena anual ✦ Fin de año ✦ 12.12.26 ✦ Elegante sport ✦</span>
+                <span>Cena anual ✦ Fin de año ✦ 12.12.26 ✦ Elegante sport ✦</span>
+              </div>
+            </div>
+
+            <section class="section" aria-labelledby="ticket-title" data-reveal>
+              <div class="section-head od-stack">
+                <p class="eyebrow">01 · Detalles</p>
+                <h2 class="h2" id="ticket-title">Tu lugar <span class="serif">en la noche</span></h2>
+              </div>
+              <div class="ticket">
+                <div class="t-main">
+                  <div class="t-grid od-grid">
+                    <div class="od-stat"><span class="k">Fecha</span><span class="v od-nowrap">Sáb 12 dic</span></div>
+                    <div class="od-stat"><span class="k">Hora</span><span class="v od-nowrap">20:00 h</span></div>
+                    <div class="od-stat"><span class="k">Dress code</span><span class="v">Elegante sport</span></div>
+                    <div class="od-stat"><span class="k">Formato</span><span class="v">Cena y fiesta</span></div>
+                    <div class="od-stat wide"><span class="k">Lugar</span><span class="v"><span class="ph">[Salón / dirección]</span></span></div>
+                  </div>
+                </div>
+                <div class="perf" aria-hidden="true"><span></span></div>
+                <div class="t-stub od-stack">
+                  <button class="btn btn-primary" type="button" data-action="open-rsvp" data-rsvp-label>Confirmar asistencia</button>
+                  <button class="btn btn-secondary" type="button" data-action="calendar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4M12 13v4M10 15h4"/></svg>
+                    Agregar al calendario
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <section class="section" aria-labelledby="agenda-title" data-reveal>
+              <div class="section-head od-stack">
+                <p class="eyebrow">02 · Programa</p>
+                <h2 class="h2" id="agenda-title">La noche, <span class="serif">hora por hora</span></h2>
+              </div>
+              <ol class="timeline" id="timeline">
+                <li class="od-row-top" data-start="20:00" data-end="21:00"><span class="node od-fixed" aria-hidden="true"></span>
+                  <div class="body od-field od-fill"><time datetime="2026-12-12T20:00" class="od-nowrap">20:00</time><span class="title">Recepción y cóctel</span><span class="desc">Bienvenida de los invitados en el salón.</span><span class="tag now-tag"><span class="live" aria-hidden="true"></span>Ahora</span></div></li>
+                <li class="od-row-top" data-start="21:00" data-end="21:30"><span class="node od-fixed" aria-hidden="true"></span>
+                  <div class="body od-field od-fill"><time datetime="2026-12-12T21:00" class="od-nowrap">21:00</time><span class="title">Palabras de bienvenida</span><span class="desc">Un repaso breve del año junto a la dirección.</span><span class="tag now-tag"><span class="live" aria-hidden="true"></span>Ahora</span></div></li>
+                <li class="od-row-top" data-start="21:30" data-end="23:00"><span class="node od-fixed" aria-hidden="true"></span>
+                  <div class="body od-field od-fill"><time datetime="2026-12-12T21:30" class="od-nowrap">21:30</time><span class="title">Cena</span><span class="desc">Menú de tres pasos con opciones para cada preferencia.</span><span class="tag now-tag"><span class="live" aria-hidden="true"></span>Ahora</span></div></li>
+                <li class="od-row-top" data-start="23:00" data-end="23:30"><span class="node od-fixed" aria-hidden="true"></span>
+                  <div class="body od-field od-fill"><time datetime="2026-12-12T23:00" class="od-nowrap">23:00</time><span class="title">Brindis de fin de año</span><span class="desc">Celebramos juntos lo logrado.</span><span class="tag now-tag"><span class="live" aria-hidden="true"></span>Ahora</span></div></li>
+                <li class="od-row-top" data-start="23:30" data-end="26:00"><span class="node od-fixed" aria-hidden="true"></span>
+                  <div class="body od-field od-fill"><time datetime="2026-12-12T23:30" class="od-nowrap">23:30</time><span class="title">Música y baile</span><span class="desc">La noche sigue en la pista.</span><span class="tag now-tag"><span class="live" aria-hidden="true"></span>Ahora</span></div></li>
+              </ol>
+              <p class="note">Agenda de ejemplo, editable según el cronograma final.</p>
+            </section>
+
+            <section class="section" aria-labelledby="map-title" data-reveal>
+              <div class="section-head od-stack">
+                <p class="eyebrow">03 · Ubicación</p>
+                <h2 class="h2" id="map-title">Cómo <span class="serif">llegar</span></h2>
+              </div>
+              <div class="map-card">
+                <svg viewBox="0 0 342 200" role="img" aria-label="Mapa ilustrativo de la zona del salón">
+                  <rect width="342" height="200" fill="#111113"/>
+                  <g stroke="rgba(243,241,236,.07)" stroke-width="1">
+                    <path d="M0 20h342M0 40h342M0 60h342M0 80h342M0 100h342M0 120h342M0 140h342M0 160h342M0 180h342"/>
+                    <path d="M20 0v200M40 0v200M60 0v200M80 0v200M100 0v200M120 0v200M140 0v200M160 0v200M180 0v200M200 0v200M220 0v200M240 0v200M260 0v200M280 0v200M300 0v200M320 0v200"/>
+                  </g>
+                  <g fill="#1C1C1F">
+                    <rect x="20" y="20" width="80" height="40" rx="2"/><rect x="120" y="20" width="40" height="60" rx="2"/>
+                    <rect x="220" y="20" width="100" height="40" rx="2"/><rect x="20" y="120" width="60" height="60" rx="2"/>
+                    <rect x="240" y="120" width="80" height="60" rx="2"/><rect x="100" y="140" width="100" height="40" rx="2"/>
+                  </g>
+                  <path d="M0 100 H130 Q150 100 160 110 L196 146 Q206 156 226 156 H342" stroke="#F3F1EC" stroke-opacity=".5" stroke-width="3" fill="none" stroke-dasharray="2 8" stroke-linecap="round"/>
+                  <circle class="pin-pulse" cx="196" cy="96" r="20" fill="#D4FF3A" fill-opacity=".35"/>
+                  <circle cx="196" cy="96" r="9" fill="#D4FF3A"/>
+                  <circle cx="196" cy="96" r="3.5" fill="#0A0A0B"/>
+                </svg>
+                <div class="map-body od-stack">
+                  <div class="od-field">
+                    <span class="venue"><span class="ph">[Salón / dirección]</span></span>
+                    <span class="helper">Mapa ilustrativo. Se reemplaza cuando se defina el lugar.</span>
+                  </div>
+                  <div class="pair od-grid">
+                    <a class="btn btn-secondary" id="directions" href="#" target="_blank" rel="noopener">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+                      Cómo llegar
+                    </a>
+                    <button class="btn btn-secondary" type="button" data-action="copy-address">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
+                      Copiar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="closing od-stack" aria-labelledby="closing-title" data-reveal>
+              <p class="eyebrow">04 · RSVP</p>
+              <h2 class="big" id="closing-title">¿Venís? <span class="serif">Te guardamos lugar.</span></h2>
+              <p class="muted">Confirmá tu asistencia antes del <span class="ph">[fecha límite]</span> y recibí tu pase digital.</p>
+              <button class="btn btn-primary" type="button" data-action="open-rsvp" data-rsvp-label>Confirmar asistencia</button>
+            </section>
+
+            <p class="footer">Consultas: <a href="mailto:contacto@empresa.com">[contacto@empresa.com]</a></p>
+          </section>
+
+          <!-- ───────── RSVP ───────── -->
+          <section class="view" id="view-rsvp" aria-labelledby="rsvp-title" hidden>
+            <div class="topbar od-row">
+              <button class="icon-btn od-fixed" type="button" data-action="back" aria-label="Volver a la invitación">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>
+              </button>
+              <p class="topbar-title od-fill">Confirmación</p>
+              <span class="od-spacer spacer-44" aria-hidden="true"></span>
+            </div>
+
+            <form class="form od-stack" id="rsvp-form" novalidate>
+              <div class="form-intro od-stack">
+                <h1 id="rsvp-title" tabindex="-1">¿Nos <span class="serif">acompañás?</span></h1>
+                <p class="muted">Sábado 12 de diciembre · <span class="od-nowrap">20:00 h</span>. Los campos con <span class="req">*</span> son obligatorios.</p>
+              </div>
+
+              <div class="error-summary od-stack" id="error-summary" role="alert" tabindex="-1" hidden>
+                <h2>Revisá estos datos para enviar tu confirmación</h2>
+                <ul id="error-list"></ul>
+              </div>
+
+              <fieldset class="field od-stack" id="g-attend" aria-describedby="e-attend">
+                <legend>¿Vas a asistir? <span class="req" aria-hidden="true">*</span></legend>
+                <div class="segmented od-grid">
+                  <label class="seg"><input type="radio" name="attend" value="yes" id="f-attend" />Sí, voy</label>
+                  <label class="seg"><input type="radio" name="attend" value="no" />No puedo</label>
+                </div>
+                <p class="error" id="e-attend" hidden></p>
+              </fieldset>
+
+              <div class="field od-field">
+                <label for="f-name">Nombre y apellido <span class="req" aria-hidden="true">*</span></label>
+                <input class="input" id="f-name" name="name" type="text" autocomplete="name" required aria-describedby="e-name" />
+                <p class="error" id="e-name" hidden></p>
+              </div>
+
+              <div class="field od-field">
+                <label for="f-email">Email <span class="req" aria-hidden="true">*</span></label>
+                <span class="helper" id="h-email">Te enviamos ahí tu pase y cualquier cambio.</span>
+                <input class="input" id="f-email" name="email" type="email" autocomplete="email" inputmode="email" required aria-describedby="h-email e-email" />
+                <p class="error" id="e-email" hidden></p>
+              </div>
+
+              <div class="conditional od-stack" id="attend-details" hidden>
+                <fieldset class="field od-stack">
+                  <legend>¿Venís con acompañante?</legend>
+                  <div class="segmented od-grid">
+                    <label class="seg"><input type="radio" name="companion" value="no" checked />Voy solo/a</label>
+                    <label class="seg"><input type="radio" name="companion" value="yes" />Con +1</label>
+                  </div>
+                </fieldset>
+
+                <div class="field od-field" id="companion-wrap" hidden>
+                  <label for="f-companion">Nombre del acompañante <span class="req" aria-hidden="true">*</span></label>
+                  <input class="input" id="f-companion" name="companionName" type="text" autocomplete="off" aria-describedby="e-companion" />
+                  <p class="error" id="e-companion" hidden></p>
+                </div>
+
+                <div class="field od-field">
+                  <label for="f-diet">Preferencia alimentaria</label>
+                  <select class="input" id="f-diet" name="diet">
+                    <option value="Ninguna">Sin restricciones</option>
+                    <option value="Vegetariana">Vegetariana</option>
+                    <option value="Vegana">Vegana</option>
+                    <option value="Sin TACC">Sin TACC (celiaquía)</option>
+                    <option value="Otra">Otra</option>
+                  </select>
+                </div>
+
+                <div class="field od-field" id="diet-other-wrap" hidden>
+                  <label for="f-diet-other">Contanos cuál <span class="req" aria-hidden="true">*</span></label>
+                  <input class="input" id="f-diet-other" name="dietOther" type="text" autocomplete="off" aria-describedby="e-diet-other" />
+                  <p class="error" id="e-diet-other" hidden></p>
+                </div>
+              </div>
+
+              <div class="field od-field">
+                <label for="f-message">Mensaje (opcional)</label>
+                <textarea class="input" id="f-message" name="message" maxlength="280" rows="3"></textarea>
+              </div>
+
+              <button class="btn btn-primary" type="submit" id="submit-btn">Enviar confirmación</button>
+            </form>
+          </section>
+
+          <!-- ───────── Pase ───────── -->
+          <section class="view" id="view-pass" aria-labelledby="pass-title" hidden>
+            <div class="topbar od-row">
+              <button class="icon-btn od-fixed" type="button" data-action="home" aria-label="Volver a la invitación">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>
+              </button>
+              <p class="topbar-title od-fill">Tu respuesta</p>
+              <span class="od-spacer spacer-44" aria-hidden="true"></span>
+            </div>
+
+            <div class="pass-wrap od-stack">
+              <div class="pass-intro od-stack">
+                <h1 id="pass-title" tabindex="-1">¡Listo!</h1>
+                <p class="muted" id="pass-text"></p>
+              </div>
+
+              <article class="pass" id="pass-card" aria-label="Pase digital">
+                <div class="p-head od-row">
+                  <span class="eye od-fill">Pase · Cena de fin de año</span>
+                  <span class="eye od-fixed od-nowrap">12.12.26</span>
+                </div>
+                <div class="p-main od-stack">
+                  <div class="p-name od-stat">
+                    <span class="k">Invitado/a</span>
+                    <span class="who" id="p-who"></span>
+                  </div>
+                  <div class="p-grid od-grid">
+                    <div class="od-stat"><span class="k">Hora</span><span class="v od-nowrap">20:00 h</span></div>
+                    <div class="od-stat"><span class="k">Mesa</span><span class="v">Por asignar</span></div>
+                    <div class="od-stat"><span class="k">Acompañante</span><span class="v" id="p-plus"></span></div>
+                    <div class="od-stat"><span class="k">Menú</span><span class="v" id="p-diet"></span></div>
+                  </div>
+                </div>
+                <div class="perf" aria-hidden="true"><span></span></div>
+                <div class="p-stub od-row">
+                  <svg class="p-code" id="p-code" viewBox="-1 -1 23 23" shape-rendering="crispEdges" role="img" aria-label="Código de ejemplo del pase"></svg>
+                  <div class="p-code-text od-field od-fill">
+                    <span class="k" style="color: var(--on-paper-muted)">Código</span>
+                    <span class="id od-nowrap" id="p-id"></span>
+                    <span class="helper">Código de ejemplo, no válido como acceso.</span>
+                  </div>
+                </div>
+              </article>
+
+              <div class="decline od-stack" id="decline-card" hidden>
+                <dl class="summary-list" id="decline-summary"></dl>
+              </div>
+
+              <div class="pass-actions od-stack">
+                <button class="btn btn-primary" type="button" data-action="calendar" id="pass-calendar">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4M12 13v4M10 15h4"/></svg>
+                  Agregar al calendario
+                </button>
+                <button class="btn btn-secondary" type="button" data-action="edit">Modificar respuesta</button>
+                <button class="btn btn-ghost" type="button" data-action="home">Volver a la invitación</button>
+              </div>
+            </div>
+          </section>
+
+        </div>
+        <!-- APP CONTENT END -->
+      </main>
+
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+      <div class="status-bar" aria-hidden="true">
+        <span class="status-time">9:41</span>
+        <span class="status-cutout-zone"></span>
+        <span class="status-icons">
+          <svg class="connectivity" viewBox="0 0 15 12"><path d="M1.5 10.5v-2m4 2v-4.5m4 4.5v-7m4 7v-9"/></svg>
+          <svg class="wifi" viewBox="0 0 16 12"><path d="M1.5 4.7a9.2 9.2 0 0 1 13 0M4.2 7.3a5.4 5.4 0 0 1 7.6 0M6.9 10a1.55 1.55 0 0 1 2.2 0"/></svg>
+          <svg class="battery" viewBox="0 0 20 11"><rect x=".75" y="1.25" width="16.5" height="8.5" rx="2"/><path d="M18.5 4v3M3.2 3.4h10.4v4.2H3.2z" fill="currentColor" stroke="none"/></svg>
+        </span>
+      </div>
+      <div class="camera-dot" aria-hidden="true"></div>
+      <div class="gesture-indicator" aria-hidden="true"></div>
+    </section>
+  </div>
+
+  <script>
+  (() => {
+    /* Datos de ejemplo. Convite puede sustituirlos por query params al generar una tarjeta. */
+    const previewParams = new URLSearchParams(window.location.search);
+    const PREVIEW = previewParams.get('preview') === '1';
+    const TEMPLATE_DATA = {
+      company: previewParams.get('empresa') || 'Nortex Colombia',
+      venue: previewParams.get('lugar') || 'Casa Dann Carlton, Bogotá',
+      deadline: previewParams.get('limite') || '5 de diciembre de 2026',
+      contact: previewParams.get('contacto') || 'eventos@nortex.co',
+    };
+    /* ── Datos del evento: editá acá ── */
+    const EVENT = {
+      title: 'Cena anual de fin de año',
+      host: TEMPLATE_DATA.company,
+      venue: TEMPLATE_DATA.venue,
+      startDate: new Date(2026, 11, 12, 20, 0, 0),
+      icsStart: '20261212T200000',
+      icsEnd: '20261213T020000',
+      dress: 'Elegante sport'
+    };
+    const STORE_KEY = 'invitacion-cena-2026-rsvp';
+    const OPENED_KEY = 'invitacion-cena-2026-opened';
+
+    function aplicarDatosDePlantilla() {
+      const reemplazos = {
+        '[Nombre de la empresa]': TEMPLATE_DATA.company,
+        '[Salón / dirección]': TEMPLATE_DATA.venue,
+        '[fecha límite]': TEMPLATE_DATA.deadline,
+        '[contacto@empresa.com]': TEMPLATE_DATA.contact,
+      };
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      const textos = [];
+      while (walker.nextNode()) textos.push(walker.currentNode);
+      textos.forEach((nodo) => {
+        let texto = nodo.nodeValue;
+        Object.entries(reemplazos).forEach(([origen, destino]) => { texto = texto.replaceAll(origen, destino); });
+        nodo.nodeValue = texto;
+      });
+      document.title = `Invitación · ${TEMPLATE_DATA.company}`;
+    }
+    aplicarDatosDePlantilla();
+
+    const $ = (s, r = document) => r.querySelector(s);
+    const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+    const scroller = $('#scroller');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const views = { gate: $('#view-gate'), invite: $('#view-invite'), rsvp: $('#view-rsvp'), pass: $('#view-pass') };
+    const form = $('#rsvp-form');
+    let current = null;
+    let inviteScroll = 0;
+
+    const ICONS = {
+      check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+      dash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12"/></svg>'
+    };
+
+    const store = {
+      get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+      set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+    };
+    const escHtml = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    /* ── Toast ── */
+    const toastEl = $('#toast');
+    let toastTimer;
+    function toast(msg) {
+      toastEl.textContent = msg;
+      toastEl.classList.add('is-visible');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toastEl.classList.remove('is-visible'), 2600);
+    }
+
+    /* ── Vistas ── */
+    function show(name) {
+      if (current === 'invite') inviteScroll = scroller.scrollTop;
+      Object.entries(views).forEach(([k, el]) => {
+        el.hidden = k !== name;
+        el.classList.remove('is-entering');
+      });
+      const view = views[name];
+      void view.offsetWidth;
+      view.classList.add('is-entering');
+      current = name;
+      scroller.scrollTop = name === 'invite' ? inviteScroll : 0;
+      const heading = view.querySelector('h1');
+      if (heading) heading.focus({ preventScroll: true });
+      if (name === 'invite') observeReveals();
+    }
+
+    /* ── Apertura del ticket ── */
+    function openInvite() {
+      store.set(OPENED_KEY, true);
+      if (reduceMotion.matches) { show('invite'); return; }
+      views.gate.classList.add('is-opening');
+      setTimeout(() => { views.gate.classList.remove('is-opening'); show('invite'); }, 260);
+    }
+
+    /* ── Revelado al hacer scroll ── */
+    let io;
+    function observeReveals() {
+      if (reduceMotion.matches || !('IntersectionObserver' in window)) return;
+      document.documentElement.classList.add('js-reveal');
+      if (!io) {
+        io = new IntersectionObserver((entries) => {
+          entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } });
+        }, { root: scroller, threshold: 0.15 });
+      }
+      $$('[data-reveal]:not(.is-in)').forEach(el => io.observe(el));
+    }
+
+    /* ── Cuenta regresiva ── */
+    const cd = { d: $('[data-cd="d"]'), h: $('[data-cd="h"]'), m: $('[data-cd="m"]'), s: $('[data-cd="s"]') };
+    const pad = n => String(n).padStart(2, '0');
+    function tick() {
+      const diff = EVENT.startDate - new Date();
+      if (diff <= 0) {
+        $('#countdown').hidden = true;
+        $('#cd-label').hidden = true;
+        const done = $('#countdown-done');
+        const endOfNight = new Date(2026, 11, 13, 2, 0, 0);
+        done.textContent = new Date() < endOfNight ? '¡Es hoy! Te esperamos.' : 'Gracias por compartir la noche.';
+        done.hidden = false;
+        markNow();
+        return false;
+      }
+      const t = Math.floor(diff / 1000);
+      cd.d.textContent = Math.floor(t / 86400);
+      cd.h.textContent = pad(Math.floor(t % 86400 / 3600));
+      cd.m.textContent = pad(Math.floor(t % 3600 / 60));
+      cd.s.textContent = pad(t % 60);
+      return true;
+    }
+    function markNow() {
+      const now = new Date();
+      const base = new Date(2026, 11, 12, 0, 0, 0);
+      const mins = (now - base) / 60000;
+      $$('#timeline li').forEach(li => {
+        const [sh, sm] = li.dataset.start.split(':').map(Number);
+        const [eh, em] = li.dataset.end.split(':').map(Number);
+        li.classList.toggle('is-now', mins >= sh * 60 + sm && mins < eh * 60 + em);
+      });
+    }
+    if (tick()) { const timer = setInterval(() => { if (!tick()) clearInterval(timer); }, 1000); }
+
+    /* ── Estado en la portada ── */
+    function renderInviteState() {
+      const data = store.get(STORE_KEY);
+      const pill = $('#status-pill');
+      $$('[data-rsvp-label]').forEach(b => { b.textContent = data ? (data.attend === 'yes' ? 'Ver mi pase' : 'Ver mi respuesta') : 'Confirmar asistencia'; });
+      if (!data) { pill.hidden = true; return; }
+      pill.hidden = false;
+      pill.dataset.state = data.attend;
+      pill.innerHTML = data.attend === 'yes'
+        ? ICONS.check + '<span>Asistencia confirmada</span>'
+        : ICONS.dash + '<span>Respondiste que no asistís</span>';
+    }
+
+    /* ── Calendario (.ics) ── */
+    function downloadIcs() {
+      const esc = s => s.replace(/[\\;,]/g, m => '\\' + m);
+      const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+      const ics = [
+        'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Invitacion//Cena fin de año//ES', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
+        'BEGIN:VEVENT',
+        'UID:cena-fin-de-anio-2026@invitacion',
+        'DTSTAMP:' + stamp,
+        'DTSTART:' + EVENT.icsStart,
+        'DTEND:' + EVENT.icsEnd,
+        'SUMMARY:' + esc(EVENT.title + ' · ' + EVENT.host),
+        'LOCATION:' + esc(EVENT.venue),
+        'DESCRIPTION:' + esc('Dress code: ' + EVENT.dress + '. Recepción 20:00 h.'),
+        'BEGIN:VALARM', 'TRIGGER:-P1D', 'ACTION:DISPLAY', 'DESCRIPTION:' + esc('Mañana: ' + EVENT.title), 'END:VALARM',
+        'END:VEVENT', 'END:VCALENDAR'
+      ].join('\r\n');
+      const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
+      const a = document.createElement('a');
+      a.href = url; a.download = 'cena-fin-de-anio-2026.ics';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      toast('Evento descargado. Abrilo para sumarlo a tu calendario.');
+    }
+
+    /* ── Ubicación ── */
+    $('#directions').href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(EVENT.venue);
+    async function copyAddress() {
+      try {
+        await navigator.clipboard.writeText(EVENT.venue);
+        toast('Dirección copiada');
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = EVENT.venue; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        const ok = document.execCommand && document.execCommand('copy');
+        ta.remove();
+        toast(ok ? 'Dirección copiada' : 'No pudimos copiar. Mantené presionada la dirección para copiarla.');
+      }
+    }
+
+    /* ── Formulario ── */
+    const f = {
+      name: $('#f-name'), email: $('#f-email'), companion: $('#f-companion'),
+      diet: $('#f-diet'), dietOther: $('#f-diet-other'), message: $('#f-message')
+    };
+    const radioVal = n => (form.querySelector(`input[name="${n}"]:checked`) || {}).value || '';
+
+    function syncConditionals() {
+      const attending = radioVal('attend') === 'yes';
+      $('#attend-details').hidden = !attending;
+      $('#companion-wrap').hidden = !(attending && radioVal('companion') === 'yes');
+      $('#diet-other-wrap').hidden = !(attending && f.diet.value === 'Otra');
+    }
+
+    const rules = {
+      attend: () => radioVal('attend') ? '' : 'Elegí si vas a asistir o no.',
+      name: () => f.name.value.trim().length >= 3 ? '' : (f.name.value.trim() ? 'Escribí tu nombre y apellido completos.' : 'Ingresá tu nombre y apellido.'),
+      email: () => {
+        const v = f.email.value.trim();
+        if (!v) return 'Ingresá tu email para enviarte el pase.';
+        return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) ? '' : 'El email parece incompleto. Revisá que tenga el formato nombre@empresa.com.';
+      },
+      companion: () => $('#companion-wrap').hidden || f.companion.value.trim() ? '' : 'Indicá el nombre de tu acompañante para la lista de invitados.',
+      dietOther: () => $('#diet-other-wrap').hidden || f.dietOther.value.trim() ? '' : 'Contanos tu preferencia para avisarle al catering.'
+    };
+    const targets = {
+      attend: { input: $('#f-attend'), group: $('#g-attend'), err: '#e-attend', label: '¿Vas a asistir?' },
+      name: { input: f.name, err: '#e-name', label: 'Nombre y apellido' },
+      email: { input: f.email, err: '#e-email', label: 'Email' },
+      companion: { input: f.companion, err: '#e-companion', label: 'Acompañante' },
+      dietOther: { input: f.dietOther, err: '#e-diet-other', label: 'Preferencia alimentaria' }
+    };
+
+    function validate(key) {
+      const msg = rules[key]();
+      const t = targets[key];
+      const err = $(t.err);
+      err.textContent = msg;
+      err.hidden = !msg;
+      (t.group || t.input).setAttribute('aria-invalid', msg ? 'true' : 'false');
+      return msg;
+    }
+
+    [['name', f.name], ['email', f.email], ['companion', f.companion], ['dietOther', f.dietOther]].forEach(([k, el]) => {
+      el.addEventListener('blur', () => { if (el.value.trim() || el.getAttribute('aria-invalid') === 'true') validate(k); });
+      el.addEventListener('input', () => { if (el.getAttribute('aria-invalid') === 'true' && !rules[k]()) validate(k); });
+    });
+    form.addEventListener('change', (e) => {
+      syncConditionals();
+      if (e.target.name === 'attend') validate('attend');
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      syncConditionals();
+      const errors = Object.keys(rules).map(k => [k, validate(k)]).filter(([, m]) => m);
+      const summary = $('#error-summary');
+      if (errors.length) {
+        $('#error-list').innerHTML = errors.map(([k, m]) =>
+          `<li><a href="#${targets[k].input.id}" data-focus="${targets[k].input.id}">${targets[k].label}: ${m}</a></li>`).join('');
+        summary.hidden = false;
+        summary.scrollIntoView({ block: 'start' });
+        summary.focus({ preventScroll: true });
+        return;
+      }
+      summary.hidden = true;
+
+      const btn = $('#submit-btn');
+      btn.disabled = true;
+      btn.setAttribute('aria-busy', 'true');
+      btn.innerHTML = '<span class="spinner" aria-hidden="true"></span>Enviando…';
+
+      const attending = radioVal('attend') === 'yes';
+      const prev = store.get(STORE_KEY);
+      const data = {
+        name: f.name.value.trim(),
+        email: f.email.value.trim(),
+        attend: attending ? 'yes' : 'no',
+        companion: attending && radioVal('companion') === 'yes' ? f.companion.value.trim() : '',
+        diet: attending ? (f.diet.value === 'Otra' ? f.dietOther.value.trim() : f.diet.value) : '',
+        dietChoice: f.diet.value,
+        dietOther: f.dietOther.value.trim(),
+        message: f.message.value.trim(),
+        code: (prev && prev.code) || makeId(),
+        at: Date.now()
+      };
+
+      setTimeout(() => {
+        store.set(STORE_KEY, data);
+        btn.disabled = false;
+        btn.removeAttribute('aria-busy');
+        btn.textContent = 'Enviar confirmación';
+        renderPass(data);
+        renderInviteState();
+        show('pass');
+      }, 900);
+    });
+
+    $('#error-summary').addEventListener('click', (e) => {
+      const a = e.target.closest('a[data-focus]');
+      if (!a) return;
+      e.preventDefault();
+      const el = document.getElementById(a.dataset.focus);
+      el.scrollIntoView({ block: 'center' });
+      el.focus({ preventScroll: true });
+    });
+
+    function fillForm(data) {
+      form.reset();
+      $$('.error', form).forEach(el => { el.hidden = true; el.textContent = ''; });
+      $$('[aria-invalid]', form).forEach(el => el.setAttribute('aria-invalid', 'false'));
+      $('#error-summary').hidden = true;
+      if (data) {
+        f.name.value = data.name; f.email.value = data.email;
+        form.querySelector(`input[name="attend"][value="${data.attend}"]`).checked = true;
+        form.querySelector(`input[name="companion"][value="${data.companion ? 'yes' : 'no'}"]`).checked = true;
+        f.companion.value = data.companion || '';
+        f.diet.value = data.dietChoice || 'Ninguna';
+        f.dietOther.value = data.dietOther || '';
+        f.message.value = data.message || '';
+      }
+      syncConditionals();
+    }
+
+    /* ── Pase digital ── */
+    function makeId() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let s = '';
+      for (let i = 0; i < 6; i++) s += chars[Math.floor(Math.random() * chars.length)];
+      return 'FA26-' + s;
+    }
+    function hash(str) {
+      let h = 2166136261;
+      for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+      return () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return (h >>> 0) / 4294967296; };
+    }
+    function drawCode(seed) {
+      const N = 21, rnd = hash(seed);
+      const inFinder = (x, y) => [[0, 0], [14, 0], [0, 14]].some(([fx, fy]) => x >= fx - 1 && x <= fx + 7 && y >= fy - 1 && y <= fy + 7);
+      let cells = '<rect x="-1" y="-1" width="23" height="23" fill="#F3F1EC"/>';
+      [[0, 0], [14, 0], [0, 14]].forEach(([x, y]) => {
+        cells += `<rect x="${x}" y="${y}" width="7" height="7" fill="currentColor"/><rect x="${x + 1}" y="${y + 1}" width="5" height="5" fill="#F3F1EC"/><rect x="${x + 2}" y="${y + 2}" width="3" height="3" fill="currentColor"/>`;
+      });
+      for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+        if (!inFinder(x, y) && rnd() > 0.52) cells += `<rect x="${x}" y="${y}" width="1" height="1" fill="currentColor"/>`;
+      }
+      $('#p-code').innerHTML = cells;
+    }
+
+    function renderPass(data) {
+      const first = data.name.split(/\s+/)[0];
+      const yes = data.attend === 'yes';
+      $('#pass-card').hidden = !yes;
+      $('#decline-card').hidden = yes;
+      $('#pass-calendar').hidden = !yes;
+      if (yes) {
+        $('#pass-title').textContent = `¡Te esperamos, ${first}!`;
+        $('#pass-text').textContent = 'Este es tu pase para la noche. Guardalo en tu teléfono.';
+        $('#p-who').textContent = data.name;
+        $('#p-plus').textContent = data.companion || 'Sin acompañante';
+        $('#p-diet').textContent = data.diet === 'Ninguna' ? 'Estándar' : data.diet;
+        $('#p-id').textContent = data.code;
+        drawCode(data.code + data.name);
+      } else {
+        $('#pass-title').textContent = `Gracias por avisar, ${first}`;
+        $('#pass-text').textContent = 'Lamentamos que no puedas acompañarnos. Si cambian tus planes, podés modificar tu respuesta.';
+        $('#decline-summary').innerHTML = [['Asistencia', 'No'], ['Nombre', data.name], ['Email', data.email]]
+          .map(([k, v]) => `<div class="row od-row"><dt class="od-fixed">${k}</dt><dd class="od-fill">${escHtml(v)}</dd></div>`).join('');
+      }
+    }
+
+    /* ── Acciones ── */
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      const action = btn.dataset.action;
+      if (action === 'open-invite') openInvite();
+      else if (action === 'open-rsvp') {
+        const data = store.get(STORE_KEY);
+        if (data) { renderPass(data); show('pass'); }
+        else { fillForm(null); show('rsvp'); }
+      }
+      else if (action === 'edit') { fillForm(store.get(STORE_KEY)); show('rsvp'); }
+      else if (action === 'back' || action === 'home') show('invite');
+      else if (action === 'calendar') downloadIcs();
+      else if (action === 'copy-address') copyAddress();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && (current === 'rsvp' || current === 'pass')) show('invite');
+    });
+
+    renderInviteState();
+    syncConditionals();
+    if (PREVIEW) {
+      try { localStorage.removeItem(STORE_KEY); localStorage.removeItem(OPENED_KEY); } catch {}
+    } else if (store.get(OPENED_KEY)) show('invite');
+    else { current = 'gate'; }
+  })();
+  </script>
+</body>
+</html>

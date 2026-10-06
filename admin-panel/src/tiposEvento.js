@@ -20,3 +20,9 @@ export const NOMBRE_TIPO_EVENTO = {
   corporativo: "Evento corporativo",
   otro: "Otro evento",
 };
+
+// Espejo de DISENOS en server/plantillas.js: cómo se dibuja el sitio.
+export const DISENOS = [
+  { key: "clasico", nombre: "Clásico (papel y dorado)" },
+  { key: "jardin", nombre: "Jardín encantado (acuarela verde)" },
+];

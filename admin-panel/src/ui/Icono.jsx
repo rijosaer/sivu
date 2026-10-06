@@ -105,6 +105,12 @@ const TRAZOS = {
       <path d="M4.5 20a7.5 7.5 0 0 1 15 0" />
     </>
   ),
+  llave: (
+    <>
+      <circle cx="8" cy="15" r="4.5" />
+      <path d="m11.2 11.8 8.3-8.3M17 7l2.5 2.5M14 10l2 2" />
+    </>
+  ),
 };
 
 export default function Icono({ nombre, className = "w-4 h-4" }) {

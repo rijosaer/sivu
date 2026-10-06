@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, urlMedia } from "../api";
+import { vocabulario } from "../vocabulario";
 import { comprimirImagen, pesoLegible } from "../archivos";
 
 // Fotos de los novios: se suben desde el computador o el celular, se
@@ -54,7 +55,7 @@ export default function GestorFotos() {
 
   return (
     <div className="border border-borde rounded-xl p-4 mb-5 bg-lienzo">
-      <p className="bloque-titulo mb-1">Fotos de los novios</p>
+      <p className="bloque-titulo mb-1">{vocabulario().fotos}</p>
       <p className="ayuda mb-3">
         Súbelas desde tu celular o tu computador; puedes seleccionar varias a la vez. Se reducen
         solas para que la invitación cargue rápido con datos móviles.

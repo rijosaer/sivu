@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api, SITIO_BASE } from "../api";
 import CampoValor, { etiquetaDe } from "./EditorCampos";
+import { vocabulario, etiquetaCampo, campoVisible } from "../vocabulario";
 import GestorFotos from "./GestorFotos";
 import EditorServidores from "./EditorServidores";
 import { PRIMERA } from "../servidores";
@@ -92,10 +93,11 @@ function Editor({
   const [verSecundarios, setVerSecundarios] = useState(false);
 
   const secundarios = CAMPOS_SECUNDARIOS[seccion.tipo] || [];
-  const campos = Object.entries(borrador.contenido).filter(([c]) => !secundarios.includes(c));
-  const camposSecundarios = Object.entries(borrador.contenido).filter(([c]) =>
-    secundarios.includes(c)
-  );
+  const voc = vocabulario();
+  const visibles = Object.entries(borrador.contenido).filter(([c, v]) => campoVisible(c, v, voc));
+  const campos = visibles.filter(([c]) => !secundarios.includes(c));
+  const camposSecundarios = visibles.filter(([c]) => secundarios.includes(c));
+  const etiqueta = (clave) => etiquetaCampo(clave, voc) || etiquetaDe(clave);
 
   function setCampo(clave, valor) {
     onCambiar({ ...borrador, contenido: { ...borrador.contenido, [clave]: valor } });
@@ -176,7 +178,7 @@ function Editor({
         <div className="space-y-4">
           {campos.map(([clave, valor]) => (
             <div key={clave}>
-              <span className="etiqueta">{etiquetaDe(clave)}</span>
+              <span className="etiqueta">{etiqueta(clave)}</span>
               <CampoValor clave={clave} valor={valor} onChange={(v) => setCampo(clave, v)} />
             </div>
           ))}
@@ -194,7 +196,7 @@ function Editor({
             <div className="space-y-4 mt-3">
               {camposSecundarios.map(([clave, valor]) => (
                 <div key={clave}>
-                  <span className="etiqueta">{etiquetaDe(clave)}</span>
+                  <span className="etiqueta">{etiqueta(clave)}</span>
                   <CampoValor clave={clave} valor={valor} onChange={(v) => setCampo(clave, v)} />
                 </div>
               ))}

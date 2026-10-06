@@ -1,9 +1,10 @@
 import { Router } from "express";
+import bcrypt from "bcryptjs";
 import { pool } from "../db.js";
 import { capturar } from "../errores.js";
 import { resolverInvitacionAdmin } from "../middlewareInvitacion.js";
 import { soloDueno } from "../auth.js";
-import { TIPOS_EVENTO, temaBase, decoracionesBase, plantillaSecciones } from "../plantillas.js";
+import { TIPOS_EVENTO, DISENOS, temaBase, decoracionesBase, plantillaSecciones } from "../plantillas.js";
 
 // CRUD de invitaciones (los "eventos" del sistema). Es lo que le permite al
 // dueño operar muchos clientes desde un solo panel: cada fila de aquí es una
@@ -59,7 +60,7 @@ invitacionesRouter.get(
     // El dueño ve todos los eventos; un cliente, solo el suyo.
     const soloUno = req.admin.invitacionId || null;
     const { rows } = await pool.query(
-      `SELECT id, slug, nombre, tipo_evento, fecha_evento, activo, es_plantilla, creado_en
+      `SELECT id, slug, nombre, tipo_evento, diseno, fecha_evento, activo, es_plantilla, creado_en
        FROM invitaciones WHERE ($1::int IS NULL OR id = $1) ORDER BY creado_en DESC`,
       [soloUno]
     );
@@ -67,15 +68,65 @@ invitacionesRouter.get(
   })
 );
 
+// Reglas compartidas para el usuario de un cliente: corto, fácil de dictar
+// por WhatsApp y sin sorpresas de teclado.
+const USUARIO_RE = /^[a-z0-9._-]{3,40}$/;
+function validarAccesoCliente(usuario, password) {
+  if (!USUARIO_RE.test(usuario || "")) {
+    return "El usuario solo puede tener minúsculas, números, punto, guion y guion bajo (3 a 40 caracteres)";
+  }
+  if (!password || String(password).length < 6) {
+    return "La contraseña del cliente necesita mínimo 6 caracteres";
+  }
+  return null;
+}
+
+// Crea (o restablece) el usuario de un cliente amarrado a UNA invitación.
+// Es la misma lógica de seed-cliente.js, disponible desde el panel.
+async function guardarUsuarioCliente(client, invitacionId, usuario, password) {
+  const previo = await client.query("SELECT invitacion_id FROM admin_usuarios WHERE usuario = $1", [usuario]);
+  if (previo.rows.length && previo.rows[0].invitacion_id === null) {
+    return { error: `"${usuario}" es el usuario administrador del sistema; elige otro nombre` };
+  }
+  const hash = bcrypt.hashSync(String(password), 10);
+  await client.query(
+    `INSERT INTO admin_usuarios (usuario, password_hash, invitacion_id) VALUES ($1, $2, $3)
+     ON CONFLICT (usuario) DO UPDATE
+       SET password_hash = EXCLUDED.password_hash, invitacion_id = EXCLUDED.invitacion_id`,
+    [usuario, hash, invitacionId]
+  );
+  return { usuario };
+}
+
 invitacionesRouter.post(
   "/",
   soloDueno,
   capturar(async (req, res) => {
-    const { nombre, tipo_evento = "boda", fecha_evento = null, slug: slugPedido } = req.body;
+    const {
+      nombre, tipo_evento = "boda", fecha_evento = null, slug: slugPedido, diseno,
+      plantilla_id = null, usuario = null, password = null,
+    } = req.body;
     if (!nombre?.trim()) return res.status(400).json({ error: "Ponle un nombre a la invitación" });
     if (!TIPOS_EVENTO.includes(tipo_evento)) {
       return res.status(400).json({ error: "Tipo de evento no válido" });
     }
+    if (usuario) {
+      const invalido = validarAccesoCliente(usuario, password);
+      if (invalido) return res.status(400).json({ error: invalido });
+    }
+    // Con plantilla se clonan su tema, decoraciones, ubicaciones y secciones
+    // (nunca sus medios ni sus invitados, que son datos de otro evento).
+    let plantilla = null;
+    if (plantilla_id) {
+      const { rows } = await pool.query(
+        "SELECT id, diseno FROM invitaciones WHERE id = $1 AND es_plantilla = true",
+        [plantilla_id]
+      );
+      if (!rows.length) return res.status(400).json({ error: "Esa plantilla no existe" });
+      plantilla = rows[0];
+    }
+    const disenoFinal = diseno || plantilla?.diseno || "clasico";
+    if (!DISENOS.includes(disenoFinal)) return res.status(400).json({ error: "Diseño no válido" });
     const base = slugificar(slugPedido || nombre) || "invitacion";
     const slug = await slugUnico(base);
 
@@ -83,37 +134,103 @@ invitacionesRouter.post(
     try {
       await client.query("BEGIN");
       const { rows } = await client.query(
-        `INSERT INTO invitaciones (slug, nombre, tipo_evento, fecha_evento)
-         VALUES ($1, $2, $3, $4) RETURNING *`,
-        [slug, nombre.trim(), tipo_evento, fecha_evento || null]
+        `INSERT INTO invitaciones (slug, nombre, tipo_evento, fecha_evento, diseno)
+         VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+        [slug, nombre.trim(), tipo_evento, fecha_evento || null, disenoFinal]
       );
       const invitacion = rows[0];
 
-      for (const [clave, valor] of temaBase()) {
+      if (plantilla) {
         await client.query(
-          "INSERT INTO tema (invitacion_id, clave, valor) VALUES ($1, $2, $3)",
-          [invitacion.id, clave, valor]
+          "INSERT INTO tema (invitacion_id, clave, valor) SELECT $1, clave, valor FROM tema WHERE invitacion_id = $2",
+          [invitacion.id, plantilla.id]
         );
-      }
-      for (const d of decoracionesBase()) {
         await client.query(
-          "INSERT INTO decoraciones (invitacion_id, clave, etiqueta, datos) VALUES ($1, $2, $3, NULL)",
-          [invitacion.id, d.clave, d.etiqueta]
+          `INSERT INTO decoraciones (invitacion_id, clave, etiqueta, datos, personalizada)
+           SELECT $1, clave, etiqueta, datos, personalizada FROM decoraciones WHERE invitacion_id = $2`,
+          [invitacion.id, plantilla.id]
         );
-      }
-      for (const sec of plantillaSecciones(tipo_evento, nombre.trim())) {
+        await client.query(
+          `INSERT INTO decoracion_ubicaciones (invitacion_id, clave, seccion_tipo, x, y, ancho, rotacion, opacidad, capa)
+           SELECT $1, clave, seccion_tipo, x, y, ancho, rotacion, opacidad, capa FROM decoracion_ubicaciones WHERE invitacion_id = $2`,
+          [invitacion.id, plantilla.id]
+        );
         await client.query(
           `INSERT INTO secciones (invitacion_id, tipo, titulo_panel, orden, activo, contenido)
-           VALUES ($1, $2, $3, $4, $5, $6)`,
-          [invitacion.id, sec.tipo, sec.titulo_panel, sec.orden, sec.activo, JSON.stringify(sec.contenido)]
+           SELECT $1, tipo, titulo_panel, orden, activo, contenido FROM secciones WHERE invitacion_id = $2`,
+          [invitacion.id, plantilla.id]
         );
+      } else {
+        for (const [clave, valor] of temaBase()) {
+          await client.query(
+            "INSERT INTO tema (invitacion_id, clave, valor) VALUES ($1, $2, $3)",
+            [invitacion.id, clave, valor]
+          );
+        }
+        for (const d of decoracionesBase()) {
+          await client.query(
+            "INSERT INTO decoraciones (invitacion_id, clave, etiqueta, datos) VALUES ($1, $2, $3, NULL)",
+            [invitacion.id, d.clave, d.etiqueta]
+          );
+        }
+        for (const sec of plantillaSecciones(tipo_evento, nombre.trim())) {
+          await client.query(
+            `INSERT INTO secciones (invitacion_id, tipo, titulo_panel, orden, activo, contenido)
+             VALUES ($1, $2, $3, $4, $5, $6)`,
+            [invitacion.id, sec.tipo, sec.titulo_panel, sec.orden, sec.activo, JSON.stringify(sec.contenido)]
+          );
+        }
+      }
+
+      let acceso = null;
+      if (usuario) {
+        acceso = await guardarUsuarioCliente(client, invitacion.id, usuario, password);
+        if (acceso.error) {
+          await client.query("ROLLBACK");
+          return res.status(400).json({ error: acceso.error });
+        }
       }
 
       await client.query("COMMIT");
-      res.status(201).json(invitacion);
+      res.status(201).json({ ...invitacion, acceso });
     } catch (e) {
       await client.query("ROLLBACK").catch(() => {});
       throw e;
+    } finally {
+      client.release();
+    }
+  })
+);
+
+// Qué usuarios de cliente tienen acceso a esta invitación (solo el nombre,
+// jamás el hash de la contraseña).
+invitacionesRouter.get(
+  "/:invitacionId/acceso",
+  soloDueno,
+  resolverInvitacionAdmin,
+  capturar(async (req, res) => {
+    const { rows } = await pool.query(
+      "SELECT usuario FROM admin_usuarios WHERE invitacion_id = $1 ORDER BY usuario",
+      [req.invitacionId]
+    );
+    res.json(rows.map((r) => r.usuario));
+  })
+);
+
+// Crear o restablecer el usuario de un cliente para esta invitación.
+invitacionesRouter.post(
+  "/:invitacionId/usuario",
+  soloDueno,
+  resolverInvitacionAdmin,
+  capturar(async (req, res) => {
+    const { usuario, password } = req.body;
+    const invalido = validarAccesoCliente(usuario, password);
+    if (invalido) return res.status(400).json({ error: invalido });
+    const client = await pool.connect();
+    try {
+      const acceso = await guardarUsuarioCliente(client, req.invitacionId, usuario, password);
+      if (acceso.error) return res.status(400).json({ error: acceso.error });
+      res.status(201).json(acceso);
     } finally {
       client.release();
     }
@@ -134,10 +251,11 @@ invitacionesRouter.put(
   soloDueno,
   resolverInvitacionAdmin,
   capturar(async (req, res) => {
-    const { nombre, slug: slugPedido, tipo_evento, fecha_evento, activo, es_plantilla } = req.body;
+    const { nombre, slug: slugPedido, tipo_evento, fecha_evento, activo, es_plantilla, diseno } = req.body;
     if (tipo_evento && !TIPOS_EVENTO.includes(tipo_evento)) {
       return res.status(400).json({ error: "Tipo de evento no válido" });
     }
+    if (diseno && !DISENOS.includes(diseno)) return res.status(400).json({ error: "Diseño no válido" });
     let slug = null;
     if (slugPedido && slugPedido !== req.invitacion.slug) {
       const candidato = slugificar(slugPedido);
@@ -157,6 +275,7 @@ invitacionesRouter.put(
          fecha_evento = CASE WHEN $5::boolean THEN $6::date ELSE fecha_evento END,
          activo = COALESCE($7, activo),
          es_plantilla = COALESCE($8, es_plantilla),
+         diseno = COALESCE($9, diseno),
          actualizado_en = now()
        WHERE id = $1 RETURNING *`,
       [
@@ -168,9 +287,72 @@ invitacionesRouter.put(
         fecha_evento || null,
         activo,
         es_plantilla,
+        diseno || null,
       ]
     );
     res.json(rows[0]);
+  })
+);
+
+// Copia completa de una invitación: tema, decoraciones (con sus imágenes),
+// ubicaciones, secciones y medios. Los invitados NO se copian: son personas
+// reales del evento original y una copia suele ser para otro evento (o de
+// ejemplo), donde esos nombres y códigos no tienen por qué estar.
+invitacionesRouter.post(
+  "/:invitacionId/duplicar",
+  soloDueno,
+  resolverInvitacionAdmin,
+  capturar(async (req, res) => {
+    const { nombre, slug: slugPedido } = req.body;
+    if (!nombre?.trim()) return res.status(400).json({ error: "Ponle un nombre a la copia" });
+    const base = slugificar(slugPedido || nombre) || "invitacion";
+    const slug = await slugUnico(base);
+    const origen = req.invitacionId;
+
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      const { rows } = await client.query(
+        `INSERT INTO invitaciones (slug, nombre, tipo_evento, fecha_evento, diseno)
+         SELECT $1, $2, tipo_evento, fecha_evento, diseno FROM invitaciones WHERE id = $3
+         RETURNING *`,
+        [slug, nombre.trim(), origen]
+      );
+      const copia = rows[0];
+
+      await client.query(
+        "INSERT INTO tema (invitacion_id, clave, valor) SELECT $1, clave, valor FROM tema WHERE invitacion_id = $2",
+        [copia.id, origen]
+      );
+      await client.query(
+        `INSERT INTO decoraciones (invitacion_id, clave, etiqueta, datos, personalizada)
+         SELECT $1, clave, etiqueta, datos, personalizada FROM decoraciones WHERE invitacion_id = $2`,
+        [copia.id, origen]
+      );
+      await client.query(
+        `INSERT INTO decoracion_ubicaciones (invitacion_id, clave, seccion_tipo, x, y, ancho, rotacion, opacidad, capa)
+         SELECT $1, clave, seccion_tipo, x, y, ancho, rotacion, opacidad, capa FROM decoracion_ubicaciones WHERE invitacion_id = $2`,
+        [copia.id, origen]
+      );
+      await client.query(
+        `INSERT INTO secciones (invitacion_id, tipo, titulo_panel, orden, activo, contenido)
+         SELECT $1, tipo, titulo_panel, orden, activo, contenido FROM secciones WHERE invitacion_id = $2`,
+        [copia.id, origen]
+      );
+      await client.query(
+        `INSERT INTO medios (invitacion_id, tipo, mime, nombre, datos, orden)
+         SELECT $1, tipo, mime, nombre, datos, orden FROM medios WHERE invitacion_id = $2`,
+        [copia.id, origen]
+      );
+
+      await client.query("COMMIT");
+      res.status(201).json(copia);
+    } catch (e) {
+      await client.query("ROLLBACK").catch(() => {});
+      throw e;
+    } finally {
+      client.release();
+    }
   })
 );
 

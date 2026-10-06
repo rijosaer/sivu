@@ -9,28 +9,21 @@ import {
   marcadoresDesconocidos,
 } from "../whatsapp";
 import { comoEnlace } from "../servidores";
+import { vocabulario } from "../vocabulario";
 
-// Texto con el que se comparte la participación a quienes no van a la boda
-// civil. Es solo el punto de partida: se edita aquí y queda guardado en el
-// tema ("whatsapp-noticia"), igual que los otros dos mensajes.
-const NOTICIA_POR_DEFECTO = `¡Tenemos una hermosa noticia! ✨
-
-Muy pronto comenzaremos una nueva etapa de nuestras vidas: ¡nos casamos! ❤️
-
-Aunque no podamos celebrar este día con todas las personas que apreciamos, queríamos compartir contigo nuestra felicidad y este momento tan especial.
-
-
-{enlace}`;
+// El texto de la participación (para quienes no están invitados) depende del
+// tipo de evento y vive en vocabulario.js. Es solo el punto de partida: se
+// edita aquí y queda guardado en el tema ("whatsapp-noticia").
 
 // Los marcadores, explicados en una línea cada uno. Antes vivían en un párrafo
 // de doce renglones que nadie leía; aquí se insertan con un clic donde esté el
 // cursor, que es como se aprenden de verdad.
-const MARCADORES = [
+const marcadores = (elEvento) => [
   { clave: "{nombre}", que: "El nombre de esa invitación" },
   { clave: "{enlace}", que: "Su enlace personal" },
   { clave: "{cupos}", que: "Frase de los cupos (vacío si no tiene)" },
   { clave: "{plazo}", que: "«quedan 5 días para confirmar»" },
-  { clave: "{dias}", que: "Días que faltan para la boda" },
+  { clave: "{dias}", que: `Días que faltan para ${elEvento}` },
   { clave: "{dias_limite}", que: "Días para el cierre (solo el número)" },
 ];
 
@@ -297,7 +290,9 @@ export default function Mensajes() {
   const toast = useToast();
   const [plantilla, setPlantilla] = useState("");
   const [recordatorio, setRecordatorio] = useState("");
-  const [noticia, setNoticia] = useState(NOTICIA_POR_DEFECTO);
+  const voc = vocabulario();
+  const MARCADORES = marcadores(voc.elEvento);
+  const [noticia, setNoticia] = useState(voc.noticia);
   const [servidores, setServidores] = useState(SERVIDORES_POR_DEFECTO);
   const [fechas, setFechas] = useState({});
   const [personas, setPersonas] = useState([]);
@@ -317,7 +312,7 @@ export default function Mensajes() {
         claveTema(tema, "whatsapp-recordatorio") ||
           "Hola {nombre}, te recordamos confirmar tu asistencia ({plazo}): {enlace}"
       );
-      setNoticia(claveTema(tema, "whatsapp-noticia") || NOTICIA_POR_DEFECTO);
+      setNoticia(claveTema(tema, "whatsapp-noticia") || voc.noticia);
       setServidores(claveTema(tema, "whatsapp-servidores") || SERVIDORES_POR_DEFECTO);
       setCargando(false);
     });
@@ -374,11 +369,11 @@ export default function Mensajes() {
           </p>
           <p className="ayuda mt-1">
             {cuenta.diasLimite === null && cuenta.dias === null
-              ? "No se pudieron leer las fechas de la boda."
+              ? `No se pudieron leer las fechas de ${voc.elEvento}.`
               : cuenta.diasLimite === null
                 ? "Falta la fecha límite de confirmación."
-                : "Falta la fecha de la boda."}{" "}
-            Se configuran en Contenido → Información de la boda.
+                : `Falta la fecha de ${voc.elEvento}.`}{" "}
+            Se configuran en Contenido, en la sección con la fecha y el lugar.
           </p>
         </div>
       )}
@@ -405,7 +400,7 @@ export default function Mensajes() {
 
       <Editor
         titulo="Participación"
-        descripcion="Para quienes no van a la boda civil: solo la noticia, sin confirmación."
+        descripcion={`Para quienes no están invitados a ${voc.elEvento}: solo la noticia, sin confirmación.`}
         valor={noticia}
         marcadores={MARCADORES_NOTICIA}
         ejemplo={{ enlace: `${SITIO_BASE}?anuncio=1`, ...cuenta }}

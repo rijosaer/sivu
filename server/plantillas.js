@@ -20,6 +20,10 @@ export const TIPOS_EVENTO = [
   "otro",
 ];
 
+// Diseños con los que el sitio puede dibujar una invitación (columna
+// invitaciones.diseno). Tiene que coincidir con src/disenos del sitio.
+export const DISENOS = ["clasico", "jardin"];
+
 export const NOMBRE_TIPO_EVENTO = {
   boda: "Boda",
   xv: "XV años",
@@ -185,6 +189,13 @@ const PLANTILLAS = {
       nota: "",
     }),
     s("faq", "Preguntas frecuentes", 7, { items: [] }),
+    s("historia", "Mi historia", 8, {
+      texto: "Aquí va un texto corto sobre la quinceañera.",
+    }, false),
+    s("sobres", "Lluvia de sobres", 9, {
+      texto: "Tu presencia es el mejor regalo. Si deseas tener un detalle conmigo, lo recibiré con cariño en una lluvia de sobres.",
+    }, false),
+    s("musica", "Música de fondo", 10, { titulo: "", src: "" }),
   ],
 
   baby_shower: (nombre) => [

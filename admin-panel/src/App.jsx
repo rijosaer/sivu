@@ -18,6 +18,7 @@ import {
 } from "./api";
 import SelectorEventos from "./pages/SelectorEventos";
 import { NOMBRE_TIPO_EVENTO } from "./tiposEvento";
+import { vocabulario } from "./vocabulario";
 import { PendientesProvider, usePendientes } from "./estado/Pendientes";
 import { ToastProvider } from "./ui/Toast";
 import { useAvisos } from "./notificaciones/useAvisos";
@@ -144,6 +145,7 @@ function Cascara({ onSalir, evento, onCambiarEvento }) {
   const avisos = useAvisos();
   const actual = TABS.find((t) => t.key === tab);
   const { Componente } = actual;
+  const descripcion = tab === "resumen" ? vocabulario(evento.tipo_evento).resumen : actual.descripcion;
 
   return (
     <div className="min-h-screen panel-lienzo lg:grid lg:grid-cols-[15rem_minmax(0,1fr)]">
@@ -186,7 +188,7 @@ function Cascara({ onSalir, evento, onCambiarEvento }) {
                 sirve: el título grande de cada pantalla se apoya en esto. */}
             <div className="hidden lg:block min-w-0">
               <h1 className="text-sm font-semibold text-ink truncate">{actual.titulo}</h1>
-              <p className="text-[11px] text-ink-tenue truncate">{actual.descripcion}</p>
+              <p className="text-[11px] text-ink-tenue truncate">{descripcion}</p>
             </div>
           </div>
 

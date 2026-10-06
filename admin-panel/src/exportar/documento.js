@@ -10,6 +10,7 @@
 // del navegador sin nada más.
 
 import { contextoDe, esUnaSolaPersona } from "../relaciones";
+import { vocabulario } from "../vocabulario";
 
 export const FORMATOS = [
   {
@@ -29,7 +30,7 @@ export const FORMATOS = [
   },
   {
     key: "resumen",
-    label: "Resumen de la boda",
+    label: "Resumen del evento",
     para: "Una página con los números, el avance y quién falta por responder.",
   },
 ];
@@ -231,7 +232,7 @@ function portada(evento, opciones, titulo, cuantos) {
   const novios = [evento.novioEl, evento.novioElla].filter(Boolean);
   return `
     <section class="portada">
-      <p class="antetitulo">${esc(evento.antetitulo || "Nuestra boda")}</p>
+      <p class="antetitulo">${esc(evento.antetitulo || vocabulario().muestra.antetitulo)}</p>
       <h1>${esc(novios[0] || "")}${novios.length === 2 ? `<span class="amp">&amp;</span>${esc(novios[1])}` : ""}</h1>
       <div class="filete"><i></i><b></b><i></i></div>
       ${evento.fecha ? `<p class="fecha">${esc(fechaLarga(evento.fecha))}</p>` : ""}

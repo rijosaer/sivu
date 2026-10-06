@@ -15,12 +15,16 @@ const AVISOS = [
   { icono: "⏳", texto: "Recordatorio enviado", sub: "a 6 pendientes", color: "#B87F1E" },
 ];
 
+// "vista" es la vista previa en vivo que se abre en el modal: la boda carga la
+// invitación real de Maite & Ricardo (los datos de ejemplo del sistema) y las
+// demás cargan las maquetas estáticas de /modelos. Sin "vista", se muestra la
+// tarjeta ilustrada de siempre.
 const MODELOS = [
-  { tipo: "Boda", nombre: "Camila & Andrés", desc: "Acuarela europea: azul empolvado, ornamento floral y mucho blanco.", fondo: "linear-gradient(200deg,#DDE6F3,#7C97C4 55%,#2A4266)", tinta: "#fff", fuente: "script" },
-  { tipo: "XV años", nombre: "Valentina", desc: "Botánico de cristal: verde bosque, salvia y champán dorado.", fondo: "linear-gradient(155deg,#1b3b2b,#657e6c 60%,#b59556)", tinta: "#fff", fuente: "serif" },
+  { tipo: "Boda", nombre: "Ana & Diego", desc: "Papel, mármol y dorado: la invitación clásica con enlace único por invitado.", fondo: "linear-gradient(200deg,#F8F4EE,#EFEAE1 55%,#D9BE87)", tinta: "#5C4530", fuente: "script", vista: "/ana-y-diego" },
+  { tipo: "XV años", nombre: "Valentina", desc: "Acuarela de ensueño: menta y durazno, con cuenta regresiva y confirmación.", fondo: "linear-gradient(155deg,#1b3b2b,#657e6c 60%,#b59556)", tinta: "#fff", fuente: "serif", vista: "/modelos/xv.html?preview=1" },
   { tipo: "Baby shower", nombre: "Bienvenido Mateo", desc: "Esmeralda y crema, tierno, con lista de regalos y juegos.", fondo: "linear-gradient(155deg,#0B4A35,#1E8F68 60%,#CFE3C8)", tinta: "#FBF3E4", fuente: "script" },
   { tipo: "Cumpleaños", nombre: "Sofía cumple 5", desc: "Azul cielo y sol, juguetón, con tema de disfraz.", fondo: "linear-gradient(155deg,#0E4676,#2E8FD4 55%,#E3A63E)", tinta: "#FBF3E4", fuente: "script" },
-  { tipo: "Corporativo", nombre: "Gala Nortex", desc: "Azul marino y oro, sobrio, con agenda y registro de entrada.", fondo: "linear-gradient(155deg,#0A1220,#101A2E 60%,#E3A63E)", tinta: "#EEF0F1", fuente: "serif" },
+  { tipo: "Corporativo", nombre: "Gala Nortex", desc: "Negro y lima neón, con agenda de la noche y pase digital.", fondo: "linear-gradient(155deg,#0A1220,#101A2E 60%,#D4FF3A)", tinta: "#EEF0F1", fuente: "serif", vista: "/modelos/corporativo.html?preview=1" },
 ];
 
 const PREGUNTAS = [
@@ -30,6 +34,28 @@ const PREGUNTAS = [
   ["¿Puedo cambiar la información después de enviarla?", "Sí. Fecha, lugar, textos, fotos y música se actualizan y todos los invitados ven el cambio al instante, sin reenviar nada."],
   ["¿Sirve para eventos que no son bodas?", "Sí: XV años, bautizos, baby showers, cumpleaños, grados, aniversarios y eventos de empresa."],
 ];
+
+// Personalización en vivo del preview: qué campo pide cada modelo y cómo se
+// llama el query param que entiende su invitación. La boda además cambia la
+// fecha (el sitio la deriva todo de ahí: cuenta regresiva, textos, calendario).
+const PERSONALIZA = {
+  "Boda": { etiqueta: "Nombres de la pareja", ejemplo: "Ana & Diego", paramNombre: "demo_novios", paramFecha: "demo_fecha" },
+  "XV años": { etiqueta: "Nombre de la quinceañera", ejemplo: "Valentina Morales", paramNombre: "nombre" },
+  "Corporativo": { etiqueta: "Nombre de la empresa", ejemplo: "Nortex Colombia", paramNombre: "empresa" },
+};
+
+function urlVista(modelo, demo) {
+  if (!modelo.vista) return null;
+  const q = new URLSearchParams();
+  const p = PERSONALIZA[modelo.tipo];
+  if (p && demo.nombres.trim()) q.set(p.paramNombre, demo.nombres.trim());
+  if (p?.paramFecha && demo.fecha) q.set(p.paramFecha, demo.fecha);
+  if (modelo.vista.includes("?")) {
+    const [base, fija] = modelo.vista.split("?");
+    return `${base}?${fija}${q.size ? "&" + q : ""}`;
+  }
+  return q.size ? `${modelo.vista}?${q}` : modelo.vista;
+}
 
 // Aparición suave al hacer scroll (respeta "reducir movimiento").
 function useAparecer() {
@@ -131,6 +157,7 @@ function Tablero() {
 
 export default function Landing() {
   const ref = useAparecer();
+  const [modeloActivo, setModeloActivo] = useState(null);
   useEffect(() => {
     document.title = "Convite · Invitaciones digitales que enamoran";
     const link = document.createElement("link");
@@ -260,7 +287,8 @@ export default function Landing() {
           <div className="cv-galeria">
             {MODELOS.map((m, k) => (
               <a key={m.tipo} className="cv-modelo" data-aparece style={{ transitionDelay: `${k * 0.08}s` }}
-                 href={waLink(`Hola, me gusta el estilo «${m.tipo}» de Convite para mi evento.`)} target="_blank" rel="noreferrer">
+                 href={m.vista || waLink(`Hola, me gusta el estilo «${m.tipo}» de Convite para mi evento.`)} target="_blank" rel="noreferrer"
+                 onClick={(e) => { e.preventDefault(); setModeloActivo(m); }}>
                 <div className="cv-modelo-tarjeta" style={{ background: m.fondo, color: m.tinta }}>
                   <span className="cv-modelo-marco" />
                   <span className="cv-modelo-tipo">{m.tipo}</span>
@@ -303,6 +331,29 @@ export default function Landing() {
       <a className="cv-flotante" href={hola} target="_blank" rel="noreferrer" aria-label="Escribir por WhatsApp">
         <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true"><path fill="currentColor" d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3Zm0 23.6a10.6 10.6 0 0 1-5.4-1.5l-.4-.2-3.9 1 1-3.8-.3-.4A10.6 10.6 0 1 1 16 26.6Zm5.8-7.9c-.3-.2-1.9-.9-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7.1a8.7 8.7 0 0 1-4.3-3.8c-.3-.6.3-.5.9-1.7.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.6 3.6 0 0 0-1.1 2.7 6.3 6.3 0 0 0 1.3 3.3 14.4 14.4 0 0 0 5.5 4.9c2 .9 2.8.9 3.8.8a3.3 3.3 0 0 0 2.2-1.5 2.7 2.7 0 0 0 .2-1.5c-.1-.2-.3-.3-.7-.5Z"/></svg>
       </a>
+      {modeloActivo && (
+        <div className="cv-modal-fondo" role="presentation" onMouseDown={() => setModeloActivo(null)}>
+          <section className="cv-modal" role="dialog" aria-modal="true" aria-labelledby="modelo-titulo" onMouseDown={(e) => e.stopPropagation()}>
+            <button type="button" className="cv-modal-cerrar" onClick={() => setModeloActivo(null)} aria-label="Cerrar vista previa">×</button>
+            <span className="cv-eyebrow cv-vino">Vista previa con datos de ejemplo</span>
+            <h3 id="modelo-titulo">{modeloActivo.tipo}: {modeloActivo.nombre}</h3>
+            {modeloActivo.vista ? (
+              <iframe className="cv-modal-iframe" title={`Modelo de ${modeloActivo.tipo} con datos de ejemplo`} src={modeloActivo.vista} />
+            ) : (
+              <div className="cv-modal-muestra" style={{ background: modeloActivo.fondo, color: modeloActivo.tinta }}>
+                <span className="cv-modelo-marco" /><span className="cv-modelo-tipo">{modeloActivo.tipo}</span><strong className={modeloActivo.fuente === "script" ? "cv-modelo-nombre cv-script" : "cv-modelo-nombre cv-serif-it"}>{modeloActivo.nombre}</strong><span>Tu celebración comienza aquí</span>
+              </div>
+            )}
+            <p>{modeloActivo.desc}</p>
+            <div className="cv-modal-acciones">
+              <a className="cv-btn cv-btn-oro" href={waLink(`Hola, me gusta el estilo ${modeloActivo.tipo} de Convite para mi evento.`)} target="_blank" rel="noreferrer">Quiero este estilo</a>
+              {modeloActivo.vista && (
+                <a className="cv-btn cv-btn-linea" href={modeloActivo.vista} target="_blank" rel="noreferrer">Abrir en pestaña</a>
+              )}
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 }
