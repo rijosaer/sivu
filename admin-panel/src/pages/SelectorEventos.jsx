@@ -90,6 +90,10 @@ function FormularioNuevo({ plantillas, onCreado, onCancelar }) {
   const [clave, setClave] = useState("");
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
+  // Solo se ofrecen plantillas del mismo tipo: una boda clonada en unos XV
+  // traería secciones y textos de boda.
+  const delTipo = plantillas.filter((p) => p.tipo_evento === tipoEvento);
+  const nombreDiseno = (key) => DISENOS.find((d) => d.key === (key || "clasico"))?.nombre || key;
 
   async function crear(e) {
     e.preventDefault();
@@ -139,7 +143,14 @@ function FormularioNuevo({ plantillas, onCreado, onCancelar }) {
       <div className="grid grid-cols-2 gap-3 mb-4">
         <label className="block">
           <span className="etiqueta">Tipo de evento</span>
-          <select className="campo" value={tipoEvento} onChange={(e) => setTipoEvento(e.target.value)}>
+          <select
+            className="campo"
+            value={tipoEvento}
+            onChange={(e) => {
+              setTipoEvento(e.target.value);
+              setPlantillaId("");
+            }}
+          >
             {TIPOS_EVENTO.map((t) => (
               <option key={t} value={t}>
                 {NOMBRE_TIPO_EVENTO[t]}
@@ -158,12 +169,23 @@ function FormularioNuevo({ plantillas, onCreado, onCancelar }) {
         <span className="etiqueta">Plantilla de partida</span>
         <select className="campo" value={plantillaId} onChange={(e) => setPlantillaId(e.target.value)}>
           <option value="">En blanco (contenido de arranque del tipo de evento)</option>
-          {plantillas.map((p) => (
+          {delTipo.map((p) => (
             <option key={p.id} value={p.id}>
-              {p.nombre} ({NOMBRE_TIPO_EVENTO[p.tipo_evento] || p.tipo_evento})
+              {p.nombre} — {nombreDiseno(p.diseno)}
             </option>
           ))}
         </select>
+        {delTipo.length === 0 && (
+          <span className="ayuda mt-1 block">
+            Aún no hay plantillas de {NOMBRE_TIPO_EVENTO[tipoEvento]}. Marca un evento como plantilla para
+            que aparezca aquí.
+          </span>
+        )}
+        {plantillaId && (
+          <span className="ayuda mt-1 block">
+            Se copian su diseño, sus colores y sus textos; nunca sus invitados ni sus fotos.
+          </span>
+        )}
       </label>
 
       {!plantillaId && (
@@ -333,6 +355,15 @@ function TarjetaEvento({ inv, onEntrar, onCambio, onBorrar }) {
     }
   }
 
+  async function alternarPlantilla() {
+    setGuardando(true);
+    try {
+      onCambio(await api.actualizarInvitacion(inv.id, { es_plantilla: !inv.es_plantilla }));
+    } finally {
+      setGuardando(false);
+    }
+  }
+
   async function alternarActivo() {
     setGuardando(true);
     try {
@@ -399,6 +430,11 @@ function TarjetaEvento({ inv, onEntrar, onCambio, onBorrar }) {
             </option>
           ))}
         </select>
+      </label>
+
+      <label className="flex items-center gap-2 text-[11px] text-ink-suave cursor-pointer">
+        <input type="checkbox" checked={Boolean(inv.es_plantilla)} onChange={alternarPlantilla} disabled={guardando} />
+        Usar como plantilla para nuevos eventos de {NOMBRE_TIPO_EVENTO[inv.tipo_evento] || "este tipo"}
       </label>
 
       <AccesoCliente inv={inv} />
