@@ -15,17 +15,14 @@ const AVISOS = [
   { icono: "⏳", texto: "Recordatorio enviado", sub: "a 6 pendientes", color: "#B87F1E" },
 ];
 
-// "vista" es la vista previa en vivo que se abre en el modal: la boda carga la
-// invitación real de ejemplo (Ana & Diego) y los demás la demostración pública
-// de su diseño (/plantillas/<diseño>, con datos de ejemplo y sin base de datos).
-// Sin "vista", se muestra la tarjeta ilustrada de siempre.
+// Cada modelo se muestra como la invitación misma, funcionando dentro de un
+// celular: la boda carga la invitación de ejemplo (Ana & Diego) y los demás la
+// demostración pública de su diseño (/plantillas/<diseño>, sin base de datos).
 const MODELOS = [
-  { tipo: "Boda", nombre: "Ana & Diego", desc: "Clásico: papel, mármol y dorado, con enlace único por invitado.", fondo: "linear-gradient(200deg,#F8F4EE,#EFEAE1 55%,#D9BE87)", tinta: "#5C4530", fuente: "script", vista: "/ana-y-diego" },
-  { tipo: "XV años", nombre: "Zoe Antonella", desc: "Jardín encantado: acuarela verde con princesa, sobre que se abre con sello de lacre y castillo.", fondo: "linear-gradient(155deg,#3D5530,#7F9663 58%,#E6E3C6)", tinta: "#fff", fuente: "script", vista: "/plantillas/jardin?preview=1" },
-  { tipo: "XV años", nombre: "Valentina", desc: "Ensueño: acuarela menta y durazno con un palacio entre nubes, cuenta regresiva y confirmación.", fondo: "linear-gradient(155deg,#1b3b2b,#657e6c 60%,#b59556)", tinta: "#fff", fuente: "serif", vista: "/plantillas/ensueno?preview=1" },
-  { tipo: "Corporativo", nombre: "Gala de fin de año", desc: "Gala: negro y lima neón, con ticket de entrada y programa hora por hora.", fondo: "linear-gradient(155deg,#0A1220,#101A2E 60%,#D4FF3A)", tinta: "#EEF0F1", fuente: "serif", vista: "/plantillas/gala?preview=1" },
-  { tipo: "Baby shower", nombre: "Bienvenido Mateo", desc: "Esmeralda y crema, tierno, con lista de regalos y juegos.", fondo: "linear-gradient(155deg,#0B4A35,#1E8F68 60%,#CFE3C8)", tinta: "#FBF3E4", fuente: "script" },
-  { tipo: "Cumpleaños", nombre: "Sofía cumple 5", desc: "Azul cielo y sol, juguetón, con tema de disfraz.", fondo: "linear-gradient(155deg,#0E4676,#2E8FD4 55%,#E3A63E)", tinta: "#FBF3E4", fuente: "script" },
+  { estilo: "Clásico", vista: "/ana-y-diego" },
+  { estilo: "Jardín encantado", vista: "/plantillas/jardin" },
+  { estilo: "Ensueño", vista: "/plantillas/ensueno" },
+  { estilo: "Gala", vista: "/plantillas/gala" },
 ];
 
 const PREGUNTAS = [
@@ -158,7 +155,6 @@ function Tablero() {
 
 export default function Landing() {
   const ref = useAparecer();
-  const [modeloActivo, setModeloActivo] = useState(null);
   useEffect(() => {
     document.title = "Convite · Invitaciones digitales que enamoran";
     const link = document.createElement("link");
@@ -285,22 +281,22 @@ export default function Landing() {
         <div className="cv-cont">
           <span className="cv-eyebrow cv-oro">Modelos</span>
           <h2 className="cv-crema">Un estilo para <span className="cv-script cv-oro">cada historia</span></h2>
-          <div className="cv-galeria">
-            {MODELOS.map((m, k) => (
-              <a key={m.nombre} className="cv-modelo" data-aparece style={{ transitionDelay: `${k * 0.08}s` }}
-                 href={m.vista || waLink(`Hola, me gusta el estilo «${m.tipo}» de Convite para mi evento.`)} target="_blank" rel="noreferrer"
-                 onClick={(e) => { e.preventDefault(); setModeloActivo(m); }}>
-                <div className="cv-modelo-tarjeta" style={{ background: m.fondo, color: m.tinta }}>
-                  <span className="cv-modelo-marco" />
-                  <span className="cv-modelo-tipo">{m.tipo}</span>
-                  <span className={m.fuente === "script" ? "cv-modelo-nombre cv-script" : "cv-modelo-nombre cv-serif-it"}>{m.nombre}</span>
+          <div className="cv-telefonos">
+            {MODELOS.map((m) => (
+              <div key={m.vista} className="cv-telefono-item" data-aparece>
+                <div className="cv-telefono">
+                  <span className="cv-telefono-camara" aria-hidden="true" />
+                  <iframe
+                    title={`Invitación de ejemplo, estilo ${m.estilo}`}
+                    src={`${m.vista}${m.vista.includes("?") ? "&" : "?"}preview=1`}
+                    loading="lazy"
+                  />
                 </div>
-                <div className="cv-modelo-pie">
-                  <span className="cv-eyebrow cv-oro">{m.tipo}</span>
-                  <p>{m.desc}</p>
-                  <span className="cv-modelo-cta">Quiero este estilo →</span>
+                <div className="cv-telefono-acciones">
+                  <a className="cv-btn cv-btn-oro" href={waLink(`Hola, me gusta el estilo «${m.estilo}» de Convite para mi evento.`)} target="_blank" rel="noreferrer">La quiero</a>
+                  <a className="cv-btn cv-btn-linea" href={m.vista} target="_blank" rel="noreferrer">Ver en grande</a>
                 </div>
-              </a>
+              </div>
             ))}
           </div>
         </div>
@@ -332,29 +328,6 @@ export default function Landing() {
       <a className="cv-flotante" href={hola} target="_blank" rel="noreferrer" aria-label="Escribir por WhatsApp">
         <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true"><path fill="currentColor" d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3Zm0 23.6a10.6 10.6 0 0 1-5.4-1.5l-.4-.2-3.9 1 1-3.8-.3-.4A10.6 10.6 0 1 1 16 26.6Zm5.8-7.9c-.3-.2-1.9-.9-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7.1a8.7 8.7 0 0 1-4.3-3.8c-.3-.6.3-.5.9-1.7.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.6 3.6 0 0 0-1.1 2.7 6.3 6.3 0 0 0 1.3 3.3 14.4 14.4 0 0 0 5.5 4.9c2 .9 2.8.9 3.8.8a3.3 3.3 0 0 0 2.2-1.5 2.7 2.7 0 0 0 .2-1.5c-.1-.2-.3-.3-.7-.5Z"/></svg>
       </a>
-      {modeloActivo && (
-        <div className="cv-modal-fondo" role="presentation" onMouseDown={() => setModeloActivo(null)}>
-          <section className="cv-modal" role="dialog" aria-modal="true" aria-labelledby="modelo-titulo" onMouseDown={(e) => e.stopPropagation()}>
-            <button type="button" className="cv-modal-cerrar" onClick={() => setModeloActivo(null)} aria-label="Cerrar vista previa">×</button>
-            <span className="cv-eyebrow cv-vino">Vista previa con datos de ejemplo</span>
-            <h3 id="modelo-titulo">{modeloActivo.tipo}: {modeloActivo.nombre}</h3>
-            {modeloActivo.vista ? (
-              <iframe className="cv-modal-iframe" title={`Modelo de ${modeloActivo.tipo} con datos de ejemplo`} src={modeloActivo.vista} />
-            ) : (
-              <div className="cv-modal-muestra" style={{ background: modeloActivo.fondo, color: modeloActivo.tinta }}>
-                <span className="cv-modelo-marco" /><span className="cv-modelo-tipo">{modeloActivo.tipo}</span><strong className={modeloActivo.fuente === "script" ? "cv-modelo-nombre cv-script" : "cv-modelo-nombre cv-serif-it"}>{modeloActivo.nombre}</strong><span>Tu celebración comienza aquí</span>
-              </div>
-            )}
-            <p>{modeloActivo.desc}</p>
-            <div className="cv-modal-acciones">
-              <a className="cv-btn cv-btn-oro" href={waLink(`Hola, me gusta el estilo ${modeloActivo.tipo} de Convite para mi evento.`)} target="_blank" rel="noreferrer">Quiero este estilo</a>
-              {modeloActivo.vista && (
-                <a className="cv-btn cv-btn-linea" href={modeloActivo.vista.replace("?preview=1", "")} target="_blank" rel="noreferrer">Abrir en pestaña</a>
-              )}
-            </div>
-          </section>
-        </div>
-      )}
     </div>
   );
 }

@@ -225,3 +225,21 @@
   .cv-galeria{grid-template-columns:1fr 1fr;gap:14px}
   .cv-seccion{padding:76px 0}
 }
+
+/* Modelos: cada invitación funcionando dentro de un celular. El iframe mide
+   390×844 (un teléfono real) y se escala al ancho de la pantalla del marco. */
+.cv-telefonos{--ancho:260px;--esc:.6205;display:flex;gap:28px;justify-content:center;flex-wrap:wrap;margin-top:44px}
+.cv-telefono-item{display:flex;flex-direction:column;align-items:center;gap:16px}
+.cv-telefono{position:relative;width:var(--ancho);aspect-ratio:390/844;padding:9px;border-radius:42px;background:linear-gradient(160deg,#3f4146,#16171a 55%,#0b0c0f);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 30px 60px -24px rgba(0,0,0,.75)}
+/* --esc = (ancho - 18px de marco) / 390 */
+.cv-telefono iframe{display:block;width:390px;height:844px;border:0;border-radius:54px;background:#fff;transform:scale(var(--esc));transform-origin:0 0}
+.cv-telefono{overflow:hidden}
+.cv-telefono-camara{position:absolute;z-index:2;top:17px;left:50%;width:62px;height:16px;margin-left:-31px;border-radius:999px;background:#0b0c0f}
+.cv-telefono-acciones{display:flex;gap:10px}
+.cv-telefono-acciones .cv-btn{padding:11px 18px;font-size:13px}
+.cv-telefono-acciones .cv-btn-linea{color:var(--crema)}
+@media (max-width:720px){
+  .cv-telefonos{--ancho:236px;--esc:.559;flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;scroll-snap-type:x mandatory;margin:32px -20px 0;padding:0 20px 8px;scrollbar-width:none}
+  .cv-telefonos::-webkit-scrollbar{display:none}
+  .cv-telefono-item{flex:none;scroll-snap-align:center}
+}
