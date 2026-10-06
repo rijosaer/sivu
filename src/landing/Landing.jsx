@@ -16,15 +16,16 @@ const AVISOS = [
 ];
 
 // "vista" es la vista previa en vivo que se abre en el modal: la boda carga la
-// invitación real de Maite & Ricardo (los datos de ejemplo del sistema) y las
-// demás cargan las maquetas estáticas de /modelos. Sin "vista", se muestra la
-// tarjeta ilustrada de siempre.
+// invitación real de ejemplo (Ana & Diego) y los demás la demostración pública
+// de su diseño (/plantillas/<diseño>, con datos de ejemplo y sin base de datos).
+// Sin "vista", se muestra la tarjeta ilustrada de siempre.
 const MODELOS = [
-  { tipo: "Boda", nombre: "Ana & Diego", desc: "Papel, mármol y dorado: la invitación clásica con enlace único por invitado.", fondo: "linear-gradient(200deg,#F8F4EE,#EFEAE1 55%,#D9BE87)", tinta: "#5C4530", fuente: "script", vista: "/ana-y-diego" },
-  { tipo: "XV años", nombre: "Valentina", desc: "Acuarela de ensueño: menta y durazno, con cuenta regresiva y confirmación.", fondo: "linear-gradient(155deg,#1b3b2b,#657e6c 60%,#b59556)", tinta: "#fff", fuente: "serif", vista: "/modelos/xv.html?preview=1" },
+  { tipo: "Boda", nombre: "Ana & Diego", desc: "Clásico: papel, mármol y dorado, con enlace único por invitado.", fondo: "linear-gradient(200deg,#F8F4EE,#EFEAE1 55%,#D9BE87)", tinta: "#5C4530", fuente: "script", vista: "/ana-y-diego" },
+  { tipo: "XV años", nombre: "Zoe Antonella", desc: "Jardín encantado: acuarela verde con princesa, sobre que se abre con sello de lacre y castillo.", fondo: "linear-gradient(155deg,#3D5530,#7F9663 58%,#E6E3C6)", tinta: "#fff", fuente: "script", vista: "/plantillas/jardin?preview=1" },
+  { tipo: "XV años", nombre: "Valentina", desc: "Ensueño: acuarela menta y durazno con un palacio entre nubes, cuenta regresiva y confirmación.", fondo: "linear-gradient(155deg,#1b3b2b,#657e6c 60%,#b59556)", tinta: "#fff", fuente: "serif", vista: "/plantillas/ensueno?preview=1" },
+  { tipo: "Corporativo", nombre: "Gala de fin de año", desc: "Gala: negro y lima neón, con ticket de entrada y programa hora por hora.", fondo: "linear-gradient(155deg,#0A1220,#101A2E 60%,#D4FF3A)", tinta: "#EEF0F1", fuente: "serif", vista: "/plantillas/gala?preview=1" },
   { tipo: "Baby shower", nombre: "Bienvenido Mateo", desc: "Esmeralda y crema, tierno, con lista de regalos y juegos.", fondo: "linear-gradient(155deg,#0B4A35,#1E8F68 60%,#CFE3C8)", tinta: "#FBF3E4", fuente: "script" },
   { tipo: "Cumpleaños", nombre: "Sofía cumple 5", desc: "Azul cielo y sol, juguetón, con tema de disfraz.", fondo: "linear-gradient(155deg,#0E4676,#2E8FD4 55%,#E3A63E)", tinta: "#FBF3E4", fuente: "script" },
-  { tipo: "Corporativo", nombre: "Gala Nortex", desc: "Negro y lima neón, con agenda de la noche y pase digital.", fondo: "linear-gradient(155deg,#0A1220,#101A2E 60%,#D4FF3A)", tinta: "#EEF0F1", fuente: "serif", vista: "/modelos/corporativo.html?preview=1" },
 ];
 
 const PREGUNTAS = [
@@ -286,7 +287,7 @@ export default function Landing() {
           <h2 className="cv-crema">Un estilo para <span className="cv-script cv-oro">cada historia</span></h2>
           <div className="cv-galeria">
             {MODELOS.map((m, k) => (
-              <a key={m.tipo} className="cv-modelo" data-aparece style={{ transitionDelay: `${k * 0.08}s` }}
+              <a key={m.nombre} className="cv-modelo" data-aparece style={{ transitionDelay: `${k * 0.08}s` }}
                  href={m.vista || waLink(`Hola, me gusta el estilo «${m.tipo}» de Convite para mi evento.`)} target="_blank" rel="noreferrer"
                  onClick={(e) => { e.preventDefault(); setModeloActivo(m); }}>
                 <div className="cv-modelo-tarjeta" style={{ background: m.fondo, color: m.tinta }}>
@@ -348,7 +349,7 @@ export default function Landing() {
             <div className="cv-modal-acciones">
               <a className="cv-btn cv-btn-oro" href={waLink(`Hola, me gusta el estilo ${modeloActivo.tipo} de Convite para mi evento.`)} target="_blank" rel="noreferrer">Quiero este estilo</a>
               {modeloActivo.vista && (
-                <a className="cv-btn cv-btn-linea" href={modeloActivo.vista} target="_blank" rel="noreferrer">Abrir en pestaña</a>
+                <a className="cv-btn cv-btn-linea" href={modeloActivo.vista.replace("?preview=1", "")} target="_blank" rel="noreferrer">Abrir en pestaña</a>
               )}
             </div>
           </section>

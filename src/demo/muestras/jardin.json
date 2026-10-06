@@ -1,0 +1,173 @@
+{
+ "site": {
+  "invitacion": {
+   "slug": "plantillas/jardin",
+   "nombre": "XV · Zoe Antonella",
+   "tipoEvento": "xv",
+   "diseno": "jardin"
+  },
+  "tema": {
+   "color-paper": "#FBFAF2",
+   "color-ink": "#4C5638",
+   "color-gold": "#7F9663",
+   "color-gold-dark": "#5B6F45",
+   "color-gold-light": "#C9D6B0",
+   "color-seal": "#9C7B34",
+   "color-marble": "#EEF1E4"
+  },
+  "decoraciones": {
+   "scrollwork": null,
+   "bouquet": null,
+   "frame": null,
+   "column": null,
+   "divider": null
+  },
+  "ubicaciones": [],
+  "secciones": [
+   {
+    "id": 26,
+    "tipo": "welcome",
+    "contenido": {
+     "novioEl": "Zoe Antonella",
+     "novioElla": "",
+     "fraseIntro": "Cumplir 15 años y compartirlo con los que amo es una manera de ser feliz y celebrar estos quince años que me han sido dados para fortalecer los dones que Dios me dio en todos los actos de mi vida.",
+     "padresTexto": "Se complacen en invitarles a celebrar los",
+     "padreElMadre": "Wendy Valencia Solís",
+     "padreElPadre": "Renzo Mendoza Rojas",
+     "padreEllaMadre": "",
+     "padreEllaPadre": "",
+     "bienvenidaTexto": "Mis XV"
+    }
+   },
+   {
+    "id": 27,
+    "tipo": "informacion_boda",
+    "contenido": {
+     "fecha": "2027-05-08T20:00:00-05:00",
+     "lugar": "Salón de Recepciones Los Jardines",
+     "mapsUrl": "https://maps.google.com/?q=Salon+de+recepciones",
+     "overline": "Mis quince años",
+     "direccion": "Calle 10 # 5-20, Barrio Centro",
+     "mapaEmbed": "",
+     "cronograma": [
+      {
+       "hora": "8:00 pm",
+       "titulo": "Recepción"
+      },
+      {
+       "hora": "8:45 pm",
+       "titulo": "Entrada de la quinceañera"
+      },
+      {
+       "hora": "9:15 pm",
+       "titulo": "Vals"
+      },
+      {
+       "hora": "10:00 pm",
+       "titulo": "Cena y fiesta"
+      }
+     ],
+     "tituloSeccion": "Información del evento",
+     "cronogramaModo": "detallado",
+     "tituloItinerario": "Programa",
+     "cronogramaMensaje": "Les compartiremos el programa más cerca de la fecha.",
+     "mostrarRestriccion": true,
+     "mostrarObservaciones": true,
+     "fechaLimiteConfirmacion": "2027-04-20"
+    }
+   },
+   {
+    "id": 29,
+    "tipo": "vestimenta",
+    "contenido": {
+     "nota": "Amablemente, el color verde únicamente para la quinceañera.",
+     "evitar": [
+      {
+       "color": "#7F9663",
+       "nombre": "Verde"
+      }
+     ],
+     "titulo": "Sport elegante",
+     "permitidos": []
+    }
+   },
+   {
+    "id": 31,
+    "tipo": "info_importante",
+    "contenido": {
+     "nota": "",
+     "items": [
+      "La invitación es personal y válida solo para los pases indicados.",
+      "Te pedimos llegar con 20 minutos de anticipación.",
+      "Habrá parqueadero dentro del salón."
+     ]
+    }
+   },
+   {
+    "id": 32,
+    "tipo": "faq",
+    "contenido": {
+     "items": [
+      {
+       "p": "¿Puedo llevar a alguien más?",
+       "r": "Cada invitación indica sus pases. Si necesitas uno adicional, escríbenos antes de confirmar."
+      },
+      {
+       "p": "¿Hasta qué hora es la fiesta?",
+       "r": "La celebración termina a las 2:00 a. m."
+      },
+      {
+       "p": "¿Hay opción vegetariana?",
+       "r": "Sí. Indícalo al confirmar tu asistencia en el campo de restricciones."
+      }
+     ]
+    }
+   },
+   {
+    "id": 33,
+    "tipo": "historia",
+    "contenido": {
+     "texto": "Crecí entre cuentos de princesas, música y una familia que siempre creyó en mis sueños. Hoy cumplo quince años y quiero vivir este cuento contigo.",
+     "titulo": "Mi historia"
+    }
+   },
+   {
+    "id": 34,
+    "tipo": "sobres",
+    "contenido": {
+     "texto": "Tu presencia en este día tan especial es el mejor regalo, pero si deseas obsequiarme un detalle, una contribución en efectivo será recibida con mucho cariño y gratitud."
+    }
+   },
+   {
+    "id": 35,
+    "tipo": "musica",
+    "contenido": {
+     "src": "",
+     "titulo": ""
+    }
+   }
+  ],
+  "fechaLimiteConfirmacion": "2027-04-20",
+  "fotosSubidas": [],
+  "audioUrl": null,
+  "fondoUrl": null
+ },
+ "invitado": {
+  "codigo": "DEMO",
+  "tipo": "cupos",
+  "nombre": "Laura Méndez",
+  "familia": "",
+  "mensaje": "",
+  "cupos": 1,
+  "miembros": [
+   {
+    "id": -1,
+    "nombre": "Laura Méndez",
+    "estado": "pendiente",
+    "restriccion": "",
+    "comentario": "",
+    "es_acompanante": false
+   }
+  ]
+ }
+}

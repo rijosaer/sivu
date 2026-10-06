@@ -1,0 +1,149 @@
+{
+ "site": {
+  "invitacion": {
+   "slug": "plantillas/gala",
+   "nombre": "Gala · Cena de fin de año",
+   "tipoEvento": "corporativo",
+   "diseno": "gala"
+  },
+  "tema": {
+   "color-paper": "#0A0A0B",
+   "color-ink": "#F3F1EC",
+   "color-gold": "#D4FF3A",
+   "color-gold-light": "#E2FF78",
+   "color-gold-dark": "#141416",
+   "color-marble": "#1C1C1F",
+   "color-seal": "#A3A3AA"
+  },
+  "decoraciones": {
+   "scrollwork": null,
+   "bouquet": null,
+   "frame": null,
+   "column": null,
+   "divider": null
+  },
+  "ubicaciones": [],
+  "secciones": [
+   {
+    "id": 56,
+    "tipo": "welcome",
+    "contenido": {
+     "novioEl": "Fin de año",
+     "novioElla": "Nortex Colombia",
+     "fraseIntro": "Cerramos el año juntos: una noche para celebrar lo logrado y brindar por lo que viene.",
+     "padresTexto": "",
+     "padreElMadre": "",
+     "padreElPadre": "",
+     "padreEllaMadre": "",
+     "padreEllaPadre": "",
+     "bienvenidaTexto": "Cena anual"
+    }
+   },
+   {
+    "id": 57,
+    "tipo": "informacion_boda",
+    "contenido": {
+     "fecha": "2026-12-12T20:00:00-05:00",
+     "lugar": "Salón Gran Nogal",
+     "mapsUrl": "https://maps.google.com/?q=Calle+93+12-40+Bogota",
+     "overline": "Cena y fiesta",
+     "direccion": "Calle 93 # 12-40, Bogotá",
+     "mapaEmbed": "",
+     "cronograma": [
+      {
+       "hora": "8:00 pm",
+       "titulo": "Recepción y cóctel",
+       "detalle": "Bienvenida de los invitados en el salón."
+      },
+      {
+       "hora": "9:00 pm",
+       "titulo": "Palabras de bienvenida",
+       "detalle": "Un repaso breve del año junto a la dirección."
+      },
+      {
+       "hora": "9:30 pm",
+       "titulo": "Cena",
+       "detalle": "Menú de tres tiempos con opciones para cada preferencia."
+      },
+      {
+       "hora": "11:00 pm",
+       "titulo": "Brindis de fin de año",
+       "detalle": "Celebramos juntos lo logrado."
+      },
+      {
+       "hora": "11:30 pm",
+       "titulo": "Música y baile",
+       "detalle": "La noche sigue en la pista."
+      }
+     ],
+     "tituloSeccion": "Información del evento",
+     "cronogramaModo": "detallado",
+     "tituloItinerario": "Programa",
+     "cronogramaMensaje": "",
+     "mostrarRestriccion": true,
+     "mostrarObservaciones": true,
+     "fechaLimiteConfirmacion": "2026-12-05"
+    }
+   },
+   {
+    "id": 58,
+    "tipo": "vestimenta",
+    "contenido": {
+     "nota": "",
+     "evitar": [],
+     "titulo": "Elegante sport",
+     "permitidos": []
+    }
+   },
+   {
+    "id": 59,
+    "tipo": "info_importante",
+    "contenido": {
+     "nota": "",
+     "items": [
+      "La invitación es personal e intransferible.",
+      "Presenta tu enlace de invitación en la entrada."
+     ]
+    }
+   },
+   {
+    "id": 60,
+    "tipo": "faq",
+    "contenido": {
+     "items": [
+      {
+       "p": "¿Puedo ir con acompañante?",
+       "r": "Tu invitación indica cuántos pases tienes reservados."
+      },
+      {
+       "p": "¿Hay parqueadero?",
+       "r": "Sí, el salón cuenta con parqueadero con valet."
+      }
+     ]
+    }
+   }
+  ],
+  "fechaLimiteConfirmacion": "2026-12-05",
+  "fotosSubidas": [],
+  "audioUrl": null,
+  "fondoUrl": null
+ },
+ "invitado": {
+  "codigo": "DEMO",
+  "tipo": "cupos",
+  "nombre": "Andrea Gómez",
+  "familia": "",
+  "mensaje": "",
+  "cupos": 1,
+  "miembros": [
+   {
+    "id": -1,
+    "nombre": "Andrea Gómez",
+    "estado": "pendiente",
+    "restriccion": "",
+    "comentario": "",
+    "es_acompanante": false
+   }
+  ]
+ }
+}
