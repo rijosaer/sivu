@@ -198,6 +198,7 @@ function FormularioNuevo({ plantillas, onCreado, onCancelar }) {
               </option>
             ))}
           </select>
+          <span className="ayuda mt-1 block">Trae sus adornos, sus colores y sus letras.</span>
         </label>
       )}
 
@@ -347,6 +348,12 @@ function TarjetaEvento({ inv, onEntrar, onCambio, onBorrar }) {
   const enlace = sitioUrlInvitacion(inv.slug);
 
   async function cambiarDiseno(e) {
+    const nuevo = DISENOS.find((d) => d.key === e.target.value);
+    const ok = window.confirm(
+      `¿Cambiar a «${nuevo?.nombre}»?\n\nSe cambian los adornos, los colores y las letras de la invitación. ` +
+        "Los textos, los invitados y las fotos se quedan igual."
+    );
+    if (!ok) return;
     setGuardando(true);
     try {
       onCambio(await api.actualizarInvitacion(inv.id, { diseno: e.target.value }));

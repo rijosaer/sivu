@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { pool } from "../db.js";
 import { capturar } from "../errores.js";
+import { temaDeDiseno } from "../plantillas.js";
 
 // Todo lo de aquí cuelga de una invitación concreta: se monta en admin.js
 // bajo /invitaciones/:invitacionId, con resolverInvitacionAdmin puesto antes
@@ -86,6 +87,23 @@ recursosRouter.get(
       [req.invitacionId]
     );
     res.json(rows);
+  })
+);
+
+// Vuelve a los colores y letras del diseño actual del evento (los demás
+// ajustes del tema, como los mensajes de WhatsApp, no se tocan).
+recursosRouter.post(
+  "/tema/restaurar",
+  capturar(async (req, res) => {
+    const { rows } = await pool.query("SELECT diseno FROM invitaciones WHERE id = $1", [req.invitacionId]);
+    for (const [clave, valor] of temaDeDiseno(rows[0]?.diseno)) {
+      await pool.query(
+        `INSERT INTO tema (invitacion_id, clave, valor) VALUES ($1, $2, $3)
+         ON CONFLICT (invitacion_id, clave) DO UPDATE SET valor = EXCLUDED.valor`,
+        [req.invitacionId, clave, valor]
+      );
+    }
+    res.json({ ok: true });
   })
 );
 

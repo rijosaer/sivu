@@ -4,7 +4,7 @@ import { pool } from "../db.js";
 import { capturar } from "../errores.js";
 import { resolverInvitacionAdmin } from "../middlewareInvitacion.js";
 import { soloDueno } from "../auth.js";
-import { TIPOS_EVENTO, DISENOS, temaBase, decoracionesBase, plantillaSecciones } from "../plantillas.js";
+import { TIPOS_EVENTO, DISENOS, temaDeDiseno, decoracionesBase, plantillaSecciones } from "../plantillas.js";
 
 // CRUD de invitaciones (los "eventos" del sistema). Es lo que le permite al
 // dueño operar muchos clientes desde un solo panel: cada fila de aquí es una
@@ -161,7 +161,7 @@ invitacionesRouter.post(
           [invitacion.id, plantilla.id]
         );
       } else {
-        for (const [clave, valor] of temaBase()) {
+        for (const [clave, valor] of temaDeDiseno(disenoFinal)) {
           await client.query(
             "INSERT INTO tema (invitacion_id, clave, valor) VALUES ($1, $2, $3)",
             [invitacion.id, clave, valor]
@@ -251,7 +251,9 @@ invitacionesRouter.put(
   soloDueno,
   resolverInvitacionAdmin,
   capturar(async (req, res) => {
-    const { nombre, slug: slugPedido, tipo_evento, fecha_evento, activo, es_plantilla, diseno } = req.body;
+    const {
+      nombre, slug: slugPedido, tipo_evento, fecha_evento, activo, es_plantilla, diseno,
+    } = req.body;
     if (tipo_evento && !TIPOS_EVENTO.includes(tipo_evento)) {
       return res.status(400).json({ error: "Tipo de evento no válido" });
     }
@@ -266,6 +268,17 @@ invitacionesRouter.put(
       );
       if (rowCount) return res.status(400).json({ error: "Ese enlace ya lo usa otra invitación" });
       slug = candidato;
+    }
+    // Cambiar de diseño aplica su paquete de colores y letras; el resto del
+    // tema (mensajes de WhatsApp, etc.) se conserva.
+    if (diseno && diseno !== req.invitacion.diseno) {
+      for (const [clave, valor] of temaDeDiseno(diseno)) {
+        await pool.query(
+          `INSERT INTO tema (invitacion_id, clave, valor) VALUES ($1, $2, $3)
+           ON CONFLICT (invitacion_id, clave) DO UPDATE SET valor = EXCLUDED.valor`,
+          [req.invitacionId, clave, valor]
+        );
+      }
     }
     const { rows } = await pool.query(
       `UPDATE invitaciones SET

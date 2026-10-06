@@ -118,6 +118,7 @@ export const api = {
     request(scoped("/secciones/reordenar"), { method: "POST", body: JSON.stringify({ orden }) }),
 
   tema: () => request(scoped("/tema")),
+  restaurarTema: () => request(scoped("/tema/restaurar"), { method: "POST" }),
   actualizarTema: (clave, valor) =>
     request(scoped(`/tema/${clave}`), { method: "PUT", body: JSON.stringify({ valor }) }),
 

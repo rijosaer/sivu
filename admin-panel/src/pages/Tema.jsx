@@ -95,6 +95,14 @@ export default function Tema() {
     setItems((prev) => prev.map((it) => (it.clave === clave ? { ...it, valor } : it)));
   }
 
+  async function restaurar() {
+    if (!window.confirm("¿Volver a los colores originales del diseño? Se pierden los colores que hayas cambiado.")) return;
+    await api.restaurarTema();
+    const data = await api.tema();
+    setItems(data.filter((it) => it.clave.startsWith("color-")));
+    toast("Colores del diseño restaurados");
+  }
+
   async function guardar(clave, valor) {
     await api.actualizarTema(clave, valor);
     toast(`${COLORES[clave]?.nombre || clave} guardado`);
@@ -111,6 +119,9 @@ export default function Tema() {
         Se aplican a toda la invitación en cuanto los guardas. Cada cambio se guarda solo al soltar
         el selector.
       </p>
+      <button type="button" onClick={restaurar} className="boton-secundario mb-5">
+        Restaurar colores del diseño
+      </button>
 
       <div className="grid lg:grid-cols-[minmax(0,1fr)_20rem] gap-5 items-start">
         <div className="grid sm:grid-cols-2 gap-3">

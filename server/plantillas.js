@@ -37,6 +37,26 @@ export const NOMBRE_TIPO_EVENTO = {
 // Misma paleta de fábrica para todos los tipos: es un punto de partida
 // neutro (beige/dorado, ya probado en la boda real) y el dueño la cambia por
 // completo desde "Colores" según la identidad de cada cliente.
+// Cada diseño es un paquete completo: además de sus adornos (que viven en el
+// código del sitio) trae sus colores y sus letras. Al crear un evento en blanco
+// o al cambiarle el diseño se escriben estas claves en su tema; los textos, los
+// invitados y las fotos no se tocan.
+const TEMA_JARDIN = [
+  ["color-paper", "#FBFAF2"],
+  ["color-ink", "#4C5638"],
+  ["color-gold", "#7F9663"],
+  ["color-gold-light", "#C9D6B0"],
+  ["color-gold-dark", "#5B6F45"],
+  ["color-marble", "#EEF1E4"],
+  ["color-seal", "#9C7B34"],
+  ["fuente-titulos", "Pinyon Script"],
+  ["fuente-cuerpo", "Cormorant Garamond"],
+];
+
+export function temaDeDiseno(diseno) {
+  return diseno === "jardin" ? TEMA_JARDIN.map((par) => [...par]) : temaBase();
+}
+
 export function temaBase() {
   return [
     ["color-paper", "#F8F4EE"],
