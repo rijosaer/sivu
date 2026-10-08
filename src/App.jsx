@@ -19,6 +19,8 @@ const DISENOS_ALTERNATIVOS = {
   jardin: lazy(() => import("./disenos/jardin/Jardin")),
   ensueno: lazy(() => import("./disenos/ensueno/Ensueno")),
   gala: lazy(() => import("./disenos/gala/Gala")),
+  lazos: lazy(() => import("./disenos/lazos/Lazos")),
+  coquette: lazy(() => import("./disenos/coquette/Coquette")),
 };
 
 function useInvitationCode() {

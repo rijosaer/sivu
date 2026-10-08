@@ -16,6 +16,21 @@ const COLORES = {
   "color-seal": { nombre: "Sello", donde: "Acentos rojizos, como el «no asisto»." },
 };
 
+// Letras de la invitación. Cada diseño trae las suyas; estas claves solo las
+// cambian cuando el cliente pide otras (las leen los diseños Moños y perlas y
+// Coquette). Vacío = la letra propia del diseño.
+const LETRAS = [
+  { clave: "fuente-guion", nombre: "Cursiva", donde: "El nombre y las palabras en letra de mano." },
+  { clave: "fuente-titulos", nombre: "Títulos", donde: "Encabezados, fecha y números." },
+  { clave: "fuente-cuerpo", nombre: "Texto", donde: "Párrafos, botones y etiquetas." },
+];
+// Sugerencias (cualquier familia de Google Fonts sirve, escrita tal cual).
+const SUGERENCIAS = [
+  "Ballet", "Dancing Script", "Great Vibes", "Pinyon Script", "Parisienne", "Allura", "Alex Brush", "Sacramento",
+  "Bodoni Moda", "Fraunces", "Playfair Display", "Cormorant Garamond", "Cinzel", "Gloock", "Libre Caslon Display",
+  "Jost", "Quicksand", "Nunito Sans", "Montserrat", "Manrope", "Poppins", "Lato",
+];
+
 // Muestra de cómo se ven juntos. Cambia en vivo mientras se elige un color, así
 // que se ve el resultado sin salir a la invitación.
 function Muestra({ valores }) {
@@ -80,6 +95,11 @@ export default function Tema() {
   const toast = useToast();
   const [items, setItems] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const [letras, setLetras] = useState({});
+
+  function leerLetras(data) {
+    setLetras(Object.fromEntries(data.filter((it) => it.clave.startsWith("fuente-")).map((it) => [it.clave, it.valor || ""])));
+  }
 
   useEffect(() => {
     api.tema().then((data) => {
@@ -87,6 +107,7 @@ export default function Tema() {
       // plantillas de WhatsApp, que se editan en Mensajes). Aquí solo van los
       // colores; si no, aparecerían con un selector de color inútil.
       setItems(data.filter((it) => it.clave.startsWith("color-")));
+      leerLetras(data);
       setCargando(false);
     });
   }, []);
@@ -96,11 +117,17 @@ export default function Tema() {
   }
 
   async function restaurar() {
-    if (!window.confirm("¿Volver a los colores originales del diseño? Se pierden los colores que hayas cambiado.")) return;
+    if (!window.confirm("¿Volver a los colores y letras originales del diseño? Se pierde lo que hayas cambiado.")) return;
     await api.restaurarTema();
     const data = await api.tema();
     setItems(data.filter((it) => it.clave.startsWith("color-")));
-    toast("Colores del diseño restaurados");
+    leerLetras(data);
+    toast("Colores y letras del diseño restaurados");
+  }
+
+  async function guardarLetra(clave, valor) {
+    await api.actualizarTema(clave, valor.trim());
+    toast(`Letra «${LETRAS.find((l) => l.clave === clave)?.nombre}» guardada`);
   }
 
   async function guardar(clave, valor) {
@@ -120,7 +147,7 @@ export default function Tema() {
         el selector.
       </p>
       <button type="button" onClick={restaurar} className="boton-secundario mb-5">
-        Restaurar colores del diseño
+        Restaurar colores y letras del diseño
       </button>
 
       <div className="grid lg:grid-cols-[minmax(0,1fr)_20rem] gap-5 items-start">
@@ -162,6 +189,31 @@ export default function Tema() {
             a la derecha.
           </p>
         </div>
+      </div>
+
+      <h2 className="panel-titulo mt-10">Letras</h2>
+      <p className="panel-subtitulo mb-4">
+        Cada diseño trae sus propias letras. Cámbialas solo si el cliente pide otras: escribe el nombre de
+        una familia de Google Fonts tal cual (por ejemplo «Great Vibes»). Vacío = la letra del diseño.
+      </p>
+      <datalist id="sugerencias-letras">
+        {SUGERENCIAS.map((f) => <option key={f} value={f} />)}
+      </datalist>
+      <div className="grid sm:grid-cols-3 gap-3">
+        {LETRAS.map((l) => (
+          <label key={l.clave} className="tarjeta p-4 block">
+            <span className="text-sm font-medium text-ink">{l.nombre}</span>
+            <span className="ayuda block">{l.donde}</span>
+            <input
+              list="sugerencias-letras"
+              className="mt-2 w-full bg-transparent border-b border-borde text-sm py-1 text-ink"
+              value={letras[l.clave] || ""}
+              placeholder="Letra del diseño"
+              onChange={(e) => setLetras((prev) => ({ ...prev, [l.clave]: e.target.value }))}
+              onBlur={(e) => guardarLetra(l.clave, e.target.value)}
+            />
+          </label>
+        ))}
       </div>
     </div>
   );

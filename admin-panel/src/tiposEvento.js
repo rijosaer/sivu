@@ -27,4 +27,6 @@ export const DISENOS = [
   { key: "jardin", nombre: "Jardín encantado (acuarela verde)" },
   { key: "ensueno", nombre: "Ensueño (acuarela menta y durazno)" },
   { key: "gala", nombre: "Gala (negro y lima neón)" },
+  { key: "lazos", nombre: "Moños y perlas (rosa palo, satén y perlas)" },
+  { key: "coquette", nombre: "Coquette (rosa con moños ilustrados)" },
 ];

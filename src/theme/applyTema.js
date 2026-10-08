@@ -21,8 +21,30 @@ function aCanales(valor) {
   return `${(n >> 16) & 255} ${(n >> 8) & 255} ${n & 255}`;
 }
 
+// Letras del tema (fuente-guion, fuente-titulos, fuente-cuerpo): se publican
+// como --fuente-* para los diseños que las leen (Moños y perlas, Coquette),
+// que traen su propia letra como respaldo. Si el cliente elige otra familia,
+// se carga de Google Fonts; si la familia no tiene esos pesos, se pide solo
+// la regular.
+function cargarFuente(familia) {
+  const id = `fuente-${familia.replace(/\W+/g, "-").toLowerCase()}`;
+  if (document.getElementById(id)) return;
+  const nombre = encodeURIComponent(familia).replace(/%20/g, "+");
+  const link = document.createElement("link");
+  link.id = id;
+  link.rel = "stylesheet";
+  link.href = `https://fonts.googleapis.com/css2?family=${nombre}:wght@400;500;600;700&display=swap`;
+  link.onerror = () => { link.onerror = null; link.href = `https://fonts.googleapis.com/css2?family=${nombre}&display=swap`; };
+  document.head.appendChild(link);
+}
+
 export function applyTema(tema = {}) {
   Object.entries(tema).forEach(([clave, valor]) => {
+    if (clave.startsWith("fuente-") && typeof valor === "string" && /^[\w -]+$/.test(valor.trim())) {
+      document.documentElement.style.setProperty(`--${clave}`, `"${valor.trim()}"`);
+      cargarFuente(valor.trim());
+      return;
+    }
     if (!clave.startsWith("color-") || !valor) return;
     const canales = aCanales(valor);
     // Un color que no se entiende se ignora: mejor dejar el de por defecto

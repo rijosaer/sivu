@@ -22,7 +22,7 @@ export const TIPOS_EVENTO = [
 
 // Diseños con los que el sitio puede dibujar una invitación (columna
 // invitaciones.diseno). Tiene que coincidir con src/disenos del sitio.
-export const DISENOS = ["clasico", "jardin", "ensueno", "gala"];
+export const DISENOS = ["clasico", "jardin", "ensueno", "gala", "lazos", "coquette"];
 
 export const NOMBRE_TIPO_EVENTO = {
   boda: "Boda",
@@ -77,7 +77,29 @@ const TEMA_GALA = [
   ["fuente-cuerpo", "Manrope"],
 ];
 
-const TEMAS_DISENO = { jardin: TEMA_JARDIN, ensueno: TEMA_ENSUENO, gala: TEMA_GALA };
+const TEMA_LAZOS = [
+  ["color-paper", "#FFF8FA"],
+  ["color-ink", "#5B2C3D"],
+  ["color-gold", "#C9638A"],
+  ["color-gold-light", "#F5C9D6"],
+  ["color-gold-dark", "#9E3D62"],
+  ["color-marble", "#FDE8EF"],
+  ["color-seal", "#B48A5A"],
+  ["fuente-guion", "Ballet"],
+  ["fuente-titulos", "Bodoni Moda"],
+  ["fuente-cuerpo", "Jost"],
+];
+
+// Coquette comparte la paleta de Moños y perlas pero no sus letras: cada
+// plantilla tiene su propia combinación.
+const TEMA_COQUETTE = [
+  ...TEMA_LAZOS.filter(([clave]) => !clave.startsWith("fuente-")),
+  ["fuente-guion", "Dancing Script"],
+  ["fuente-titulos", "Fraunces"],
+  ["fuente-cuerpo", "Quicksand"],
+];
+
+const TEMAS_DISENO = { jardin: TEMA_JARDIN, ensueno: TEMA_ENSUENO, gala: TEMA_GALA, lazos: TEMA_LAZOS, coquette: TEMA_COQUETTE };
 
 export function temaDeDiseno(diseno) {
   const tema = TEMAS_DISENO[diseno];
