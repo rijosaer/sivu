@@ -22,7 +22,7 @@ export const TIPOS_EVENTO = [
 
 // Diseños con los que el sitio puede dibujar una invitación (columna
 // invitaciones.diseno). Tiene que coincidir con src/disenos del sitio.
-export const DISENOS = ["clasico", "jardin", "ensueno", "gala", "lazos", "coquette", "mariposas"];
+export const DISENOS = ["clasico", "jardin", "ensueno", "gala", "lazos", "coquette", "paris"];
 
 export const NOMBRE_TIPO_EVENTO = {
   boda: "Boda",
@@ -99,22 +99,21 @@ const TEMA_COQUETTE = [
   ["fuente-cuerpo", "Quicksand"],
 ];
 
-// Mariposas y brillo: fucsia con platas. El «papel» es la ciruela que se ve
-// detrás del cielo fucsia y el «texto» es blanco rosado (va sobre fucsia).
-const TEMA_MARIPOSAS = [
-  ["color-paper", "#2A0A22"],
-  ["color-ink", "#FFF5FA"],
-  ["color-gold", "#F0388A"],
-  ["color-gold-light", "#FFB3D6"],
-  ["color-gold-dark", "#A3115C"],
-  ["color-marble", "#ECE6F0"],
-  ["color-seal", "#B9B5C8"],
-  ["fuente-guion", "Yellowtail"],
-  ["fuente-titulos", "DM Serif Display"],
-  ["fuente-cuerpo", "Outfit"],
+
+const TEMA_PARIS = [
+  ["color-paper", "#FBF3F0"],
+  ["color-ink", "#4E3236"],
+  ["color-gold", "#B76E79"],
+  ["color-gold-light", "#EBC8C4"],
+  ["color-gold-dark", "#8C4E58"],
+  ["color-marble", "#F6E7E3"],
+  ["color-seal", "#C9A27E"],
+  ["fuente-guion", "Parisienne"],
+  ["fuente-titulos", "Marcellus"],
+  ["fuente-cuerpo", "Josefin Sans"],
 ];
 
-const TEMAS_DISENO = { jardin: TEMA_JARDIN, ensueno: TEMA_ENSUENO, gala: TEMA_GALA, lazos: TEMA_LAZOS, coquette: TEMA_COQUETTE, mariposas: TEMA_MARIPOSAS };
+const TEMAS_DISENO = { jardin: TEMA_JARDIN, ensueno: TEMA_ENSUENO, gala: TEMA_GALA, lazos: TEMA_LAZOS, coquette: TEMA_COQUETTE, paris: TEMA_PARIS };
 
 export function temaDeDiseno(diseno) {
   const tema = TEMAS_DISENO[diseno];

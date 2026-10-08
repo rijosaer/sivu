@@ -21,7 +21,7 @@ const DISENOS_ALTERNATIVOS = {
   gala: lazy(() => import("./disenos/gala/Gala")),
   lazos: lazy(() => import("./disenos/lazos/Lazos")),
   coquette: lazy(() => import("./disenos/coquette/Coquette")),
-  mariposas: lazy(() => import("./disenos/mariposas/Mariposas")),
+  paris: lazy(() => import("./disenos/paris/Paris")),
 };
 
 function useInvitationCode() {

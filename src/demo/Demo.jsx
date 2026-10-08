@@ -14,7 +14,7 @@ const DISENOS = {
   gala: lazy(() => import("../disenos/gala/Gala")),
   lazos: lazy(() => import("../disenos/lazos/Lazos")),
   coquette: lazy(() => import("../disenos/coquette/Coquette")),
-  mariposas: lazy(() => import("../disenos/mariposas/Mariposas")),
+  paris: lazy(() => import("../disenos/paris/Paris")),
 };
 
 const MUESTRAS = {
@@ -23,10 +23,10 @@ const MUESTRAS = {
   gala: () => import("./muestras/gala.json"),
   lazos: () => import("./muestras/lazos.json"),
   coquette: () => import("./muestras/coquette.json"),
-  mariposas: () => import("./muestras/mariposas.json"),
+  paris: () => import("./muestras/paris.json"),
 };
 
-const NOMBRES = { jardin: "Jardín encantado", ensueno: "Ensueño", gala: "Gala", lazos: "Moños y perlas", coquette: "Coquette", mariposas: "Mariposas y brillo" };
+const NOMBRES = { jardin: "Jardín encantado", ensueno: "Ensueño", gala: "Gala", lazos: "Moños y perlas", coquette: "Coquette", paris: "París rosé" };
 
 export default function Demo({ diseno }) {
   const [datos, setDatos] = useState(null);

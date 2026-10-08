@@ -1,0 +1,272 @@
+/* Diseño «París rosé»: rosa empolvado, oro rosa y crema, con arte pintado
+   semi-realista. Línea fina y clara: filetes dorados, botones rectangulares,
+   postales y una carta de bistró.
+   Letras propias: Parisienne (cursiva francesa, nombres y etiquetas),
+   Marcellus (romana clásica, títulos y cifras) y Josefin Sans (texto, art
+   déco). El tema del evento puede cambiarlas (fuente-guion, fuente-titulos,
+   fuente-cuerpo). */
+.pr {
+  /* Colores del tema: principal = oro rosa, claro = rosa empolvado, oscuro =
+     rosa antiguo, papel = crema rosada, mármol = rosa muy claro, sello = oro. */
+  --papel: rgb(var(--color-paper));
+  --tinta: rgb(var(--color-ink));
+  --oro-rosa: rgb(var(--color-gold));
+  --empolvado: rgb(var(--color-gold-light));
+  --antiguo: rgb(var(--color-gold-dark));
+  --nube: rgb(var(--color-marble));
+  --oro: rgb(var(--color-seal));
+  --suave: color-mix(in srgb, var(--tinta) 72%, white);
+  --filete: color-mix(in srgb, var(--oro) 70%, var(--oro-rosa));
+  --cartulina: #FFFBF8;
+  --brillo-oro: linear-gradient(135deg, color-mix(in srgb, var(--oro-rosa) 70%, white), var(--oro-rosa) 45%, var(--antiguo));
+  --grano: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .3 0 0 0 0 .3 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+
+  --f-guion: var(--fuente-guion, "Parisienne"), "Great Vibes", cursive;
+  --f-titulo: var(--fuente-titulos, "Marcellus"), "Cormorant Garamond", Georgia, serif;
+  --f-texto: var(--fuente-cuerpo, "Josefin Sans"), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --curva: cubic-bezier(.16, 1, .3, 1);
+
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow-x: hidden;
+  color: var(--tinta);
+  font-family: var(--f-texto);
+  font-size: 16.5px;
+  line-height: 1.6;
+  background:
+    var(--grano),
+    radial-gradient(90% 40% at 100% 0%, color-mix(in srgb, var(--empolvado) 55%, transparent), transparent 70%),
+    radial-gradient(80% 35% at 0% 55%, color-mix(in srgb, var(--empolvado) 40%, transparent), transparent 70%),
+    var(--papel);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+.pr *, .pr *::before, .pr *::after { box-sizing: border-box; }
+.pr h1, .pr h2, .pr p, .pr figure { margin: 0; }
+.pr img[aria-hidden="true"] { pointer-events: none; user-select: none; }
+.pr :focus-visible { outline: 2px solid var(--antiguo); outline-offset: 3px; }
+
+/* ---------- Piezas comunes ---------- */
+.pr .pr-frances { font: 400 30px/1.2 var(--f-guion); color: var(--oro-rosa); }
+.pr .pr-etiqueta { font: 600 12px/1.4 var(--f-texto); letter-spacing: .34em; text-transform: uppercase; color: var(--antiguo); }
+.pr .pr-ayuda { color: var(--suave); font-size: 15.5px; line-height: 1.55; }
+.pr .pr-ayuda b { color: var(--tinta); font-weight: 600; }
+.pr .pr-lead { font-size: 17px; line-height: 1.6; }
+.pr .k { font: 600 11.5px/1.4 var(--f-texto); letter-spacing: .26em; text-transform: uppercase; color: var(--oro-rosa); }
+.pr .v { font: 400 21px/1.3 var(--f-titulo); color: var(--tinta); overflow-wrap: anywhere; }
+
+/* Filete dorado con un rombo al centro */
+.pr .pr-filete { display: flex; align-items: center; justify-content: center; gap: 10px; width: 180px; margin: 0 auto; }
+.pr .pr-filete::before, .pr .pr-filete::after { content: ""; flex: 1; height: 1px; background: var(--filete); }
+.pr .pr-filete i { width: 7px; height: 7px; background: var(--filete); transform: rotate(45deg); }
+
+.pr .pr-cabeza { display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; margin-bottom: 26px; }
+.pr .pr-cabeza h2 { font: 400 22px/1.3 var(--f-titulo); letter-spacing: .18em; text-transform: uppercase; color: var(--tinta); margin-bottom: 10px; }
+
+.pr .pr-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 10px 18px; border-radius: 2px;
+  font: 600 13.5px/1.2 var(--f-texto); letter-spacing: .16em; text-transform: uppercase; text-decoration: none; white-space: nowrap; cursor: pointer;
+  transition: background-color .15s var(--curva), color .15s var(--curva), filter .15s var(--curva);
+}
+.pr .pr-btn svg { width: 18px; height: 18px; flex: none; }
+.pr .pr-btn-linea { color: var(--antiguo); background: transparent; border: 1px solid var(--oro-rosa); }
+@media (hover: hover) { .pr .pr-btn-linea:hover { background: var(--nube); } }
+/* Botón principal: oro rosa con un filete interior, como un sello de papelería */
+.pr .pr-btn-oro { position: relative; width: 100%; min-height: 56px; border: 0; color: #fff; background: var(--brillo-oro); font-size: 14px; letter-spacing: .26em;
+  box-shadow: 0 14px 24px -14px var(--antiguo); }
+.pr .pr-btn-oro::after { content: ""; position: absolute; inset: 5px; border: 1px solid rgb(255 255 255 / .55); pointer-events: none; }
+@media (hover: hover) { .pr .pr-btn-oro:hover { filter: brightness(1.06); } }
+.pr .pr-enlace { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; color: var(--antiguo); font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
+.pr .pr-enlace svg { width: 17px; height: 17px; }
+
+.pr .pr-musica {
+  position: fixed; z-index: 25; top: 12px; right: 12px;
+  display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px 0 12px;
+  border: 1px solid var(--oro-rosa); border-radius: 2px; background: rgb(255 251 248 / .94); color: var(--antiguo);
+  font: 600 13px/1 var(--f-texto); letter-spacing: .12em; text-transform: uppercase; cursor: pointer;
+}
+.pr .pr-musica svg { width: 19px; height: 19px; }
+.pr .pr-musica[aria-pressed="true"] { background: var(--brillo-oro); color: #fff; border-color: transparent; }
+
+/* ---------- Portada: «Enciende París» ---------- */
+.pr .pr-portada { position: relative; min-height: 100svh; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  gap: 18px; padding: 40px 20px 38px; text-align: center; transition: opacity .8s ease 2.2s; }
+.pr .pr-encendida { opacity: 0; }
+/* La pintura cubre la pantalla conservando su proporción, para que las luces
+   (en % de la imagen) caigan siempre sobre la torre. */
+.pr .pr-lienzo { position: absolute; z-index: 0; left: 50%; top: 50%; width: max(100vw, calc(100svh * .684)); aspect-ratio: 832 / 1216; transform: translate(-50%, -50%); }
+.pr .pr-pintura { display: block; width: 100%; height: 100%; object-fit: cover; }
+.pr .pr-noche { position: absolute; inset: 0; opacity: 0; transition: opacity 1.4s ease .15s;
+  background: linear-gradient(180deg, rgb(58 24 52 / .82) 0%, rgb(96 40 70 / .5) 55%, rgb(52 20 40 / .7) 100%); }
+.pr .pr-encendida .pr-noche { opacity: 1; }
+.pr .pr-luces { position: absolute; inset: 0; }
+.pr .pr-luces::before { content: ""; position: absolute; left: 44.8%; top: 42%; width: 52%; height: 66%; transform: translate(-50%, -50%); opacity: 0;
+  background: radial-gradient(closest-side, rgb(255 210 140 / .55), rgb(255 190 150 / .18) 60%, transparent); transition: opacity 1.2s ease .3s; }
+.pr .pr-encendida .pr-luces::before { opacity: 1; }
+.pr .pr-luces i { position: absolute; width: var(--tam); height: var(--tam); margin: calc(var(--tam) / -2) 0 0 calc(var(--tam) / -2); border-radius: 50%;
+  background: #FFF8E6; box-shadow: 0 0 6px 2px rgb(255 236 190 / .9); opacity: 0; }
+.pr .pr-encendida .pr-luces i { animation: pr-centellear .7s ease-in-out calc(.35s + var(--retraso) / 3) infinite alternate; }
+@keyframes pr-centellear { from { opacity: 0; transform: scale(.5); } to { opacity: 1; transform: scale(1.2); } }
+/* Velo claro arriba y abajo para leer el texto sobre la pintura */
+.pr .pr-portada::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(180deg, transparent 0%, transparent 50%, rgb(255 246 244 / .8) 64%, rgb(255 246 244 / .94) 100%);
+  transition: opacity 1s ease; }
+.pr .pr-encendida::before { opacity: 0; }
+.pr .pr-portada-arriba, .pr .pr-portada-abajo { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: color 1s ease .2s; }
+.pr .pr-encendida .pr-portada-arriba, .pr .pr-encendida .pr-portada-abajo { color: #fff; }
+.pr .pr-encendida .pr-etiqueta, .pr .pr-encendida .pr-frances, .pr .pr-encendida .pr-portada-nombre { color: #fff; }
+.pr .pr-portada-nombre { font: 400 clamp(52px, 14.5vw, 70px)/1.15 var(--f-guion); color: var(--antiguo); overflow-wrap: anywhere; transition: color 1s ease .2s; }
+.pr .pr-para { font-size: 15.5px; color: var(--suave); }
+.pr .pr-para b { color: inherit; font-weight: 600; }
+.pr .pr-encendida .pr-para { color: rgb(255 255 255 / .85); }
+.pr .pr-encender { display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 12px 22px; border: 1px solid var(--oro-rosa); border-radius: 2px;
+  background: rgb(255 251 248 / .86); color: var(--antiguo); font: 600 13px/1.2 var(--f-texto); letter-spacing: .2em; text-transform: uppercase; cursor: pointer;
+  box-shadow: 0 10px 22px -14px var(--antiguo); animation: pr-latir 2.4s ease-in-out infinite; }
+.pr .pr-encender svg { width: 22px; height: 22px; }
+@keyframes pr-latir { 0%, 100% { box-shadow: 0 10px 22px -14px var(--antiguo), 0 0 0 0 rgb(183 110 121 / .35); } 50% { box-shadow: 0 10px 22px -14px var(--antiguo), 0 0 0 8px rgb(183 110 121 / 0); } }
+.pr .pr-encendida .pr-encender { opacity: 0; transition: opacity .4s ease; }
+.pr .pr-pases { font-size: 15px; color: var(--suave); }
+.pr .pr-pases b { font: 400 22px/1 var(--f-titulo); color: var(--antiguo); }
+.pr .pr-encendida .pr-pases, .pr .pr-encendida .pr-pases b { color: #fff; }
+.pr .pr-toque { position: absolute; inset: 0; z-index: 1; border: 0; padding: 0; background: transparent; cursor: pointer; }
+
+/* ---------- Cuerpo ---------- */
+.pr .pr-cuerpo { position: relative; width: 100%; max-width: 520px; margin: 0 auto; padding: 0 22px; }
+.pr .pr-hero { display: flex; flex-direction: column; align-items: center; gap: 6px; padding-top: 30px; text-align: center; }
+.pr .pr-nombre { margin-top: 4px; font: 400 clamp(60px, 18vw, 86px)/1.1 var(--f-guion); color: var(--antiguo); overflow-wrap: anywhere; }
+.pr .pr-y { font-size: .6em; color: var(--oro); }
+.pr .pr-frase { max-width: 30ch; margin-top: 6px; font-size: 17px; font-weight: 300; line-height: 1.6; color: var(--suave); }
+.pr .pr-fecha { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: 14px; padding: 12px 0; border-top: 1px solid var(--filete); border-bottom: 1px solid var(--filete); min-width: 76%; }
+.pr .pr-fecha-sem { font: 600 12px/1.4 var(--f-texto); letter-spacing: .34em; text-transform: uppercase; color: var(--oro-rosa); }
+.pr .pr-fecha-dia { font: 400 24px/1.2 var(--f-titulo); letter-spacing: .08em; text-transform: uppercase; }
+.pr .pr-bici { width: min(92%, 380px); height: auto; margin-bottom: 10px; filter: drop-shadow(0 16px 20px rgb(120 60 70 / .16)); }
+.pr .pr-foto { width: 74%; margin-top: 24px; padding: 8px; background: var(--cartulina); border: 1px solid var(--empolvado); box-shadow: 0 16px 30px -18px var(--antiguo); }
+.pr .pr-foto img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; }
+
+.pr .pr-seccion { position: relative; margin-top: 66px; }
+.pr [data-reveal] { opacity: 0; transform: translateY(16px); transition: opacity .6s var(--curva), transform .6s var(--curva); }
+.pr [data-reveal].is-in { opacity: 1; transform: none; }
+
+/* Cuenta regresiva: letrero con doble filete, como una vitrina parisina */
+.pr .pr-letrero { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 18px 6px 14px; background: var(--cartulina);
+  border: 1px solid var(--filete); box-shadow: inset 0 0 0 5px var(--cartulina), inset 0 0 0 6px var(--filete), 0 14px 26px -20px var(--antiguo); }
+.pr .pr-letrero > div { display: grid; justify-items: center; gap: 4px; }
+.pr .pr-letrero > div + div { border-left: 1px solid color-mix(in srgb, var(--filete) 60%, transparent); }
+.pr .pr-letrero .n { font: 400 clamp(32px, 9.5vw, 42px)/1 var(--f-titulo); color: var(--antiguo); font-variant-numeric: lining-nums tabular-nums; }
+.pr .pr-letrero .l { font: 600 10.5px/1.2 var(--f-texto); letter-spacing: .2em; text-transform: uppercase; color: var(--suave); }
+.pr .pr-llego { font: 400 50px/1.1 var(--f-guion); color: var(--oro-rosa); text-align: center; }
+
+/* Postales con estampilla perforada y matasellos */
+.pr .pr-postales { display: grid; gap: 18px; }
+.pr .pr-postal { position: relative; padding: 22px 100px 22px 20px; background: var(--cartulina); border: 1px solid color-mix(in srgb, var(--empolvado) 80%, white);
+  box-shadow: 0 16px 26px -20px var(--antiguo); transform: rotate(var(--inclina)); }
+.pr .pr-postal::before { content: ""; position: absolute; top: 18px; bottom: 18px; right: 88px; width: 1px; background: color-mix(in srgb, var(--empolvado) 90%, var(--oro-rosa)); }
+.pr .pr-postal-texto { display: flex; flex-direction: column; gap: 4px; }
+.pr .pr-estampilla { position: absolute; top: 16px; right: 16px; width: 58px; height: 70px; display: grid; place-items: center; padding: 5px; color: var(--antiguo);
+  background: linear-gradient(160deg, color-mix(in srgb, var(--empolvado) 70%, white), var(--empolvado));
+  -webkit-mask: radial-gradient(circle 3px, #0000 97%, #000) -4px -4px / 8px 8px, linear-gradient(#000 0 0) content-box;
+  mask: radial-gradient(circle 3px, #0000 97%, #000) -4px -4px / 8px 8px, linear-gradient(#000 0 0) content-box; }
+.pr .pr-estampilla svg { width: 34px; height: 34px; }
+.pr .pr-matasellos { position: absolute; top: 40px; right: 30px; width: 86px; height: auto; fill: none; stroke: color-mix(in srgb, var(--tinta) 32%, transparent); stroke-width: 1.4; transform: rotate(-10deg); pointer-events: none; }
+.pr .pr-botones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
+/* Programa: carta de bistró con doble filete y puntos guía */
+.pr .pr-carta { position: relative; padding: 30px 24px 26px; text-align: center; background: var(--cartulina);
+  border: 1px solid var(--filete); box-shadow: inset 0 0 0 6px var(--cartulina), inset 0 0 0 7px var(--filete), 0 18px 30px -22px var(--antiguo); }
+.pr .pr-carta-titulo { font: 400 22px/1.3 var(--f-titulo); letter-spacing: .18em; text-transform: uppercase; margin: 2px 0 10px; }
+.pr .pr-carta-lista { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 14px; text-align: left; }
+.pr .pr-carta-lista li { display: flex; align-items: baseline; gap: 8px; }
+.pr .pr-carta-que { font-size: 17px; }
+.pr .pr-puntos { flex: 1; min-width: 20px; border-bottom: 2px dotted color-mix(in srgb, var(--filete) 80%, transparent); transform: translateY(-4px); }
+.pr .pr-carta-hora { font: 400 18px/1 var(--f-titulo); color: var(--antiguo); white-space: nowrap; }
+
+/* Familia: nombres sueltos centrados */
+.pr .pr-familia { text-align: center; }
+.pr .pr-quien { font: 400 22px/1.4 var(--f-titulo); overflow-wrap: anywhere; }
+.pr .pr-grupo { margin-top: 18px; display: grid; gap: 2px; }
+
+/* Historia: carta escrita a mano en papel pautado */
+.pr .pr-carta-mano { position: relative; padding: 26px 22px 18px; background: var(--cartulina); transform: rotate(-.6deg);
+  background-image: repeating-linear-gradient(transparent 0 31px, color-mix(in srgb, var(--empolvado) 70%, transparent) 31px 32px); background-position: 0 14px;
+  border: 1px solid color-mix(in srgb, var(--empolvado) 80%, white); box-shadow: 0 16px 26px -20px var(--antiguo); }
+.pr .pr-carta-mano p { font-size: 17.5px; line-height: 32px; font-weight: 300; }
+.pr .pr-firma { margin-top: 8px; text-align: right; font: 400 40px/1.1 var(--f-guion) !important; color: var(--antiguo); }
+
+.pr .pr-regalo { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; }
+.pr .pr-macarons { width: 150px; height: auto; filter: drop-shadow(0 12px 16px rgb(120 60 70 / .2)); }
+.pr .pr-transferir { width: 100%; display: flex; align-items: center; gap: 12px; padding: 14px 16px; text-align: left; background: var(--cartulina); border: 1px dashed var(--oro-rosa); }
+.pr .pr-transferir > div { flex: 1 1 0; min-width: 0; display: grid; gap: 2px; }
+.pr .pr-transferir .v { font: 600 16px/1.4 var(--f-texto); }
+
+.pr .pr-marco { padding: 22px 20px; background: var(--cartulina); border: 1px solid var(--filete); box-shadow: inset 0 0 0 5px var(--cartulina), inset 0 0 0 6px color-mix(in srgb, var(--filete) 50%, transparent); }
+.pr .pr-lista { margin: 4px 0 0; padding-left: 1.2em; display: grid; gap: 8px; }
+.pr .pr-lista li::marker { color: var(--oro-rosa); }
+.pr .pr-faq { padding-block: 10px; }
+.pr .pr-faq details { border-bottom: 1px solid color-mix(in srgb, var(--filete) 40%, transparent); padding: 12px 0; }
+.pr .pr-faq details:last-child { border-bottom: 0; }
+.pr .pr-faq summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 12px; font-weight: 600; }
+.pr .pr-faq summary::-webkit-details-marker { display: none; }
+.pr .pr-faq summary::after { content: "+"; color: var(--oro-rosa); font-size: 1.3em; line-height: 1; }
+.pr .pr-faq details[open] summary::after { content: "–"; }
+.pr .pr-faq p { margin-top: 8px; color: var(--suave); }
+
+/* Confirmación: «Répondez, s'il vous plaît» */
+.pr .pr-rsvp { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; padding: 34px 22px 28px; background: var(--cartulina);
+  border: 1px solid var(--filete); box-shadow: inset 0 0 0 6px var(--cartulina), inset 0 0 0 7px var(--filete); }
+.pr .pr-rsvp > .pr-frances { font: 400 15px/1 var(--f-titulo); letter-spacing: .4em; color: var(--oro-rosa); }
+.pr .pr-rsvp h2 { font: 400 clamp(38px, 11vw, 48px)/1.15 var(--f-guion); color: var(--antiguo); }
+.pr .pr-traduccion { font: 600 12px/1.4 var(--f-texto); letter-spacing: .3em; text-transform: uppercase; color: var(--suave); margin-bottom: 8px; }
+.pr .pr-rsvp .pr-ayuda { margin: 8px 0 6px; }
+
+.pr .pr-final { margin-top: 60px; padding-bottom: 72px; text-align: center; }
+.pr .pr-ventana { width: 58%; max-width: 240px; aspect-ratio: 3 / 4; margin: 0 auto 18px; padding: 7px; border-radius: 999px 999px 4px 4px; background: var(--cartulina);
+  border: 1px solid var(--filete); box-shadow: inset 0 0 0 1px var(--cartulina), 0 18px 30px -18px var(--antiguo); }
+.pr .pr-ventana img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 45% 30%; border-radius: 999px 999px 2px 2px; }
+.pr .pr-te-espero { font: 400 clamp(54px, 16vw, 72px)/1.1 var(--f-guion); color: var(--antiguo); }
+
+.pr .pr-aviso { position: fixed; z-index: 30; left: 16px; right: 16px; bottom: 16px; max-width: 480px; margin: 0 auto; padding: 12px 16px; border-radius: 2px;
+  background: var(--tinta); color: #fff; font: 600 14px/1.4 var(--f-texto); text-align: center; opacity: 0; transform: translateY(12px); pointer-events: none; transition: opacity .2s, transform .2s; }
+.pr .pr-aviso.is-visible { opacity: 1; transform: none; }
+
+/* ---------- Formulario de confirmación con la ropa de la plantilla ----------
+   El RSVP es un componente común (Tailwind, letra mono de 10-11 px). */
+.pr .pr-modal { position: fixed; inset: 0; z-index: 80; display: flex; align-items: flex-end; justify-content: center; background: rgb(60 30 40 / .45); animation: pr-fundido .25s ease; }
+.pr .pr-modal-caja { position: relative; width: 100%; max-width: 520px; max-height: 92svh; overflow: auto; background: var(--grano), var(--papel); border-top: 1px solid var(--filete); animation: pr-subir .35s var(--curva); }
+@media (min-width: 600px) { .pr .pr-modal { align-items: center; } .pr .pr-modal-caja { border: 1px solid var(--filete); } }
+.pr .pr-cerrar { position: absolute; z-index: 2; top: 10px; right: 14px; width: 40px; height: 40px; border: 1px solid var(--filete); border-radius: 2px; background: var(--cartulina); color: var(--antiguo); font-size: 24px; line-height: 1; cursor: pointer; }
+.pr .pr-modal-rsvp { margin-top: 28px; text-align: center; font: 400 15px/1 var(--f-titulo); letter-spacing: .4em; color: var(--oro-rosa); }
+.pr .pr-modal #rsvp { padding: 14px 22px 36px; border-top: 0; font-family: var(--f-texto); color: var(--tinta); }
+.pr .pr-modal #rsvp img { display: none; }
+.pr .pr-modal #rsvp .font-mono { font-family: var(--f-texto); letter-spacing: .2em; }
+.pr .pr-modal #rsvp p.font-mono, .pr .pr-modal #rsvp span.font-mono { font-size: 12px; font-weight: 600; color: var(--oro-rosa); }
+.pr .pr-modal #rsvp h2 { font-family: var(--f-guion); font-weight: 400; font-size: clamp(36px, 10vw, 44px); line-height: 1.2; color: var(--antiguo); margin: 6px 0 4px; }
+.pr .pr-modal #rsvp h2 + p.font-mono, .pr .pr-modal #rsvp h2 + div + p.font-mono { margin-top: 14px !important; margin-bottom: 22px !important; }
+.pr .pr-modal #rsvp .font-body { font-family: var(--f-texto); font-size: 17px; font-weight: 400; color: var(--tinta); }
+.pr .pr-modal #rsvp p.text-xs, .pr .pr-modal #rsvp p.text-sm { font-size: 15.5px; line-height: 1.55; color: var(--suave); }
+.pr .pr-modal #rsvp .divide-y > * { padding-block: 16px; }
+.pr .pr-modal #rsvp .divide-y, .pr .pr-modal #rsvp .divide-y > * + * { border-color: color-mix(in srgb, var(--filete) 40%, transparent); }
+.pr .pr-modal #rsvp button[aria-pressed] { width: 64px; min-height: 44px; border-radius: 2px; font: 600 14px/1 var(--f-texto); letter-spacing: .12em; text-transform: uppercase;
+  border: 1px solid var(--oro-rosa); background: var(--cartulina); color: var(--antiguo); }
+.pr .pr-modal #rsvp button[aria-pressed="true"]:first-child { background: var(--brillo-oro); color: #fff; border-color: transparent; }
+.pr .pr-modal #rsvp button[aria-pressed="true"]:last-child { background: var(--tinta); color: #fff; border-color: var(--tinta); }
+.pr .pr-modal #rsvp form > div > button[type="button"]:not([aria-pressed]), .pr .pr-modal #rsvp .border-dashed {
+  border-radius: 2px; padding: 11px 18px; font: 600 13px/1.2 var(--f-texto); letter-spacing: .1em; }
+.pr .pr-modal #rsvp input[type="text"], .pr .pr-modal #rsvp textarea { font: 16px/1.4 var(--f-texto); color: var(--tinta);
+  padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--empolvado) 80%, var(--oro-rosa)); border-radius: 2px; background: var(--cartulina); }
+.pr .pr-modal #rsvp input[type="text"]:focus, .pr .pr-modal #rsvp textarea:focus { border-color: var(--oro-rosa); box-shadow: 0 0 0 3px color-mix(in srgb, var(--oro-rosa) 18%, transparent); }
+.pr .pr-modal #rsvp label > span.font-mono { display: block; margin-bottom: 2px; }
+.pr .pr-modal #rsvp button[type="submit"] { position: relative; min-height: 56px; border-radius: 2px; border: 0; font: 600 14px/1.2 var(--f-texto); letter-spacing: .24em; color: #fff;
+  background: var(--brillo-oro); box-shadow: inset 0 0 0 5px transparent, inset 0 0 0 6px rgb(255 255 255 / .5), 0 14px 24px -14px var(--antiguo); }
+.pr .pr-modal #rsvp button[type="submit"]:disabled { opacity: .4; }
+.pr .pr-modal #rsvp .border-gold\/40 { border-color: var(--filete); background: var(--cartulina); }
+@keyframes pr-fundido { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pr-subir { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .pr .pr-encender, .pr .pr-encendida .pr-luces i { animation: none; }
+  .pr .pr-encendida .pr-luces i { opacity: 1; }
+  .pr .pr-noche, .pr .pr-luces::before { transition: none; }
+  .pr [data-reveal] { opacity: 1; transform: none; }
+}
