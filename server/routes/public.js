@@ -26,10 +26,13 @@ invitacionRouter.get(
   capturar(async (req, res) => {
     const id = req.invitacionId;
     const [tema, decoraciones, ubicaciones, secciones, fotos, audio, fondo, limite] = await Promise.all([
-      // Solo los colores: la tabla "tema" también guarda ajustes del panel
-      // (como la plantilla de WhatsApp) que no tienen por qué viajar al
+      // Solo colores y letras: la tabla "tema" también guarda ajustes del
+      // panel (como la plantilla de WhatsApp) que no tienen por qué viajar al
       // navegador de cada invitado.
-      pool.query("SELECT clave, valor FROM tema WHERE invitacion_id = $1 AND clave LIKE 'color-%'", [id]),
+      pool.query(
+        "SELECT clave, valor FROM tema WHERE invitacion_id = $1 AND (clave LIKE 'color-%' OR clave LIKE 'fuente-%')",
+        [id]
+      ),
       pool.query(
         "SELECT clave, (datos IS NOT NULL) AS tiene, extract(epoch FROM actualizado_en)::bigint AS v FROM decoraciones WHERE invitacion_id = $1",
         [id]
