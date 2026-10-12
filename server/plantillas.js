@@ -22,7 +22,7 @@ export const TIPOS_EVENTO = [
 
 // Diseños con los que el sitio puede dibujar una invitación (columna
 // invitaciones.diseno). Tiene que coincidir con src/disenos del sitio.
-export const DISENOS = ["clasico", "jardin", "ensueno", "gala", "lazos", "coquette", "paris", "valle", "valle-claro", "celebracion"];
+export const DISENOS = ["clasico", "jardin", "ensueno", "gala", "lazos", "coquette", "paris", "valle", "valle-claro", "celebracion", "celebracion-azul"];
 
 export const NOMBRE_TIPO_EVENTO = {
   boda: "Boda",
@@ -157,7 +157,23 @@ const TEMA_CELEBRACION = [
   ["fuente-cuerpo", "Libre Baskerville"],
 ];
 
-const TEMAS_DISENO = { celebracion: TEMA_CELEBRACION, valle: TEMA_VALLE, "valle-claro": TEMA_VALLE_CLARO, jardin: TEMA_JARDIN, ensueno: TEMA_ENSUENO, gala: TEMA_GALA, lazos: TEMA_LAZOS, coquette: TEMA_COQUETTE, paris: TEMA_PARIS };
+// Celebración azul: la misma tarjeta en azul de loza sobre crema (tomado de
+// un backdrop de referencia). Principal = azul, claro = azul empolvado,
+// oscuro = azul tinta, sello = azul de los nombres.
+const TEMA_CELEBRACION_AZUL = [
+  ["color-paper", "#FAF7F0"],
+  ["color-ink", "#1E2A4A"],
+  ["color-gold", "#2E4A86"],
+  ["color-gold-light", "#B4C3E0"],
+  ["color-gold-dark", "#1F2F5C"],
+  ["color-marble", "#EDF0F6"],
+  ["color-seal", "#263A70"],
+  ["fuente-guion", "Great Vibes"],
+  ["fuente-titulos", "Playfair Display"],
+  ["fuente-cuerpo", "Libre Baskerville"],
+];
+
+const TEMAS_DISENO = { celebracion: TEMA_CELEBRACION, "celebracion-azul": TEMA_CELEBRACION_AZUL, valle: TEMA_VALLE, "valle-claro": TEMA_VALLE_CLARO, jardin: TEMA_JARDIN, ensueno: TEMA_ENSUENO, gala: TEMA_GALA, lazos: TEMA_LAZOS, coquette: TEMA_COQUETTE, paris: TEMA_PARIS };
 
 export function temaDeDiseno(diseno) {
   const tema = TEMAS_DISENO[diseno];

@@ -3,8 +3,11 @@
    tarjeta completa (foto, título, festejados con su edad, fecha, hora, lugar
    y confirmación); debajo, lo digital.
    Letras propias: Great Vibes (pincel: título y nombres), Playfair Display
-   (cifras de la edad y la cuenta) y Libre Baskerville (texto). El tema del
-   evento puede cambiarlas (fuente-guion, fuente-titulos, fuente-cuerpo). */
+   (cifras de la edad y la cuenta), Libre Baskerville (texto) y Cormorant
+   Garamond (nombre del invitado, recto). El tema del evento puede cambiar
+   las tres primeras (fuente-guion, fuente-titulos, fuente-cuerpo).
+   Todo el color sale del tema: con otra paleta (p. ej. «Celebración azul»)
+   cambian también las luces, los brillos y las sombras. */
 .cd {
   /* Colores del tema: principal = oro, claro = oro pálido, oscuro = oro
      viejo, papel = crema, mármol = crema tostada, sello = rosa de los nombres. */
@@ -16,6 +19,9 @@
   --crema: rgb(var(--color-marble));
   --rosa: rgb(var(--color-seal));
   --verde: #1F3A2C;
+  /* Color de los nombres en las columnas pares (rosa, verde, rosa…). */
+  --nombre-2: var(--verde);
+  --sombra: color-mix(in srgb, var(--oro-viejo) 55%, black);
   --suave: color-mix(in srgb, var(--tinta) 74%, white);
   --cartulina: #FFFCF6;
   --brillo-oro: linear-gradient(180deg, color-mix(in srgb, var(--oro-claro) 70%, white) 0%, var(--oro) 48%, var(--oro-viejo) 100%);
@@ -24,6 +30,7 @@
   --f-guion: var(--fuente-guion, "Great Vibes"), "Pinyon Script", cursive;
   --f-cifra: var(--fuente-titulos, "Playfair Display"), "Libre Baskerville", Georgia, serif;
   --f-texto: var(--fuente-cuerpo, "Libre Baskerville"), Georgia, "Times New Roman", serif;
+  --f-invitado: "Cormorant Garamond", var(--f-texto);
   --curva: cubic-bezier(.16, 1, .3, 1);
 
   position: relative;
@@ -53,27 +60,29 @@
 .cd .cd-luces {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background:
-    radial-gradient(circle at 8% 22%, rgb(232 205 150 / .55) 0 14px, transparent 26px),
+    radial-gradient(circle at 8% 22%, color-mix(in srgb, var(--oro-claro) 55%, transparent) 0 14px, transparent 26px),
     radial-gradient(circle at 92% 14%, rgb(255 255 255 / .9) 0 20px, transparent 34px),
-    radial-gradient(circle at 86% 40%, rgb(232 205 150 / .45) 0 12px, transparent 22px),
+    radial-gradient(circle at 86% 40%, color-mix(in srgb, var(--oro-claro) 45%, transparent) 0 12px, transparent 22px),
     radial-gradient(circle at 4% 62%, rgb(255 255 255 / .85) 0 22px, transparent 38px),
-    radial-gradient(circle at 95% 72%, rgb(232 205 150 / .5) 0 16px, transparent 28px),
-    radial-gradient(circle at 12% 90%, rgb(232 205 150 / .4) 0 10px, transparent 20px),
+    radial-gradient(circle at 95% 72%, color-mix(in srgb, var(--oro-claro) 50%, transparent) 0 16px, transparent 28px),
+    radial-gradient(circle at 12% 90%, color-mix(in srgb, var(--oro-claro) 40%, transparent) 0 10px, transparent 20px),
     radial-gradient(circle at 70% 94%, rgb(255 255 255 / .8) 0 18px, transparent 30px),
-    radial-gradient(circle at 30% 6%, rgb(232 205 150 / .35) 0 8px, transparent 16px);
+    radial-gradient(circle at 30% 6%, color-mix(in srgb, var(--oro-claro) 35%, transparent) 0 8px, transparent 16px);
   filter: blur(3px);
   animation: cd-titilar 7s ease-in-out infinite alternate;
 }
 @keyframes cd-titilar { from { opacity: .7; } to { opacity: 1; } }
 
-/* A quién se invitó, arriba de la foto y bien visible. */
-.cd .cd-invitado { position: relative; z-index: 4; display: flex; flex-direction: column; align-items: center; padding: 10cqi 8px 4px; }
-.cd .cd-invitado-k { font: 700 clamp(11px, 3cqi, 14px)/1.3 var(--f-texto); letter-spacing: .22em; text-transform: uppercase; color: var(--oro-viejo); }
-.cd .cd-invitado-nombre { max-width: 100%; margin-top: 2px; font: 400 clamp(38px, 11cqi, 60px)/1.15 var(--f-guion); color: var(--tinta); overflow-wrap: anywhere; text-wrap: balance; }
+/* A quién se invitó, arriba de la foto: se lee primero pero sin competir
+   con los festejados. Letra recta y fina (no de pincel), más chica que los
+   nombres de la tarjeta. */
+.cd .cd-invitado { position: relative; z-index: 4; display: flex; flex-direction: column; align-items: center; padding: 10cqi 8px 0; }
+.cd .cd-invitado-k { font: 700 clamp(10px, 2.6cqi, 12px)/1.3 var(--f-texto); letter-spacing: .22em; text-transform: uppercase; color: var(--oro-viejo); }
+.cd .cd-invitado-nombre { max-width: 100%; margin-top: 4px; font: 500 clamp(21px, 6cqi, 30px)/1.2 var(--f-invitado); letter-spacing: .03em; color: var(--tinta); overflow-wrap: anywhere; text-wrap: balance; }
 .cd .cd-invitado-pases {
-  margin-top: 8px; padding: 6px 16px; border-radius: 999px;
-  border: 1.2px solid var(--oro); background: rgb(255 252 246 / .9);
-  font: 700 clamp(13px, 3.4cqi, 16px)/1.2 var(--f-texto); color: var(--oro-viejo);
+  margin-top: 6px; padding: 4px 12px; border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--oro) 60%, transparent); background: rgb(255 252 246 / .9);
+  font: 700 clamp(11px, 2.9cqi, 13px)/1.2 var(--f-texto); color: var(--oro-viejo);
 }
 .cd .cd-invitado + .cd-foto { margin-top: 2px; }
 
@@ -104,7 +113,7 @@
 .cd .cd-marco i:nth-child(3) { bottom: 0; left: 0; border-width: var(--l) var(--l) 0 0; border-top-right-radius: var(--r); }
 .cd .cd-marco i:nth-child(4) { bottom: 0; right: 0; border-width: var(--l) 0 0 var(--l); border-top-left-radius: var(--r); }
 
-.cd .cd-flores { position: absolute; z-index: 3; width: 34%; max-width: 200px; filter: drop-shadow(0 6px 10px rgb(90 70 30 / .12)); }
+.cd .cd-flores { position: absolute; z-index: 3; width: 34%; max-width: 200px; filter: drop-shadow(0 6px 10px color-mix(in srgb, var(--sombra) 12%, transparent)); }
 .cd .cd-flores-arriba { top: -30px; left: -26px; }
 .cd .cd-flores-abajo { bottom: -30px; right: -26px; transform: rotate(180deg); width: 30%; }
 
@@ -151,7 +160,7 @@
   max-width: 100%;
   margin-bottom: -.12em;
 }
-.cd .cd-nombre-verde { color: var(--verde); }
+.cd .cd-nombre-verde { color: var(--nombre-2); }
 .cd .cd-n4 .cd-nombre { font-size: clamp(28px, 8.5cqi, 48px); }
 .cd .cd-anillo { position: relative; display: flex; flex-direction: column; align-items: center; width: 92%; aspect-ratio: 1 / .92; justify-content: center; }
 .cd .cd-anillo::before {
@@ -165,7 +174,7 @@
   background: var(--brillo-oro);
   -webkit-background-clip: text; background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 2px 1px rgb(120 80 20 / .25));
+  filter: drop-shadow(0 2px 1px color-mix(in srgb, var(--sombra) 25%, transparent));
   font-variant-numeric: tabular-nums lining-nums;
 }
 .cd .cd-anos { margin-top: 4px; font: 700 clamp(12px, 3.6cqi, 19px)/1 var(--f-texto); letter-spacing: .06em; text-transform: uppercase; color: var(--oro-viejo); }
@@ -195,7 +204,7 @@
 .cd .cd-fecha-dia {
   font: 700 clamp(60px, 18cqi, 96px)/.9 var(--f-cifra);
   background: var(--brillo-oro); -webkit-background-clip: text; background-clip: text; color: transparent;
-  filter: drop-shadow(0 2px 1px rgb(120 80 20 / .22));
+  filter: drop-shadow(0 2px 1px color-mix(in srgb, var(--sombra) 22%, transparent));
   font-variant-numeric: lining-nums;
 }
 .cd .cd-fecha-mes { margin-top: 10px; font: 700 clamp(14px, 4cqi, 19px)/1.2 var(--f-texto); letter-spacing: .3em; text-transform: uppercase; color: var(--oro-viejo); }
@@ -206,7 +215,7 @@
   border-top: 1px solid color-mix(in srgb, var(--oro) 45%, transparent);
 }
 .cd .cd-icono { width: clamp(26px, 7cqi, 34px); color: var(--oro); margin-bottom: 6px; }
-.cd .cd-icono svg { display: block; width: 100%; height: auto; filter: drop-shadow(0 2px 2px rgb(120 80 20 / .2)); }
+.cd .cd-icono svg { display: block; width: 100%; height: auto; filter: drop-shadow(0 2px 2px color-mix(in srgb, var(--sombra) 20%, transparent)); }
 .cd .cd-icono svg [fill="currentColor"] { fill: url(#cd-oro); }
 .cd .cd-donde-tipo { font: 700 clamp(11px, 3.2cqi, 14px)/1.3 var(--f-texto); letter-spacing: .26em; text-transform: uppercase; color: var(--oro-viejo); }
 .cd .cd-donde-nombre { margin-top: 2px; font: 700 clamp(24px, 7.4cqi, 34px)/1.15 var(--f-cifra); color: var(--tinta); text-wrap: balance; }
@@ -321,7 +330,7 @@
 
 /* ---------- Formulario de confirmación con la ropa de la plantilla ----------
    El RSVP es un componente común (Tailwind, letra mono de 10-11 px). */
-.cd .cd-modal { position: fixed; inset: 0; z-index: 80; display: flex; align-items: flex-end; justify-content: center; background: rgb(60 45 20 / .45); animation: cd-fundido .25s ease; }
+.cd .cd-modal { position: fixed; inset: 0; z-index: 80; display: flex; align-items: flex-end; justify-content: center; background: color-mix(in srgb, var(--tinta) 45%, transparent); animation: cd-fundido .25s ease; }
 .cd .cd-modal-caja { position: relative; width: 100%; max-width: 520px; max-height: 92svh; overflow: auto; background: var(--papel); border-top: 1.5px solid var(--oro); border-radius: 14px 14px 0 0; animation: cd-subir .35s var(--curva); }
 @media (min-width: 600px) { .cd .cd-modal { align-items: center; } .cd .cd-modal-caja { border: 1.5px solid var(--oro); border-radius: 10px; } }
 .cd .cd-cerrar { position: absolute; z-index: 2; top: 10px; right: 14px; width: 40px; height: 40px; border: 1px solid var(--oro); border-radius: 50%; background: var(--cartulina); color: var(--oro-viejo); font-size: 24px; line-height: 1; cursor: pointer; }
@@ -354,3 +363,6 @@
   .cd .cd-flores-arriba, .cd [data-reveal], .cd .cd-paso { transform: none; }
   .cd .cd-flores-abajo { transform: rotate(180deg); }
 }
+
+/* ---------- Variante «Celebración azul» ---------- */
+.cd.cd-azul { --nombre-2: var(--rosa); }

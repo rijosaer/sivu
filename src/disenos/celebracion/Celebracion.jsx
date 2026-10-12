@@ -18,10 +18,11 @@ import flores from "./arte/flores.webp";
 //   opcionales. Lo que ya dice la tarjeta (lugar, cómo llegar, confirmación)
 //   no se repite abajo.
 // Colores del tema: principal = oro, claro = oro pálido, oscuro = oro viejo,
-// papel = crema, sello = rosa de los nombres.
+// papel = crema, sello = rosa de los nombres. Todo el color sale del tema, así
+// que «Celebración azul» es este mismo diseño con otra paleta (variante).
 
 const FUENTES =
-  "https://fonts.googleapis.com/css2?family=Great+Vibes&family=Libre+Baskerville:wght@400;700&family=Playfair+Display:wght@600;700&display=swap";
+  "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Great+Vibes&family=Libre+Baskerville:wght@400;700&family=Playfair+Display:wght@600;700&display=swap";
 
 // Palabras con las que suele empezar el nombre de un lugar: van en su propio
 // renglón, como en la tarjeta («Restaurante / El Gran Víctor»).
@@ -97,7 +98,7 @@ function Lugar({ nombre }) {
   return <><span className="cd-donde-tipo">{m[1]}</span><b className="cd-donde-nombre">{m[2]}</b></>;
 }
 
-export default function Celebracion({ site, contenidoDe, invitacion, onEnviarRSVP }) {
+export default function Celebracion({ site, contenidoDe, invitacion, onEnviarRSVP, variante }) {
   useFuentes(FUENTES);
   const [rsvpAbierto, setRsvpAbierto] = useState(false);
   const [sonando, setSonando] = useState(false);
@@ -163,7 +164,7 @@ export default function Celebracion({ site, contenidoDe, invitacion, onEnviarRSV
       : null;
 
   return (
-    <div className={`cd ${lista ? "cd-lista" : ""}`} ref={raiz}>
+    <div className={`cd ${variante ? `cd-${variante}` : ""} ${lista ? "cd-lista" : ""}`} ref={raiz}>
       {audioSrc && <audio ref={audioRef} src={audioSrc} loop />}
       {audioSrc && (
         <button className="cd-musica" type="button" aria-pressed={sonando} onClick={alternarMusica} aria-label="Música de fondo">
@@ -173,12 +174,12 @@ export default function Celebracion({ site, contenidoDe, invitacion, onEnviarRSV
       )}
 
       <span className="cd-luces" aria-hidden="true" />
-      {/* Degradado de oro que usan los íconos rellenos de la tarjeta. */}
+      {/* Degradado del color principal que usan los íconos rellenos de la tarjeta. */}
       <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
         <linearGradient id="cd-oro" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#E6C77E" />
-          <stop offset=".5" stopColor="#B8862E" />
-          <stop offset="1" stopColor="#8A5E1C" />
+          <stop offset="0" style={{ stopColor: "var(--oro-claro)" }} />
+          <stop offset=".5" style={{ stopColor: "var(--oro)" }} />
+          <stop offset="1" style={{ stopColor: "var(--oro-viejo)" }} />
         </linearGradient>
       </svg>
 

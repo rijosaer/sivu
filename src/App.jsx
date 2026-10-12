@@ -25,6 +25,7 @@ const DISENOS_ALTERNATIVOS = {
   valle: lazy(() => import("./disenos/valle/Valle")),
   "valle-claro": lazy(() => import("./disenos/valle/ValleClaro")),
   celebracion: lazy(() => import("./disenos/celebracion/Celebracion")),
+  "celebracion-azul": lazy(() => import("./disenos/celebracion/CelebracionAzul")),
 };
 
 function useInvitationCode() {

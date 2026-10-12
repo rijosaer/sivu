@@ -33,4 +33,5 @@ export const DISENOS = [
   { key: "valle", nombre: "Valle de luna (acuarela azul noche, boda)" },
   { key: "valle-claro", nombre: "Valle claro (acuarela azul cielo, boda)" },
   { key: "celebracion", nombre: "Celebración dorada (crema y oro, cumpleaños de varias personas)" },
+  { key: "celebracion-azul", nombre: "Celebración azul (crema y azul loza, cumpleaños de varias personas)" },
 ];
