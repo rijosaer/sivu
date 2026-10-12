@@ -334,11 +334,12 @@
 .cd .cd-modal-caja { position: relative; width: 100%; max-width: 520px; max-height: 92svh; overflow: auto; background: var(--papel); border-top: 1.5px solid var(--oro); border-radius: 14px 14px 0 0; animation: cd-subir .35s var(--curva); }
 @media (min-width: 600px) { .cd .cd-modal { align-items: center; } .cd .cd-modal-caja { border: 1.5px solid var(--oro); border-radius: 10px; } }
 .cd .cd-cerrar { position: absolute; z-index: 2; top: 10px; right: 14px; width: 40px; height: 40px; border: 1px solid var(--oro); border-radius: 50%; background: var(--cartulina); color: var(--oro-viejo); font-size: 24px; line-height: 1; cursor: pointer; }
-.cd .cd-modal #rsvp { padding: 30px 22px 36px; border-top: 0; font-family: var(--f-texto); color: var(--tinta); }
+.cd .cd-modal #rsvp { padding: 58px 22px 36px; border-top: 0; font-family: var(--f-texto); color: var(--tinta); }
 .cd .cd-modal #rsvp img { display: none; }
 .cd .cd-modal #rsvp .font-mono { font-family: var(--f-texto); letter-spacing: .14em; }
 .cd .cd-modal #rsvp p.font-mono, .cd .cd-modal #rsvp span.font-mono { font-size: 12px; font-weight: 700; color: var(--oro-viejo); }
-.cd .cd-modal #rsvp h2 { font-family: var(--f-guion); font-weight: 400; font-size: clamp(40px, 11vw, 48px); line-height: 1.15; color: var(--oro-viejo); margin: 6px 0 4px; }
+/* El título lleva el nombre del invitado: misma letra recta que en la tarjeta. */
+.cd .cd-modal #rsvp h2 { font-family: var(--f-invitado); font-weight: 500; font-size: clamp(26px, 7vw, 32px); letter-spacing: .02em; line-height: 1.2; color: var(--oro-viejo); margin: 6px 0 4px; text-wrap: balance; }
 .cd .cd-modal #rsvp h2 + p.font-mono, .cd .cd-modal #rsvp h2 + div + p.font-mono { margin-top: 14px !important; margin-bottom: 22px !important; }
 .cd .cd-modal #rsvp .font-body { font-family: var(--f-texto); font-size: 17px; font-weight: 400; color: var(--tinta); }
 .cd .cd-modal #rsvp p.text-xs, .cd .cd-modal #rsvp p.text-sm { font-size: 15.5px; line-height: 1.55; color: var(--suave); }
