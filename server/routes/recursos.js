@@ -757,6 +757,32 @@ recursosRouter.get(
        FROM invitados WHERE invitacion_id = $1`,
       [req.invitacionId]
     );
-    res.json({ ...personas.rows[0], invitaciones: invitaciones.rows[0] });
+    // Los cupos de cada invitación «titular + cupos», separados por lo que
+    // todavía puede pasar con ellos:
+    //   asignados    → ya tienen nombre (acompañantes registrados).
+    //   por_confirmar → sin nombre y la invitación no ha respondido: esa gente
+    //                   todavía podría llegar.
+    //   no_usados    → sin nombre pero el titular ya respondió: no se llenaron.
+    const cupos = await pool.query(
+      `WITH por_invitacion AS (
+         SELECT i.cupos,
+                count(m.id) FILTER (WHERE m.es_acompanante)::int AS asignados,
+                bool_or(NOT m.es_acompanante AND m.estado <> 'pendiente') AS respondio
+         FROM invitados i
+         LEFT JOIN invitado_miembros m ON m.invitado_id = i.id
+         WHERE i.invitacion_id = $1 AND i.tipo = 'cupos'
+         GROUP BY i.id
+       )
+       SELECT
+         COALESCE(sum(cupos), 0)::int AS total,
+         COALESCE(sum(asignados), 0)::int AS asignados,
+         COALESCE(sum(GREATEST(cupos - asignados, 0)) FILTER (WHERE NOT COALESCE(respondio, false)), 0)::int
+           AS por_confirmar,
+         COALESCE(sum(GREATEST(cupos - asignados, 0)) FILTER (WHERE COALESCE(respondio, false)), 0)::int
+           AS no_usados
+       FROM por_invitacion`,
+      [req.invitacionId]
+    );
+    res.json({ ...personas.rows[0], invitaciones: invitaciones.rows[0], cupos: cupos.rows[0] });
   })
 );

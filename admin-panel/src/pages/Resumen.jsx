@@ -119,6 +119,10 @@ export default function Resumen({ irA }) {
   if (!datos) return <p className="text-sm text-ink-tenue">Cargando...</p>;
 
   const inv = datos.invitaciones || {};
+  const cupos = datos.cupos || {};
+  // Personas posibles: las que ya tienen nombre más los cupos que todavía
+  // pueden llenarse. Es el número para el lugar y el catering.
+  const posibles = (datos.total || 0) + (cupos.por_confirmar || 0);
   const respondieron = (datos.confirmados || 0) + (datos.no_asisten || 0);
   const avance = datos.total ? Math.round((respondieron / datos.total) * 100) : 0;
 
@@ -141,9 +145,11 @@ export default function Resumen({ irA }) {
       accion: "Recordarles",
       ir: "invitados",
     },
-    inv.cupos_libres > 0 && {
+    cupos.por_confirmar > 0 && {
       icono: "persona",
-      texto: `${inv.cupos_libres} de ${inv.cupos_totales} cupos siguen sin nombre: podrían sumarse hasta esas personas más.`,
+      texto: `${cupos.por_confirmar} ${
+        cupos.por_confirmar === 1 ? "cupo sigue" : "cupos siguen"
+      } por confirmar: sus invitaciones aún no responden.`,
       accion: "Ver cupos",
       ir: "invitados",
     },
@@ -165,10 +171,23 @@ export default function Resumen({ irA }) {
       <CuentaRegresiva limite={limite} pendientes={datos.pendientes} />
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-        <Dato label="Personas invitadas" valor={datos.total} />
+        <Dato
+          label="Personas invitadas"
+          valor={posibles}
+          destacado={
+            cupos.por_confirmar > 0
+              ? `${datos.total} con nombre + ${cupos.por_confirmar} en cupos`
+              : null
+          }
+        />
         <Dato label="Asisten" valor={datos.confirmados} color="text-emerald-600" />
         <Dato label="No asisten" valor={datos.no_asisten} color="text-red-600" />
-        <Dato label="Sin responder" valor={datos.pendientes} color="text-amber-600" />
+        <Dato
+          label="Sin responder"
+          valor={datos.pendientes}
+          color="text-amber-600"
+          destacado={cupos.por_confirmar > 0 ? `+ ${cupos.por_confirmar} cupos por confirmar` : null}
+        />
       </div>
 
       <div className="tarjeta p-4 mb-6">
@@ -182,6 +201,34 @@ export default function Resumen({ irA }) {
           <div className="h-full bg-marca transition-all" style={{ width: `${avance}%` }} />
         </div>
       </div>
+
+      {/* Los cupos solo existen en las invitaciones «titular + cupos». */}
+      {cupos.total > 0 && (
+        <>
+          <h3 className="bloque-titulo mb-2">Cupos de acompañantes</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+            <Dato label="Cupos en total" valor={cupos.total} destacado={`en ${inv.con_cupos} invitaciones`} />
+            <Dato
+              label="Con nombre"
+              valor={cupos.asignados}
+              color="text-emerald-600"
+              destacado="Acompañantes ya registrados"
+            />
+            <Dato
+              label="Por confirmar"
+              valor={cupos.por_confirmar}
+              color="text-amber-600"
+              destacado="La invitación aún no responde"
+            />
+            <Dato
+              label="No usados"
+              valor={cupos.no_usados}
+              color="text-ink-tenue"
+              destacado="Respondieron sin llenarlos"
+            />
+          </div>
+        </>
+      )}
 
       {tareas.length > 0 && (
         <>
