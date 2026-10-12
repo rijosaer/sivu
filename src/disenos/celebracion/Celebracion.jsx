@@ -4,7 +4,7 @@ import RSVP from "../../components/RSVP";
 import {
   partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer,
 } from "../comun";
-import flores from "./arte/flores.webp";
+import floresBlancas from "./arte/flores.webp";
 
 // Diseño «Celebración dorada»: crema con luces desenfocadas, filetes de oro y
 // flores blancas en las esquinas. Nace de una tarjeta impresa de cumpleaños
@@ -98,7 +98,7 @@ function Lugar({ nombre }) {
   return <><span className="cd-donde-tipo">{m[1]}</span><b className="cd-donde-nombre">{m[2]}</b></>;
 }
 
-export default function Celebracion({ site, contenidoDe, invitacion, onEnviarRSVP, variante }) {
+export default function Celebracion({ site, contenidoDe, invitacion, onEnviarRSVP, variante, flores = floresBlancas }) {
   useFuentes(FUENTES);
   const [rsvpAbierto, setRsvpAbierto] = useState(false);
   const [sonando, setSonando] = useState(false);

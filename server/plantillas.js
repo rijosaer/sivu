@@ -159,7 +159,7 @@ const TEMA_CELEBRACION = [
 
 // Celebración azul: la misma tarjeta en azul de loza sobre crema (tomado de
 // un backdrop de referencia). Principal = azul, claro = azul empolvado,
-// oscuro = azul tinta, sello = azul de los nombres.
+// oscuro = azul tinta, sello = rosa de los nombres de las cumpleañeras.
 const TEMA_CELEBRACION_AZUL = [
   ["color-paper", "#FAF7F0"],
   ["color-ink", "#1E2A4A"],
@@ -167,7 +167,7 @@ const TEMA_CELEBRACION_AZUL = [
   ["color-gold-light", "#B4C3E0"],
   ["color-gold-dark", "#1F2F5C"],
   ["color-marble", "#EDF0F6"],
-  ["color-seal", "#263A70"],
+  ["color-seal", "#B4466A"],
   ["fuente-guion", "Great Vibes"],
   ["fuente-titulos", "Playfair Display"],
   ["fuente-cuerpo", "Libre Baskerville"],

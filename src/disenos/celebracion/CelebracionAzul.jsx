@@ -1,8 +1,10 @@
 import Celebracion from "./Celebracion";
+import floresAzules from "./arte/flores-azul.webp";
 
 // Diseño «Celebración azul»: la misma tarjeta de Celebración dorada en azul
-// de loza sobre crema (los colores vienen del tema). Todos los nombres de los
-// festejados van en el mismo azul, sin alternar con el verde.
+// de loza sobre crema (los colores vienen del tema). El ramillete es la misma
+// acuarela teñida de azul loza, y los nombres alternan rosa (sello del tema)
+// y azul en lugar de rosa y verde.
 export default function CelebracionAzul(props) {
-  return <Celebracion {...props} variante="azul" />;
+  return <Celebracion {...props} variante="azul" flores={floresAzules} />;
 }
