@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import { api, SITIO_BASE } from "../api";
 import { useToast } from "../ui/Toast";
 import Icono from "../ui/Icono";
@@ -11,6 +11,9 @@ import {
   plazoCerrado,
   telefonoValido,
 } from "../whatsapp";
+
+// El importador trae el lector de Excel: se carga solo cuando se abre.
+const ImportarInvitados = lazy(() => import("./ImportarInvitados"));
 
 // Cada tipo se explica por lo que hace el invitado al confirmar, que es lo que
 // de verdad los diferencia. El ejemplo de abajo se muestra al elegirlo.
@@ -891,6 +894,7 @@ export default function Invitados({ irA }) {
   const [filtro, setFiltro] = useState("");
   const [vista, setVista] = useState("todas");
   const [creando, setCreando] = useState(false);
+  const [importando, setImportando] = useState(false);
 
   async function cargar() {
     setCargando(true);
@@ -984,11 +988,22 @@ export default function Invitados({ irA }) {
               : `${cuentas.todas} invitaciones · ${cuentas.sin_enviar} sin enviar · ${cuentas.sin_responder} esperando respuesta`}
           </p>
         </div>
-        <button onClick={() => setCreando((v) => !v)} className="boton-primario">
-          <Icono nombre="mas" className="w-3.5 h-3.5" />
-          Nueva invitación
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setImportando((v) => !v)} className="boton-secundario">
+            Importar desde Excel
+          </button>
+          <button onClick={() => setCreando((v) => !v)} className="boton-primario">
+            <Icono nombre="mas" className="w-3.5 h-3.5" />
+            Nueva invitación
+          </button>
+        </div>
       </div>
+
+      {importando && (
+        <Suspense fallback={<p className="text-sm text-ink-tenue mb-6">Cargando importador...</p>}>
+          <ImportarInvitados lista={lista} onTerminado={cargar} onCerrar={() => setImportando(false)} />
+        </Suspense>
+      )}
 
       {creando && <Crear onCreada={cargar} onCancelar={() => setCreando(false)} />}
 
