@@ -5,6 +5,8 @@ import { publicRouter } from "./routes/public.js";
 import { authRouter } from "./routes/auth.js";
 import { adminRouter } from "./routes/admin.js";
 import { manejadorDeErrores } from "./errores.js";
+import { reanudarWhatsapp } from "./whatsappWeb.js";
+import { iniciarResumenes } from "./resumenDiario.js";
 import { cabecerasSeguras, corsOpciones, limitador } from "./seguridad.js";
 
 const app = express();
@@ -47,4 +49,10 @@ app.get("/", (_req, res) => res.send("Backend de la invitación funcionando."));
 app.use(manejadorDeErrores);
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`Servidor escuchando en http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Servidor escuchando en http://localhost:${PORT}`);
+  // Si ya había un número de WhatsApp vinculado, vuelve a conectarse solo.
+  reanudarWhatsapp();
+  // Revisa cada minuto qué eventos deben recibir su resumen diario.
+  iniciarResumenes();
+});

@@ -1,0 +1,228 @@
+{
+ "site": {
+  "invitacion": {
+   "slug": "plantillas/valle-claro",
+   "nombre": "Boda · Camila & Andrés",
+   "tipoEvento": "boda",
+   "diseno": "valle-claro"
+  },
+  "tema": {
+   "color-paper": "#F7F9FC",
+   "color-ink": "#2A3A55",
+   "color-gold": "#4F77A8",
+   "color-gold-light": "#BCD2EA",
+   "color-gold-dark": "#36537D",
+   "color-marble": "#EAF1F9",
+   "color-seal": "#B08A52",
+   "fuente-guion": "Pinyon Script",
+   "fuente-titulos": "Cormorant Garamond",
+   "fuente-cuerpo": "Jost"
+  },
+  "decoraciones": {
+   "scrollwork": null,
+   "bouquet": null,
+   "frame": null,
+   "column": null,
+   "divider": null
+  },
+  "ubicaciones": [],
+  "fechaLimiteConfirmacion": "2027-07-15",
+  "fotosSubidas": [],
+  "audioUrl": null,
+  "fondoUrl": null,
+  "secciones": [
+   {
+    "id": 1,
+    "tipo": "welcome",
+    "contenido": {
+     "bienvenidaTexto": "Nos casamos",
+     "novioEl": "Camila",
+     "novioElla": "Andrés",
+     "fraseIntro": "Y queremos que seas parte del comienzo de nuestra historia para siempre.",
+     "padresTexto": "Con la bendición de nuestros padres",
+     "padreElPadre": "Jorge Herrera",
+     "padreElMadre": "Lucía Montoya",
+     "padreEllaPadre": "Ernesto Rivas",
+     "padreEllaMadre": "Patricia Gómez",
+     "versiculo": "Mejores son dos que uno, porque obtienen más fruto de su esfuerzo.",
+     "versiculoCita": "Eclesiastés 4:9"
+    }
+   },
+   {
+    "id": 2,
+    "tipo": "informacion_boda",
+    "contenido": {
+     "overline": "Ceremonia",
+     "tituloSeccion": "Información de la boda",
+     "tituloItinerario": "Itinerario",
+     "fecha": "2027-08-28T17:00:00-05:00",
+     "lugar": "Hacienda San Gabriel",
+     "direccion": "Camino a Colorines Km. 4.5, Valle de Bravo, Estado de México",
+     "mapsUrl": "https://maps.google.com/?q=Valle+de+Bravo",
+     "mapaEmbed": "",
+     "fechaLimiteConfirmacion": "2027-07-15",
+     "mostrarRestriccion": true,
+     "mostrarObservaciones": true,
+     "cronogramaModo": "detallado",
+     "cronogramaMensaje": "",
+     "cronograma": [
+      {
+       "hora": "17:00",
+       "titulo": "Ceremonia"
+      },
+      {
+       "hora": "18:00",
+       "titulo": "Cóctel"
+      },
+      {
+       "hora": "20:00",
+       "titulo": "Cena"
+      },
+      {
+       "hora": "22:00",
+       "titulo": "Fiesta"
+      }
+     ]
+    }
+   },
+   {
+    "id": 3,
+    "tipo": "vestimenta",
+    "contenido": {
+     "titulo": "Formal",
+     "nota": "El blanco y sus tonos quedan reservados para la novia.",
+     "permitidos": [
+      {
+       "nombre": "Tonos de cielo",
+       "colores": [
+        "#4F77A8",
+        "#7FA2CC",
+        "#BCD2EA",
+        "#D9C9B0",
+        "#A7A3C9"
+       ]
+      }
+     ],
+     "evitar": [
+      {
+       "nombre": "Blanco",
+       "color": "#FFFFFF"
+      },
+      {
+       "nombre": "Marfil",
+       "color": "#F4EEDF"
+      }
+     ]
+    }
+   },
+   {
+    "id": 4,
+    "tipo": "padrinos",
+    "contenido": {
+     "titulo": "Nuestros padrinos",
+     "grupos": [
+      {
+       "etiqueta": "Padrinos de velación",
+       "personas": [
+        "Mariana Rivas",
+        "Tomás Herrera"
+       ]
+      },
+      {
+       "etiqueta": "Padrinos de anillos",
+       "personas": [
+        "Sofía Luna",
+        "Diego Paredes"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 5,
+    "tipo": "sobres",
+    "contenido": {
+     "texto": "Tu presencia es nuestro mejor regalo. Si deseas tener un detalle con nosotros, lo recibiremos con cariño en una lluvia de sobres."
+    }
+   },
+   {
+    "id": 6,
+    "tipo": "regalos",
+    "activo": true,
+    "contenido": {
+     "titulo": "Mesa de regalos",
+     "texto": "",
+     "enlaces": [
+      {
+       "tienda": "Liverpool",
+       "url": "https://mesaderegalos.liverpool.com.mx"
+      }
+     ],
+     "datosTransferencia": "BBVA · Camila Herrera\nCLABE 0121 8000 1234 5678 90"
+    }
+   },
+   {
+    "id": 7,
+    "tipo": "info_importante",
+    "contenido": {
+     "nota": "",
+     "items": [
+      "La invitación es exclusivamente para las personas indicadas en tu pase.",
+      "Celebración solo para adultos.",
+      "Habrá estacionamiento dentro de la hacienda."
+     ]
+    }
+   },
+   {
+    "id": 8,
+    "tipo": "faq",
+    "contenido": {
+     "items": [
+      {
+       "p": "¿Hay hospedaje cerca?",
+       "r": "Sí, en el centro de Valle de Bravo, a 15 minutos de la hacienda."
+      },
+      {
+       "p": "¿A qué hora termina?",
+       "r": "La fiesta termina a las 2:00 a. m."
+      }
+     ]
+    }
+   },
+   {
+    "id": 9,
+    "tipo": "historia",
+    "activo": false,
+    "contenido": {
+     "texto": ""
+    }
+   },
+   {
+    "id": 10,
+    "tipo": "musica",
+    "contenido": {
+     "titulo": "",
+     "src": ""
+    }
+   }
+  ]
+ },
+ "invitado": {
+  "codigo": "DEMO",
+  "tipo": "cupos",
+  "nombre": "Familia Ortega",
+  "familia": "",
+  "mensaje": "",
+  "cupos": 1,
+  "miembros": [
+   {
+    "id": -1,
+    "nombre": "Laura Ortega",
+    "estado": "pendiente",
+    "restriccion": "",
+    "comentario": "",
+    "es_acompanante": false
+   }
+  ]
+ }
+}

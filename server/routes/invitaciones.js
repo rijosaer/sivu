@@ -4,6 +4,8 @@ import { pool } from "../db.js";
 import { capturar } from "../errores.js";
 import { resolverInvitacionAdmin } from "../middlewareInvitacion.js";
 import { soloDueno } from "../auth.js";
+import { avisosListos, describirRespuesta, enviarAviso, telefonosDe } from "../avisosWhatsapp.js";
+import { enviarResumen } from "../resumenDiario.js";
 import { TIPOS_EVENTO, DISENOS, temaDeDiseno, decoracionesBase, plantillaSecciones } from "../plantillas.js";
 
 // CRUD de invitaciones (los "eventos" del sistema). Es lo que le permite al
@@ -60,7 +62,7 @@ invitacionesRouter.get(
     // El dueño ve todos los eventos; un cliente, solo el suyo.
     const soloUno = req.admin.invitacionId || null;
     const { rows } = await pool.query(
-      `SELECT id, slug, nombre, tipo_evento, diseno, fecha_evento, activo, es_plantilla, creado_en
+      `SELECT id, slug, nombre, tipo_evento, diseno, fecha_evento, activo, es_plantilla, avisos_whatsapp, creado_en
        FROM invitaciones WHERE ($1::int IS NULL OR id = $1) ORDER BY creado_en DESC`,
       [soloUno]
     );
@@ -214,6 +216,96 @@ invitacionesRouter.get(
       [req.invitacionId]
     );
     res.json(rows.map((r) => r.usuario));
+  })
+);
+
+// Avisos por WhatsApp al cliente cuando un invitado responde. Solo el dueño
+// los prende y decide a qué números van; aquí también se ven los últimos
+// envíos, para saber si salieron y, si no, por qué.
+async function estadoAvisos(invitacionId) {
+  const ev = await pool.query(
+    "SELECT avisos_whatsapp, avisos_telefonos, avisos_resumen, avisos_resumen_hora FROM invitaciones WHERE id = $1",
+    [invitacionId]
+  );
+  // El teléfono de «Favor confirmar al» de la invitación: se sugiere como
+  // número para los avisos, que suele ser el del anfitrión.
+  const sugerido = await pool.query(
+    "SELECT contenido->>'telefonoConfirmar' AS t FROM secciones WHERE invitacion_id = $1 AND tipo = 'informacion_boda' LIMIT 1",
+    [invitacionId]
+  );
+  const { rows: ultimos } = await pool.query(
+    `SELECT telefono, texto, estado, detalle, creado_en FROM avisos_enviados
+     WHERE invitacion_id = $1 ORDER BY creado_en DESC LIMIT 8`,
+    [invitacionId]
+  );
+  return {
+    activo: ev.rows[0].avisos_whatsapp,
+    telefonos: ev.rows[0].avisos_telefonos,
+    sugerido: sugerido.rows[0]?.t || "",
+    resumen: ev.rows[0].avisos_resumen,
+    resumenHora: ev.rows[0].avisos_resumen_hora,
+    configurado: avisosListos(),
+    ultimos,
+  };
+}
+
+invitacionesRouter.get(
+  "/:invitacionId/avisos",
+  soloDueno,
+  resolverInvitacionAdmin,
+  capturar(async (req, res) => res.json(await estadoAvisos(req.invitacionId)))
+);
+
+invitacionesRouter.put(
+  "/:invitacionId/avisos",
+  soloDueno,
+  resolverInvitacionAdmin,
+  capturar(async (req, res) => {
+    const activo = Boolean(req.body.activo);
+    const telefonos = String(req.body.telefonos || "").trim();
+    const resumen = Boolean(req.body.resumen);
+    const hora = Number.isInteger(req.body.resumenHora) ? req.body.resumenHora : 19;
+    if (hora < 0 || hora > 23) return res.status(400).json({ error: "La hora del resumen no es válida" });
+    if (activo && !telefonosDe(telefonos).length) {
+      return res.status(400).json({ error: "Escribe al menos un número de WhatsApp del cliente" });
+    }
+    await pool.query(
+      `UPDATE invitaciones SET avisos_whatsapp = $2, avisos_telefonos = $3, avisos_resumen = $4,
+         avisos_resumen_hora = $5, actualizado_en = now() WHERE id = $1`,
+      [req.invitacionId, activo, telefonos, resumen, hora]
+    );
+    res.json(await estadoAvisos(req.invitacionId));
+  })
+);
+
+// Aviso de ejemplo a los números guardados, para comprobar que llega.
+invitacionesRouter.post(
+  "/:invitacionId/avisos/prueba",
+  soloDueno,
+  resolverInvitacionAdmin,
+  capturar(async (req, res) => {
+    const { rows } = await pool.query("SELECT avisos_telefonos FROM invitaciones WHERE id = $1", [req.invitacionId]);
+    const telefonos = telefonosDe(rows[0].avisos_telefonos);
+    if (!telefonos.length) return res.status(400).json({ error: "Primero guarda un número de WhatsApp" });
+    const envio = await enviarAviso({
+      invitacionId: req.invitacionId,
+      telefonos,
+      evento: req.invitacion.nombre,
+      respuesta: describirRespuesta({ nombre: "Invitado de prueba" }, [{ estado: "confirmado" }]),
+    });
+    res.json({ ...envio, ...(await estadoAvisos(req.invitacionId)) });
+  })
+);
+
+// Resumen del avance ahora mismo, haya o no respuestas nuevas.
+invitacionesRouter.post(
+  "/:invitacionId/avisos/resumen",
+  soloDueno,
+  resolverInvitacionAdmin,
+  capturar(async (req, res) => {
+    const envio = await enviarResumen(req.invitacionId, { siempre: true });
+    if (envio.omitido) return res.status(400).json({ error: "Primero guarda un número de WhatsApp" });
+    res.json({ ...envio, ...(await estadoAvisos(req.invitacionId)) });
   })
 );
 

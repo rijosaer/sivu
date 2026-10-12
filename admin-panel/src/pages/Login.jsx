@@ -32,7 +32,7 @@ export default function Login({ onLogin }) {
           <span className="marca-sello">c.</span>
           <span>
             <span className="block text-[15px] font-semibold tracking-[-.03em] text-ink">
-              Convite
+              Sivú
             </span>
             <span className="block text-[10px] uppercase tracking-[.16em] text-ink-tenue mt-0.5">
               invitaciones digitales

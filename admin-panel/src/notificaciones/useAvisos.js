@@ -107,7 +107,7 @@ export function useAvisos() {
           toast(`${icono} ${texto}`, tono);
           if ("Notification" in window && Notification.permission === "granted") {
             try {
-              new Notification(getInvitacionActual()?.nombre || "Convite", { body: texto });
+              new Notification(getInvitacionActual()?.nombre || "Sivú", { body: texto });
             } catch {
               /* ignora */
             }

@@ -2,6 +2,7 @@ import { Router } from "express";
 import { pool } from "../db.js";
 import { capturar } from "../errores.js";
 import { resolverInvitacionPublica } from "../middlewareInvitacion.js";
+import { avisarRespuesta, fotoRespuestas } from "../avisosWhatsapp.js";
 
 export const publicRouter = Router();
 
@@ -219,6 +220,9 @@ invitacionRouter.post(
       }
     }
 
+    // Cómo estaba antes, para avisar al cliente solo si algo cambió.
+    const antes = await fotoRespuestas(invitadoId);
+
     const client = await pool.connect();
     try {
       await client.query("BEGIN");
@@ -282,6 +286,8 @@ invitacionRouter.post(
 
       await client.query("COMMIT");
       res.json({ ok: true });
+      // Después de responder: el invitado no espera a que salga el WhatsApp.
+      avisarRespuesta({ invitacionId: req.invitacionId, invitadoId, antes });
     } catch (e) {
       await client.query("ROLLBACK").catch(() => {});
       throw e;

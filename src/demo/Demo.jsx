@@ -15,6 +15,8 @@ const DISENOS = {
   lazos: lazy(() => import("../disenos/lazos/Lazos")),
   coquette: lazy(() => import("../disenos/coquette/Coquette")),
   paris: lazy(() => import("../disenos/paris/Paris")),
+  valle: lazy(() => import("../disenos/valle/Valle")),
+  "valle-claro": lazy(() => import("../disenos/valle/ValleClaro")),
 };
 
 const MUESTRAS = {
@@ -24,9 +26,11 @@ const MUESTRAS = {
   lazos: () => import("./muestras/lazos.json"),
   coquette: () => import("./muestras/coquette.json"),
   paris: () => import("./muestras/paris.json"),
+  valle: () => import("./muestras/valle.json"),
+  "valle-claro": () => import("./muestras/valle-claro.json"),
 };
 
-const NOMBRES = { jardin: "Jardín encantado", ensueno: "Ensueño", gala: "Gala", lazos: "Moños y perlas", coquette: "Coquette", paris: "París rosé" };
+const NOMBRES = { jardin: "Jardín encantado", ensueno: "Ensueño", gala: "Gala", lazos: "Moños y perlas", coquette: "Coquette", paris: "París rosé", valle: "Valle de luna", "valle-claro": "Valle claro" };
 
 export default function Demo({ diseno }) {
   const [datos, setDatos] = useState(null);
@@ -37,7 +41,7 @@ export default function Demo({ diseno }) {
     if (!MUESTRAS[diseno]) return;
     MUESTRAS[diseno]().then((m) => {
       applyTema(m.default.site.tema);
-      document.title = `Plantilla ${NOMBRES[diseno]} · Convite`;
+      document.title = `Plantilla ${NOMBRES[diseno]} · Sivú`;
       setDatos(m.default);
     });
   }, [diseno]);
@@ -55,7 +59,7 @@ export default function Demo({ diseno }) {
   const { site, invitado } = datos;
   const contenidoDe = (tipo) => site.secciones.find((s) => s.tipo === tipo)?.contenido || {};
   const wa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
-    `Hola, me gusta la plantilla «${NOMBRES[diseno]}» de Convite para mi evento.`
+    `Hola, me gusta la plantilla «${NOMBRES[diseno]}» de Sivú para mi evento.`
   )}`;
 
   return (

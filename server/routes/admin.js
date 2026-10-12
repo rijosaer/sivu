@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { requiereAdmin } from "../auth.js";
+import { requiereAdmin, soloDueno } from "../auth.js";
 import { resolverInvitacionAdmin } from "../middlewareInvitacion.js";
 import { invitacionesRouter } from "./invitaciones.js";
 import { recursosRouter } from "./recursos.js";
+import { whatsappRouter } from "./whatsapp.js";
 
 // Todo /api/admin exige sesión. Dos cosas cuelgan de aquí:
 //  - /invitaciones            CRUD de los eventos en sí (crear, listar, editar).
@@ -10,8 +11,10 @@ import { recursosRouter } from "./recursos.js";
 //                             decoraciones, invitados...), antes montado
 //                             directo en /api/admin y ahora resuelto contra
 //                             esa invitación concreta.
+// Y /whatsapp, el número de Sivú que manda los avisos (solo el dueño).
 export const adminRouter = Router();
 adminRouter.use(requiereAdmin);
 
+adminRouter.use("/whatsapp", soloDueno, whatsappRouter);
 adminRouter.use("/invitaciones", invitacionesRouter);
 adminRouter.use("/invitaciones/:invitacionId", resolverInvitacionAdmin, recursosRouter);

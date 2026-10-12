@@ -99,7 +99,7 @@ function Marca() {
     <div className="flex items-center gap-3">
       <span className="marca-sello">c.</span>
       <span>
-        <span className="block text-[15px] font-semibold tracking-[-.03em] text-ink">Convite</span>
+        <span className="block text-[15px] font-semibold tracking-[-.03em] text-ink">Sivú</span>
         <span className="block text-[10px] uppercase tracking-[.1em] whitespace-nowrap text-ink-tenue mt-0.5">
           invitaciones digitales
         </span>

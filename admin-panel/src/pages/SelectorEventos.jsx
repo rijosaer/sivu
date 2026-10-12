@@ -342,6 +342,279 @@ function AccesoCliente({ inv }) {
   );
 }
 
+// El número de WhatsApp de Sivú que manda los avisos, vinculado como
+// WhatsApp Web: se escanea el QR desde el celular de ese número (WhatsApp →
+// Dispositivos vinculados). Provisional mientras no esté la cuenta oficial.
+function WhatsappSivu() {
+  const toast = useToast();
+  const [wa, setWa] = useState(null);
+  const [ocupado, setOcupado] = useState(false);
+
+  useEffect(() => {
+    let vivo = true;
+    let id;
+    async function mirar() {
+      try {
+        const e = await api.estadoWhatsapp();
+        if (!vivo) return;
+        setWa(e);
+        // Mientras se conecta o espera el escaneo, se consulta seguido.
+        id = setTimeout(mirar, e.estado === "qr" || e.estado === "conectando" ? 2000 : 15000);
+      } catch {
+        if (vivo) id = setTimeout(mirar, 15000);
+      }
+    }
+    mirar();
+    return () => {
+      vivo = false;
+      clearTimeout(id);
+    };
+  }, []);
+
+  async function conectar() {
+    setOcupado(true);
+    try {
+      setWa(await api.conectarWhatsapp());
+    } catch (err) {
+      toast(err.message, "error");
+    } finally {
+      setOcupado(false);
+    }
+  }
+
+  async function desconectar() {
+    if (!confirm("¿Desvincular el WhatsApp de Sivú? Los avisos dejan de salir hasta que lo vuelvas a vincular.")) return;
+    setOcupado(true);
+    try {
+      setWa(await api.desconectarWhatsapp());
+      toast("WhatsApp desvinculado");
+    } catch (err) {
+      toast(err.message, "error");
+    } finally {
+      setOcupado(false);
+    }
+  }
+
+  if (!wa) return null;
+  const conectado = wa.estado === "conectado";
+
+  return (
+    <div className="tarjeta-lista p-5 mb-8 flex flex-col sm:flex-row gap-5 sm:items-center">
+      <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-semibold text-ink">WhatsApp de Sivú</span>
+          <span className={`insignia ${conectado ? "insignia-ok" : wa.estado === "apagado" ? "insignia-neutra" : "insignia-aviso"}`}>
+            {conectado ? `vinculado · +${wa.numero}` : wa.estado === "qr" ? "esperando escaneo" : wa.estado === "conectando" ? "conectando..." : "sin vincular"}
+          </span>
+        </div>
+        <p className="text-[12px] text-ink-suave">
+          {conectado
+            ? "Los avisos de los eventos que los tengan activos salen desde este número."
+            : wa.estado === "qr"
+              ? "En el celular del número de Sivú abre WhatsApp → Dispositivos vinculados → Vincular un dispositivo, y escanea el código."
+              : "Vincula un número de Sivú para que los avisos a los clientes salgan por WhatsApp."}
+        </p>
+        <p className="text-[11px] text-amber-700">
+          Usa un número aparte, no el personal: este modo no es oficial y WhatsApp puede bloquear el número.
+        </p>
+        {wa.error && !conectado && <p className="text-[11px] text-red-600">{wa.error}</p>}
+        <div className="flex gap-2 mt-1">
+          {conectado ? (
+            <button onClick={desconectar} disabled={ocupado} className="boton-secundario !py-1.5 !text-xs">
+              Desvincular
+            </button>
+          ) : (
+            wa.estado === "apagado" && (
+              <button onClick={conectar} disabled={ocupado} className="boton-primario !py-1.5 !text-xs">
+                {ocupado ? "Preparando..." : "Vincular número"}
+              </button>
+            )
+          )}
+        </div>
+      </div>
+      {wa.estado === "qr" && wa.qr && (
+        <img src={wa.qr} alt="Código QR para vincular WhatsApp" className="w-56 h-56 self-center rounded-lg border border-borde bg-white p-2" />
+      )}
+    </div>
+  );
+}
+
+const ESTADO_AVISO = {
+  enviado: ["insignia-ok", "enviado"],
+  simulado: ["insignia-neutra", "simulado"],
+  error: ["insignia-no", "falló"],
+};
+
+// Avisos por WhatsApp: cuando un invitado responde desde su enlace, Sivú le
+// escribe al cliente aunque no tenga el panel abierto. Se prende por evento.
+function AvisosWhatsapp({ inv, onCambio }) {
+  const toast = useToast();
+  const [abierto, setAbierto] = useState(false);
+  const [datos, setDatos] = useState(null);
+  const [activo, setActivo] = useState(false);
+  const [telefonos, setTelefonos] = useState("");
+  const [resumen, setResumen] = useState(false);
+  const [hora, setHora] = useState(19);
+  const [ocupado, setOcupado] = useState(false);
+  const [error, setError] = useState("");
+
+  function cargar(d) {
+    setDatos(d);
+    setActivo(d.activo);
+    // Sin números guardados, se propone el de «Favor confirmar al».
+    setTelefonos(d.telefonos || d.sugerido || "");
+    setResumen(d.resumen);
+    setHora(d.resumenHora);
+  }
+
+  async function abrir() {
+    if (!abierto) {
+      try {
+        cargar(await api.obtenerAvisos(inv.id));
+      } catch (err) {
+        toast(err.message, "error");
+        return;
+      }
+    }
+    setAbierto(!abierto);
+  }
+
+  async function guardar(e) {
+    e.preventDefault();
+    setOcupado(true);
+    setError("");
+    try {
+      const d = await api.guardarAvisos(inv.id, { activo, telefonos, resumen, resumenHora: hora });
+      cargar(d);
+      onCambio({ ...inv, avisos_whatsapp: d.activo });
+      toast(d.activo ? "Avisos por WhatsApp activados" : "Avisos por WhatsApp apagados");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setOcupado(false);
+    }
+  }
+
+  async function resumenAhora() {
+    setOcupado(true);
+    setError("");
+    try {
+      const r = await api.enviarResumen(inv.id);
+      cargar(r);
+      const fallo = r.resultados.find((x) => x.estado === "error");
+      if (fallo) setError(`No salió: ${fallo.detalle}`);
+      else toast(r.resultados[0]?.estado === "simulado" ? "Resumen simulado: el WhatsApp de Sivú no está vinculado" : "Resumen enviado");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setOcupado(false);
+    }
+  }
+
+  async function probar() {
+    setOcupado(true);
+    setError("");
+    try {
+      const r = await api.probarAvisos(inv.id);
+      cargar(r);
+      const fallos = r.resultados.filter((x) => x.estado === "error");
+      if (fallos.length) setError(`No salió: ${fallos[0].detalle}`);
+      else toast(r.resultados[0]?.estado === "simulado" ? "Prueba simulada: falta configurar WhatsApp en el servidor" : "Prueba enviada: revisa el WhatsApp del cliente");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setOcupado(false);
+    }
+  }
+
+  if (!abierto) {
+    return (
+      <button onClick={abrir} className="boton-texto !text-[11px] self-start">
+        <Icono nombre="campana" className="w-3.5 h-3.5" />
+        Avisos por WhatsApp{inv.avisos_whatsapp ? " · activos" : ""}
+      </button>
+    );
+  }
+
+  return (
+    <div className="border border-borde rounded-lg p-3 flex flex-col gap-2">
+      <div className="flex items-center justify-between">
+        <span className="etiqueta !mb-0">Avisos por WhatsApp</span>
+        <button onClick={() => setAbierto(false)} className="boton-texto !text-[11px]">
+          cerrar
+        </button>
+      </div>
+      <p className="text-[11px] text-ink-suave">
+        Cada vez que un invitado responda desde su enlace, el cliente recibe un WhatsApp diciendo si asiste o no.
+        También puede recibir un resumen diario de cómo va.
+      </p>
+      {datos && !datos.configurado && (
+        <p className="text-[11px] text-amber-700">
+          El WhatsApp de Sivú no está vinculado (recuadro de arriba): los avisos quedan anotados como «simulado» y no salen.
+        </p>
+      )}
+      <form onSubmit={guardar} className="flex flex-col gap-2">
+        <label className="flex items-center gap-2 text-[11px] text-ink cursor-pointer">
+          <input type="checkbox" checked={activo} onChange={(e) => setActivo(e.target.checked)} />
+          Avisarle al cliente en tiempo real
+        </label>
+        <input
+          className="campo !py-1.5 !text-xs"
+          value={telefonos}
+          onChange={(e) => setTelefonos(e.target.value)}
+          placeholder="WhatsApp del cliente (varios separados por coma)"
+          inputMode="tel"
+        />
+        <label className="flex items-center gap-2 text-[11px] text-ink cursor-pointer">
+          <input type="checkbox" checked={resumen} onChange={(e) => setResumen(e.target.checked)} />
+          Resumen diario del avance a las
+          <select
+            className="campo !w-auto !py-0.5 !text-xs"
+            value={hora}
+            onChange={(e) => setHora(Number(e.target.value))}
+            disabled={!resumen}
+          >
+            {Array.from({ length: 24 }, (_, h) => (
+              <option key={h} value={h}>
+                {h === 0 ? "12 a. m." : h < 12 ? `${h} a. m.` : h === 12 ? "12 m." : `${h - 12} p. m.`}
+              </option>
+            ))}
+          </select>
+        </label>
+        <p className="text-[10px] text-ink-tenue -mt-1">Solo llega los días con respuestas nuevas, hasta el día del evento.</p>
+        {error && <p className="text-red-600 text-[11px]">{error}</p>}
+        <div className="flex gap-2">
+          <button disabled={ocupado} className="boton-secundario !py-1.5 !text-xs">
+            {ocupado ? "Guardando..." : "Guardar"}
+          </button>
+          <button type="button" disabled={ocupado || !datos?.telefonos} onClick={probar} className="boton-texto !text-[11px]">
+            Enviar prueba
+          </button>
+          <button type="button" disabled={ocupado || !datos?.telefonos} onClick={resumenAhora} className="boton-texto !text-[11px]">
+            Enviar resumen ahora
+          </button>
+        </div>
+      </form>
+      {datos?.ultimos?.length > 0 && (
+        <ul className="flex flex-col gap-1.5 border-t border-borde pt-2">
+          {datos.ultimos.map((a, i) => {
+            const [clase, etiqueta] = ESTADO_AVISO[a.estado] || ["insignia-neutra", a.estado];
+            return (
+              <li key={i} className="text-[11px] text-ink-suave">
+                <span className={`insignia ${clase} mr-1`}>{etiqueta}</span>
+                {new Date(a.creado_en).toLocaleString("es-CO", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}
+                {" · "}
+                {a.texto.replace(/ · [^·]*$/, "")}
+                {a.estado === "error" && <span className="block text-red-600">{a.detalle}</span>}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 function TarjetaEvento({ inv, onEntrar, onCambio, onBorrar }) {
   const toast = useToast();
   const [guardando, setGuardando] = useState(false);
@@ -445,6 +718,7 @@ function TarjetaEvento({ inv, onEntrar, onCambio, onBorrar }) {
       </label>
 
       <AccesoCliente inv={inv} />
+      <AvisosWhatsapp inv={inv} onCambio={onCambio} />
 
       <div className="flex gap-2 mt-1">
         <button onClick={() => onEntrar(inv)} className="boton-primario flex-1">
@@ -508,7 +782,7 @@ export default function SelectorEventos({ onElegir, onSalir }) {
             <span className="marca-sello">c.</span>
             <span>
               <span className="block text-[15px] font-semibold tracking-[-.03em] text-ink">
-                Convite
+                Sivú
               </span>
               <span className="block text-[10px] uppercase tracking-[.16em] text-ink-tenue mt-0.5">
                 invitaciones digitales
@@ -527,6 +801,8 @@ export default function SelectorEventos({ onElegir, onSalir }) {
         </p>
 
         {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
+
+        <WhatsappSivu />
 
         {!eventos ? (
           <p className="text-sm text-ink-tenue">Cargando...</p>

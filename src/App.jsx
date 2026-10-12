@@ -22,6 +22,9 @@ const DISENOS_ALTERNATIVOS = {
   lazos: lazy(() => import("./disenos/lazos/Lazos")),
   coquette: lazy(() => import("./disenos/coquette/Coquette")),
   paris: lazy(() => import("./disenos/paris/Paris")),
+  valle: lazy(() => import("./disenos/valle/Valle")),
+  "valle-claro": lazy(() => import("./disenos/valle/ValleClaro")),
+  celebracion: lazy(() => import("./disenos/celebracion/Celebracion")),
 };
 
 function useInvitationCode() {

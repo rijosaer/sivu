@@ -4,3 +4,4 @@ dist
 .env
 server/.env
 admin-panel/.env
+*.log

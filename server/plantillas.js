@@ -22,7 +22,7 @@ export const TIPOS_EVENTO = [
 
 // Diseños con los que el sitio puede dibujar una invitación (columna
 // invitaciones.diseno). Tiene que coincidir con src/disenos del sitio.
-export const DISENOS = ["clasico", "jardin", "ensueno", "gala", "lazos", "coquette", "paris"];
+export const DISENOS = ["clasico", "jardin", "ensueno", "gala", "lazos", "coquette", "paris", "valle", "valle-claro", "celebracion"];
 
 export const NOMBRE_TIPO_EVENTO = {
   boda: "Boda",
@@ -113,7 +113,51 @@ const TEMA_PARIS = [
   ["fuente-cuerpo", "Josefin Sans"],
 ];
 
-const TEMAS_DISENO = { jardin: TEMA_JARDIN, ensueno: TEMA_ENSUENO, gala: TEMA_GALA, lazos: TEMA_LAZOS, coquette: TEMA_COQUETTE, paris: TEMA_PARIS };
+// Valle de luna: principal = azul noche, claro = azul empolvado, oscuro =
+// azul profundo, sello = oro de los filetes.
+const TEMA_VALLE = [
+  ["color-paper", "#F8F5EF"],
+  ["color-ink", "#1F2A40"],
+  ["color-gold", "#2C3E5F"],
+  ["color-gold-light", "#A9B9CF"],
+  ["color-gold-dark", "#18233A"],
+  ["color-marble", "#E7ECF3"],
+  ["color-seal", "#B08A52"],
+  ["fuente-guion", "Pinyon Script"],
+  ["fuente-titulos", "Cormorant Garamond"],
+  ["fuente-cuerpo", "Jost"],
+];
+
+// Valle claro: el mismo diseño en azul cielo empolvado.
+const TEMA_VALLE_CLARO = [
+  ["color-paper", "#F7F9FC"],
+  ["color-ink", "#2A3A55"],
+  ["color-gold", "#4F77A8"],
+  ["color-gold-light", "#BCD2EA"],
+  ["color-gold-dark", "#36537D"],
+  ["color-marble", "#EAF1F9"],
+  ["color-seal", "#B08A52"],
+  ["fuente-guion", "Pinyon Script"],
+  ["fuente-titulos", "Cormorant Garamond"],
+  ["fuente-cuerpo", "Jost"],
+];
+
+// Celebración dorada: principal = oro, claro = oro pálido, oscuro = oro
+// viejo, sello = rosa de los nombres.
+const TEMA_CELEBRACION = [
+  ["color-paper", "#FBF6EC"],
+  ["color-ink", "#3A2A1C"],
+  ["color-gold", "#B8862E"],
+  ["color-gold-light", "#E8CF97"],
+  ["color-gold-dark", "#7E5A1E"],
+  ["color-marble", "#F3E8D6"],
+  ["color-seal", "#B4466A"],
+  ["fuente-guion", "Great Vibes"],
+  ["fuente-titulos", "Playfair Display"],
+  ["fuente-cuerpo", "Libre Baskerville"],
+];
+
+const TEMAS_DISENO = { celebracion: TEMA_CELEBRACION, valle: TEMA_VALLE, "valle-claro": TEMA_VALLE_CLARO, jardin: TEMA_JARDIN, ensueno: TEMA_ENSUENO, gala: TEMA_GALA, lazos: TEMA_LAZOS, coquette: TEMA_COQUETTE, paris: TEMA_PARIS };
 
 export function temaDeDiseno(diseno) {
   const tema = TEMAS_DISENO[diseno];
@@ -166,6 +210,8 @@ const PLANTILLAS = {
       padreEllaPadre: "Nombre del padre",
       padreEllaMadre: "Nombre de la madre",
       fraseIntro: "Nos encantaría que nos acompañes en este día tan especial.",
+      versiculo: "",
+      versiculoCita: "",
     }),
     s("fotos", "Fotos de los novios", 2, {
       titulo: "Nuestras fotos",
@@ -332,6 +378,8 @@ const PLANTILLAS = {
       padreEllaPadre: "",
       padreEllaMadre: "",
       fraseIntro: "Quiero celebrar este día contigo.",
+      // Para cumpleaños de varias personas a la vez (diseño Celebración dorada).
+      festejados: [{ nombre: "", edad: "" }],
     }),
     s("informacion_boda", "Información del evento", 2, {
       overline: "Cumpleaños",
@@ -348,6 +396,7 @@ const PLANTILLAS = {
       cronogramaModo: "oculto",
       cronogramaMensaje: "",
       cronograma: [],
+      telefonoConfirmar: "",
     }),
     s("regalos", "Lista de regalos", 3, {
       titulo: "Lista de regalos",

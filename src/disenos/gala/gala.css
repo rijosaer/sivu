@@ -335,7 +335,7 @@
 .ga .marquee-track, .ga .pin-pulse { animation: none !important; }
 }
 
-/* ═══════════ Ajustes de Convite sobre la maqueta ═══════════ */
+/* ═══════════ Ajustes de Sivú sobre la maqueta ═══════════ */
 /* Colores desde el tema del panel (ver el comentario de Gala.jsx). */
 .ga {
   --bg: rgb(var(--color-paper));

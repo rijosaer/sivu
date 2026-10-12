@@ -1,4 +1,4 @@
-// Datos comerciales de la landing de Convite. Cambiar aquí y redesplegar el sitio.
+// Datos comerciales de la landing de Sivú. Cambiar aquí y redesplegar el sitio.
 // VITE_WHATSAPP (variable del servicio en Railway) manda; si no está, se usa este número.
 export const WHATSAPP = import.meta.env.VITE_WHATSAPP || "573236019372";
 export const PRECIOS = { general: "150.000", personalizada: "200.000", gestion: "250.000" };

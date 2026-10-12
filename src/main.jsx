@@ -5,7 +5,7 @@ import App from './App.jsx'
 import { mostrarLanding } from './landing/config.js'
 import { disenoDeDemo } from './demo/ruta.js'
 
-// En la raíz de un dominio de Convite (sin slug ni ?i=) se muestra la landing comercial;
+// En la raíz de un dominio de Sivú (sin slug ni ?i=) se muestra la landing comercial;
 // todo lo demás sigue siendo la invitación, igual que antes.
 const Landing = lazy(() => import('./landing/Landing.jsx'))
 // /plantillas/<diseño>: demostración pública de un diseño con datos de ejemplo.

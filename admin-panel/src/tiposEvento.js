@@ -30,4 +30,7 @@ export const DISENOS = [
   { key: "lazos", nombre: "Moños y perlas (rosa palo, satén y perlas)" },
   { key: "coquette", nombre: "Coquette (rosa con moños ilustrados)" },
   { key: "paris", nombre: "París rosé (rosa empolvado y oro rosa)" },
+  { key: "valle", nombre: "Valle de luna (acuarela azul noche, boda)" },
+  { key: "valle-claro", nombre: "Valle claro (acuarela azul cielo, boda)" },
+  { key: "celebracion", nombre: "Celebración dorada (crema y oro, cumpleaños de varias personas)" },
 ];

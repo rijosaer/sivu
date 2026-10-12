@@ -131,7 +131,7 @@ function Tablero() {
   ];
   return (
     <div className="cv-tablero" data-aparece>
-      <div className="cv-tab-barra"><i /><i /><i /><span>panel.convite · Camila & Andrés</span></div>
+      <div className="cv-tab-barra"><i /><i /><i /><span>panel.sivu · Camila & Andrés</span></div>
       <div className="cv-tab-cuerpo">
         <div className="cv-tab-kpis">
           <div><b>68</b><span>confirmados</span></div>
@@ -156,20 +156,20 @@ function Tablero() {
 export default function Landing() {
   const ref = useAparecer();
   useEffect(() => {
-    document.title = "Convite · Invitaciones digitales que enamoran";
+    document.title = "Sivú · Invitaciones digitales que enamoran";
     const link = document.createElement("link");
     link.rel = "stylesheet";
     link.href = "https://fonts.googleapis.com/css2?family=Alex+Brush&family=Fraunces:ital,opsz,wght@0,9..144,300..800;1,9..144,400..700&family=Work+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap";
     document.head.appendChild(link);
     return () => link.remove();
   }, []);
-  const hola = waLink("¡Hola Convite! Quiero una invitación digital para mi evento.");
+  const hola = waLink("¡Hola Sivú! Quiero una invitación digital para mi evento.");
 
   return (
     <div className="cv" ref={ref}>
       <nav className="cv-nav">
         <div className="cv-cont cv-nav-in">
-          <a href="#inicio" className="cv-logo">Convite</a>
+          <a href="#inicio" className="cv-logo">Sivú</a>
           <div className="cv-nav-links">
             <a href="#como">Cómo funciona</a><a href="#paquetes">Paquetes</a><a href="#modelos">Modelos</a><a href="#preguntas">Preguntas</a>
           </div>
@@ -255,7 +255,7 @@ export default function Landing() {
               <div className="cv-monto">${PRECIOS.general}</div>
               <p>Una tarjeta, toda la información, un solo enlace para todos.</p>
               <ul><li>Tarjeta con toda la información del evento</li><li>Diseño temático a tu elección</li><li>Cuenta regresiva y agregar al calendario</li><li>Confirmación de asistencia general</li></ul>
-              <a className="cv-btn cv-btn-linea" href={waLink("Hola, me interesa el paquete General de Convite.")} target="_blank" rel="noreferrer">Lo quiero</a>
+              <a className="cv-btn cv-btn-linea" href={waLink("Hola, me interesa el paquete General de Sivú.")} target="_blank" rel="noreferrer">Lo quiero</a>
             </article>
             <article className="cv-precio cv-p-destacado" data-aparece>
               <span className="cv-recomendado">Recomendado</span>
@@ -263,14 +263,14 @@ export default function Landing() {
               <div className="cv-monto">${PRECIOS.personalizada}</div>
               <p>Todo lo de General, más control de quién confirma.</p>
               <ul><li>Enlace único por invitado, familia o cupo</li><li>Tablero de confirmados y pendientes</li><li>Exportación de la lista en PDF</li><li>Recordatorios personalizados a quien falta</li></ul>
-              <a className="cv-btn cv-btn-oro" href={waLink("Hola, me interesa el paquete Personalizada de Convite.")} target="_blank" rel="noreferrer">Lo quiero</a>
+              <a className="cv-btn cv-btn-oro" href={waLink("Hola, me interesa el paquete Personalizada de Sivú.")} target="_blank" rel="noreferrer">Lo quiero</a>
             </article>
             <article className="cv-precio cv-p-gestion" data-aparece>
               <span className="cv-eyebrow">Personalizada + Gestión</span>
               <div className="cv-monto">${PRECIOS.gestion}</div>
               <p>Todo lo anterior, pero lo operamos nosotros por ti.</p>
               <ul><li>Cargamos tu lista de invitados</li><li>Enviamos cada enlace personalizado</li><li>Seguimiento diario de confirmaciones</li><li>Entrega final del PDF de confirmados</li></ul>
-              <a className="cv-btn cv-btn-linea" href={waLink("Hola, me interesa el paquete Personalizada + Gestión de Convite.")} target="_blank" rel="noreferrer">Lo quiero</a>
+              <a className="cv-btn cv-btn-linea" href={waLink("Hola, me interesa el paquete Personalizada + Gestión de Sivú.")} target="_blank" rel="noreferrer">Lo quiero</a>
             </article>
           </div>
           <p className="cv-nota">Precios de referencia en pesos colombianos. El valor final depende del número de invitados y del evento.</p>
@@ -293,7 +293,7 @@ export default function Landing() {
                   />
                 </div>
                 <div className="cv-telefono-acciones">
-                  <a className="cv-btn cv-btn-oro" href={waLink(`Hola, me gusta el estilo «${m.estilo}» de Convite para mi evento.`)} target="_blank" rel="noreferrer">La quiero</a>
+                  <a className="cv-btn cv-btn-oro" href={waLink(`Hola, me gusta el estilo «${m.estilo}» de Sivú para mi evento.`)} target="_blank" rel="noreferrer">La quiero</a>
                   <a className="cv-btn cv-btn-linea" href={m.vista} target="_blank" rel="noreferrer">Ver en grande</a>
                 </div>
               </div>
@@ -321,7 +321,7 @@ export default function Landing() {
           <span className="cv-script cv-cierre-titulo">¿Le contamos a tus invitados?</span>
           <p>Escríbenos con la fecha y el tipo de evento, y armamos tu invitación esta semana.</p>
           <a href={hola} className="cv-btn cv-btn-oro cv-btn-grande" target="_blank" rel="noreferrer">Escribir por WhatsApp</a>
-          <span className="cv-mono">CONVITE · INVITACIONES DIGITALES</span>
+          <span className="cv-mono">SIVÚ · INVITACIONES DIGITALES</span>
         </div>
       </section>
 

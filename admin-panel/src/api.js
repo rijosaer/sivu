@@ -103,6 +103,16 @@ export const api = {
   obtenerAcceso: (id) => request(`/api/admin/invitaciones/${id}/acceso`),
   crearUsuarioCliente: (id, datos) =>
     request(`/api/admin/invitaciones/${id}/usuario`, { method: "POST", body: JSON.stringify(datos) }),
+  // Avisos por WhatsApp al cliente cuando un invitado responde (solo dueño).
+  obtenerAvisos: (id) => request(`/api/admin/invitaciones/${id}/avisos`),
+  guardarAvisos: (id, datos) =>
+    request(`/api/admin/invitaciones/${id}/avisos`, { method: "PUT", body: JSON.stringify(datos) }),
+  probarAvisos: (id) => request(`/api/admin/invitaciones/${id}/avisos/prueba`, { method: "POST" }),
+  enviarResumen: (id) => request(`/api/admin/invitaciones/${id}/avisos/resumen`, { method: "POST" }),
+  // El número de WhatsApp de Sivú que manda esos avisos, vinculado con QR.
+  estadoWhatsapp: () => request("/api/admin/whatsapp"),
+  conectarWhatsapp: () => request("/api/admin/whatsapp/conectar", { method: "POST" }),
+  desconectarWhatsapp: () => request("/api/admin/whatsapp/desconectar", { method: "POST" }),
 
   // ---------- Todo lo de abajo es del evento seleccionado (scoped()) ----------
 
