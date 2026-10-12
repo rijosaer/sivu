@@ -384,7 +384,7 @@ function cuposValidos(valor) {
 
 async function invitadoConMiembros(invitacionId, id) {
   const { rows } = await pool.query(
-    `SELECT id, codigo, tipo, nombre, familia, mensaje, telefono, cupos, enviado_en, creado_en
+    `SELECT id, codigo, tipo, nombre, familia, mensaje, telefono, telefono_aux, cupos, enviado_en, creado_en
      FROM invitados WHERE id = $1 AND invitacion_id = $2`,
     [id, invitacionId]
   );
@@ -402,7 +402,7 @@ recursosRouter.get(
   capturar(async (req, res) => {
     const { rows } = await pool.query(
       `SELECT i.id, i.codigo, i.tipo, i.nombre, i.familia, i.mensaje,
-              i.telefono, i.cupos, i.enviado_en, i.abierto_en, i.ultima_apertura, i.aperturas, i.creado_en,
+              i.telefono, i.telefono_aux, i.cupos, i.enviado_en, i.abierto_en, i.ultima_apertura, i.aperturas, i.creado_en,
               COALESCE(json_agg(
                 json_build_object('id', m.id, 'nombre', m.nombre, 'orden', m.orden,
                                   'estado', m.estado, 'restriccion', m.restriccion,
@@ -431,7 +431,7 @@ function generarCodigo() {
 recursosRouter.post(
   "/invitados",
   capturar(async (req, res) => {
-    const { nombre, familia, mensaje, telefono, tipo = "individual", miembros = [], cupos } = req.body;
+    const { nombre, familia, mensaje, telefono, telefono_aux, tipo = "individual", miembros = [], cupos } = req.body;
     if (!nombre?.trim()) return res.status(400).json({ error: "El nombre es obligatorio" });
     if (!TIPOS.includes(tipo)) return res.status(400).json({ error: "Tipo de invitación no válido" });
 
@@ -474,9 +474,12 @@ recursosRouter.post(
     try {
       await client.query("BEGIN");
       const { rows } = await client.query(
-        `INSERT INTO invitados (invitacion_id, codigo, nombre, familia, mensaje, tipo, telefono, cupos)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
-        [req.invitacionId, codigo, nombre.trim(), familia || "", mensaje || "", tipo, (telefono || "").trim(), numeroCupos]
+        `INSERT INTO invitados (invitacion_id, codigo, nombre, familia, mensaje, tipo, telefono, telefono_aux, cupos)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+        [
+          req.invitacionId, codigo, nombre.trim(), familia || "", mensaje || "", tipo,
+          (telefono || "").trim(), (telefono_aux || "").trim(), numeroCupos,
+        ]
       );
       const id = rows[0].id;
       for (const [i, persona] of personas.entries()) {
@@ -499,7 +502,7 @@ recursosRouter.post(
 recursosRouter.put(
   "/invitados/:id",
   capturar(async (req, res) => {
-    const { nombre, familia, mensaje, tipo, telefono, enviado, cupos } = req.body;
+    const { nombre, familia, mensaje, tipo, telefono, telefono_aux, enviado, cupos } = req.body;
     if (tipo && !TIPOS.includes(tipo)) {
       return res.status(400).json({ error: "Tipo de invitación no válido" });
     }
@@ -536,9 +539,13 @@ recursosRouter.put(
          tipo = COALESCE($6, tipo),
          telefono = COALESCE($7, telefono),
          cupos = COALESCE($8, cupos),
+         telefono_aux = COALESCE($9, telefono_aux),
          enviado_en = ${marcaEnvio}
        WHERE id = $1 AND invitacion_id = $2 RETURNING id`,
-      [req.params.id, req.invitacionId, nombre, familia, mensaje, tipo, telefono, numeroCupos]
+      [
+        req.params.id, req.invitacionId, nombre, familia, mensaje, tipo, telefono, numeroCupos,
+        typeof telefono_aux === "string" ? telefono_aux.trim() : null,
+      ]
     );
     if (!rows.length) return res.status(404).json({ error: "Invitación no encontrada" });
     res.json(await invitadoConMiembros(req.invitacionId, rows[0].id));

@@ -60,6 +60,7 @@ const NUEVO_VACIO = {
   personas: "",
   cupos: "1",
   telefono: "",
+  telefonoAux: "",
   mensaje: "",
 };
 
@@ -380,6 +381,8 @@ function Tarjeta({ invitacion, plantilla, plantillaRecordatorio, cuenta, onCambi
   const [editando, setEditando] = useState(false);
   const [copiado, setCopiado] = useState("");
   const [telefono, setTelefono] = useState(invitacion.telefono || "");
+  // Segundo número, opcional: la misma invitación puede salir también a él.
+  const [telefonoAux, setTelefonoAux] = useState(invitacion.telefono_aux || "");
 
   const enlace = `${SITIO_BASE}?i=${invitacion.codigo}`;
   // "cupos" solo tiene valor en las invitaciones de tipo cupos; en el resto
@@ -395,6 +398,8 @@ function Tarjeta({ invitacion, plantilla, plantillaRecordatorio, cuenta, onCambi
   const mensajeRecordatorio = armarMensaje(plantillaRecordatorio, datosMensaje);
   const enviado = Boolean(invitacion.enviado_en);
   const telefonoSucio = telefono.trim() && !telefonoValido(telefono);
+  const auxSucio = telefonoAux.trim() && !telefonoValido(telefonoAux);
+  const tieneAux = Boolean(telefonoAux.trim());
   // Pasado el cierre no tiene sentido recordar: el sitio esconde el formulario
   // y el servidor rechaza la respuesta, así que sería mandar a la gente a una
   // puerta cerrada.
@@ -413,6 +418,11 @@ function Tarjeta({ invitacion, plantilla, plantillaRecordatorio, cuenta, onCambi
   async function guardarTelefono() {
     if (telefono.trim() === (invitacion.telefono || "").trim()) return;
     onCambio(await api.actualizarInvitado(invitacion.id, { telefono: telefono.trim() }));
+  }
+
+  async function guardarTelefonoAux() {
+    if (telefonoAux.trim() === (invitacion.telefono_aux || "").trim()) return;
+    onCambio(await api.actualizarInvitado(invitacion.id, { telefono_aux: telefonoAux.trim() }));
   }
 
   async function marcar(valor) {
@@ -434,6 +444,19 @@ function Tarjeta({ invitacion, plantilla, plantillaRecordatorio, cuenta, onCambi
   function recordar() {
     window.open(enlaceWhatsApp(telefono, mensajeRecordatorio), "_blank", "noopener");
     if (telefono.trim() !== (invitacion.telefono || "").trim()) guardarTelefono();
+  }
+
+  // Lo mismo, al número auxiliar. La invitación cuenta como enviada igual: es
+  // la misma invitación, con el mismo enlace, que llega por otro número.
+  async function enviarAux() {
+    window.open(enlaceWhatsApp(telefonoAux, mensaje), "_blank", "noopener");
+    await guardarTelefonoAux();
+    if (!enviado) await marcar(true);
+  }
+
+  function recordarAux() {
+    window.open(enlaceWhatsApp(telefonoAux, mensajeRecordatorio), "_blank", "noopener");
+    guardarTelefonoAux();
   }
 
   return (
@@ -501,6 +524,16 @@ function Tarjeta({ invitacion, plantilla, plantillaRecordatorio, cuenta, onCambi
           <button onClick={enviar} className="boton-verde">
             {enviado ? "Reenviar por WhatsApp" : "Enviar por WhatsApp"}
           </button>
+          {tieneAux && (
+            <button
+              onClick={enviarAux}
+              disabled={auxSucio}
+              className="boton-secundario"
+              title={`Enviar la misma invitación al número auxiliar (+${normalizarTelefono(telefonoAux)})`}
+            >
+              Al 2.º número
+            </button>
+          )}
           <button
             onClick={() => setAbierto(!abierto)}
             aria-label={abierto ? "Ocultar detalles" : "Ver detalles"}
@@ -530,6 +563,29 @@ function Tarjeta({ invitacion, plantilla, plantillaRecordatorio, cuenta, onCambi
                   ? `Se enviará a +${normalizarTelefono(telefono)}`
                   : "Sin número, WhatsApp te deja elegir el contacto."}
               </p>
+
+              <span className="etiqueta mt-3">WhatsApp auxiliar (opcional)</span>
+              <input
+                value={telefonoAux}
+                onChange={(e) => setTelefonoAux(e.target.value)}
+                onBlur={guardarTelefonoAux}
+                placeholder="Otro número de la misma persona"
+                className={`campo ${auxSucio ? "border-red-300" : ""}`}
+                aria-label={`Teléfono auxiliar de ${invitacion.nombre}`}
+              />
+              {tieneAux && (
+                <div className="flex flex-wrap items-center gap-2 mt-2">
+                  <span className="ayuda">+{normalizarTelefono(telefonoAux)}</span>
+                  <button onClick={enviarAux} disabled={auxSucio} className="boton-texto">
+                    Enviar invitación
+                  </button>
+                  {pendientes > 0 && enviado && (
+                    <button onClick={recordarAux} disabled={cerrado || auxSucio} className="boton-texto">
+                      Recordar
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
             <div>
@@ -643,6 +699,7 @@ function Crear({ onCreada, onCancelar }) {
         nombre,
         mensaje: nuevo.mensaje,
         telefono: nuevo.telefono,
+        telefono_aux: nuevo.telefonoAux,
         tipo: nuevo.tipo,
         miembros,
         ...(cupos ? { cupos } : {}),
@@ -787,6 +844,15 @@ function Crear({ onCreada, onCancelar }) {
           />
         </label>
         <label>
+          <span className="etiqueta">WhatsApp auxiliar (opcional)</span>
+          <input
+            placeholder="Otro número de la misma persona"
+            value={nuevo.telefonoAux}
+            onChange={(e) => setNuevo({ ...nuevo, telefonoAux: e.target.value })}
+            className="campo"
+          />
+        </label>
+        <label>
           <span className="etiqueta">Mensaje personal dentro de la invitación (opcional)</span>
           <input
             placeholder="Ej. ¡No podemos imaginarnos ese día sin ti!"
@@ -894,6 +960,7 @@ export default function Invitados({ irA }) {
         paraBuscar(i.familia).includes(q) ||
         paraBuscar(i.codigo).includes(q) ||
         (i.telefono || "").includes(q) ||
+        (i.telefono_aux || "").includes(q) ||
         i.miembros.some((m) => paraBuscar(m.nombre).includes(q))
       );
     });
