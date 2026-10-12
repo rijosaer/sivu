@@ -7,6 +7,7 @@ import { adminRouter } from "./routes/admin.js";
 import { manejadorDeErrores } from "./errores.js";
 import { reanudarWhatsapp } from "./whatsappWeb.js";
 import { iniciarResumenes } from "./resumenDiario.js";
+import { iniciarEnvios } from "./envioMasivo.js";
 import { cabecerasSeguras, corsOpciones, limitador } from "./seguridad.js";
 
 const app = express();
@@ -55,4 +56,6 @@ app.listen(PORT, () => {
   reanudarWhatsapp();
   // Revisa cada minuto qué eventos deben recibir su resumen diario.
   iniciarResumenes();
+  // Cola del envío automático de invitaciones (sigue donde iba tras reiniciar).
+  iniciarEnvios();
 });

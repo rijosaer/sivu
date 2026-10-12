@@ -163,6 +163,13 @@ export const api = {
     request(scoped(`/invitados/${id}`), { method: "PUT", body: JSON.stringify(datos) }),
   borrarInvitado: (id) => request(scoped(`/invitados/${id}`), { method: "DELETE" }),
 
+  // Envío automático por el WhatsApp de Sivú (solo el dueño)
+  envioAutomatico: () => request(scoped("/envio-automatico")),
+  iniciarEnvioAutomatico: (tipo, items) =>
+    request(scoped("/envio-automatico"), { method: "POST", body: JSON.stringify({ tipo, items }) }),
+  accionEnvioAutomatico: (accion) =>
+    request(scoped(`/envio-automatico/${accion}`), { method: "POST" }),
+
   // "acompanante" solo aplica a las invitaciones por cupos: ocupa uno de los
   // cupos y entra como confirmado (lo agregamos cuando nos avisan por fuera,
   // por ejemplo por WhatsApp).

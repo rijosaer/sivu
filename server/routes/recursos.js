@@ -2,6 +2,9 @@ import { Router } from "express";
 import { pool } from "../db.js";
 import { capturar } from "../errores.js";
 import { temaDeDiseno } from "../plantillas.js";
+import { soloDueno } from "../auth.js";
+import { RITMO } from "../envioMasivo.js";
+import { estadoWhatsapp } from "../whatsappWeb.js";
 
 // Todo lo de aquí cuelga de una invitación concreta: se monta en admin.js
 // bajo /invitaciones/:invitacionId, con resolverInvitacionAdmin puesto antes
@@ -784,5 +787,128 @@ recursosRouter.get(
       [req.invitacionId]
     );
     res.json({ ...personas.rows[0], invitaciones: invitaciones.rows[0], cupos: cupos.rows[0] });
+  })
+);
+
+// ---------- Envío automático por el WhatsApp de Sivú ----------
+// Solo el dueño: sale del número de Sivú, no del cliente. El panel arma cada
+// mensaje con la misma plantilla de «Mensajes» y aquí solo se encola; el ritmo
+// lo pone envioMasivo.js.
+
+async function envioActual(invitacionId) {
+  const { rows: [envio] } = await pool.query(
+    "SELECT * FROM envios_masivos WHERE invitacion_id = $1 ORDER BY id DESC LIMIT 1",
+    [invitacionId]
+  );
+  if (!envio) return null;
+  const { rows: items } = await pool.query(
+    `SELECT nombre, telefono, estado, detalle, enviado_en FROM envios_masivos_items
+     WHERE envio_id = $1 ORDER BY orden`,
+    [envio.id]
+  );
+  const cuenta = (e) => items.filter((i) => i.estado === e).length;
+  return {
+    id: envio.id,
+    tipo: envio.tipo,
+    estado: envio.estado,
+    detalle: envio.detalle,
+    siguienteEn: envio.siguiente_en,
+    creadoEn: envio.creado_en,
+    total: items.length,
+    enviados: cuenta("enviado"),
+    pendientes: cuenta("pendiente") + cuenta("enviando"),
+    fallidos: items.filter((i) => i.estado === "fallido").map(({ nombre, telefono, detalle }) => ({ nombre, telefono, detalle })),
+    omitidos: cuenta("omitido"),
+  };
+}
+
+recursosRouter.get(
+  "/envio-automatico",
+  soloDueno,
+  capturar(async (req, res) => {
+    res.json({ envio: await envioActual(req.invitacionId), whatsapp: estadoWhatsapp().estado, ritmo: RITMO });
+  })
+);
+
+recursosRouter.post(
+  "/envio-automatico",
+  soloDueno,
+  capturar(async (req, res) => {
+    const tipo = req.body.tipo === "recordatorio" ? "recordatorio" : "invitacion";
+    const items = Array.isArray(req.body.items) ? req.body.items : [];
+    if (!items.length) return res.status(400).json({ error: "No hay mensajes para enviar" });
+    if (items.length > 2000) return res.status(400).json({ error: "Demasiados mensajes en un solo envío" });
+
+    const activo = await pool.query(
+      `SELECT e.invitacion_id, i.nombre FROM envios_masivos e JOIN invitaciones i ON i.id = e.invitacion_id
+       WHERE e.estado IN ('en_curso', 'pausado') LIMIT 1`
+    );
+    if (activo.rows.length) {
+      const otro = activo.rows[0];
+      return res.status(409).json({
+        error:
+          otro.invitacion_id === req.invitacionId
+            ? "Ya hay un envío en curso en este evento"
+            : `Ya hay un envío en curso en «${otro.nombre}»: el número es uno solo, espera a que termine`,
+      });
+    }
+
+    // Solo invitaciones de este evento; el teléfono y el texto llegan armados.
+    const ids = items.map((i) => Number(i.invitado_id));
+    const { rows: propios } = await pool.query(
+      "SELECT id, nombre FROM invitados WHERE invitacion_id = $1 AND id = ANY($2::int[])",
+      [req.invitacionId, ids]
+    );
+    const nombres = new Map(propios.map((r) => [r.id, r.nombre]));
+    const validos = items.filter(
+      (i) => nombres.has(Number(i.invitado_id)) && /^\d{10,15}$/.test(String(i.telefono || "")) && String(i.texto || "").trim()
+    );
+    if (!validos.length) return res.status(400).json({ error: "Ningún mensaje tiene invitación y teléfono válidos" });
+
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      const { rows: [envio] } = await client.query(
+        "INSERT INTO envios_masivos (invitacion_id, tipo) VALUES ($1, $2) RETURNING id",
+        [req.invitacionId, tipo]
+      );
+      for (const [orden, i] of validos.entries()) {
+        await client.query(
+          `INSERT INTO envios_masivos_items (envio_id, invitado_id, orden, nombre, telefono, texto)
+           VALUES ($1, $2, $3, $4, $5, $6)`,
+          [envio.id, Number(i.invitado_id), orden, nombres.get(Number(i.invitado_id)), String(i.telefono), String(i.texto)]
+        );
+      }
+      await client.query("COMMIT");
+    } catch (e) {
+      await client.query("ROLLBACK").catch(() => {});
+      throw e;
+    } finally {
+      client.release();
+    }
+    res.status(201).json({ envio: await envioActual(req.invitacionId) });
+  })
+);
+
+// pausar → no sale nada hasta reanudar. reanudar → sigue con una pausa corta
+// (también después de que se detuvo solo). cancelar → los pendientes no salen.
+recursosRouter.post(
+  "/envio-automatico/:accion",
+  soloDueno,
+  capturar(async (req, res) => {
+    const desde = { pausar: ["en_curso"], reanudar: ["pausado", "detenido"], cancelar: ["en_curso", "pausado", "detenido"] };
+    const hacia = { pausar: "pausado", reanudar: "en_curso", cancelar: "cancelado" };
+    const accion = req.params.accion;
+    if (!hacia[accion]) return res.status(404).json({ error: "Acción no válida" });
+    const { rowCount } = await pool.query(
+      `UPDATE envios_masivos SET estado = $3, detalle = '', fallos_seguidos = 0,
+         siguiente_en = CASE WHEN $3 = 'en_curso' THEN now() + interval '10 seconds' ELSE siguiente_en END,
+         actualizado_en = now()
+       WHERE id = (SELECT id FROM envios_masivos WHERE invitacion_id = $1 ORDER BY id DESC LIMIT 1)
+         AND estado = ANY($2::text[])`,
+      [req.invitacionId, desde[accion], hacia[accion]]
+    );
+    if (!rowCount) return res.status(409).json({ error: "El envío no está en un estado que permita eso" });
+    res.json({ envio: await envioActual(req.invitacionId) });
   })
 );

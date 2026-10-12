@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect, useMemo, useState } from "react";
-import { api, SITIO_BASE } from "../api";
+import { api, SITIO_BASE, esEventoFijo } from "../api";
 import { useToast } from "../ui/Toast";
 import Icono from "../ui/Icono";
 import {
@@ -14,6 +14,7 @@ import {
 
 // El importador trae el lector de Excel: se carga solo cuando se abre.
 const ImportarInvitados = lazy(() => import("./ImportarInvitados"));
+const EnvioAutomatico = lazy(() => import("./EnvioAutomatico"));
 
 // Cada tipo se explica por lo que hace el invitado al confirmar, que es lo que
 // de verdad los diferencia. El ejemplo de abajo se muestra al elegirlo.
@@ -895,6 +896,9 @@ export default function Invitados({ irA }) {
   const [vista, setVista] = useState("todas");
   const [creando, setCreando] = useState(false);
   const [importando, setImportando] = useState(false);
+  // El envío automático sale del número de Sivú: solo lo ve el dueño.
+  const [enviando, setEnviando] = useState(false);
+  const esDueno = !esEventoFijo();
 
   async function cargar() {
     setCargando(true);
@@ -977,6 +981,36 @@ export default function Invitados({ irA }) {
     diasLimite: diasHasta(fechas.fechaLimiteConfirmacion),
   };
 
+  // Mensajes para el envío automático, armados igual que el botón «Enviar por
+  // WhatsApp» de cada tarjeta: misma plantilla, mismo enlace, solo al número
+  // principal.
+  function armarItems(tipo) {
+    const cerrado = plazoCerrado(cuenta.diasLimite);
+    return lista
+      .filter((i) => telefonoValido(i.telefono))
+      .filter((i) =>
+        tipo === "invitacion"
+          ? !i.enviado_en
+          : !cerrado && i.enviado_en && i.miembros.some((m) => m.estado === "pendiente")
+      )
+      .reverse() // la lista va de la más nueva a la más vieja; se envía en el orden en que se crearon
+      .map((i) => ({
+        invitado_id: i.id,
+        telefono: normalizarTelefono(i.telefono),
+        texto: armarMensaje(tipo === "invitacion" ? plantilla : recordatorio, {
+          nombre: i.familia || i.nombre,
+          enlace: `${SITIO_BASE}?i=${i.codigo}`,
+          cupos: cuposDe(i).total,
+          ...cuenta,
+        }),
+      }));
+  }
+
+  // Refresco silencioso de la lista mientras corre el envío automático.
+  async function cargarLista() {
+    setLista(await api.invitados());
+  }
+
   return (
     <div>
       <div className="flex items-start justify-between gap-4 flex-wrap mb-6">
@@ -988,7 +1022,12 @@ export default function Invitados({ irA }) {
               : `${cuentas.todas} invitaciones · ${cuentas.sin_enviar} sin enviar · ${cuentas.sin_responder} esperando respuesta`}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {esDueno && (
+            <button onClick={() => setEnviando((v) => !v)} className="boton-secundario">
+              Envío automático
+            </button>
+          )}
           <button onClick={() => setImportando((v) => !v)} className="boton-secundario">
             Importar desde Excel
           </button>
@@ -998,6 +1037,12 @@ export default function Invitados({ irA }) {
           </button>
         </div>
       </div>
+
+      {enviando && (
+        <Suspense fallback={<p className="text-sm text-ink-tenue mb-6">Cargando...</p>}>
+          <EnvioAutomatico armarItems={armarItems} onCambio={cargarLista} onCerrar={() => setEnviando(false)} />
+        </Suspense>
+      )}
 
       {importando && (
         <Suspense fallback={<p className="text-sm text-ink-tenue mb-6">Cargando importador...</p>}>
