@@ -366,3 +366,4 @@
 
 /* ---------- Variante «Celebración azul» ---------- */
 .cd.cd-azul { --nombre-2: var(--oro-viejo); }
+.cd.cd-azul .cd-flores { filter: url(#cd-azulado) drop-shadow(0 6px 10px color-mix(in srgb, var(--sombra) 12%, transparent)); }

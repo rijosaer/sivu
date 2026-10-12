@@ -4,7 +4,7 @@ import RSVP from "../../components/RSVP";
 import {
   partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer,
 } from "../comun";
-import floresBlancas from "./arte/flores.webp";
+import flores from "./arte/flores.webp";
 
 // Diseño «Celebración dorada»: crema con luces desenfocadas, filetes de oro y
 // flores blancas en las esquinas. Nace de una tarjeta impresa de cumpleaños
@@ -98,7 +98,7 @@ function Lugar({ nombre }) {
   return <><span className="cd-donde-tipo">{m[1]}</span><b className="cd-donde-nombre">{m[2]}</b></>;
 }
 
-export default function Celebracion({ site, contenidoDe, invitacion, onEnviarRSVP, variante, flores = floresBlancas }) {
+export default function Celebracion({ site, contenidoDe, invitacion, onEnviarRSVP, variante }) {
   useFuentes(FUENTES);
   const [rsvpAbierto, setRsvpAbierto] = useState(false);
   const [sonando, setSonando] = useState(false);
@@ -181,6 +181,18 @@ export default function Celebracion({ site, contenidoDe, invitacion, onEnviarRSV
           <stop offset=".5" style={{ stopColor: "var(--oro)" }} />
           <stop offset="1" style={{ stopColor: "var(--oro-viejo)" }} />
         </linearGradient>
+        {/* Tiñe el ramillete de azul loza: la acuarela pasa a grises y cada
+            tono se lleva a un azul (pétalos casi blancos, hojas de tinta). */}
+        {variante === "azul" && (
+          <filter id="cd-azulado" colorInterpolationFilters="sRGB">
+            <feColorMatrix type="matrix" values=".299 .587 .114 0 0  .299 .587 .114 0 0  .299 .587 .114 0 0  0 0 0 1 0" />
+            <feComponentTransfer>
+              <feFuncR type="table" tableValues=".078 .078 .078 .078 .078 .078 .084 .102 .123 .145 .167 .238 .370 .505 .680 .877 .980" />
+              <feFuncG type="table" tableValues=".133 .133 .133 .133 .133 .133 .142 .170 .201 .235 .270 .346 .474 .604 .749 .903 .984" />
+              <feFuncB type="table" tableValues=".282 .282 .282 .282 .282 .282 .296 .339 .388 .440 .494 .572 .679 .788 .877 .958 1" />
+            </feComponentTransfer>
+          </filter>
+        )}
       </svg>
 
       <article className="cd-tarjeta" aria-labelledby="cd-titulo">
