@@ -4,7 +4,7 @@ import { normalizarTelefono, telefonosDe } from "./avisosWhatsapp.js";
 import { ahoraEnBogota } from "./hora.js";
 
 // Clientes potenciales de los anuncios de Sivú en Facebook e Instagram. Todo
-// se atiende por WhatsApp, así que cada pocos minutos se revisan los
+// se atiende por WhatsApp, así que cada minuto se revisan los
 // formularios de cotización de la página y, por cada contacto nuevo:
 //  1. Se le escribe desde el WhatsApp de Sivú vinculado (saludo con lo que
 //     pidió), para que la conversación quede abierta en ese chat.
@@ -26,7 +26,7 @@ import { ahoraEnBogota } from "./hora.js";
 // revisión.
 
 const API = "https://graph.facebook.com/v21.0";
-const CADA_MS = 3 * 60 * 1000;
+const CADA_MS = 60 * 1000;
 // Contactos de más de un día (por ejemplo, de antes de activar esto) se anotan
 // como vistos sin escribirles: un saludo tan tarde ya no tiene sentido.
 const VIGENCIA_MS = 24 * 3600 * 1000;
@@ -187,7 +187,7 @@ export async function revisarLeads() {
     await guardarNuevos();
     ultimoError = "";
   } catch (e) {
-    // El mismo error (p. ej. token vencido) se anota una vez, no cada 3 minutos.
+    // El mismo error (p. ej. token vencido) se anota una vez, no en cada revisión.
     if (e.message !== ultimoError) console.error("Leads de Meta:", e.message);
     ultimoError = e.message;
   }
@@ -196,7 +196,20 @@ export async function revisarLeads() {
 
 export function iniciarLeads() {
   if (!configurado()) return;
-  const revisar = () => revisarLeads().catch((e) => console.error("Leads de Meta:", e));
+  // Una revisión a la vez: si los envíos de una tardan más de un minuto, la
+  // siguiente no arranca encima (le escribiría dos veces al mismo contacto).
+  let ocupado = false;
+  const revisar = async () => {
+    if (ocupado) return;
+    ocupado = true;
+    try {
+      await revisarLeads();
+    } catch (e) {
+      console.error("Leads de Meta:", e);
+    } finally {
+      ocupado = false;
+    }
+  };
   setTimeout(revisar, 20 * 1000);
   setInterval(revisar, CADA_MS);
 }
