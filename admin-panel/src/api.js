@@ -169,6 +169,23 @@ export const api = {
       setTimeout(() => URL.revokeObjectURL(url), 5000);
     },
     mensajesInvitados: () => request("/api/admin/crm/mensajes-invitados"),
+    // Bandeja de WhatsApp (como WhatsApp Web).
+    chats: () => request("/api/admin/crm/bandeja/chats"),
+    chat: (tel) => request(`/api/admin/crm/bandeja/chats/${tel}`),
+    chatLeido: (tel) => request(`/api/admin/crm/bandeja/chats/${tel}/leido`, { method: "POST" }),
+    chatEnviar: (tel, texto) =>
+      request(`/api/admin/crm/bandeja/chats/${tel}/enviar`, { method: "POST", body: JSON.stringify({ texto }) }),
+    chatArchivo: (tel, datos) =>
+      request(`/api/admin/crm/bandeja/chats/${tel}/archivo`, { method: "POST", body: JSON.stringify(datos) }),
+    // Los archivos piden el token, así que se bajan con fetch y se muestran
+    // como blob (un <img src> normal no lo manda).
+    chatMedia: async (id) => {
+      const res = await fetch(`${API_URL}/api/admin/crm/bandeja/media/${id}`, {
+        headers: getToken() ? { Authorization: `Bearer ${getToken()}` } : {},
+      });
+      if (!res.ok) throw new Error("No se pudo abrir el archivo");
+      return URL.createObjectURL(await res.blob());
+    },
     pagosPorConfirmar: (recientes) => request(`/api/admin/crm/pagos-por-confirmar${recientes ? "?recientes=1" : ""}`),
     confirmarPago: (id, datos) =>
       request(`/api/admin/crm/pagos-reportados/${id}/confirmar`, { method: "POST", body: JSON.stringify(datos) }),

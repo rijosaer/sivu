@@ -79,6 +79,13 @@
   .insignia-neutra { @apply bg-lienzo text-ink-tenue border-borde; }
   .insignia-oro { @apply bg-oro-suave text-oro-oscuro border-[#F1D9A8]; }
 
+  /* ---------- Bandeja de WhatsApp ----------
+     Ocupa el alto de la pantalla: la lista y la conversación hacen scroll por
+     dentro, como en WhatsApp Web. */
+  .bandeja { height: calc(100dvh - 4.25rem - 3.6rem); }
+  @media (min-width: 1024px) { .bandeja { height: calc(100dvh - 4.25rem - 5rem); min-height: 32rem; } }
+  .bandeja-fondo { background-color: #F7EFE3; background-image: radial-gradient(circle at 1px 1px, rgb(155 31 62 / .06) 1px, transparent 0); background-size: 18px 18px; }
+
   /* ---------- Tablas ---------- */
   .tabla { @apply w-full text-sm border-collapse; }
   .tabla thead th { @apply text-left px-3 py-2 font-medium text-[11px] uppercase tracking-[.08em] text-ink-tenue bg-lienzo; }

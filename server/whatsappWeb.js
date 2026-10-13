@@ -1,5 +1,5 @@
 import makeWASocket, {
-  Browsers, BufferJSON, DisconnectReason, fetchLatestBaileysVersion, initAuthCreds, proto,
+  Browsers, BufferJSON, DisconnectReason, downloadMediaMessage, fetchLatestBaileysVersion, initAuthCreds, proto,
 } from "@whiskeysockets/baileys";
 import pino from "pino";
 import QRCode from "qrcode";
@@ -230,6 +230,7 @@ export function enviarTexto(telefono, texto, { automatico = false } = {}) {
         jid: r?.key?.remoteJid || jid,
         key: r?.key,
         timestamp: r?.messageTimestamp,
+        mensaje: r,
       };
     } catch (e) {
       return { estado: "error", detalle: e.message || "No se pudo enviar" };
@@ -237,5 +238,40 @@ export function enviarTexto(telefono, texto, { automatico = false } = {}) {
   });
   cola = tarea.catch(() => {});
   if (automatico) tarea.finally(() => setTimeout(() => automaticos.delete(String(telefono)), 15000));
+  return tarea;
+}
+
+// Baja la foto, audio, video o documento de un mensaje recibido (o enviado).
+// WhatsApp guarda los archivos cifrados en sus servidores un tiempo; si ya
+// expiraron, se le pide al celular que los vuelva a subir.
+export async function descargarMedia(m) {
+  if (!whatsappConectado()) throw new Error("El WhatsApp de Sivú no está vinculado");
+  return downloadMediaMessage(m, "buffer", {}, { logger: silencio, reuploadRequest: sock.updateMediaMessage });
+}
+
+// Manda un archivo desde la bandeja del panel: foto, documento o audio.
+export function enviarArchivo(telefono, { tipo, buffer, mime, nombre, texto }) {
+  const tarea = cola.then(async () => {
+    if (!whatsappConectado()) return { estado: "error", detalle: "El WhatsApp de Sivú no está vinculado" };
+    try {
+      const [existe] = await sock.onWhatsApp(telefono);
+      if (!existe?.exists) return { estado: "error", detalle: "Ese número no tiene WhatsApp" };
+      const jid = existe.jid;
+      const contenido =
+        tipo === "imagen"
+          ? { image: buffer, caption: texto || undefined, mimetype: mime }
+          : tipo === "video"
+            ? { video: buffer, caption: texto || undefined, mimetype: mime }
+            : tipo === "audio"
+              ? { audio: buffer, mimetype: mime, ptt: /ogg|opus|webm/.test(mime) }
+              : { document: buffer, mimetype: mime || "application/octet-stream", fileName: nombre || "archivo", caption: texto || undefined };
+      const r = await sock.sendMessage(jid, contenido);
+      await espera(azar(1500, 3000));
+      return { estado: "enviado", detalle: r?.key?.id || "", jid: r?.key?.remoteJid || jid, key: r?.key, timestamp: r?.messageTimestamp, mensaje: r };
+    } catch (e) {
+      return { estado: "error", detalle: e.message || "No se pudo enviar" };
+    }
+  });
+  cola = tarea.catch(() => {});
   return tarea;
 }

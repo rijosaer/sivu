@@ -1,6 +1,6 @@
 import { pool } from "./db.js";
 import {
-  alRecibirMensajes, enviarTexto, esAutomatico, etiquetasConocidas, numeroVinculado, socketActual, whatsappConectado,
+  alRecibirMensajes, descargarMedia, enviarTexto, esAutomatico, etiquetasConocidas, numeroVinculado, socketActual, whatsappConectado,
 } from "./whatsappWeb.js";
 import { normalizarTelefono } from "./avisosWhatsapp.js";
 import { leerAjuste, telefonosAviso } from "./ajustes.js";
@@ -73,6 +73,48 @@ export function contenido(message) {
   if (m.locationMessage) return { tipo: "otro", texto: "Ubicación" };
   // Reacciones, recibos, cambios de protocolo...: no son conversación.
   return null;
+}
+
+// Datos del archivo de un mensaje (foto, audio...), si trae uno.
+function archivoDe(message) {
+  const m = desenvolver(message);
+  const a = m.imageMessage || m.videoMessage || m.audioMessage || m.documentMessage || m.stickerMessage;
+  if (!a) return null;
+  return {
+    mime: a.mimetype || "",
+    nombre: m.documentMessage?.fileName || "",
+    segundos: a.seconds || null,
+    bytes: Number(a.fileLength || 0),
+  };
+}
+
+// Hasta este tamaño se guarda el archivo en la base; lo más pesado (videos
+// largos) queda anotado y se ve en el celular.
+const MAX_MEDIA = 16 * 1024 * 1024;
+
+export async function guardarMedia(mensajeId, m, buffer = null) {
+  const a = archivoDe(m.message);
+  if (!a) return;
+  let datos = buffer;
+  let error = "";
+  if (!datos) {
+    if (a.bytes > MAX_MEDIA) error = "Archivo muy pesado: ábrelo en el celular";
+    else {
+      try {
+        datos = await descargarMedia(m);
+      } catch (e) {
+        error = `No se pudo descargar: ${e.message}`.slice(0, 300);
+      }
+    }
+  }
+  await pool.query(
+    `INSERT INTO mensajes_media (mensaje_id, mime, nombre, segundos, bytes, datos, error)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
+     ON CONFLICT (mensaje_id) DO UPDATE SET datos = COALESCE(mensajes_media.datos, EXCLUDED.datos),
+       error = CASE WHEN mensajes_media.datos IS NULL THEN EXCLUDED.error ELSE '' END,
+       bytes = GREATEST(mensajes_media.bytes, EXCLUDED.bytes)`,
+    [mensajeId, a.mime.split(";")[0], a.nombre.slice(0, 200), a.segundos, datos ? datos.length : a.bytes, datos, error]
+  );
 }
 
 const ultimos10 = (t) => String(t).slice(-10);
@@ -236,11 +278,14 @@ export async function registrar(m, tipoUpsert) {
   // conversaciones del número (amigos, proveedores) no son asunto del panel.
   if (!prospecto && !quien.invitado) return;
 
-  const { rowCount } = await pool.query(
+  // La hora real del mensaje (los que llegan al reconectar traen la suya).
+  const ts = Number(m.messageTimestamp?.low ?? m.messageTimestamp) || 0;
+  const { rows: [nuevo] } = await pool.query(
     `INSERT INTO mensajes_whatsapp
-       (wa_id, telefono, direccion, texto, tipo, nombre_contacto, prospecto_id, invitacion_id, invitado_id, leido)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-     ON CONFLICT (wa_id) WHERE wa_id IS NOT NULL DO NOTHING`,
+       (wa_id, telefono, direccion, texto, tipo, nombre_contacto, prospecto_id, invitacion_id, invitado_id, leido, creado_en)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, COALESCE(to_timestamp(NULLIF($11, 0)), now()))
+     ON CONFLICT (wa_id) WHERE wa_id IS NOT NULL DO NOTHING
+     RETURNING id`,
     [
       key.id || null,
       telefono,
@@ -252,9 +297,15 @@ export async function registrar(m, tipoUpsert) {
       prospecto ? null : quien.invitado?.invitacion_id || null,
       prospecto ? null : quien.invitado?.id || null,
       saliente,
+      ts,
     ]
   );
-  if (!rowCount) return; // ya estaba guardado
+  if (!nuevo) return null; // ya estaba guardado
+
+  // Fotos, audios y documentos: se bajan aparte para no frenar lo demás.
+  if (archivoDe(m.message)) {
+    guardarMedia(nuevo.id, m).catch((e) => console.error("WhatsApp (guardar archivo):", e.message));
+  }
 
   if (prospecto) {
     if (saliente && esAutomatico(telefono)) {
@@ -290,6 +341,7 @@ export async function registrar(m, tipoUpsert) {
     const { responderWhatsappDirecto } = await leerAjuste("saludo");
     if (responderWhatsappDirecto) await saludarSiToca(prospecto.id);
   }
+  return nuevo.id;
 }
 
 export function iniciarOrdenWhatsapp() {

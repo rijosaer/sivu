@@ -11,11 +11,14 @@ import { textoSaludo } from "../saludo.js";
 import { metricas, pendientesDeHoy, enviarReporte, armarReporte } from "../reporte.js";
 import { estadoLeads } from "../leadsMeta.js";
 import { crearEventoBasico } from "./invitaciones.js";
+import { bandejaRouter } from "./bandeja.js";
 
 // Todo lo del negocio de Sivú que está por encima de un evento: clientes
 // potenciales, configuración, cotizaciones y producción. Solo el dueño (lo
 // monta admin.js detrás de soloDueno).
 export const crmRouter = Router();
+
+crmRouter.use("/bandeja", bandejaRouter);
 
 const token = () => crypto.randomBytes(9).toString("base64url");
 const entero = (v) => (v === "" || v === null || v === undefined ? null : Math.max(0, Math.round(Number(v) || 0)));
