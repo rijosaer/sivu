@@ -6,21 +6,22 @@ const Hoy = lazy(() => import("./Hoy"));
 const Clientes = lazy(() => import("./Clientes"));
 const Eventos = lazy(() => import("./Produccion"));
 const Configuracion = lazy(() => import("./Configuracion"));
+const Bandeja = lazy(() => import("./Bandeja"));
 
-// Lo que ve el dueño de Sivú al entrar: el negocio completo en cuatro
-// pantallas. «Eventos» junta lo que antes eran «Eventos» y «Producción» (la
-// misma lista vista dos veces); los mensajes de los invitados ahora viven
-// dentro de cada evento (Invitados → WhatsApp).
+// Lo que ve el dueño de Sivú al entrar. «Eventos» junta lo que antes eran
+// «Eventos» y «Producción» (la misma lista vista dos veces); «Mensajes» es la
+// bandeja del WhatsApp de Sivú, con clientes e invitados de todos los eventos.
 
 const TABS = [
   { key: "hoy", label: "Hoy", icono: "sol", descripcion: "Lo que hay que hacer hoy y cómo va el negocio." },
   { key: "clientes", label: "Clientes", icono: "persona", descripcion: "Quién escribió, a quién cotizaste y quién firmó." },
+  { key: "mensajes", label: "Mensajes", icono: "chat", descripcion: "Lo que llega al WhatsApp de Sivú: clientes e invitados." },
   { key: "eventos", label: "Eventos", icono: "calendario", descripcion: "Cada evento contratado: etapa, datos y pagos." },
   { key: "configuracion", label: "Configuración", icono: "ajustes", descripcion: "Textos, horario, avisos, precios y pagos." },
 ];
 
 // Direcciones de antes: siguen funcionando.
-const ANTES = { produccion: "eventos", mensajes: "eventos" };
+const ANTES = { produccion: "eventos" };
 
 export default function PanelDueno({ tramos = [], onElegir, onSalir }) {
   const pedida = ANTES[tramos[0]] || tramos[0];
@@ -43,7 +44,8 @@ export default function PanelDueno({ tramos = [], onElegir, onSalir }) {
 
   const contador = {
     hoy: tablero?.pagosPorConfirmar || 0,
-    clientes: tablero ? tablero.hoy.sinContactar + tablero.hoy.sinLeer + tablero.hoy.seguimientos : 0,
+    clientes: tablero ? tablero.hoy.sinContactar + tablero.hoy.seguimientos : 0,
+    mensajes: tablero?.hoy.sinLeer || 0,
     eventos: tablero ? tablero.hoy.atrasados.length + tablero.hoy.saldos.length : 0,
   };
   const actual = TABS.find((t) => t.key === tab);
@@ -68,6 +70,7 @@ export default function PanelDueno({ tramos = [], onElegir, onSalir }) {
             onAbrir={(id) => ir(id ? `/clientes/${id}` : "/clientes")}
           />
         )}
+        {tab === "mensajes" && <Bandeja sub={sub} />}
         {tab === "eventos" && <Eventos onElegirEvento={onElegir} />}
         {tab === "configuracion" && <Configuracion seccion={sub} />}
       </Suspense>
