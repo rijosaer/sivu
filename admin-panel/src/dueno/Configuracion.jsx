@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ir } from "../ruta";
 import { api } from "../api";
 import { useToast } from "../ui/Toast";
 import { EVENTO_EN_FRASE, EVENTOS, rellenar, peso, TIPOS_PAGO, ETIQUETAS_CAMPO_PAGO, nombreMetodo, textoMetodosPago } from "./comun";
@@ -48,9 +49,9 @@ function proximaAtencion(h) {
   return "en cuanto podamos";
 }
 
-function Bloque({ titulo, ayuda, children, onGuardar, guardando, sucio }) {
+function Bloque({ id, titulo, ayuda, children, onGuardar, guardando, sucio }) {
   return (
-    <section className="tarjeta p-5 mb-5">
+    <section id={id ? `cfg-${id}` : undefined} className="tarjeta p-5 mb-5 scroll-mt-28">
       <div className="flex items-start justify-between gap-3 mb-4 flex-wrap">
         <div className="max-w-prose">
           <h3 className="bloque-titulo">{titulo}</h3>
@@ -202,7 +203,13 @@ function MetodoPago({ m, onCambio, onQuitar, onSubir, primero }) {
   );
 }
 
-export default function Configuracion() {
+const SECCIONES = [
+  ["horario", "Horario"], ["mensaje", "Mensaje automático"], ["avisos", "Avisos"], ["reporte", "Reporte"],
+  ["whatsapp", "WhatsApp"], ["seguimientos", "Seguimientos"], ["respuestas", "Respuestas"], ["planes", "Planes"],
+  ["pagos", "Métodos de pago"], ["cotizaciones", "Cotizaciones"],
+];
+
+export default function Configuracion({ seccion }) {
   const toast = useToast();
   const [a, setA] = useState(null);
   const [original, setOriginal] = useState(null);
@@ -215,6 +222,12 @@ export default function Configuracion() {
       setOriginal(JSON.stringify(r.ajustes));
     });
   }, []);
+
+  // /configuracion/pagos lleva directo a ese bloque.
+  useEffect(() => {
+    if (!a || !seccion) return;
+    document.getElementById(`cfg-${seccion}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [Boolean(a), seccion]);
 
   if (!a) return <p className="text-sm text-ink-tenue">Cargando...</p>;
   const orig = JSON.parse(original);
@@ -246,9 +259,21 @@ export default function Configuracion() {
   return (
     <div>
       <h2 className="panel-titulo">Configuración</h2>
-      <p className="panel-subtitulo mb-6">Textos, horario, avisos, reporte, respuestas y precios. Todo se cambia aquí.</p>
+      <p className="panel-subtitulo mb-4">Textos, horario, avisos, reporte, respuestas y precios. Todo se cambia aquí.</p>
+      <div className="flex gap-1.5 overflow-x-auto pb-2 mb-4">
+        {SECCIONES.map(([k, t]) => (
+          <button
+            key={k}
+            onClick={() => (seccion === k ? document.getElementById(`cfg-${k}`)?.scrollIntoView({ behavior: "smooth" }) : ir(`/configuracion/${k}`, { reemplazar: true }))}
+            className={`chip-filtro shrink-0 ${seccion === k ? "chip-filtro-activo" : ""}`}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
 
       <Bloque
+        id="horario"
         titulo="Horario de atención"
         ayuda="Si lo defines, el mensaje automático lo menciona y usa otro texto fuera de horario. Si no, no se menciona."
         onGuardar={() => guardar("horario")}
@@ -286,6 +311,7 @@ export default function Configuracion() {
       </Bloque>
 
       <Bloque
+        id="mensaje"
         titulo="Mensaje automático al cliente"
         ayuda="Le llega a quien llena el formulario del anuncio: confirma que recibimos su solicitud y que una persona le escribirá. No arma nada ni promete tiempos."
         onGuardar={() => guardar("saludo")}
@@ -352,6 +378,7 @@ export default function Configuracion() {
       </Bloque>
 
       <Bloque
+        id="avisos"
         titulo="Avisos al equipo"
         ayuda="A estos números les llega cada cliente potencial nuevo y las novedades importantes, desde el WhatsApp de Sivú."
         onGuardar={() => guardar("avisos")}
@@ -381,6 +408,7 @@ export default function Configuracion() {
       </Bloque>
 
       <Bloque
+        id="reporte"
         titulo="Reporte de la mañana"
         ayuda="Cada día: anuncios de ayer, clientes nuevos y qué hay que hacer hoy. Los lunes suma la semana. Si no hay novedades, no llega."
         onGuardar={() => guardar("reporte")}
@@ -418,6 +446,7 @@ export default function Configuracion() {
       </Bloque>
 
       <Bloque
+        id="whatsapp"
         titulo="Orden del WhatsApp"
         ayuda="Para que el WhatsApp de Sivú no sea un reguero entre clientes e invitados."
         onGuardar={() => guardar("whatsapp", "captura")}
@@ -438,6 +467,7 @@ export default function Configuracion() {
       </Bloque>
 
       <Bloque
+        id="seguimientos"
         titulo="Seguimientos"
         onGuardar={() => guardar("seguimiento")}
         guardando={guardando === "seguimiento"}
@@ -468,6 +498,7 @@ export default function Configuracion() {
       </Bloque>
 
       <Bloque
+        id="respuestas"
         titulo="Respuestas listas"
         ayuda="Botones en la ficha de cada cliente: abren su chat con el texto ya escrito para que lo revises y lo mandes. Comodines: {nombre}, {evento}, {valor}, {catalogo}, {cotizacion} (enlace de su última cotización), {datos} (enlace del formulario de datos de su evento), {pagos} (tus métodos de pago), {anticipo} (valor del anticipo)."
         onGuardar={() => guardar("respuestas")}
@@ -504,6 +535,7 @@ export default function Configuracion() {
       </Bloque>
 
       <Bloque
+        id="planes"
         titulo="Planes y extras"
         ayuda="Con esto se arma una cotización en un toque. Cada cotización se puede ajustar a mano."
         onGuardar={() => guardar("planes", "extras")}
@@ -572,6 +604,7 @@ export default function Configuracion() {
       </Bloque>
 
       <Bloque
+        id="pagos"
         titulo="Métodos de pago"
         ayuda="Salen en cada cotización con botón para copiar el número, y en la respuesta lista «Datos de pago». El cliente puede avisar «Ya pagué» y te llega el aviso."
         onGuardar={() => guardar("pagos")}
@@ -635,6 +668,7 @@ export default function Configuracion() {
       </Bloque>
 
       <Bloque
+        id="cotizaciones"
         titulo="Cotizaciones"
         ayuda="Lo que ve el cliente al abrir su cotización."
         onGuardar={() => guardar("cotizacion")}

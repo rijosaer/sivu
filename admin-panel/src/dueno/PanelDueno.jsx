@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
+import { ir } from "../ruta";
 import SelectorEventos from "../pages/SelectorEventos";
 import Hoy from "./Hoy";
 import Clientes from "./Clientes";
@@ -20,27 +21,13 @@ const TABS = [
   ["configuracion", "Configuración"],
 ];
 
-function leerTab() {
-  try {
-    return localStorage.getItem("dueno_tab") || "hoy";
-  } catch {
-    return "hoy";
-  }
-}
-
-export default function PanelDueno({ onElegir, onSalir }) {
-  const [tab, setTab] = useState(leerTab);
+export default function PanelDueno({ tramos = [], onElegir, onSalir }) {
+  // La pestaña y el cliente abierto salen de la dirección: /clientes/25.
+  const tab = TABS.some(([k]) => k === tramos[0]) ? tramos[0] : "hoy";
+  const sub = tramos[1] || null;
   const [tablero, setTablero] = useState(null);
 
-  function irA(t) {
-    setTab(t);
-    try {
-      localStorage.setItem("dueno_tab", t);
-    } catch {
-      /* sin almacenamiento: no se recuerda la pestaña */
-    }
-    window.scrollTo({ top: 0 });
-  }
+  const irA = (t) => ir(`/${t}`);
 
   const cargarTablero = () => api.crm.tablero().then(setTablero).catch(() => {});
   useEffect(() => {
@@ -87,12 +74,18 @@ export default function PanelDueno({ onElegir, onSalir }) {
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {tab === "hoy" && <Hoy tablero={tablero} irA={irA} onCambio={cargarTablero} />}
         {tab === "clientes" && (
-          <Clientes conteos={tablero?.conteos} onCambio={cargarTablero} onIrAProduccion={() => irA("produccion")} />
+          <Clientes
+            conteos={tablero?.conteos}
+            onCambio={cargarTablero}
+            onIrAProduccion={() => irA("produccion")}
+            abierto={sub ? Number(sub) : null}
+            onAbrir={(id) => ir(id ? `/clientes/${id}` : "/clientes")}
+          />
         )}
         {tab === "eventos" && <SelectorEventos onElegir={onElegir} onSalir={onSalir} incrustado />}
         {tab === "produccion" && <Produccion onElegirEvento={onElegir} />}
         {tab === "mensajes" && <MensajesInvitados />}
-        {tab === "configuracion" && <Configuracion />}
+        {tab === "configuracion" && <Configuracion seccion={sub} />}
       </main>
     </div>
   );

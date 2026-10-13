@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { ir, useRuta } from "./ruta";
 import Login from "./pages/Login";
 import Resumen from "./pages/Resumen";
 import Invitados from "./pages/Invitados";
@@ -8,10 +9,12 @@ import Contenido from "./pages/Contenido";
 import Tema from "./pages/Tema";
 import Decoraciones from "./pages/Decoraciones";
 import {
+  api,
   hasToken,
   clearToken,
   SITIO_BASE,
   getInvitacionActual,
+  setInvitacionActual,
   clearInvitacionActual,
   actualizarSitioBase,
   esEventoFijo,
@@ -149,8 +152,9 @@ function Navegacion({ tab, onCambiar, hayPendientes }) {
   );
 }
 
-function Cascara({ onSalir, evento, onCambiarEvento }) {
-  const [tab, setTab] = useState("resumen");
+function Cascara({ onSalir, evento, onCambiarEvento, tab: tabRuta }) {
+  const tab = TABS.some((t) => t.key === tabRuta) ? tabRuta : "resumen";
+  const setTab = (t) => ir(`/evento/${evento.id}/${t}`);
   const { hayPendientes, seccionesPendientes } = usePendientes();
   const avisos = useAvisos();
   const actual = TABS.find((t) => t.key === tab);
@@ -244,50 +248,107 @@ function Cascara({ onSalir, evento, onCambiarEvento }) {
 
 export default function App() {
   const [logueado, setLogueado] = useState(hasToken());
-  // El panel administra muchos eventos (multi-invitación): antes de entrar a
-  // "editar" hay que elegir cuál. Se recuerda entre sesiones (localStorage),
-  // así que quien entra todos los días a la misma boda no tiene que elegirla
-  // cada vez.
+  const tramos = useRuta();
+  // El evento que se está editando: lo dice la dirección (/evento/12/...).
+  // Si es el mismo que quedó guardado, se usa sin pedirlo otra vez.
   const [evento, setEvento] = useState(() => {
     const actual = getInvitacionActual();
     if (actual) actualizarSitioBase(actual.slug);
     return actual;
   });
+  const [errorEvento, setErrorEvento] = useState("");
+
+  const enEvento = tramos[0] === "evento" && tramos[1];
+  const idRuta = enEvento ? String(tramos[1]) : null;
+
+  // Entrar por enlace (o recargar) a un evento distinto del guardado.
+  useEffect(() => {
+    if (!logueado || !idRuta || String(evento?.id) === idRuta) return;
+    let vivo = true;
+    setErrorEvento("");
+    api
+      .obtenerInvitacion(idRuta)
+      .then((inv) => {
+        if (!vivo) return;
+        setInvitacionActual(inv);
+        actualizarSitioBase(inv.slug);
+        setEvento({ id: String(inv.id), slug: inv.slug, nombre: inv.nombre, tipo_evento: inv.tipo_evento });
+      })
+      .catch(() => vivo && setErrorEvento("No encontramos ese evento o no tienes acceso a él."));
+    return () => {
+      vivo = false;
+    };
+  }, [logueado, idRuta]);
+
+  // Direcciones viejas o vacías: a donde corresponde según quién entra.
+  useEffect(() => {
+    if (!logueado) return;
+    if (esEventoFijo()) {
+      const propio = getInvitacionActual();
+      if (propio && (!enEvento || idRuta !== String(propio.id))) {
+        ir(`/evento/${propio.id}/${enEvento ? tramos[2] || "resumen" : "resumen"}`, { reemplazar: true });
+      }
+    } else if (!tramos.length) {
+      ir("/hoy", { reemplazar: true });
+    }
+  }, [logueado, tramos.join("/")]);
 
   function elegirEvento(inv) {
+    setInvitacionActual(inv);
     actualizarSitioBase(inv.slug);
-    setEvento(inv);
+    setEvento({ id: String(inv.id), slug: inv.slug, nombre: inv.nombre, tipo_evento: inv.tipo_evento });
+    ir(`/evento/${inv.id}/resumen`);
   }
 
   function cambiarEvento() {
     clearInvitacionActual();
     actualizarSitioBase(null);
     setEvento(null);
+    ir("/eventos");
   }
 
-  return (
-    <ToastProvider>
-      {!logueado ? (
-        <Login
-          onLogin={(inv) => {
-            if (inv) elegirEvento(inv);
-            setLogueado(true);
-          }}
-        />
-      ) : !evento ? (
-        <PanelDueno onElegir={elegirEvento} onSalir={() => { clearToken(); setLogueado(false); }} />
-      ) : (
-        <PendientesProvider>
-          <Cascara
-            evento={evento}
-            onCambiarEvento={cambiarEvento}
-            onSalir={() => {
-              clearToken();
-              setLogueado(false);
-            }}
-          />
+  function salir() {
+    clearToken();
+    clearInvitacionActual();
+    setEvento(null);
+    setLogueado(false);
+    ir("/", { reemplazar: true });
+  }
+
+  let contenido;
+  if (!logueado) {
+    contenido = (
+      <Login
+        onLogin={(inv) => {
+          setLogueado(true);
+          if (inv) elegirEvento(inv);
+          else if (!tramos.length || tramos[0] === "evento") ir("/hoy", { reemplazar: true });
+        }}
+      />
+    );
+  } else if (enEvento) {
+    contenido =
+      evento && String(evento.id) === idRuta ? (
+        <PendientesProvider key={evento.id}>
+          <Cascara evento={evento} tab={tramos[2]} onCambiarEvento={cambiarEvento} onSalir={salir} />
         </PendientesProvider>
-      )}
-    </ToastProvider>
-  );
+      ) : (
+        <div className="min-h-screen grid place-items-center text-sm text-ink-tenue px-6 text-center">
+          {errorEvento ? (
+            <div>
+              <p className="mb-3">{errorEvento}</p>
+              <button className="boton-secundario" onClick={() => ir("/eventos")}>
+                Ver mis eventos
+              </button>
+            </div>
+          ) : (
+            "Cargando evento..."
+          )}
+        </div>
+      );
+  } else {
+    contenido = <PanelDueno tramos={tramos} onElegir={elegirEvento} onSalir={salir} />;
+  }
+
+  return <ToastProvider>{contenido}</ToastProvider>;
 }

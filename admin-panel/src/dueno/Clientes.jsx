@@ -118,7 +118,7 @@ function Fila({ p, activo, onAbrir }) {
   );
 }
 
-export default function Clientes({ conteos, onCambio, abrirId, onIrAProduccion }) {
+export default function Clientes({ conteos, onCambio, abierto = null, onAbrir, onIrAProduccion }) {
   const toast = useToast();
   const [filtro, setFiltro] = useState("abiertos");
   const [q, setQ] = useState("");
@@ -126,7 +126,8 @@ export default function Clientes({ conteos, onCambio, abrirId, onIrAProduccion }
   const [evento, setEvento] = useState("");
   const [orden, setOrden] = useState("prioridad");
   const [lista, setLista] = useState(null);
-  const [abierto, setAbierto] = useState(abrirId || null);
+  // El cliente abierto vive en la dirección (/clientes/25).
+  const setAbierto = (id) => onAbrir?.(id);
   const [agregando, setAgregando] = useState(false);
   const [ajustes, setAjustes] = useState(null);
   const [conectado, setConectado] = useState(false);
@@ -154,10 +155,6 @@ export default function Clientes({ conteos, onCambio, abrirId, onIrAProduccion }
     const t = setInterval(cargar, 30000);
     return () => clearInterval(t);
   }, [filtro, q, origen, evento]);
-
-  useEffect(() => {
-    if (abrirId) setAbierto(abrirId);
-  }, [abrirId]);
 
   const ordenada = useMemo(() => {
     if (!lista) return [];
