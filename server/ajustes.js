@@ -64,47 +64,20 @@ export const DEFECTOS = {
   // Seguimientos.
   seguimiento: { diasCotizado: 2, diasFrio: 7 },
   // Textos que el dueño manda con un toque desde la ficha del cliente.
+  // Guion de ventas para clientes que llegan del anuncio (orden de uso).
   respuestas: [
-    {
-      id: "datos",
-      titulo: "Pedir datos",
-      texto:
-        "¡Hola {nombre}! Soy de Sivú 💌 Para prepararte la cotización de {evento}, cuéntame:\n• Fecha y ciudad\n• Número aproximado de invitados\n• El estilo o los colores que te imaginas\n• Si tienes alguna invitación de referencia",
-    },
-    {
-      id: "catalogo",
-      titulo: "Enviar catálogo",
-      texto:
-        "¡Hola {nombre}! Aquí puedes ver nuestros diseños y cómo funcionan las invitaciones (confirmación de asistencia, música, mapa y más): {catalogo}\n\nCuéntame cuál te gusta y lo adaptamos a {evento} ✨",
-    },
-    {
-      id: "cotizacion",
-      titulo: "Enviar cotización",
-      texto: "¡Hola {nombre}! Te comparto la cotización de {evento} 💌\n{cotizacion}\n\nCualquier ajuste me dices y lo revisamos.",
-    },
-    {
-      id: "seguimiento1",
-      titulo: "Seguimiento 1",
-      texto: "¡Hola {nombre}! ¿Pudiste revisar la cotización de {evento}? Si quieres ajustamos algo o te muestro más diseños 😊",
-    },
-    {
-      id: "seguimiento2",
-      titulo: "Seguimiento 2",
-      texto:
-        "¡Hola {nombre}! Te escribo de Sivú para saber si sigues interesada/o en la invitación de {evento}. Las fechas se nos llenan, así que si quieres te aparto el espacio desde ya 💌",
-    },
-    {
-      id: "pago",
-      titulo: "Datos de pago",
-      texto:
-        "¡Hola {nombre}! Para separar la fecha de {evento} el anticipo es de {anticipo} 💌\n\nPuedes pagar por:\n{pagos}\n\nCuando lo hagas, envíame el comprobante por aquí y te confirmo.",
-    },
-    {
-      id: "bienvenida",
-      titulo: "Bienvenida de cliente",
-      texto:
-        "¡{nombre}, bienvenida/o a Sivú! 🎉 Gracias por confiar en nosotros para {evento}.\n\nPara empezar, llena aquí los datos de tu evento (puedes subir fotos, música y tu lista de invitados): {datos}\n\nApenas lo recibamos arrancamos con el diseño.",
-    },
+    {"id": "primero-formulario", "titulo": "1 · Primer mensaje (formulario)", "texto": "¡Hola {nombre}! 💌 Soy de Sivú. Vi que estás organizando {evento} y ya tengo los datos que nos dejaste.\n\nPara mostrarte cómo quedaría la tuya, cuéntame dos cosas:\n• ¿Qué fecha exacta es?\n• ¿Tienes algún estilo o colores en mente?\n\nMientras tanto te mando un ejemplo para que veas cómo la recibe cada invitado 👇"},
+    {"id": "primero-whatsapp", "titulo": "2 · Primer mensaje (WhatsApp)", "texto": "¡Hola {nombre}! 💌 Gracias por escribirle a Sivú.\n\nCuéntame un poquito de tu celebración para ayudarte mejor:\n• ¿Qué evento es y en qué fecha?\n• ¿Más o menos cuántos invitados?\n• ¿En qué ciudad?"},
+    {"id": "catalogo", "titulo": "3 · Enviar ejemplo", "texto": "Así se ve una invitación de Sivú 👉 {catalogo}\n\nLlega por WhatsApp con el nombre de cada invitado, se abre como un sobre, tiene la cuenta regresiva, el botón para llegar al lugar y confirma en un toque. Y a ti te avisa al instante quién va y quién no ✅"},
+    {"id": "precios", "titulo": "4 · Precios", "texto": "Tenemos tres opciones, {nombre}:\n\n✨ *General · $150.000*\nUna invitación con toda la información y un solo enlace para todos.\n\n💌 *Personalizada · $200.000* (la que más eligen)\nCada invitado recibe su propio enlace con su nombre y sus cupos. Ves en tu tablero quién confirmó y quién falta, y al final te llevas la lista en PDF.\n\n🤝 *Personalizada + Gestión · $250.000*\nTodo lo anterior, pero nosotros cargamos tu lista, enviamos cada invitación y hacemos el seguimiento por ti.\n\n¿Cuál se acomoda mejor a {evento}?"},
+    {"id": "pensarlo", "titulo": "5 · «Lo voy a pensar» / «está caro»", "texto": "¡Claro, {nombre}! Piénsalo con calma 😊\n\nSolo para tenerlo en cuenta: con la Personalizada ya no tienes que perseguir a nadie para saber si va. Cada quien confirma en su enlace y tú ves la lista en tiempo real. Para eventos de más de 80 invitados es donde más tiempo te ahorra.\n\nSi quieres te aparto la fecha y lo definimos después."},
+    {"id": "canva", "titulo": "6 · «¿Y no la hago en Canva o PDF?»", "texto": "¡Se puede! La diferencia es lo que pasa después de enviarla 😊\n\nCon un PDF, tus invitados te escriben a preguntar la hora, la dirección y si pueden llevar a alguien, y tú tienes que anotar a mano quién confirma.\n\nCon Sivú, la invitación responde todo eso sola, cada uno confirma en un toque y tú ves la lista lista para el salón."},
+    {"id": "pago", "titulo": "7 · Cierre y datos de pago", "texto": "¡Qué emoción, {nombre}! 🎉 Vamos con {evento}.\n\nPara separar la fecha el anticipo es de {anticipo}. Puedes pagar por:\n{pagos}\n\nCuando lo hagas, mándame el comprobante por aquí y arrancamos con tu diseño 💌"},
+    {"id": "sin-respuesta", "titulo": "8 · No respondió (mismo día)", "texto": "¡Hola {nombre}! Te escribí más temprano por la invitación de {evento} 💌 ¿Te parece si te muestro un ejemplo? Así ves cómo les llegaría a tus invitados."},
+    {"id": "seguimiento1", "titulo": "9 · Seguimiento (2 días)", "texto": "¡Hola {nombre}! ¿Pudiste revisar las opciones para {evento}? Si quieres te hago un ejemplo con el nombre de tu celebración para que lo veas antes de decidir 😊"},
+    {"id": "seguimiento2", "titulo": "10 · Último seguimiento (7 días)", "texto": "¡Hola {nombre}! Te escribo por última vez para no llenarte de mensajes 😊 Si más adelante decides hacer la invitación de {evento}, aquí estamos. ¡Que sea una celebración hermosa! 💌"},
+    {"id": "cotizacion", "titulo": "Enviar cotización (enlace)", "texto": "¡Hola {nombre}! Te comparto la cotización de {evento} 💌\n{cotizacion}\n\nCualquier ajuste me dices y lo revisamos."},
+    {"id": "bienvenida", "titulo": "Bienvenida de cliente (formulario de datos)", "texto": "¡{nombre}, bienvenida/o a Sivú! 🎉 Gracias por confiar en nosotros para {evento}.\n\nPara empezar, llena aquí los datos de tu evento (puedes subir fotos, música y tu lista de invitados): {datos}\n\nApenas lo recibamos arrancamos con el diseño."},
   ],
   // Planes y extras para armar cotizaciones.
   planes: [
