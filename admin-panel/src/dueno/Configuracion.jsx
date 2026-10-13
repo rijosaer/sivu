@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
 import { useToast } from "../ui/Toast";
-import { EVENTO_EN_FRASE, EVENTOS, rellenar, peso } from "./comun";
+import { EVENTO_EN_FRASE, EVENTOS, rellenar, peso, TIPOS_PAGO, ETIQUETAS_CAMPO_PAGO, nombreMetodo, textoMetodosPago } from "./comun";
 
 // Configuración del negocio: todo lo que antes había que pedir que se
 // cambiara en el servidor. Cada bloque se guarda por separado.
@@ -92,6 +92,73 @@ const textoATelefonos = (t) =>
     .split(/[,;\n]+/)
     .map((x) => x.replace(/\D/g, ""))
     .filter(Boolean);
+
+// Un método de pago: el tipo decide qué datos se piden.
+function MetodoPago({ m, onCambio, onQuitar, onSubir, primero }) {
+  const t = TIPOS_PAGO[m.tipo] || TIPOS_PAGO.otro;
+  const activo = m.activo !== false;
+  const campo = (k, label, props = {}) => (
+    <label key={k} className="block">
+      <span className="etiqueta">{label}</span>
+      <input className="campo-sm" value={m[k] || ""} onChange={(e) => onCambio({ [k]: e.target.value })} {...props} />
+    </label>
+  );
+  return (
+    <div className={`border rounded-xl p-3 flex flex-col gap-3 ${activo ? "border-borde" : "border-dashed border-borde-fuerte opacity-60"}`}>
+      <div className="flex items-center gap-2 flex-wrap">
+        <span
+          className="w-8 h-8 rounded-lg grid place-items-center text-base shrink-0"
+          style={{ background: `${t.color}14`, border: `1px solid ${t.color}33` }}
+        >
+          {t.emoji}
+        </span>
+        <select className="campo-sm !w-auto" value={m.tipo} onChange={(e) => onCambio({ tipo: e.target.value, nombre: "" })}>
+          {Object.entries(TIPOS_PAGO).map(([k, v]) => (
+            <option key={k} value={k}>
+              {v.nombre}
+            </option>
+          ))}
+        </select>
+        <input
+          className="campo-sm flex-1 min-w-[8rem]"
+          value={m.nombre || ""}
+          placeholder={`Nombre que ve el cliente (${t.nombre})`}
+          onChange={(e) => onCambio({ nombre: e.target.value })}
+        />
+        <label className="flex items-center gap-1.5 text-[12px] text-ink cursor-pointer">
+          <input type="checkbox" checked={activo} onChange={(e) => onCambio({ activo: e.target.checked })} />
+          Mostrar
+        </label>
+        {!primero && (
+          <button onClick={onSubir} className="boton-texto !text-[11px]" title="Subir">
+            ↑
+          </button>
+        )}
+        <button onClick={onQuitar} className="boton-texto !text-[11px]">
+          quitar
+        </button>
+      </div>
+      <div className="grid sm:grid-cols-2 gap-2">
+        {t.campos.map((k) =>
+          k === "numero"
+            ? campo("numero", t.etiquetaNumero || "Número", { inputMode: m.tipo === "llave" ? "text" : "numeric" })
+            : k === "tipoCuenta" ? (
+                <label key={k} className="block">
+                  <span className="etiqueta">Tipo de cuenta</span>
+                  <select className="campo-sm" value={m.tipoCuenta || ""} onChange={(e) => onCambio({ tipoCuenta: e.target.value })}>
+                    <option value="">—</option>
+                    <option>Ahorros</option>
+                    <option>Corriente</option>
+                  </select>
+                </label>
+              ) : (
+                campo(k, ETIQUETAS_CAMPO_PAGO[k], k === "enlace" ? { placeholder: "https://..." } : {})
+              )
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function Configuracion() {
   const toast = useToast();
@@ -360,7 +427,7 @@ export default function Configuracion() {
 
       <Bloque
         titulo="Respuestas listas"
-        ayuda="Botones en la ficha de cada cliente: abren su chat con el texto ya escrito para que lo revises y lo mandes. Comodines: {nombre}, {evento}, {valor}, {catalogo}, {cotizacion} (enlace de su última cotización), {datos} (enlace del formulario de datos de su evento)."
+        ayuda="Botones en la ficha de cada cliente: abren su chat con el texto ya escrito para que lo revises y lo mandes. Comodines: {nombre}, {evento}, {valor}, {catalogo}, {cotizacion} (enlace de su última cotización), {datos} (enlace del formulario de datos de su evento), {pagos} (tus métodos de pago), {anticipo} (valor del anticipo)."
         onGuardar={() => guardar("respuestas")}
         guardando={guardando === "respuestas"}
         sucio={sucio("respuestas")}
@@ -463,6 +530,69 @@ export default function Configuracion() {
       </Bloque>
 
       <Bloque
+        titulo="Métodos de pago"
+        ayuda="Salen en cada cotización con botón para copiar el número, y en la respuesta lista «Datos de pago». El cliente puede avisar «Ya pagué» y te llega el aviso."
+        onGuardar={() => guardar("pagos")}
+        guardando={guardando === "pagos"}
+        sucio={sucio("pagos")}
+      >
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2 text-[13px] flex-wrap">
+            Anticipo para separar la fecha:
+            <input
+              className="campo-sm !w-16 text-center"
+              inputMode="numeric"
+              value={a.pagos.anticipo}
+              onChange={(e) => set("pagos", { anticipo: Math.min(100, Number(e.target.value.replace(/\D/g, "")) || 0) })}
+            />
+            % <span className="ayuda">(0 = no se menciona)</span>
+          </div>
+          {a.pagos.metodos.map((m, i) => (
+            <MetodoPago
+              key={m.id}
+              m={m}
+              primero={i === 0}
+              onCambio={(c) => set("pagos", { metodos: a.pagos.metodos.map((x, j) => (j === i ? { ...x, ...c } : x)) })}
+              onQuitar={() => set("pagos", { metodos: a.pagos.metodos.filter((_, j) => j !== i) })}
+              onSubir={() => {
+                const l = [...a.pagos.metodos];
+                [l[i - 1], l[i]] = [l[i], l[i - 1]];
+                set("pagos", { metodos: l });
+              }}
+            />
+          ))}
+          <div className="flex flex-wrap gap-1.5">
+            {Object.entries(TIPOS_PAGO).map(([k, v]) => (
+              <button
+                key={k}
+                onClick={() =>
+                  set("pagos", { metodos: [...a.pagos.metodos, { id: `m${Date.now()}`, tipo: k, nombre: "", activo: true }] })
+                }
+                className="chip-filtro"
+              >
+                + {v.emoji} {v.nombre}
+              </button>
+            ))}
+          </div>
+          <label className="block">
+            <span className="etiqueta">Indicación después de pagar</span>
+            <input className="campo-sm" value={a.pagos.instrucciones} onChange={(e) => set("pagos", { instrucciones: e.target.value })} />
+          </label>
+          {a.pagos.metodos.some((m) => m.activo !== false) && (
+            <div>
+              <span className="etiqueta">Así sale en WhatsApp (respuesta «Datos de pago»)</span>
+              <pre className="whitespace-pre-wrap font-sans text-[13px] bg-[#efeae2] rounded-xl p-3">{textoMetodosPago(a.pagos.metodos)}</pre>
+            </div>
+          )}
+          {!a.pagos.metodos.length && <p className="ayuda">Agrega al menos uno con los botones de arriba.</p>}
+          <p className="ayuda">
+            En Producción, al registrar un pago eliges con cuál llegó:{" "}
+            {a.pagos.metodos.length ? a.pagos.metodos.map(nombreMetodo).join(", ") : "—"}.
+          </p>
+        </div>
+      </Bloque>
+
+      <Bloque
         titulo="Cotizaciones"
         ayuda="Lo que ve el cliente al abrir su cotización."
         onGuardar={() => guardar("cotizacion")}
@@ -485,14 +615,14 @@ export default function Configuracion() {
             <textarea className="campo-sm min-h-[70px]" value={a.cotizacion.notas} onChange={(e) => set("cotizacion", { notas: e.target.value })} />
           </label>
           <label className="block">
-            <span className="etiqueta">Datos de pago (Nequi, cuenta, llave...)</span>
+            <span className="etiqueta">Otras indicaciones de pago (opcional)</span>
             <textarea
               className="campo-sm min-h-[70px]"
               value={a.cotizacion.pago}
               onChange={(e) => set("cotizacion", { pago: e.target.value })}
-              placeholder="Ej. Nequi 323 601 9372 a nombre de ..."
+              placeholder="Ej. Si pagas desde otro banco, la transferencia tarda un día"
             />
-            <span className="ayuda">Si lo dejas vacío, la cotización no muestra datos de pago.</span>
+            <span className="ayuda">Los métodos de pago se configuran en el bloque de arriba; esto es un texto adicional.</span>
           </label>
         </div>
       </Bloque>

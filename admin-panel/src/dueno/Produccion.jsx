@@ -2,17 +2,18 @@ import { useEffect, useState } from "react";
 import { api, setInvitacionActual, sitioUrlInvitacion } from "../api";
 import { useToast } from "../ui/Toast";
 import { NOMBRE_TIPO_EVENTO } from "../tiposEvento";
-import { ETAPAS, CAMPOS_DATOS, peso, fechaCorta, diasHasta, haceCuanto, waUrl, hoyIso } from "./comun";
+import { ETAPAS, CAMPOS_DATOS, peso, fechaCorta, diasHasta, haceCuanto, waUrl, hoyIso, nombreMetodo } from "./comun";
 
 // Producción: todos los eventos contratados, en qué etapa va cada uno, cuánto
 // se ha cobrado y qué datos mandó el cliente. Lo atrasado se ve en rojo.
 
-function Pagos({ ev, onCambio }) {
+function Pagos({ ev, metodos, onCambio }) {
   const toast = useToast();
   const [pagos, setPagos] = useState(null);
   const [valor, setValor] = useState("");
   const [nota, setNota] = useState("");
   const [fecha, setFecha] = useState(hoyIso());
+  const [metodo, setMetodo] = useState("");
 
   const cargar = () => api.crm.pagos(ev.id).then(setPagos);
   useEffect(() => {
@@ -22,7 +23,7 @@ function Pagos({ ev, onCambio }) {
   async function agregar(e) {
     e.preventDefault();
     try {
-      await api.crm.agregarPago(ev.id, { valor: valor.replace(/\D/g, ""), nota, fecha });
+      await api.crm.agregarPago(ev.id, { valor: valor.replace(/\D/g, ""), nota, fecha, metodo });
       setValor("");
       setNota("");
       toast("Pago registrado");
@@ -48,6 +49,7 @@ function Pagos({ ev, onCambio }) {
             <li key={p.id} className="text-[12px] text-ink-suave flex items-center gap-2">
               <span className="tabular-nums text-ink font-medium">{peso(p.valor)}</span>
               <span>{fechaCorta(p.fecha)}</span>
+              {p.metodo && <span>· {p.metodo}</span>}
               {p.nota && <span>· {p.nota}</span>}
               <button onClick={() => borrar(p.id)} className="boton-texto !text-[11px] ml-auto">
                 quitar
@@ -68,6 +70,14 @@ function Pagos({ ev, onCambio }) {
           required
         />
         <input type="date" className="campo-sm !w-auto" value={fecha} onChange={(e) => setFecha(e.target.value)} />
+        <select className="campo-sm !w-auto" value={metodo} onChange={(e) => setMetodo(e.target.value)}>
+          <option value="">¿Por dónde llegó?</option>
+          {(metodos || []).map((m) => (
+            <option key={m.id}>{nombreMetodo(m)}</option>
+          ))}
+          <option>Efectivo</option>
+          <option>Otro</option>
+        </select>
         <input className="campo-sm !w-32 flex-1" placeholder="Nota (anticipo, saldo...)" value={nota} onChange={(e) => setNota(e.target.value)} />
         <button className="boton-secundario !py-1 !text-xs">Registrar</button>
       </form>
@@ -181,7 +191,7 @@ function DatosCliente({ ev, onCambio }) {
   );
 }
 
-function TarjetaProduccion({ ev, onCambio, onEntrar }) {
+function TarjetaProduccion({ ev, metodos, onCambio, onEntrar }) {
   const toast = useToast();
   const [abierto, setAbierto] = useState(null); // "pagos" | "datos" | "notas"
   const dias = diasHasta(ev.fecha_evento);
@@ -267,7 +277,7 @@ function TarjetaProduccion({ ev, onCambio, onEntrar }) {
         </button>
       </div>
 
-      {abierto === "pagos" && <Pagos ev={ev} onCambio={onCambio} />}
+      {abierto === "pagos" && <Pagos ev={ev} metodos={metodos} onCambio={onCambio} />}
       {abierto === "datos" && <DatosCliente ev={ev} onCambio={onCambio} />}
       {abierto === "cliente" && (
         <div className="grid sm:grid-cols-2 gap-2">
@@ -300,10 +310,12 @@ export default function Produccion({ onElegirEvento }) {
   const toast = useToast();
   const [eventos, setEventos] = useState(null);
   const [filtro, setFiltro] = useState("activos");
+  const [metodos, setMetodos] = useState([]);
 
   const cargar = () => api.crm.produccion().then(setEventos).catch((e) => toast(e.message, "error"));
   useEffect(() => {
     cargar();
+    api.crm.ajustes().then((r) => setMetodos((r.ajustes.pagos?.metodos || []).filter((m) => m.tipo !== "efectivo"))).catch(() => {});
   }, []);
 
   function entrar(ev) {
@@ -352,7 +364,7 @@ export default function Produccion({ onElegirEvento }) {
       ) : (
         <div className="flex flex-col gap-3">
           {visibles.map((ev) => (
-            <TarjetaProduccion key={ev.id} ev={ev} onCambio={cargar} onEntrar={entrar} />
+            <TarjetaProduccion key={ev.id} ev={ev} metodos={metodos} onCambio={cargar} onEntrar={entrar} />
           ))}
         </div>
       )}

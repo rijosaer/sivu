@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { API_URL } from "../api/site";
 import { cargarFuentes } from "./fuentes";
+import ComoPagar from "./ComoPagar";
 import "./negocio.css";
 
 // La cotización que Sivú le manda a un cliente: /cotizacion/<token>. Muestra
-// lo que incluye, el total, las condiciones y los datos de pago; el cliente
-// puede aceptarla con un toque (al equipo le llega el aviso) o preguntar por
-// WhatsApp.
+// lo que incluye, el total, las condiciones y cómo pagar; el cliente puede
+// aceptarla con un toque, avisar «Ya pagué» (al equipo le llega el aviso) o
+// preguntar por WhatsApp.
 
 const peso = (n) => `$${Math.round(Number(n) || 0).toLocaleString("es-CO")}`;
 const fechaLarga = (v) =>
@@ -148,14 +149,7 @@ export default function Cotizacion({ token }) {
           </section>
         )}
 
-        {c.pago && (
-          <section className="sv-tarjeta">
-            <span className="sv-etiqueta">Datos de pago</span>
-            <p className="sv-nota" style={{ color: "var(--tinta)" }}>
-              {c.pago}
-            </p>
-          </section>
-        )}
+        <ComoPagar c={c} token={token} aceptada={aceptada} onPagado={() => setAceptada(true)} />
 
         <div className="sv-botones">
           {aceptada ? (

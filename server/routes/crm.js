@@ -476,8 +476,8 @@ crmRouter.post(
     const valor = entero(req.body.valor);
     if (!valor) return res.status(400).json({ error: "Escribe el valor del pago" });
     const { rows: [p] } = await pool.query(
-      "INSERT INTO pagos (invitacion_id, valor, fecha, nota) VALUES ($1, $2, COALESCE($3::date, CURRENT_DATE), $4) RETURNING *",
-      [req.params.id, valor, fecha(req.body.fecha), String(req.body.nota || "").slice(0, 200)]
+      "INSERT INTO pagos (invitacion_id, valor, fecha, nota, metodo) VALUES ($1, $2, COALESCE($3::date, CURRENT_DATE), $4, $5) RETURNING *",
+      [req.params.id, valor, fecha(req.body.fecha), String(req.body.nota || "").slice(0, 200), String(req.body.metodo || "").slice(0, 80)]
     );
     res.status(201).json({ ...p, valor: Number(p.valor) });
   })

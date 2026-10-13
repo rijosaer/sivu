@@ -37,7 +37,7 @@ publicoNegocioRouter.get(
       );
       if (c.prospecto_id && !c.vistas) await anotar(c.prospecto_id, "cotizacion", "Abrió la cotización");
     }
-    const { pago } = await leerAjuste("cotizacion");
+    const [{ pago }, pagos] = await Promise.all([leerAjuste("cotizacion"), leerAjuste("pagos")]);
     const vencida = c.vigencia && new Date(`${String(c.vigencia.toISOString?.() || c.vigencia).slice(0, 10)}T23:59:59-05:00`) < new Date();
     res.json({
       cliente: c.cliente,
@@ -51,6 +51,12 @@ publicoNegocioRouter.get(
       aceptada: c.estado === "aceptada",
       creado_en: c.creado_en,
       pago,
+      pagos: {
+        anticipo: Number(pagos.anticipo) || 0,
+        instrucciones: pagos.instrucciones || "",
+        metodos: (pagos.metodos || []).filter((m) => m.activo !== false),
+      },
+      pagoReportado: Boolean(c.pago_reportado_en),
       whatsapp: WHATSAPP_SIVU(),
     });
   })
@@ -77,6 +83,41 @@ publicoNegocioRouter.post(
       "cotizacionAceptada",
       `✅ *${c.cliente || "Un cliente"} aceptó la cotización* de $${Number(c.total).toLocaleString("es-CO")}${c.evento ? ` (${c.evento})` : ""}.\nEscríbele para separar la fecha.`
     );
+    res.json({ ok: true, whatsapp: WHATSAPP_SIVU() });
+  })
+);
+
+// «Ya pagué»: el cliente avisa que hizo el pago (con qué método y cuánto).
+// Queda en la ficha y le llega el aviso al equipo para revisar el comprobante.
+publicoNegocioRouter.post(
+  "/cotizacion/:token/pague",
+  capturar(async (req, res) => {
+    const { rows: [c] } = await pool.query("SELECT * FROM cotizaciones WHERE token = $1", [req.params.token]);
+    if (!c) return res.status(404).json({ error: "Esta cotización no existe" });
+    const metodo = String(req.body?.metodo || "").slice(0, 80);
+    const valor = Math.max(0, Math.round(Number(req.body?.valor) || 0));
+    const primero = !c.pago_reportado_en;
+    // Pagar es aceptar: si no la había aceptado, queda aceptada también.
+    await pool.query(
+      `UPDATE cotizaciones SET pago_reportado_en = now(),
+         estado = 'aceptada', aceptada_en = COALESCE(aceptada_en, now())
+       WHERE id = $1`,
+      [c.id]
+    );
+    if (c.prospecto_id) {
+      await anotar(
+        c.prospecto_id,
+        "pago",
+        `Dice que pagó${valor ? ` $${valor.toLocaleString("es-CO")}` : ""}${metodo ? ` por ${metodo}` : ""}: revisa el comprobante`
+      );
+      await pool.query("UPDATE prospectos SET proximo_seguimiento = CURRENT_DATE, actualizado_en = now() WHERE id = $1", [c.prospecto_id]);
+    }
+    if (primero) {
+      await avisarEquipo(
+        "pagoReportado",
+        `💵 *${c.cliente || "Un cliente"} dice que ya pagó*${valor ? ` $${valor.toLocaleString("es-CO")}` : ""}${metodo ? ` por ${metodo}` : ""}${c.evento ? ` (${c.evento})` : ""}.\nRevisa el comprobante y regístralo en Producción.`
+      );
+    }
     res.json({ ok: true, whatsapp: WHATSAPP_SIVU() });
   })
 );

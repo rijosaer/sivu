@@ -218,7 +218,7 @@ export default function FichaCliente({ id, ajustes, conectado, onCambio, onCerra
   async function usarRespuesta(r) {
     const ultima = p.cotizaciones?.[0];
     const datos = r.texto.includes("{datos}") ? await obtenerEnlaceDatos() : "";
-    setComponiendo(rellenar(r.texto, valoresDe(p, { cotizacion: ultima?.url ? ultima.url : "", datos })));
+    setComponiendo(rellenar(r.texto, valoresDe(p, { cotizacion: ultima?.url ? ultima.url : "", datos, pagos: ajustes?.pagos })));
   }
 
   if (!p) return <div className="tarjeta p-6 text-sm text-ink-tenue">Cargando...</div>;
@@ -312,7 +312,7 @@ export default function FichaCliente({ id, ajustes, conectado, onCambio, onCerra
               cargar();
               onCambio();
               const r = (ajustes?.respuestas || []).find((x) => x.id === "cotizacion");
-              if (r && p.telefono) setComponiendo(rellenar(r.texto, valoresDe(p, { cotizacion: c.url })));
+              if (r && p.telefono) setComponiendo(rellenar(r.texto, valoresDe(p, { cotizacion: c.url, pagos: ajustes?.pagos })));
             }}
             onCancelar={() => setCotizando(null)}
           />

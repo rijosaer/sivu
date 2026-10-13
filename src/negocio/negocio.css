@@ -61,3 +61,22 @@ textarea.sv-campo{min-height:90px;resize:vertical;line-height:1.5}
   .sv-cabecera{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .sv-tarjeta{box-shadow:none}
 }
+
+/* Cómo pagar */
+.sv-mini{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--suave);font-weight:600}
+.sv-anticipo{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;background:#fdf0d7;border:1px solid #f1d39a;border-radius:16px;padding:14px 16px;margin-bottom:14px}
+.sv-anticipo b{display:block;font-family:'Fraunces',serif;font-size:28px;color:var(--vino-osc);margin-top:2px}
+.sv-metodos{display:grid;gap:12px}
+@media (min-width:560px){.sv-metodos{grid-template-columns:1fr 1fr}}
+.sv-metodo{background:#fff;border:1px solid var(--linea);border-top:4px solid var(--c);border-radius:16px;padding:14px}
+.sv-metodo-cab{display:flex;align-items:center;gap:10px;font-size:16px}
+.sv-metodo-ico{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 10%,#fff);font-size:17px}
+.sv-copiable{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;background:var(--crema);border-radius:12px;padding:10px 12px}
+.sv-numero{display:block;font-size:19px;font-weight:700;letter-spacing:.04em;font-variant-numeric:tabular-nums;word-break:break-all;margin-top:2px}
+.sv-copiar{flex-shrink:0;border:1.5px solid var(--vino-osc);background:#fff;color:var(--vino-osc);border-radius:999px;padding:8px 14px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.sv-metodo-filas{margin:10px 0 0;display:grid;gap:6px}
+.sv-metodo-filas div{display:flex;justify-content:space-between;gap:10px;font-size:13.5px}
+.sv-metodo-filas dt{color:var(--suave)}
+.sv-metodo-filas dd{margin:0;font-weight:600;text-align:right}
+.sv-ya-pague{margin-top:16px;padding-top:16px;border-top:1px solid var(--linea)}
+select.sv-campo{appearance:auto}

@@ -52,7 +52,7 @@ export const DEFECTOS = {
   // Horario de atención del equipo. Sin definir, los mensajes no lo mencionan.
   horario: { definido: false, dias: [1, 2, 3, 4, 5, 6], desde: 8, hasta: 18 },
   // Quién recibe el aviso de cada cliente potencial nuevo.
-  avisos: { telefonos: [], whatsappDirecto: true, cotizacionAceptada: true, datosRecibidos: true },
+  avisos: { telefonos: [], whatsappDirecto: true, cotizacionAceptada: true, datosRecibidos: true, pagoReportado: true },
   // Captura: quien escribe por primera vez al WhatsApp de Sivú y no es
   // invitado ni cliente se vuelve cliente potencial.
   captura: { whatsappDirecto: true },
@@ -92,6 +92,12 @@ export const DEFECTOS = {
       titulo: "Seguimiento 2",
       texto:
         "¡Hola {nombre}! Te escribo de Sivú para saber si sigues interesada/o en la invitación de {evento}. Las fechas se nos llenan, así que si quieres te aparto el espacio desde ya 💌",
+    },
+    {
+      id: "pago",
+      titulo: "Datos de pago",
+      texto:
+        "¡Hola {nombre}! Para separar la fecha de {evento} el anticipo es de {anticipo} 💌\n\nPuedes pagar por:\n{pagos}\n\nCuando lo hagas, envíame el comprobante por aquí y te confirmo.",
     },
     {
       id: "bienvenida",
@@ -140,6 +146,14 @@ export const DEFECTOS = {
     },
   ],
   extras: [],
+  // Cómo se le cobra al cliente: aparecen en cada cotización (con botón de
+  // copiar) y en la respuesta lista «Datos de pago».
+  //   tipo: nequi | daviplata | bancolombia | banco | llave | enlace | efectivo | otro
+  pagos: {
+    anticipo: 50, // % para separar la fecha (0 = no se menciona)
+    metodos: [],
+    instrucciones: "Cuando hagas el pago, envíanos el comprobante por WhatsApp para confirmarlo.",
+  },
   // Lo que ve el cliente en la cotización.
   cotizacion: {
     vigenciaDias: 8,

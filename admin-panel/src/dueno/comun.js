@@ -94,6 +94,9 @@ export function rellenar(texto, valores) {
 }
 
 export function valoresDe(p, extra = {}) {
+  const pagos = extra.pagos || {};
+  const total = p.valor_ganado ?? p.valor_cotizado;
+  const pct = Number(pagos.anticipo) || 0;
   return {
     nombre: (p.nombre || "").split(/\s+/)[0] || "",
     evento: EVENTO_EN_FRASE[p.evento] || "tu evento",
@@ -101,7 +104,60 @@ export function valoresDe(p, extra = {}) {
     catalogo: CATALOGO(),
     cotizacion: extra.cotizacion || "",
     datos: extra.datos || "",
+    pagos: textoMetodosPago(pagos.metodos),
+    anticipo: total && pct ? `${peso(Math.round((total * pct) / 100))} (${pct} %)` : pct ? `el ${pct} %` : "",
   };
+}
+
+// ---------- Métodos de pago ----------
+
+// Qué datos pide cada tipo. «campos» se muestran en el panel y en la
+// cotización; el «numero» es lo que el cliente copia.
+export const TIPOS_PAGO = {
+  nequi: { nombre: "Nequi", emoji: "💜", color: "#2a0a4a", campos: ["numero", "titular"], etiquetaNumero: "Número Nequi" },
+  daviplata: { nombre: "Daviplata", emoji: "❤️", color: "#c8102e", campos: ["numero", "titular"], etiquetaNumero: "Número Daviplata" },
+  bancolombia: {
+    nombre: "Bancolombia", emoji: "💛", color: "#1d1d1b",
+    campos: ["tipoCuenta", "numero", "titular", "documento"], etiquetaNumero: "Número de cuenta",
+  },
+  banco: {
+    nombre: "Cuenta bancaria", emoji: "🏦", color: "#0e4676",
+    campos: ["banco", "tipoCuenta", "numero", "titular", "documento"], etiquetaNumero: "Número de cuenta",
+  },
+  llave: { nombre: "Llave Bre-B", emoji: "🔑", color: "#146b4e", campos: ["numero", "titular"], etiquetaNumero: "Llave (celular, correo o código)" },
+  enlace: { nombre: "Pago en línea", emoji: "💳", color: "#5c0f27", campos: ["enlace"], etiquetaNumero: "" },
+  efectivo: { nombre: "Efectivo", emoji: "💵", color: "#6b5f52", campos: ["nota"], etiquetaNumero: "" },
+  otro: { nombre: "Otro", emoji: "💠", color: "#6b5f52", campos: ["numero", "titular", "nota"], etiquetaNumero: "Número o dato" },
+};
+export const ETIQUETAS_CAMPO_PAGO = {
+  banco: "Banco",
+  tipoCuenta: "Tipo de cuenta",
+  titular: "A nombre de",
+  documento: "Cédula o NIT",
+  enlace: "Enlace de pago (Wompi, Bold, Mercado Pago...)",
+  nota: "Indicación",
+};
+
+export const nombreMetodo = (m) => m.nombre || TIPOS_PAGO[m.tipo]?.nombre || "Pago";
+
+// Texto para WhatsApp: una línea por método activo.
+export function textoMetodosPago(metodos) {
+  return (metodos || [])
+    .filter((m) => m.activo !== false)
+    .map((m) => {
+      const t = TIPOS_PAGO[m.tipo] || TIPOS_PAGO.otro;
+      const partes = [
+        m.tipo === "banco" && m.banco,
+        m.tipoCuenta,
+        m.numero,
+        m.titular && `a nombre de ${m.titular}`,
+        m.documento && `(${m.documento})`,
+        m.enlace,
+        m.nota,
+      ].filter(Boolean);
+      return `${t.emoji} *${nombreMetodo(m)}*: ${partes.join(" · ")}`;
+    })
+    .join("\n");
 }
 
 // CSV que Excel abre bien en español: separador «;» y BOM para las tildes.
