@@ -3,8 +3,12 @@ import { pool } from "../db.js";
 import { capturar } from "../errores.js";
 import { resolverInvitacionPublica } from "../middlewareInvitacion.js";
 import { avisarRespuesta, fotoRespuestas } from "../avisosWhatsapp.js";
+import { publicoNegocioRouter } from "./publicoNegocio.js";
 
 export const publicRouter = Router();
+
+// Cotizaciones y formulario de datos del evento (enlaces con token).
+publicRouter.use(publicoNegocioRouter);
 
 // Convierte una data URL ("data:image/png;base64,AAA...") en bytes + mime.
 // Las decoraciones se guardan así desde antes; se decodifican al servirlas.

@@ -16,7 +16,8 @@ import {
   actualizarSitioBase,
   esEventoFijo,
 } from "./api";
-import SelectorEventos from "./pages/SelectorEventos";
+import PanelDueno from "./dueno/PanelDueno";
+import RespuestasInvitados from "./pages/RespuestasInvitados";
 import { NOMBRE_TIPO_EVENTO } from "./tiposEvento";
 import { vocabulario } from "./vocabulario";
 import { PendientesProvider, usePendientes } from "./estado/Pendientes";
@@ -55,6 +56,15 @@ const TABS = [
     titulo: "Lista de personas",
     descripcion: "Quién asiste, con qué restricción. Para exportar o imprimir.",
     Componente: Lista,
+  },
+  {
+    grupo: "Invitados",
+    key: "respuestas",
+    label: "Respuestas WhatsApp",
+    icono: "chat",
+    titulo: "Respuestas por WhatsApp",
+    descripcion: "Lo que los invitados le escribieron al WhatsApp de Sivú.",
+    Componente: RespuestasInvitados,
   },
   {
     grupo: "Invitados",
@@ -265,7 +275,7 @@ export default function App() {
           }}
         />
       ) : !evento ? (
-        <SelectorEventos onElegir={elegirEvento} onSalir={() => { clearToken(); setLogueado(false); }} />
+        <PanelDueno onElegir={elegirEvento} onSalir={() => { clearToken(); setLogueado(false); }} />
       ) : (
         <PendientesProvider>
           <Cascara

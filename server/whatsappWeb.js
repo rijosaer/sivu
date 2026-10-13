@@ -22,6 +22,15 @@ let qr = null; // imagen del QR (data URL) mientras se espera el escaneo
 let numero = null;
 let reintento = null;
 let ultimoError = "";
+const oyentes = new Set();
+const etiquetas = new Map(); // id → { nombre, borrada }
+
+export function alRecibirMensajes(fn) {
+  oyentes.add(fn);
+}
+export const socketActual = () => (estado === "conectado" ? sock : null);
+export const numeroVinculado = () => numero;
+export const etiquetasConocidas = () => etiquetas;
 
 // ---------- Sesión en Postgres (espejo de useMultiFileAuthState) ----------
 
@@ -102,6 +111,19 @@ export async function conectar() {
   });
   sock = nuevo;
   nuevo.ev.on("creds.update", guardarCreds);
+  // Mensajes que entran y salen (también los que se escriben desde el
+  // celular): los guarda waOrden.js para el panel.
+  nuevo.ev.on("messages.upsert", (u) => {
+    if (sock !== nuevo) return;
+    for (const fn of oyentes) {
+      Promise.resolve(fn(u)).catch((e) => console.error("WhatsApp (mensajes):", e.message));
+    }
+  });
+  // Etiquetas de WhatsApp Business que ya existen en la cuenta (llegan al
+  // sincronizar): para no repetir ids al crear las de Sivú.
+  nuevo.ev.on("labels.edit", (l) => {
+    if (l?.id) etiquetas.set(String(l.id), { nombre: l.name, borrada: Boolean(l.deleted) });
+  });
   nuevo.ev.on("connection.update", async (u) => {
     if (sock !== nuevo) return; // una conexión vieja que se cerró tarde
     if (u.qr) {
@@ -184,7 +206,13 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
 const azar = (min, max) => min + Math.random() * (max - min);
 let cola = Promise.resolve();
 
-export function enviarTexto(telefono, texto) {
+// Números a los que el servidor les está escribiendo solo (saludo
+// automático): sus mensajes no cuentan como «el dueño ya le escribió».
+const automaticos = new Set();
+export const esAutomatico = (telefono) => automaticos.has(String(telefono));
+
+export function enviarTexto(telefono, texto, { automatico = false } = {}) {
+  if (automatico) automaticos.add(String(telefono));
   const tarea = cola.then(async () => {
     if (!whatsappConectado()) return { estado: "error", detalle: "El WhatsApp de Sivú no está vinculado" };
     try {
@@ -196,11 +224,18 @@ export function enviarTexto(telefono, texto) {
       await sock.sendPresenceUpdate("paused", jid);
       const r = await sock.sendMessage(jid, { text: texto });
       await espera(azar(2500, 5000));
-      return { estado: "enviado", detalle: r?.key?.id || "" };
+      return {
+        estado: "enviado",
+        detalle: r?.key?.id || "",
+        jid: r?.key?.remoteJid || jid,
+        key: r?.key,
+        timestamp: r?.messageTimestamp,
+      };
     } catch (e) {
       return { estado: "error", detalle: e.message || "No se pudo enviar" };
     }
   });
   cola = tarea.catch(() => {});
+  if (automatico) tarea.finally(() => setTimeout(() => automaticos.delete(String(telefono)), 15000));
   return tarea;
 }

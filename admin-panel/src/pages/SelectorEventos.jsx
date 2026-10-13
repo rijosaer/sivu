@@ -735,7 +735,7 @@ function TarjetaEvento({ inv, onEntrar, onCambio, onBorrar }) {
   );
 }
 
-export default function SelectorEventos({ onElegir, onSalir }) {
+export default function SelectorEventos({ onElegir, onSalir, incrustado = false }) {
   const toast = useToast();
   const [eventos, setEventos] = useState(null);
   const [creando, setCreando] = useState(false);
@@ -774,10 +774,11 @@ export default function SelectorEventos({ onElegir, onSalir }) {
     }
   }
 
+  // Dentro del panel del dueño (pestaña «Eventos») ya hay cabecera y fondo.
   return (
-    <div className="min-h-screen panel-lienzo px-6 py-10">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
+    <div className={incrustado ? "" : "min-h-screen panel-lienzo px-6 py-10"}>
+      <div className={incrustado ? "" : "max-w-4xl mx-auto"}>
+        {!incrustado && <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
             <span className="marca-sello">c.</span>
             <span>
@@ -792,7 +793,7 @@ export default function SelectorEventos({ onElegir, onSalir }) {
           <button onClick={onSalir} className="boton-texto">
             Cerrar sesión
           </button>
-        </div>
+        </div>}
 
         <h1 className="panel-titulo">Tus eventos</h1>
         <p className="panel-subtitulo mb-8">

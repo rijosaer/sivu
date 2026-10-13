@@ -1,6 +1,7 @@
 import { pool } from "./db.js";
 import { enviarTexto, whatsappConectado } from "./whatsappWeb.js";
 import { ahoraEnBogota } from "./hora.js";
+import { ordenarChatInvitado } from "./waOrden.js";
 
 // Envío automático de invitaciones por el número de Sivú vinculado.
 //
@@ -110,6 +111,9 @@ async function paso() {
        WHERE id = $1`,
       [item.id, ok ? "enviado" : "fallido", ok ? "" : r.detalle || "No se pudo enviar", ok]
     );
+    // Etiqueta del evento y al archivo: la bandeja principal queda para los
+    // clientes (las respuestas de los invitados se ven en el panel).
+    if (ok) ordenarChatInvitado(r, envio.invitacion_id);
     if (ok && envio.tipo === "invitacion") {
       await pool.query("UPDATE invitados SET enviado_en = COALESCE(enviado_en, now()) WHERE id = $1", [
         item.invitado_id,

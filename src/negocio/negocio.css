@@ -1,0 +1,63 @@
+/* Cotización y formulario de datos de Sivú — todo bajo .sv para no tocar las invitaciones */
+.sv{
+  --crema:#FBF3E4; --papel:#FFFDF8; --tinta:#1C1712; --suave:#6B5F52; --linea:#eadfca;
+  --vino:#9B1F3E; --vino-osc:#5C0F27; --oro:#E3A63E; --oro-osc:#B87F1E; --coral:#E0553C;
+  min-height:100vh; background:var(--crema); color:var(--tinta);
+  font-family:'Work Sans',system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+}
+.sv *{box-sizing:border-box}
+.sv h1,.sv h2,.sv h3{font-family:'Fraunces',Georgia,serif;font-weight:600;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.sv p{margin:0}
+.sv-cabecera{background:linear-gradient(150deg,#5C0F27 0%,#9B1F3E 60%,#E0553C 130%);color:var(--crema);padding:34px 20px 70px;position:relative;overflow:hidden}
+.sv-cabecera::after{content:"";position:absolute;inset:0;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.12) 1.3px,transparent 0);background-size:26px 26px;pointer-events:none}
+.sv-cont{max-width:680px;margin:0 auto;position:relative;z-index:1}
+.sv-logo{font-family:'Alex Brush',cursive;font-size:44px;line-height:1}
+.sv-de{font-size:10px;letter-spacing:.32em;text-transform:uppercase;color:var(--oro);font-weight:600}
+.sv-eyebrow{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--oro);font-weight:600}
+.sv-titulo{font-size:clamp(30px,7vw,44px);line-height:1.05;margin-top:10px}
+.sv-titulo i{color:var(--oro);font-weight:500}
+.sv-sub{margin-top:8px;color:rgba(251,243,228,.82);font-size:15px}
+.sv-cuerpo{max-width:680px;margin:-44px auto 0;padding:0 16px 60px;position:relative;z-index:2}
+.sv-tarjeta{background:var(--papel);border:1px solid var(--linea);border-radius:22px;padding:22px;box-shadow:0 18px 40px -26px rgba(60,20,20,.35)}
+.sv-tarjeta + .sv-tarjeta{margin-top:14px}
+.sv-item{padding:16px 0;border-top:1px solid var(--linea);display:flex;gap:14px;align-items:flex-start}
+.sv-item:first-child{border-top:0;padding-top:4px}
+.sv-item h3{font-size:18px}
+.sv-detalle{margin-top:6px;color:var(--suave);font-size:14px;line-height:1.55;white-space:pre-line}
+.sv-valor{margin-left:auto;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.sv-total{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding-top:16px;border-top:2px solid var(--vino-osc);margin-top:6px}
+.sv-total b{font-family:'Fraunces',serif;font-size:34px;color:var(--vino-osc)}
+.sv-fila{display:flex;justify-content:space-between;color:var(--suave);font-size:14px;padding:4px 0}
+.sv-nota{color:var(--suave);font-size:14px;line-height:1.55;white-space:pre-line}
+.sv-etiqueta{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;color:var(--vino);margin-bottom:8px}
+.sv-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:15px 26px;border-radius:999px;font-weight:700;font-size:15px;border:2px solid transparent;cursor:pointer;text-decoration:none;transition:transform .15s ease,box-shadow .15s ease;font-family:inherit}
+.sv-btn:hover{transform:translateY(-1px)}
+.sv-btn:disabled{opacity:.6;cursor:default;transform:none}
+.sv-btn-oro{background:var(--oro);color:var(--vino-osc);box-shadow:0 14px 30px -14px rgba(0,0,0,.45)}
+.sv-btn-vino{background:var(--vino-osc);color:var(--crema)}
+.sv-btn-borde{border-color:var(--vino-osc);color:var(--vino-osc);background:transparent}
+.sv-botones{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.sv-aviso{border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.5}
+.sv-aviso-oro{background:#fdf0d7;color:#7a4f0b;border:1px solid #f1d39a}
+.sv-aviso-ok{background:#e4f3ea;color:#145c38;border:1px solid #b6dfc6}
+.sv-campo{width:100%;border:1.5px solid var(--linea);background:#fff;border-radius:12px;padding:12px 14px;font:inherit;font-size:15px;color:var(--tinta);transition:border-color .15s}
+.sv-campo:focus{outline:none;border-color:var(--vino)}
+textarea.sv-campo{min-height:90px;resize:vertical;line-height:1.5}
+.sv-label{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
+.sv-ayuda{display:block;color:var(--suave);font-size:12.5px;margin-top:5px;line-height:1.45}
+.sv-grid{display:grid;gap:14px}
+@media (min-width:560px){.sv-grid-2{grid-template-columns:1fr 1fr}}
+.sv-seccion-titulo{font-size:22px;margin-bottom:4px}
+.sv-archivos{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.sv-archivo{display:flex;align-items:center;gap:10px;font-size:13.5px;background:#fff;border:1px solid var(--linea);border-radius:10px;padding:8px 10px}
+.sv-archivo button{margin-left:auto;background:none;border:0;color:var(--vino);font-weight:600;cursor:pointer;font-size:12.5px}
+.sv-subir{display:flex;align-items:center;justify-content:center;gap:8px;border:2px dashed var(--linea);border-radius:14px;padding:16px;color:var(--vino-osc);font-weight:600;cursor:pointer;background:#fffaf1;font-size:14px}
+.sv-subir:hover{border-color:var(--oro)}
+.sv-pie{text-align:center;color:var(--suave);font-size:12.5px;margin-top:26px}
+.sv-guardado{font-size:12px;color:var(--suave)}
+@media print{
+  .sv{background:#fff}
+  .sv-botones,.sv-no-imprimir{display:none !important}
+  .sv-cabecera{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .sv-tarjeta{box-shadow:none}
+}

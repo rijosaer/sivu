@@ -9,6 +9,8 @@ import { reanudarWhatsapp } from "./whatsappWeb.js";
 import { iniciarResumenes } from "./resumenDiario.js";
 import { iniciarEnvios } from "./envioMasivo.js";
 import { iniciarLeads } from "./leadsMeta.js";
+import { iniciarOrdenWhatsapp } from "./waOrden.js";
+import { iniciarReporte } from "./reporte.js";
 import { cabecerasSeguras, corsOpciones, limitador } from "./seguridad.js";
 
 const app = express();
@@ -61,4 +63,8 @@ app.listen(PORT, () => {
   iniciarEnvios();
   // Clientes potenciales de los anuncios de Meta → WhatsApp de Sivú.
   iniciarLeads();
+  // Guarda y ordena lo que entra y sale por el WhatsApp de Sivú.
+  iniciarOrdenWhatsapp();
+  // Reporte de cada mañana al equipo.
+  iniciarReporte();
 });

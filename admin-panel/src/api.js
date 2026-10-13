@@ -114,7 +114,68 @@ export const api = {
   conectarWhatsapp: () => request("/api/admin/whatsapp/conectar", { method: "POST" }),
   desconectarWhatsapp: () => request("/api/admin/whatsapp/desconectar", { method: "POST" }),
 
+  // ---------- Negocio de Sivú (solo dueño): clientes potenciales,
+  // configuración, cotizaciones y producción ----------
+  crm: {
+    tablero: () => request("/api/admin/crm/tablero"),
+    prospectos: (filtros = {}) => {
+      const q = new URLSearchParams(Object.entries(filtros).filter(([, v]) => v)).toString();
+      return request(`/api/admin/crm/prospectos${q ? `?${q}` : ""}`);
+    },
+    prospecto: (id) => request(`/api/admin/crm/prospectos/${id}`),
+    crearProspecto: (datos) =>
+      request("/api/admin/crm/prospectos", { method: "POST", body: JSON.stringify(datos) }),
+    actualizarProspecto: (id, cambios) =>
+      request(`/api/admin/crm/prospectos/${id}`, { method: "PUT", body: JSON.stringify(cambios) }),
+    borrarProspecto: (id, ignorar) =>
+      request(`/api/admin/crm/prospectos/${id}${ignorar ? "?ignorar=1" : ""}`, { method: "DELETE" }),
+    marcarLeido: (id) => request(`/api/admin/crm/prospectos/${id}/leido`, { method: "POST" }),
+    enviarMensaje: (id, texto) =>
+      request(`/api/admin/crm/prospectos/${id}/mensaje`, { method: "POST", body: JSON.stringify({ texto }) }),
+    crearCotizacion: (id, datos) =>
+      request(`/api/admin/crm/prospectos/${id}/cotizaciones`, { method: "POST", body: JSON.stringify(datos) }),
+    actualizarCotizacion: (id, datos) =>
+      request(`/api/admin/crm/cotizaciones/${id}`, { method: "PUT", body: JSON.stringify(datos) }),
+    borrarCotizacion: (id) => request(`/api/admin/crm/cotizaciones/${id}`, { method: "DELETE" }),
+    ajustes: () => request("/api/admin/crm/ajustes"),
+    guardarAjuste: (clave, valor) =>
+      request(`/api/admin/crm/ajustes/${clave}`, { method: "PUT", body: JSON.stringify({ valor }) }),
+    vistaSaludo: (ejemplo) =>
+      request("/api/admin/crm/ajustes/vista-saludo", { method: "POST", body: JSON.stringify(ejemplo) }),
+    vistaReporte: () => request("/api/admin/crm/reporte/vista"),
+    enviarReporte: () => request("/api/admin/crm/reporte/enviar", { method: "POST" }),
+    exportar: () => request("/api/admin/crm/exportar"),
+    produccion: () => request("/api/admin/crm/produccion"),
+    actualizarProduccion: (id, cambios) =>
+      request(`/api/admin/crm/produccion/${id}`, { method: "PUT", body: JSON.stringify(cambios) }),
+    pagos: (id) => request(`/api/admin/crm/produccion/${id}/pagos`),
+    agregarPago: (id, datos) =>
+      request(`/api/admin/crm/produccion/${id}/pagos`, { method: "POST", body: JSON.stringify(datos) }),
+    borrarPago: (id) => request(`/api/admin/crm/pagos/${id}`, { method: "DELETE" }),
+    enlaceDatos: (id) => request(`/api/admin/crm/produccion/${id}/enlace-datos`, { method: "POST" }),
+    datosEvento: (id) => request(`/api/admin/crm/produccion/${id}/datos`),
+    usarArchivo: (id) => request(`/api/admin/crm/archivos/${id}/usar`, { method: "POST" }),
+    // El archivo viaja con la sesión: se baja como blob y se abre/guarda.
+    descargarArchivo: async (id, nombre) => {
+      const res = await fetch(`${API_URL}/api/admin/crm/archivos/${id}`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      if (!res.ok) throw new Error("No se pudo descargar");
+      const url = URL.createObjectURL(await res.blob());
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = nombre || "archivo";
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    },
+    mensajesInvitados: () => request("/api/admin/crm/mensajes-invitados"),
+  },
+
   // ---------- Todo lo de abajo es del evento seleccionado (scoped()) ----------
+
+  // Lo que los invitados le escriben al WhatsApp de Sivú.
+  mensajesEvento: () => request(scoped("/mensajes")),
+  marcarMensajesLeidos: () => request(scoped("/mensajes/leidos"), { method: "POST" }),
 
   resumen: () => request(scoped("/resumen")),
   // Respuestas y aperturas más nuevas que "desde" (ISO). Para los avisos.

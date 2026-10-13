@@ -1,0 +1,98 @@
+import { useEffect, useState } from "react";
+import { api } from "../api";
+import SelectorEventos from "../pages/SelectorEventos";
+import Hoy from "./Hoy";
+import Clientes from "./Clientes";
+import Produccion from "./Produccion";
+import MensajesInvitados from "./MensajesInvitados";
+import Configuracion from "./Configuracion";
+
+// Lo que ve el dueño de Sivú al entrar: el negocio completo. «Eventos» es la
+// lista de siempre; lo demás (clientes potenciales, producción, mensajes y
+// configuración) es lo que se atiende antes y después de cada contrato.
+
+const TABS = [
+  ["hoy", "Hoy"],
+  ["clientes", "Clientes"],
+  ["eventos", "Eventos"],
+  ["produccion", "Producción"],
+  ["mensajes", "Mensajes de invitados"],
+  ["configuracion", "Configuración"],
+];
+
+function leerTab() {
+  try {
+    return localStorage.getItem("dueno_tab") || "hoy";
+  } catch {
+    return "hoy";
+  }
+}
+
+export default function PanelDueno({ onElegir, onSalir }) {
+  const [tab, setTab] = useState(leerTab);
+  const [tablero, setTablero] = useState(null);
+
+  function irA(t) {
+    setTab(t);
+    try {
+      localStorage.setItem("dueno_tab", t);
+    } catch {
+      /* sin almacenamiento: no se recuerda la pestaña */
+    }
+    window.scrollTo({ top: 0 });
+  }
+
+  const cargarTablero = () => api.crm.tablero().then(setTablero).catch(() => {});
+  useEffect(() => {
+    cargarTablero();
+    const t = setInterval(cargarTablero, 30000);
+    return () => clearInterval(t);
+  }, []);
+
+  const badge = {
+    clientes: tablero ? tablero.hoy.sinContactar + tablero.hoy.sinLeer + tablero.hoy.seguimientos : 0,
+    produccion: tablero ? tablero.hoy.atrasados.length + tablero.hoy.saldos.length : 0,
+  };
+
+  return (
+    <div className="min-h-screen panel-lienzo">
+      <header className="bg-white border-b border-borde sticky top-0 z-30">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="marca-sello">c.</span>
+            <span>
+              <span className="block text-[15px] font-semibold tracking-[-.03em] text-ink">Sivú</span>
+              <span className="block text-[10px] uppercase tracking-[.16em] text-ink-tenue mt-0.5">tu negocio</span>
+            </span>
+          </div>
+          <button onClick={onSalir} className="boton-texto">
+            Cerrar sesión
+          </button>
+        </div>
+        <nav className="max-w-6xl mx-auto px-4 sm:px-6 mt-3 flex gap-5 overflow-x-auto" aria-label="Secciones">
+          {TABS.map(([k, t]) => (
+            <button key={k} onClick={() => irA(k)} className={`pestana shrink-0 ${tab === k ? "pestana-activa" : ""}`}>
+              {t}
+              {badge[k] > 0 && (
+                <span className="ml-1.5 text-[10px] font-semibold bg-amber-500 text-white rounded-full px-1.5 py-0.5 align-middle">
+                  {badge[k]}
+                </span>
+              )}
+            </button>
+          ))}
+        </nav>
+      </header>
+
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        {tab === "hoy" && <Hoy tablero={tablero} irA={irA} />}
+        {tab === "clientes" && (
+          <Clientes conteos={tablero?.conteos} onCambio={cargarTablero} onIrAProduccion={() => irA("produccion")} />
+        )}
+        {tab === "eventos" && <SelectorEventos onElegir={onElegir} onSalir={onSalir} incrustado />}
+        {tab === "produccion" && <Produccion onElegirEvento={onElegir} />}
+        {tab === "mensajes" && <MensajesInvitados />}
+        {tab === "configuracion" && <Configuracion />}
+      </main>
+    </div>
+  );
+}
