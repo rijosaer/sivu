@@ -34,7 +34,8 @@ function ahora() {
 // ---------- Anuncios (Meta) ----------
 
 const sinAcentos = (t) => String(t).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
-let cacheAnuncios = { clave: "", hasta: 0, datos: null };
+// Memoria por rango de fechas (el reporte pide ayer y antier; el panel, el mes).
+const cacheAnuncios = new Map(); // clave → { hasta, datos }
 
 // Gasto, alcance y clientes potenciales de las campañas de Sivú entre dos
 // fechas (YYYY-MM-DD, ambas incluidas).
@@ -43,7 +44,8 @@ export async function anuncios(desde, hasta) {
   const cuenta = process.env.META_ADS_ACCOUNT;
   if (!token || !cuenta) return { configurado: false };
   const clave = `${desde}|${hasta}`;
-  if (cacheAnuncios.clave === clave && cacheAnuncios.hasta > Date.now()) return cacheAnuncios.datos;
+  const guardado = cacheAnuncios.get(clave);
+  if (guardado && guardado.hasta > Date.now()) return guardado.datos;
   const { filtroCampana } = await leerAjuste("reporte");
   const url = new URL(`${API}/${cuenta}/insights`);
   url.searchParams.set("level", "campaign");
@@ -68,11 +70,26 @@ export async function anuncios(desde, hasta) {
         0
       ),
     };
-    cacheAnuncios = { clave, hasta: Date.now() + 10 * 60 * 1000, datos };
+    cacheAnuncios.set(clave, { hasta: Date.now() + 10 * 60 * 1000, datos });
     return datos;
   } catch (e) {
     return { configurado: true, error: e.message };
   }
+}
+
+// Para el panel: nunca hace esperar. Devuelve lo último que se sabe (aunque
+// tenga unos minutos) y, si ya está viejo, lo actualiza por detrás para la
+// próxima vez. Sin nada guardado todavía, responde «cargando».
+const refrescando = new Set();
+export function anunciosSinEsperar(desde, hasta) {
+  if (!process.env.META_ADS_TOKEN || !process.env.META_ADS_ACCOUNT) return { configurado: false };
+  const clave = `${desde}|${hasta}`;
+  const guardado = cacheAnuncios.get(clave);
+  if ((!guardado || guardado.hasta <= Date.now()) && !refrescando.has(clave)) {
+    refrescando.add(clave);
+    anuncios(desde, hasta).finally(() => refrescando.delete(clave));
+  }
+  return guardado ? guardado.datos : { configurado: true, cargando: true };
 }
 
 // ---------- Cifras del negocio ----------
@@ -103,7 +120,7 @@ export async function metricas() {
     `SELECT evento, count(*)::int AS n, count(*) FILTER (WHERE estado = 'ganado')::int AS ganados
      FROM prospectos WHERE creado_en >= now() - interval '30 days' AND evento <> '' GROUP BY evento ORDER BY n DESC`
   );
-  const adsMes = await anuncios(inicioMes, hoy);
+  const adsMes = anunciosSinEsperar(inicioMes, hoy);
   return {
     ...m,
     cotizado_abierto: Number(m.cotizado_abierto),
@@ -307,6 +324,9 @@ async function revisar() {
 }
 
 export function iniciarReporte() {
+  // Deja listos los datos de anuncios del mes: el panel nunca los espera.
+  const hoy = fechaBogota(0);
+  anunciosSinEsperar(`${hoy.slice(0, 7)}-01`, hoy);
   setInterval(() => revisar().catch((e) => console.error("Reporte de la mañana:", e)), 60 * 1000);
 }
 

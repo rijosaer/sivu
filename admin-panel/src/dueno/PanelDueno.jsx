@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { api } from "../api";
 import { ir } from "../ruta";
-import SelectorEventos from "../pages/SelectorEventos";
-import Hoy from "./Hoy";
-import Clientes from "./Clientes";
-import Produccion from "./Produccion";
-import MensajesInvitados from "./MensajesInvitados";
-import Configuracion from "./Configuracion";
+const SelectorEventos = lazy(() => import("../pages/SelectorEventos"));
+const Hoy = lazy(() => import("./Hoy"));
+const Clientes = lazy(() => import("./Clientes"));
+const Produccion = lazy(() => import("./Produccion"));
+const MensajesInvitados = lazy(() => import("./MensajesInvitados"));
+const Configuracion = lazy(() => import("./Configuracion"));
 
 // Lo que ve el dueño de Sivú al entrar: el negocio completo. «Eventos» es la
 // lista de siempre; lo demás (clientes potenciales, producción, mensajes y
@@ -72,6 +72,7 @@ export default function PanelDueno({ tramos = [], onElegir, onSalir }) {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <Suspense fallback={<p className="text-sm text-ink-tenue">Cargando...</p>}>
         {tab === "hoy" && <Hoy tablero={tablero} irA={irA} onCambio={cargarTablero} />}
         {tab === "clientes" && (
           <Clientes
@@ -86,6 +87,7 @@ export default function PanelDueno({ tramos = [], onElegir, onSalir }) {
         {tab === "produccion" && <Produccion onElegirEvento={onElegir} />}
         {tab === "mensajes" && <MensajesInvitados />}
         {tab === "configuracion" && <Configuracion seccion={sub} />}
+        </Suspense>
       </main>
     </div>
   );

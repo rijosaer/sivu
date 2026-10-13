@@ -162,12 +162,14 @@ export default function Hoy({ tablero, irA, onCambio }) {
         <Dato label="Vendido este mes" valor={peso(m.ganado_mes)} nota={`${m.ganados_mes} ${m.ganados_mes === 1 ? "venta" : "ventas"}`} />
         <Dato
           label="Anuncios este mes"
-          valor={ads?.configurado ? (ads.error ? "—" : peso(ads.gasto)) : "—"}
+          valor={ads?.configurado ? (ads.error ? "—" : ads.cargando ? "…" : peso(ads.gasto)) : "—"}
           nota={
             !ads?.configurado
               ? "Sin conectar a la cuenta de anuncios"
               : ads.error
                 ? "No se pudo leer Meta"
+                : ads.cargando
+                  ? "Consultando Meta…"
                 : m.costoPorVentaMes
                   ? `${peso(m.costoPorVentaMes)} por venta`
                   : `${ads.leads} contactos`

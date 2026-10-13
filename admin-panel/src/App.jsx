@@ -1,13 +1,19 @@
-import { useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { ir, useRuta } from "./ruta";
 import Login from "./pages/Login";
-import Resumen from "./pages/Resumen";
-import Invitados from "./pages/Invitados";
-import Lista from "./pages/Lista";
-import Mensajes from "./pages/Mensajes";
-import Contenido from "./pages/Contenido";
-import Tema from "./pages/Tema";
-import Decoraciones from "./pages/Decoraciones";
+
+// Cada pantalla se descarga solo cuando se abre: el panel arranca liviano.
+const PanelDueno = lazy(() => import("./dueno/PanelDueno"));
+const Resumen = lazy(() => import("./pages/Resumen"));
+const Invitados = lazy(() => import("./pages/Invitados"));
+const Lista = lazy(() => import("./pages/Lista"));
+const Mensajes = lazy(() => import("./pages/Mensajes"));
+const Contenido = lazy(() => import("./pages/Contenido"));
+const Tema = lazy(() => import("./pages/Tema"));
+const Decoraciones = lazy(() => import("./pages/Decoraciones"));
+const RespuestasInvitados = lazy(() => import("./pages/RespuestasInvitados"));
+
+const Cargando = () => <p className="text-sm text-ink-tenue">Cargando...</p>;
 import {
   api,
   hasToken,
@@ -19,8 +25,6 @@ import {
   actualizarSitioBase,
   esEventoFijo,
 } from "./api";
-import PanelDueno from "./dueno/PanelDueno";
-import RespuestasInvitados from "./pages/RespuestasInvitados";
 import { NOMBRE_TIPO_EVENTO } from "./tiposEvento";
 import { vocabulario } from "./vocabulario";
 import { PendientesProvider, usePendientes } from "./estado/Pendientes";
@@ -239,7 +243,9 @@ function Cascara({ onSalir, evento, onCambiarEvento, tab: tabRuta }) {
         </header>
 
         <main className="flex-1 w-full max-w-[76rem] mx-auto px-5 py-8 sm:px-10 sm:py-10">
-          <Componente irA={setTab} />
+          <Suspense fallback={<Cargando />}>
+            <Componente irA={setTab} />
+          </Suspense>
         </main>
       </div>
     </div>
@@ -347,7 +353,11 @@ export default function App() {
         </div>
       );
   } else {
-    contenido = <PanelDueno tramos={tramos} onElegir={elegirEvento} onSalir={salir} />;
+    contenido = (
+      <Suspense fallback={<div className="min-h-screen panel-lienzo" />}>
+        <PanelDueno tramos={tramos} onElegir={elegirEvento} onSalir={salir} />
+      </Suspense>
+    );
   }
 
   return <ToastProvider>{contenido}</ToastProvider>;
