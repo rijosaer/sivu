@@ -101,7 +101,7 @@ export default function DialogoExportar({ datos, onCerrar }) {
                   className={`w-full text-left px-3 py-2 rounded-lg border transition-colors ${
                     opciones.formato === f.key
                       ? "border-ink bg-ink text-white"
-                      : "border-borde-fuerte hover:border-[#aeb5aa]"
+                      : "border-borde-fuerte hover:border-[#D6C3A7]"
                   }`}
                 >
                   <span className="block text-xs font-medium">{f.label}</span>

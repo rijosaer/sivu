@@ -1,33 +1,38 @@
 import { Suspense, lazy, useEffect, useState } from "react";
 import { api } from "../api";
 import { ir } from "../ruta";
-const SelectorEventos = lazy(() => import("../pages/SelectorEventos"));
+import Marco from "../ui/Marco";
 const Hoy = lazy(() => import("./Hoy"));
 const Clientes = lazy(() => import("./Clientes"));
-const Produccion = lazy(() => import("./Produccion"));
-const MensajesInvitados = lazy(() => import("./MensajesInvitados"));
+const Eventos = lazy(() => import("./Produccion"));
 const Configuracion = lazy(() => import("./Configuracion"));
 
-// Lo que ve el dueño de Sivú al entrar: el negocio completo. «Eventos» es la
-// lista de siempre; lo demás (clientes potenciales, producción, mensajes y
-// configuración) es lo que se atiende antes y después de cada contrato.
+// Lo que ve el dueño de Sivú al entrar: el negocio completo en cuatro
+// pantallas. «Eventos» junta lo que antes eran «Eventos» y «Producción» (la
+// misma lista vista dos veces); los mensajes de los invitados ahora viven
+// dentro de cada evento (Invitados → WhatsApp).
 
 const TABS = [
-  ["hoy", "Hoy"],
-  ["clientes", "Clientes"],
-  ["eventos", "Eventos"],
-  ["produccion", "Producción"],
-  ["mensajes", "Mensajes de invitados"],
-  ["configuracion", "Configuración"],
+  { key: "hoy", label: "Hoy", icono: "sol", descripcion: "Lo que hay que hacer hoy y cómo va el negocio." },
+  { key: "clientes", label: "Clientes", icono: "persona", descripcion: "Quién escribió, a quién cotizaste y quién firmó." },
+  { key: "eventos", label: "Eventos", icono: "calendario", descripcion: "Cada evento contratado: etapa, datos y pagos." },
+  { key: "configuracion", label: "Configuración", icono: "ajustes", descripcion: "Textos, horario, avisos, precios y pagos." },
 ];
 
+// Direcciones de antes: siguen funcionando.
+const ANTES = { produccion: "eventos", mensajes: "eventos" };
+
 export default function PanelDueno({ tramos = [], onElegir, onSalir }) {
-  // La pestaña y el cliente abierto salen de la dirección: /clientes/25.
-  const tab = TABS.some(([k]) => k === tramos[0]) ? tramos[0] : "hoy";
+  const pedida = ANTES[tramos[0]] || tramos[0];
+  const tab = TABS.some((t) => t.key === pedida) ? pedida : "hoy";
   const sub = tramos[1] || null;
   const [tablero, setTablero] = useState(null);
 
-  const irA = (t) => ir(`/${t}`);
+  useEffect(() => {
+    if (ANTES[tramos[0]]) ir(`/${ANTES[tramos[0]]}`, { reemplazar: true });
+  }, [tramos[0]]);
+
+  const irA = (t) => ir(`/${ANTES[t] || t}`);
 
   const cargarTablero = () => api.crm.tablero().then(setTablero).catch(() => {});
   useEffect(() => {
@@ -36,59 +41,36 @@ export default function PanelDueno({ tramos = [], onElegir, onSalir }) {
     return () => clearInterval(t);
   }, []);
 
-  const badge = {
+  const contador = {
     hoy: tablero?.pagosPorConfirmar || 0,
     clientes: tablero ? tablero.hoy.sinContactar + tablero.hoy.sinLeer + tablero.hoy.seguimientos : 0,
-    produccion: tablero ? tablero.hoy.atrasados.length + tablero.hoy.saldos.length : 0,
+    eventos: tablero ? tablero.hoy.atrasados.length + tablero.hoy.saldos.length : 0,
   };
+  const actual = TABS.find((t) => t.key === tab);
 
   return (
-    <div className="min-h-screen panel-lienzo">
-      <header className="bg-white border-b border-borde sticky top-0 z-30">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="marca-sello">c.</span>
-            <span>
-              <span className="block text-[15px] font-semibold tracking-[-.03em] text-ink">Sivú</span>
-              <span className="block text-[10px] uppercase tracking-[.16em] text-ink-tenue mt-0.5">tu negocio</span>
-            </span>
-          </div>
-          <button onClick={onSalir} className="boton-texto">
-            Cerrar sesión
-          </button>
-        </div>
-        <nav className="max-w-6xl mx-auto px-4 sm:px-6 mt-3 flex gap-5 overflow-x-auto" aria-label="Secciones">
-          {TABS.map(([k, t]) => (
-            <button key={k} onClick={() => irA(k)} className={`pestana shrink-0 ${tab === k ? "pestana-activa" : ""}`}>
-              {t}
-              {badge[k] > 0 && (
-                <span className="ml-1.5 text-[10px] font-semibold bg-amber-500 text-white rounded-full px-1.5 py-0.5 align-middle">
-                  {badge[k]}
-                </span>
-              )}
-            </button>
-          ))}
-        </nav>
-      </header>
-
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        <Suspense fallback={<p className="text-sm text-ink-tenue">Cargando...</p>}>
+    <Marco
+      items={TABS.map((t) => ({ ...t, contador: contador[t.key] }))}
+      activo={tab}
+      onIr={irA}
+      onSalir={onSalir}
+      titulo={actual.label}
+      descripcion={actual.descripcion}
+    >
+      <Suspense fallback={<p className="text-sm text-ink-tenue">Cargando...</p>}>
         {tab === "hoy" && <Hoy tablero={tablero} irA={irA} onCambio={cargarTablero} />}
         {tab === "clientes" && (
           <Clientes
             conteos={tablero?.conteos}
             onCambio={cargarTablero}
-            onIrAProduccion={() => irA("produccion")}
+            onIrAProduccion={() => irA("eventos")}
             abierto={sub ? Number(sub) : null}
             onAbrir={(id) => ir(id ? `/clientes/${id}` : "/clientes")}
           />
         )}
-        {tab === "eventos" && <SelectorEventos onElegir={onElegir} onSalir={onSalir} incrustado />}
-        {tab === "produccion" && <Produccion onElegirEvento={onElegir} />}
-        {tab === "mensajes" && <MensajesInvitados />}
+        {tab === "eventos" && <Eventos onElegirEvento={onElegir} />}
         {tab === "configuracion" && <Configuracion seccion={sub} />}
-        </Suspense>
-      </main>
-    </div>
+      </Suspense>
+    </Marco>
   );
 }

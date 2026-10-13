@@ -9,7 +9,7 @@ import PagosPorConfirmar from "./PagosPorConfirmar";
 
 function Tarea({ emoji, texto, accion, onIr, tono = "" }) {
   return (
-    <button onClick={onIr} className={`w-full text-left flex items-center gap-3 px-4 py-3 border-t border-borde first:border-t-0 hover:bg-lienzo ${tono}`}>
+    <button onClick={onIr} className={`w-full text-left flex items-center gap-3 px-4 py-3 !rounded-none border-t border-borde first:border-t-0 hover:bg-lienzo ${tono}`}>
       <span className="text-lg w-6 text-center">{emoji}</span>
       <span className="text-sm text-ink flex-1">{texto}</span>
       <span className="text-[11px] text-ink-tenue shrink-0">{accion} →</span>
@@ -20,7 +20,7 @@ function Tarea({ emoji, texto, accion, onIr, tono = "" }) {
 function Dato({ label, valor, nota }) {
   return (
     <div className="tarjeta p-4">
-      <p className="text-2xl font-semibold tabular-nums text-ink">{valor}</p>
+      <p className="font-display text-[1.85rem] leading-none font-medium tabular-nums text-ink">{valor}</p>
       <p className="text-[11px] uppercase tracking-wide text-ink-tenue mt-1">{label}</p>
       {nota && <p className="text-[11px] text-ink-tenue mt-1">{nota}</p>}
     </div>
@@ -88,14 +88,14 @@ export default function Hoy({ tablero, irA, onCambio }) {
     ...hoy.atrasados.map((e) => ({
       emoji: "⚠️",
       texto: `${e.nombre}: faltan ${e.dias} días y sigue en «${{ datos: "esperando datos", diseno: "diseño", revision: "revisión" }[e.etapa]}»`,
-      accion: "Producción",
-      ir: () => irA("produccion"),
+      accion: "Eventos",
+      ir: () => irA("eventos"),
     })),
     ...hoy.saldos.map((e) => ({
       emoji: "💵",
       texto: `${e.nombre}: falta cobrar ${peso(e.falta)} (evento en ${e.dias} días)`,
-      accion: "Producción",
-      ir: () => irA("produccion"),
+      accion: "Eventos",
+      ir: () => irA("eventos"),
     })),
   ].filter(Boolean);
 
@@ -131,7 +131,7 @@ export default function Hoy({ tablero, irA, onCambio }) {
           {!tablero.whatsapp && (
             <p>
               ⚠️ El WhatsApp de Sivú no está vinculado: no salen avisos, reportes ni mensajes.{" "}
-              <button className="underline" onClick={() => irA("eventos")}>
+              <button className="underline" onClick={() => irA("configuracion/whatsapp-sivu")}>
                 Vincularlo
               </button>
             </p>

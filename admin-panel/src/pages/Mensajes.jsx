@@ -356,7 +356,7 @@ export default function Mensajes() {
 
   return (
     <div>
-      <h2 className="panel-titulo">Mensajes</h2>
+      <h2 className="panel-titulo">Textos de los mensajes</h2>
       <p className="panel-subtitulo mb-6">
         Los textos con los que sale cada WhatsApp. Lo que escribas entre llaves se reemplaza por los
         datos de cada invitación al momento de enviar.
@@ -407,17 +407,6 @@ export default function Mensajes() {
         onGuardar={(t) => guardar("whatsapp-noticia", t, setNoticia, "Mensaje de la noticia guardado")}
       />
 
-      <Editor
-        titulo="Servidores"
-        descripcion="Para quienes acompañan sirviendo: la tarjeta de agradecimiento, sin confirmación."
-        valor={servidores}
-        marcadores={MARCADORES_SERVIDORES}
-        ejemplo={ejemploServidor}
-        onGuardar={(t) =>
-          guardar("whatsapp-servidores", t, setServidores, "Mensaje de los servidores guardado")
-        }
-      />
-
       <EnlacePublico
         titulo="Dar la noticia a quienes no van"
         ayuda="Página pública con la noticia y la fecha, sin lugar ni confirmación. Su texto se edita en Contenido → Bienvenida (campos «Participación»)."
@@ -426,7 +415,8 @@ export default function Mensajes() {
         cuenta={cuenta}
       />
 
-      <TarjetasServidores personas={personas} plantilla={servidores} cuenta={cuenta} />
+      {/* Servidores salió del menú: el código queda (EditorServidores,
+          TarjetasServidores) por si un cliente lo vuelve a pedir. */}
     </div>
   );
 }

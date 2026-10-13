@@ -73,7 +73,7 @@ function Campo({ etiqueta, ayuda, children }) {
 }
 
 const btnChico =
-  "text-[11px] px-2 py-1 rounded-md border border-borde-fuerte text-ink-suave hover:border-[#aeb5aa] hover:text-ink transition-colors";
+  "text-[11px] px-2 py-1 rounded-md border border-borde-fuerte text-ink-suave hover:border-[#D6C3A7] hover:text-ink transition-colors";
 
 function Persona({ persona, indice, total, onCambiar, onMover, onQuitar }) {
   const enlace = persona.nombre ? `${SITIO_BASE}?servidores=${comoEnlace(persona.nombre)}` : "";

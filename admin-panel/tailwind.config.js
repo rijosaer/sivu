@@ -2,58 +2,40 @@ export default {
   content: ["./index.html", "./src/**/*.{js,jsx}"],
   theme: {
     extend: {
-      // El panel no imita a la invitación: es una herramienta de
-      // administración y a futuro manejará muchas invitaciones con un usuario
-      // cada una, así que se ve como un producto.
+      // Paleta de la marca Sivú (la misma de heysivu.com y de la cotización):
+      // crema de fondo, vino como acento principal y oro para lo que se
+      // celebra. El panel sigue siendo una herramienta, así que el vino se usa
+      // con medida: la barra lateral, los botones principales y lo activo.
       //
-      // Paleta piedra y salvia. La cáscara (barra lateral, cabecera) ya estaba
-      // escrita con estos colores a mano; aquí los tokens apuntan a los mismos
-      // valores para que las pantallas dejen de verse de otra época. Los
-      // nombres viejos ("gold", "paper") se conservan porque siguen usados
+      // Los nombres viejos ("gold", "paper") se conservan porque siguen usados
       // sueltos; lo que cambia es a qué color apuntan.
-      //
-      // Al escribir pantallas nuevas, usar los nombres semánticos: marca,
-      // lienzo, borde, ink — y las clases de src/index.css (.tarjeta, .campo,
-      // .boton-primario, .insignia...) antes que inventar utilidades.
       fontFamily: {
-        display: [
-          "Inter",
-          "ui-sans-serif",
-          "system-ui",
-          "-apple-system",
-          "Segoe UI",
-          "Roboto",
-          "Helvetica Neue",
-          "Arial",
-          "sans-serif",
-        ],
+        sans: ["'Work Sans'", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Arial", "sans-serif"],
+        display: ["Fraunces", "Georgia", "'Times New Roman'", "serif"],
+        firma: ["'Alex Brush'", "cursive"],
       },
       colors: {
-        // Acento: verde salvia. El botón principal es casi negro (marca-dark),
-        // que es como se ve la cáscara; el salvia queda para acentos y foco.
         marca: {
-          DEFAULT: "#526555",
-          suave: "#eef1ec",
-          medio: "#7d8c7f",
-          dark: "#202321",
+          DEFAULT: "#9B1F3E",
+          suave: "#F7E8EB",
+          medio: "#C26A80",
+          dark: "#5C0F27",
+          noche: "#3A0918",
         },
-        gold: { DEFAULT: "#526555", light: "#dfe5df", dark: "#202321" },
-        // Superficies.
-        paper: "#ffffff",
-        lienzo: "#f7f7f4",
-        // Texto: gris cálido, a juego con el lienzo (el slate azulado que
-        // había antes desentonaba sobre un fondo cálido).
+        oro: { DEFAULT: "#E3A63E", suave: "#FBEFD8", oscuro: "#B87F1E" },
+        gold: { DEFAULT: "#9B1F3E", light: "#F2DCE1", dark: "#1C1712" },
+        paper: "#FFFDF9",
+        lienzo: "#FBF6EE",
         ink: {
-          DEFAULT: "#202321",
-          suave: "#5f6560",
-          tenue: "#8b918a",
+          DEFAULT: "#1C1712",
+          suave: "#6B5F52",
+          tenue: "#9A8C7C",
         },
-        // Bordes: el normal para separar, el fuerte para lo interactivo.
-        borde: { DEFAULT: "#e8e8e3", fuerte: "#deded8" },
+        borde: { DEFAULT: "#EFE4D3", fuerte: "#E3D4BD" },
       },
       boxShadow: {
-        tarjeta: "0 1px 1px rgb(30 35 33 / .025)",
-        flotante: "0 12px 32px -12px rgb(30 35 33 / .28)",
+        tarjeta: "0 1px 2px rgb(60 20 20 / .04), 0 8px 24px -18px rgb(60 20 20 / .18)",
+        flotante: "0 18px 40px -16px rgb(60 20 20 / .35)",
       },
     },
   },

@@ -45,7 +45,7 @@ function CuentaRegresiva({ limite, pendientes }) {
   let clase;
   if (dias > 1) {
     texto = `Faltan ${dias} días para el cierre de confirmaciones`;
-    clase = "bg-marca-suave text-marca border-[#dbe2da]";
+    clase = "bg-marca-suave text-marca border-[#EBCCD4]";
   } else if (dias === 1) {
     texto = "Mañana cierra el plazo de confirmaciones";
     clase = "bg-amber-50 text-amber-700 border-amber-200";

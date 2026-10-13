@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { WhatsappSivu } from "../pages/SelectorEventos";
 import { ir } from "../ruta";
 import { api } from "../api";
 import { useToast } from "../ui/Toast";
@@ -204,7 +205,7 @@ function MetodoPago({ m, onCambio, onQuitar, onSubir, primero }) {
 }
 
 const SECCIONES = [
-  ["horario", "Horario"], ["mensaje", "Mensaje automático"], ["avisos", "Avisos"], ["reporte", "Reporte"],
+  ["whatsapp-sivu", "WhatsApp de Sivú"], ["horario", "Horario"], ["mensaje", "Mensaje automático"], ["avisos", "Avisos"], ["reporte", "Reporte"],
   ["whatsapp", "WhatsApp"], ["seguimientos", "Seguimientos"], ["respuestas", "Respuestas"], ["planes", "Planes"],
   ["pagos", "Métodos de pago"], ["cotizaciones", "Cotizaciones"],
 ];
@@ -271,6 +272,10 @@ export default function Configuracion({ seccion }) {
           </button>
         ))}
       </div>
+
+      <section id="cfg-whatsapp-sivu" className="scroll-mt-28">
+        <WhatsappSivu />
+      </section>
 
       <Bloque
         id="horario"

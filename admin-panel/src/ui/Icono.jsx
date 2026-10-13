@@ -111,6 +111,32 @@ const TRAZOS = {
       <path d="m11.2 11.8 8.3-8.3M17 7l2.5 2.5M14 10l2 2" />
     </>
   ),
+  sol: (
+    <>
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4" />
+    </>
+  ),
+  calendario: (
+    <>
+      <rect x="3.5" y="5" width="17" height="15.5" rx="2" />
+      <path d="M3.5 10h17M8 3v4M16 3v4" />
+    </>
+  ),
+  ajustes: (
+    <>
+      <path d="M4 7h9M17 7h3M4 17h3M11 17h9" />
+      <circle cx="15" cy="7" r="2" />
+      <circle cx="9" cy="17" r="2" />
+    </>
+  ),
+  volver: <path d="M14.5 6 8.5 12l6 6" />,
+  salir: (
+    <>
+      <path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4" />
+      <path d="M10 16.5 5.5 12 10 7.5M5.5 12H15" />
+    </>
+  ),
 };
 
 export default function Icono({ nombre, className = "w-4 h-4" }) {

@@ -3,71 +3,84 @@
 @tailwind utilities;
 
 @layer base {
-  :root { color: #202321; background: #f7f7f4; }
-  body { background: #f7f7f4; color: #202321; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
-  button, input, textarea, select { border-radius: .45rem; }
-  input, textarea, select { background: #fff; }
-  input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 3px solid rgb(82 101 85 / .14); outline-offset: 0; border-color: #526555; }
+  :root { color: #1C1712; background: #FBF6EE; }
+  body { background: #FBF6EE; color: #1C1712; font-family: "Work Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
+  button, input, textarea, select { border-radius: .6rem; }
+  input, textarea, select { background: #FFFDF9; }
+  input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 3px solid rgb(155 31 62 / .14); outline-offset: 0; border-color: #9B1F3E; }
   /* Todo lo pulsable comparte el mismo foco visible: se navega con teclado sin
      perder de vista dónde se está. */
-  button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline: 2px solid #526555; outline-offset: 2px; border-radius: .45rem; }
+  button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline: 2px solid #9B1F3E; outline-offset: 2px; border-radius: .6rem; }
   input[type="color"] { padding: 0; }
+  input[type="checkbox"], input[type="radio"] { accent-color: #9B1F3E; }
 }
 
 @layer components {
-  /* ---------- Cáscara ---------- */
+  /* ---------- Cáscara ----------
+     Barra lateral en vino profundo con la firma de Sivú; el contenido sobre
+     crema. En el celular la barra se vuelve una fila de arriba que se desliza. */
   .panel-lienzo { @apply bg-lienzo; }
-  .barra-lateral { @apply bg-white border-b lg:border-b-0 lg:border-r border-borde flex lg:flex-col min-h-0; }
-  .marca-sello { @apply w-8 h-8 rounded-full bg-ink text-white text-sm font-semibold grid place-items-center; }
-  .navegacion-panel { @apply flex lg:flex-col gap-1 px-3 lg:px-4 py-3 overflow-x-auto lg:overflow-visible; }
-  .grupo-nav { @apply hidden lg:block text-[10px] uppercase tracking-[.13em] text-ink-tenue px-3 pt-4 pb-1.5; }
-  .enlace-nav { @apply text-left text-sm px-3 py-2.5 rounded-md text-ink-suave whitespace-nowrap transition-colors hover:bg-lienzo hover:text-ink flex items-center gap-2.5; }
-  .enlace-nav-activo { @apply bg-[#eceee9] text-ink font-medium hover:bg-[#eceee9]; }
-  .icono-nav { @apply w-4 h-4 shrink-0 opacity-60; }
-  .cabecera-panel { @apply sticky top-0 z-30 min-h-[4.5rem] flex items-center justify-between gap-4 bg-lienzo/90 backdrop-blur border-b border-borde px-5 sm:px-10 py-3; }
-  .enlace-vista { @apply hidden sm:inline text-xs font-medium text-ink-suave underline underline-offset-4 decoration-borde-fuerte hover:text-ink; }
+  .barra-lateral { @apply bg-marca-noche text-[#F6E7D8] flex lg:flex-col min-h-0 lg:sticky lg:top-0 lg:h-screen; background-image: linear-gradient(170deg, #4A0C20 0%, #3A0918 55%, #2E0713 100%); }
+  .marca-firma { @apply font-firma text-[2.1rem] leading-none text-[#FBF3E4]; }
+  .marca-de { @apply block text-[9px] uppercase tracking-[.32em] text-oro font-semibold mt-1; }
+  .navegacion-panel { @apply flex lg:flex-col gap-0.5 px-3 lg:px-3 py-2 lg:py-3 overflow-x-auto lg:overflow-visible; }
+  .grupo-nav { @apply hidden lg:block text-[10px] uppercase tracking-[.2em] text-[#C9A9A0] px-3 pt-5 pb-2; }
+  .enlace-nav { @apply relative text-left text-[13.5px] px-3 py-2.5 rounded-lg text-[#E9D5CB] whitespace-nowrap transition-colors hover:bg-white/[.07] hover:text-white flex items-center gap-3; }
+  .enlace-nav-activo { @apply bg-white/[.11] text-white font-medium hover:bg-white/[.11]; }
+  .enlace-nav-activo::before { content: ""; @apply hidden lg:block absolute -left-3 top-2 bottom-2 w-[3px] rounded-r bg-oro; }
+  .icono-nav { @apply w-[17px] h-[17px] shrink-0 opacity-80; }
+  .contador-nav { @apply ml-auto text-[10px] font-semibold bg-oro text-marca-noche rounded-full min-w-[1.25rem] px-1.5 py-0.5 text-center tabular-nums; }
+  .tarjeta-evento { @apply mx-3 mb-2 px-3.5 py-3 rounded-xl bg-white/[.06] border border-white/10; }
+  .cabecera-panel { @apply sticky top-0 z-30 min-h-[4.25rem] flex items-center justify-between gap-4 bg-lienzo/90 backdrop-blur border-b border-borde px-5 sm:px-10 py-3; }
+  .enlace-vista { @apply hidden sm:inline-flex items-center gap-1 text-xs font-medium text-marca hover:text-marca-dark underline underline-offset-4 decoration-marca/30; }
+
+  /* Pestañas internas de una pantalla (Invitados → Invitaciones · Personas…). */
+  .subnav { @apply flex gap-1 p-1 mb-7 rounded-full bg-[#F3E9DA] border border-borde w-max max-w-full overflow-x-auto; }
+  .subnav-item { @apply shrink-0 text-[13px] px-4 py-1.5 rounded-full text-ink-suave hover:text-ink transition-colors whitespace-nowrap; }
+  .subnav-activo { @apply bg-paper text-marca-dark font-medium shadow-tarjeta hover:text-marca-dark; }
 
   /* ---------- Superficies ---------- */
-  .tarjeta { @apply bg-white border border-borde rounded-xl shadow-tarjeta; }
-  .tarjeta-lista { @apply bg-white border border-borde rounded-xl shadow-tarjeta transition-colors hover:border-borde-fuerte; }
-  .panel-titulo { @apply text-[2rem] sm:text-[2.35rem] leading-[1.05] font-medium tracking-[-.045em] text-ink; }
-  .panel-subtitulo { @apply text-sm text-ink-suave mt-2; }
+  .tarjeta { @apply bg-paper border border-borde rounded-2xl shadow-tarjeta; }
+  .tarjeta-lista { @apply bg-paper border border-borde rounded-2xl shadow-tarjeta transition-colors hover:border-borde-fuerte; }
+  .panel-titulo { @apply font-display text-[2rem] sm:text-[2.4rem] leading-[1.05] font-medium tracking-[-.02em] text-ink; text-wrap: balance; }
+  .panel-subtitulo { @apply text-sm text-ink-suave mt-2 max-w-[62ch]; }
   .bloque-titulo { @apply text-sm font-semibold text-ink; }
   .ayuda { @apply text-xs text-ink-tenue leading-relaxed; }
-  .etiqueta { @apply block text-[11px] font-medium uppercase tracking-[.08em] text-ink-tenue mb-1.5; }
+  .etiqueta { @apply block text-[11px] font-medium uppercase tracking-[.1em] text-ink-tenue mb-1.5; }
   .separador { @apply border-t border-borde; }
 
   /* Estado vacío: en vez de una línea suelta de texto gris. */
-  .vacio { @apply border border-dashed border-borde-fuerte rounded-xl px-6 py-10 text-center; }
+  .vacio { @apply border border-dashed border-borde-fuerte rounded-2xl px-6 py-10 text-center bg-paper/50; }
 
   /* ---------- Formularios ---------- */
-  .campo { @apply w-full border border-borde-fuerte px-3 py-2.5 text-sm text-ink placeholder:text-ink-tenue transition-colors hover:border-[#c9cbc3]; }
+  .campo { @apply w-full border border-borde-fuerte px-3 py-2.5 text-sm text-ink placeholder:text-ink-tenue transition-colors hover:border-[#D6C3A7]; }
   .campo-sm { @apply w-full border border-borde-fuerte px-2.5 py-1.5 text-xs text-ink placeholder:text-ink-tenue; }
 
   /* ---------- Botones ---------- */
-  .boton-primario { @apply inline-flex items-center justify-center gap-2 bg-ink text-white px-4 py-2.5 text-xs font-medium hover:bg-[#3b443d] transition-colors disabled:opacity-40 disabled:cursor-not-allowed; }
-  .boton-secundario { @apply inline-flex items-center justify-center gap-2 border border-borde-fuerte bg-white text-ink-suave px-3 py-2 text-xs font-medium hover:border-[#aeb5aa] hover:text-ink transition-colors disabled:opacity-40 disabled:cursor-not-allowed; }
-  .boton-peligro { @apply inline-flex items-center justify-center gap-2 border border-borde-fuerte bg-white text-ink-suave px-3 py-2 text-xs font-medium hover:border-red-300 hover:text-red-600 transition-colors; }
-  .boton-texto { @apply text-xs font-medium text-ink-suave underline underline-offset-4 decoration-borde-fuerte hover:text-ink transition-colors; }
-  .boton-verde { @apply inline-flex items-center justify-center gap-2 bg-emerald-600 text-white px-3 py-2 text-xs font-medium hover:bg-emerald-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed; }
+  .boton-primario { @apply inline-flex items-center justify-center gap-2 bg-marca-dark text-[#FBF3E4] px-4 py-2.5 text-xs font-semibold rounded-full hover:bg-marca transition-colors disabled:opacity-40 disabled:cursor-not-allowed; }
+  .boton-secundario { @apply inline-flex items-center justify-center gap-2 border border-borde-fuerte bg-paper text-ink-suave px-3.5 py-2 text-xs font-medium rounded-full hover:border-marca/40 hover:text-marca-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed; }
+  .boton-peligro { @apply inline-flex items-center justify-center gap-2 border border-borde-fuerte bg-paper text-ink-suave px-3.5 py-2 text-xs font-medium rounded-full hover:border-red-300 hover:text-red-600 transition-colors; }
+  .boton-texto { @apply inline-flex items-center gap-1 text-xs font-medium text-marca underline underline-offset-4 decoration-marca/30 hover:text-marca-dark transition-colors; }
+  .boton-verde { @apply inline-flex items-center justify-center gap-2 bg-emerald-600 text-white px-3.5 py-2 text-xs font-medium rounded-full hover:bg-emerald-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed; }
 
   /* ---------- Chips y pestañas ---------- */
-  .chip-filtro { @apply inline-flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-md border border-borde bg-white text-ink-suave hover:border-borde-fuerte hover:text-ink transition-colors; }
-  .chip-filtro-activo { @apply bg-ink text-white border-ink hover:bg-ink hover:text-white; }
+  .chip-filtro { @apply inline-flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border border-borde bg-paper text-ink-suave hover:border-borde-fuerte hover:text-ink transition-colors; }
+  .chip-filtro-activo { @apply bg-marca-dark text-[#FBF3E4] border-marca-dark hover:bg-marca-dark hover:text-[#FBF3E4]; }
   .chip-cuenta { @apply text-[10px] tabular-nums opacity-60; }
   .pestana { @apply px-1 pb-2.5 -mb-px text-sm font-medium text-ink-tenue border-b-2 border-transparent hover:text-ink transition-colors; }
-  .pestana-activa { @apply text-ink border-ink; }
+  .pestana-activa { @apply text-marca-dark border-marca; }
 
   /* ---------- Insignias de estado ---------- */
   .insignia { @apply inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full border whitespace-nowrap; }
   .insignia-ok { @apply bg-emerald-50 text-emerald-700 border-emerald-200; }
   .insignia-no { @apply bg-red-50 text-red-700 border-red-200; }
   .insignia-aviso { @apply bg-amber-50 text-amber-700 border-amber-200; }
-  .insignia-info { @apply bg-marca-suave text-marca border-[#dbe2da]; }
+  .insignia-info { @apply bg-marca-suave text-marca border-[#EBCCD4]; }
   .insignia-neutra { @apply bg-lienzo text-ink-tenue border-borde; }
+  .insignia-oro { @apply bg-oro-suave text-oro-oscuro border-[#F1D9A8]; }
 
   /* ---------- Tablas ---------- */
   .tabla { @apply w-full text-sm border-collapse; }
-  .tabla thead th { @apply text-left px-3 py-2 font-medium text-[11px] uppercase tracking-[.06em] text-ink-tenue bg-lienzo; }
+  .tabla thead th { @apply text-left px-3 py-2 font-medium text-[11px] uppercase tracking-[.08em] text-ink-tenue bg-lienzo; }
   .tabla tbody td { @apply px-3 py-2 border-t border-borde align-top; }
 }

@@ -2,10 +2,14 @@ import { useEffect, useState } from "react";
 import { api, setInvitacionActual, sitioUrlInvitacion } from "../api";
 import { useToast } from "../ui/Toast";
 import { NOMBRE_TIPO_EVENTO } from "../tiposEvento";
+import { FormularioNuevo, EventoCreado } from "../pages/SelectorEventos";
+import Icono from "../ui/Icono";
 import { ETAPAS, CAMPOS_DATOS, peso, fechaCorta, diasHasta, haceCuanto, waUrl, hoyIso, nombreMetodo } from "./comun";
 
-// Producción: todos los eventos contratados, en qué etapa va cada uno, cuánto
-// se ha cobrado y qué datos mandó el cliente. Lo atrasado se ve en rojo.
+// Eventos: la lista única de eventos (antes había dos, «Eventos» y
+// «Producción»). Cada tarjeta dice en qué etapa va, cuánto se ha cobrado y qué
+// datos mandó el cliente; lo atrasado se ve en rojo. Los ajustes de cada
+// evento (acceso, avisos, diseño base) están adentro, en «Ajustes».
 
 function Pagos({ ev, metodos, onCambio }) {
   const toast = useToast();
@@ -191,6 +195,23 @@ function DatosCliente({ ev, onCambio }) {
   );
 }
 
+// La fecha del evento como en un calendario de escritorio: es lo primero que
+// se busca al recorrer la lista.
+function FechaTile({ fecha }) {
+  if (!fecha) {
+    return <div className="w-12 h-14 shrink-0 rounded-xl border border-dashed border-borde-fuerte grid place-items-center text-[10px] text-ink-tenue">sin fecha</div>;
+  }
+  const d = new Date(`${String(fecha).slice(0, 10)}T00:00:00`);
+  return (
+    <div className="w-12 shrink-0 rounded-xl overflow-hidden border border-borde text-center bg-paper">
+      <p className="bg-marca-dark text-[#FBF3E4] text-[9px] uppercase tracking-[.14em] py-0.5">
+        {d.toLocaleDateString("es-CO", { month: "short" }).replace(".", "")}
+      </p>
+      <p className="font-display text-xl leading-none py-1.5 text-ink tabular-nums">{d.getDate()}</p>
+    </div>
+  );
+}
+
 function TarjetaProduccion({ ev, metodos, onCambio, onEntrar }) {
   const toast = useToast();
   const [abierto, setAbierto] = useState(null); // "pagos" | "datos" | "notas"
@@ -211,8 +232,9 @@ function TarjetaProduccion({ ev, metodos, onCambio, onEntrar }) {
   return (
     <div className={`tarjeta-lista p-4 flex flex-col gap-3 ${atrasado ? "!border-red-300" : ""}`}>
       <div className="flex items-start gap-3 flex-wrap">
+        <FechaTile fecha={ev.fecha_evento} />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-ink truncate">{ev.nombre}</p>
+          <p className="font-display text-[17px] leading-tight text-ink truncate">{ev.nombre}</p>
           <p className="text-[11px] text-ink-tenue">
             {NOMBRE_TIPO_EVENTO[ev.tipo_evento] || ev.tipo_evento}
             {ev.fecha_evento && ` · ${fechaCorta(ev.fecha_evento)}`}
@@ -272,8 +294,8 @@ function TarjetaProduccion({ ev, metodos, onCambio, onEntrar }) {
         <a className="boton-texto !text-xs" href={sitioUrlInvitacion(ev.slug)} target="_blank" rel="noreferrer">
           Ver ↗
         </a>
-        <button onClick={() => onEntrar(ev)} className="boton-secundario !py-1 !text-xs">
-          Entrar a editar
+        <button onClick={() => onEntrar(ev)} className="boton-primario !py-1.5">
+          Abrir evento →
         </button>
       </div>
 
@@ -311,10 +333,14 @@ export default function Produccion({ onElegirEvento }) {
   const [eventos, setEventos] = useState(null);
   const [filtro, setFiltro] = useState("activos");
   const [metodos, setMetodos] = useState([]);
+  const [plantillas, setPlantillas] = useState([]);
+  const [creando, setCreando] = useState(false);
+  const [recienCreado, setRecienCreado] = useState(null); // { inv, clave }
 
   const cargar = () => api.crm.produccion().then(setEventos).catch((e) => toast(e.message, "error"));
   useEffect(() => {
     cargar();
+    api.listarInvitaciones().then((l) => setPlantillas(l.filter((e) => e.es_plantilla))).catch(() => {});
     api.crm.ajustes().then((r) => setMetodos((r.ajustes.pagos?.metodos || []).filter((m) => m.tipo !== "efectivo"))).catch(() => {});
   }, []);
 
@@ -324,7 +350,7 @@ export default function Produccion({ onElegirEvento }) {
     onElegirEvento(inv);
   }
 
-  const visibles = (eventos || []).filter((e) =>
+  const visibles = filtro === "plantillas" ? plantillas.map((p) => ({ ...p, etapa: null, pagado: 0, enviados: 0, plantilla: true })) : (eventos || []).filter((e) =>
     filtro === "activos" ? e.etapa !== "realizado" : filtro === "realizados" ? e.etapa === "realizado" : e.etapa === filtro
   );
   const conteo = (k) => (eventos || []).filter((e) => e.etapa === k).length;
@@ -334,11 +360,47 @@ export default function Produccion({ onElegirEvento }) {
 
   return (
     <div>
-      <h2 className="panel-titulo">Producción</h2>
-      <p className="panel-subtitulo mb-4">
-        En qué va cada evento contratado, qué datos mandó el cliente y cuánto falta por cobrar
-        {porCobrar > 0 && <b className="text-ink"> · por cobrar: {peso(porCobrar)}</b>}.
-      </p>
+      <div className="flex flex-wrap items-end justify-between gap-4 mb-5">
+        <div>
+          <h2 className="panel-titulo">Eventos</h2>
+          <p className="panel-subtitulo">
+            En qué va cada evento, qué datos mandó el cliente y cuánto falta por cobrar.
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          {porCobrar > 0 && (
+            <div className="text-right">
+              <p className="etiqueta !mb-0">Por cobrar</p>
+              <p className="font-display text-2xl text-marca-dark tabular-nums">{peso(porCobrar)}</p>
+            </div>
+          )}
+          {!creando && !recienCreado && (
+            <button className="boton-primario" onClick={() => setCreando(true)}>
+              <Icono nombre="mas" className="w-3.5 h-3.5" />
+              Nuevo evento
+            </button>
+          )}
+        </div>
+      </div>
+
+      {recienCreado ? (
+        <div className="mb-6">
+          <EventoCreado inv={recienCreado.inv} clave={recienCreado.clave} onEntrar={entrar} onVolver={() => setRecienCreado(null)} />
+        </div>
+      ) : creando ? (
+        <div className="mb-6">
+          <FormularioNuevo
+            plantillas={plantillas}
+            onCreado={(inv, clave) => {
+              setCreando(false);
+              cargar();
+              if (inv.acceso) setRecienCreado({ inv, clave });
+              else entrar(inv);
+            }}
+            onCancelar={() => setCreando(false)}
+          />
+        </div>
+      ) : null}
       <div className="flex gap-1.5 overflow-x-auto pb-2 mb-4">
         <button onClick={() => setFiltro("activos")} className={`chip-filtro shrink-0 ${filtro === "activos" ? "chip-filtro-activo" : ""}`}>
           En curso
@@ -353,6 +415,11 @@ export default function Produccion({ onElegirEvento }) {
         <button onClick={() => setFiltro("realizados")} className={`chip-filtro shrink-0 ${filtro === "realizados" ? "chip-filtro-activo" : ""}`}>
           Realizados <span className="chip-cuenta">{conteo("realizado")}</span>
         </button>
+        {plantillas.length > 0 && (
+          <button onClick={() => setFiltro("plantillas")} className={`chip-filtro shrink-0 ${filtro === "plantillas" ? "chip-filtro-activo" : ""}`}>
+            Plantillas <span className="chip-cuenta">{plantillas.length}</span>
+          </button>
+        )}
       </div>
       {!eventos ? (
         <p className="text-sm text-ink-tenue">Cargando...</p>
@@ -363,9 +430,21 @@ export default function Produccion({ onElegirEvento }) {
         </div>
       ) : (
         <div className="flex flex-col gap-3">
-          {visibles.map((ev) => (
+          {visibles.map((ev) =>
+            ev.plantilla ? (
+              <div key={ev.id} className="tarjeta-lista p-4 flex items-center gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-ink truncate">{ev.nombre}</p>
+                  <p className="text-[11px] text-ink-tenue">{NOMBRE_TIPO_EVENTO[ev.tipo_evento] || ev.tipo_evento} · plantilla para eventos nuevos</p>
+                </div>
+                <button onClick={() => entrar(ev)} className="boton-secundario">
+                  Abrir →
+                </button>
+              </div>
+            ) : (
             <TarjetaProduccion key={ev.id} ev={ev} metodos={metodos} onCambio={cargar} onEntrar={entrar} />
-          ))}
+            )
+          )}
         </div>
       )}
     </div>

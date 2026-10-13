@@ -319,12 +319,12 @@ export default function ListaConfirmados() {
               Exportar <span className="ml-1.5 opacity-70">⌄</span>
             </button>
             {menuExportacion && (
-              <div className="absolute right-0 top-full mt-2 z-20 w-64 bg-white border border-[#deded8] rounded-lg shadow-[0_12px_28px_rgb(30_35_33/.12)] p-1.5">
+              <div className="absolute right-0 top-full mt-2 z-20 w-64 bg-white border border-[#E3D4BD] rounded-lg shadow-[0_12px_28px_rgb(30_35_33/.12)] p-1.5">
                 <p className="px-2.5 py-2 text-[10px] uppercase tracking-[.12em] text-slate-400">Descargar CSV</p>
-                <button onClick={() => { exportar(); setMenuExportacion(false); }} disabled={!visibles.length} className="w-full text-left px-2.5 py-2 rounded-md text-xs text-slate-700 hover:bg-[#f5f5f1] disabled:opacity-40">Vista actual <span className="float-right text-slate-400">{visibles.length}</span></button>
-                <button onClick={() => { exportarTodo(); setMenuExportacion(false); }} className="w-full text-left px-2.5 py-2 rounded-md text-xs text-slate-700 hover:bg-[#f5f5f1]">Todas las personas <span className="float-right text-slate-400">{filas.length}</span></button>
-                <div className="border-t border-[#ecece8] my-1.5" />
-                {FILTROS.filter((f) => f.key !== "todos").map((f) => <button key={f.key} onClick={() => exportarEstado(f.key)} className="w-full text-left px-2.5 py-2 rounded-md text-xs text-slate-600 hover:bg-[#f5f5f1]">Solo {f.label.toLowerCase()} <span className="float-right text-slate-400">{conteo[f.key]}</span></button>)}
+                <button onClick={() => { exportar(); setMenuExportacion(false); }} disabled={!visibles.length} className="w-full text-left px-2.5 py-2 rounded-md text-xs text-slate-700 hover:bg-[#FBF6EE] disabled:opacity-40">Vista actual <span className="float-right text-slate-400">{visibles.length}</span></button>
+                <button onClick={() => { exportarTodo(); setMenuExportacion(false); }} className="w-full text-left px-2.5 py-2 rounded-md text-xs text-slate-700 hover:bg-[#FBF6EE]">Todas las personas <span className="float-right text-slate-400">{filas.length}</span></button>
+                <div className="border-t border-[#F3E9DA] my-1.5" />
+                {FILTROS.filter((f) => f.key !== "todos").map((f) => <button key={f.key} onClick={() => exportarEstado(f.key)} className="w-full text-left px-2.5 py-2 rounded-md text-xs text-slate-600 hover:bg-[#FBF6EE]">Solo {f.label.toLowerCase()} <span className="float-right text-slate-400">{conteo[f.key]}</span></button>)}
               </div>
             )}
           </div>

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { api, SITIO_BASE } from "../api";
+import { api, SITIO_BASE, esEventoFijo } from "../api";
 import CampoValor, { etiquetaDe } from "./EditorCampos";
 import { vocabulario, etiquetaCampo, campoVisible } from "../vocabulario";
 import GestorFotos from "./GestorFotos";
@@ -25,7 +25,7 @@ const CAMPOS_SECUNDARIOS = { fotos: ["urls"] };
 // tarjeta: así se puede saltar de una sección a otra sin perder lo escrito, y
 // el aviso de «sin publicar» cuenta todas, no solo la que estás viendo.
 
-function ListaSecciones({ secciones, seleccionada, onSeleccionar, esPendiente, arrastrar }) {
+function ListaSecciones({ secciones, seleccionada, onSeleccionar, esPendiente, arrastrar, soloTextos }) {
   return (
     <ul className="tarjeta divide-y divide-borde overflow-hidden">
       {secciones.map((s) => {
@@ -40,10 +40,10 @@ function ListaSecciones({ secciones, seleccionada, onSeleccionar, esPendiente, a
           >
             <div
               className={`flex items-center gap-2 pr-2 transition-colors ${
-                activa ? "bg-[#eceee9]" : "hover:bg-lienzo"
+                activa ? "bg-[#F3E9DA]" : "hover:bg-lienzo"
               }`}
             >
-              <span
+              {!soloTextos && <span
                 draggable
                 onDragStart={() => arrastrar.tomar(s)}
                 onDragEnd={() => arrastrar.fin()}
@@ -51,11 +51,11 @@ function ListaSecciones({ secciones, seleccionada, onSeleccionar, esPendiente, a
                 className="cursor-grab active:cursor-grabbing text-ink-tenue hover:text-ink select-none pl-2.5 py-2.5"
               >
                 ⋮⋮
-              </span>
+              </span>}
               <button
                 onClick={() => onSeleccionar(s.id)}
                 aria-current={activa ? "true" : undefined}
-                className="flex-1 min-w-0 text-left py-2.5"
+                className={`flex-1 min-w-0 text-left py-2.5 ${soloTextos ? "pl-4" : ""}`}
               >
                 <span
                   className={`block text-sm truncate ${
@@ -87,6 +87,7 @@ function Editor({
   onMover,
   esPrimera,
   esUltima,
+  soloTextos,
 }) {
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
@@ -128,7 +129,9 @@ function Editor({
           </p>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        {/* El cliente solo corrige textos: el orden y qué secciones se ven
+            los define Sivú, igual que el diseño. */}
+        {!soloTextos && <div className="flex items-center gap-2 shrink-0">
           <button
             disabled={esPrimera}
             onClick={() => onMover(-1)}
@@ -159,7 +162,7 @@ function Editor({
             />
             {borrador.activo ? "Visible" : "Oculta"}
           </label>
-        </div>
+        </div>}
       </div>
 
       {/* Estas dos secciones traen además su gestor de archivos. */}
@@ -223,6 +226,7 @@ function Editor({
 export default function Contenido() {
   const toast = useToast();
   const { marcar } = usePendientes();
+  const soloTextos = esEventoFijo();
   const [secciones, setSecciones] = useState([]);
   const [borradores, setBorradores] = useState({});
   const [seleccionada, setSeleccionada] = useState(null);
@@ -239,7 +243,9 @@ export default function Contenido() {
   async function cargar() {
     setCargando(true);
     const data = await api.secciones();
-    const ordenadas = data.sort((a, b) => a.orden - b.orden);
+    // Servidores salió del menú (se hizo para una sola boda); su sección
+    // sigue en la base por si un cliente la vuelve a pedir.
+    const ordenadas = data.filter((s) => s.tipo !== "servidores" && (!esEventoFijo() || s.activo)).sort((a, b) => a.orden - b.orden);
     setSecciones(ordenadas);
     setSeleccionada((prev) => prev ?? ordenadas[0]?.id ?? null);
     setCargando(false);
@@ -405,10 +411,13 @@ export default function Contenido() {
             onSeleccionar={setSeleccionada}
             esPendiente={sinPublicar}
             arrastrar={arrastrar}
+            soloTextos={soloTextos}
           />
-          <p className="ayuda mt-2">
-            Arrastra ⋮⋮ para cambiar el orden en que aparecen en la invitación.
-          </p>
+          {!soloTextos && (
+            <p className="ayuda mt-2">
+              Arrastra ⋮⋮ para cambiar el orden en que aparecen en la invitación.
+            </p>
+          )}
         </div>
 
         <div className="space-y-5">
@@ -447,6 +456,7 @@ export default function Contenido() {
               onMover={(d) => mover(actual, d)}
               esPrimera={secciones[0]?.id === actual.id}
               esUltima={secciones[secciones.length - 1]?.id === actual.id}
+              soloTextos={soloTextos}
             />
           )}
         </div>

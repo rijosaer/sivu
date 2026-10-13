@@ -733,7 +733,7 @@ function Crear({ onCreada, onCancelar }) {
             className={`text-left px-3 py-2.5 rounded-lg border transition-colors ${
               nuevo.tipo === t.key
                 ? "border-ink bg-ink text-white"
-                : "border-borde-fuerte bg-white hover:border-[#aeb5aa]"
+                : "border-borde-fuerte bg-white hover:border-[#D6C3A7]"
             }`}
           >
             <span className="block text-xs font-medium">{t.label}</span>
@@ -1117,7 +1117,7 @@ export default function Invitados({ irA }) {
         <p className="ayuda mt-5">
           El texto de los WhatsApp se edita en{" "}
           <button onClick={() => irA?.("mensajes")} className="boton-texto">
-            Mensajes
+            Invitados → WhatsApp
           </button>
           .
         </p>

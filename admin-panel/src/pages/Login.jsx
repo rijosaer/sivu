@@ -26,22 +26,15 @@ export default function Login({ onLogin }) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 py-10">
+    <div className="min-h-screen flex items-center justify-center px-6 py-10 barra-lateral !flex-row">
       <div className="w-full max-w-sm">
-        <div className="flex items-center gap-3 justify-center mb-7">
-          <span className="marca-sello">c.</span>
-          <span>
-            <span className="block text-[15px] font-semibold tracking-[-.03em] text-ink">
-              Sivú
-            </span>
-            <span className="block text-[10px] uppercase tracking-[.16em] text-ink-tenue mt-0.5">
-              invitaciones digitales
-            </span>
-          </span>
+        <div className="text-center mb-7">
+          <p className="marca-firma !text-[3.2rem]">Sivú</p>
+          <p className="marca-de">invitaciones digitales</p>
         </div>
 
         <form onSubmit={handleSubmit} className="tarjeta p-7">
-          <h1 className="text-lg font-medium tracking-[-.02em] text-ink">Entra a tu panel</h1>
+          <h1 className="font-display text-2xl font-medium text-ink">Entra a tu panel</h1>
           <p className="ayuda mt-1 mb-6">Administra las invitaciones y el contenido del evento.</p>
 
           <label className="block mb-4">

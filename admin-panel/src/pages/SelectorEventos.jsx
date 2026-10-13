@@ -13,7 +13,7 @@ import Icono from "../ui/Icono";
 // La contraseña solo se ve una vez, aquí recién creada: el servidor guarda
 // su hash y no hay forma de volver a leerla (después solo se puede
 // restablecer desde la tarjeta del evento).
-function EventoCreado({ inv, clave, onEntrar, onVolver }) {
+export function EventoCreado({ inv, clave, onEntrar, onVolver }) {
   const toast = useToast();
   const enlaceInvitacion = sitioUrlInvitacion(inv.slug);
   const enlacePanel = window.location.origin;
@@ -79,7 +79,7 @@ function EventoCreado({ inv, clave, onEntrar, onVolver }) {
   );
 }
 
-function FormularioNuevo({ plantillas, onCreado, onCancelar }) {
+export function FormularioNuevo({ plantillas, onCreado, onCancelar }) {
   const toast = useToast();
   const [nombre, setNombre] = useState("");
   const [tipoEvento, setTipoEvento] = useState("boda");
@@ -253,14 +253,19 @@ function FormularioNuevo({ plantillas, onCreado, onCancelar }) {
 // Acceso del cliente a este evento: ver qué usuarios existen y crear o
 // restablecer usuario y contraseña. El servidor los amarra solo a esta
 // invitación; la contraseña nunca se puede leer de vuelta, solo reemplazar.
-function AccesoCliente({ inv }) {
+export function AccesoCliente({ inv, fijo = false }) {
   const toast = useToast();
-  const [abierto, setAbierto] = useState(false);
+  const [abierto, setAbierto] = useState(fijo);
   const [usuarios, setUsuarios] = useState(null);
   const [usuario, setUsuario] = useState("");
   const [clave, setClave] = useState("");
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
+
+  // En Ajustes del evento el bloque va siempre abierto.
+  useEffect(() => {
+    if (fijo) api.obtenerAcceso(inv.id).then(setUsuarios).catch((err) => toast(err.message, "error"));
+  }, [fijo, inv.id]);
 
   async function abrir() {
     if (!abierto) {
@@ -300,13 +305,15 @@ function AccesoCliente({ inv }) {
   }
 
   return (
-    <div className="border border-borde rounded-lg p-3 flex flex-col gap-2">
-      <div className="flex items-center justify-between">
-        <span className="etiqueta !mb-0">Acceso del cliente</span>
-        <button onClick={() => setAbierto(false)} className="boton-texto !text-[11px]">
-          cerrar
-        </button>
-      </div>
+    <div className={fijo ? "flex flex-col gap-2" : "border border-borde rounded-lg p-3 flex flex-col gap-2"}>
+      {!fijo && (
+        <div className="flex items-center justify-between">
+          <span className="etiqueta !mb-0">Acceso del cliente</span>
+          <button onClick={() => setAbierto(false)} className="boton-texto !text-[11px]">
+            cerrar
+          </button>
+        </div>
+      )}
       <p className="text-[11px] text-ink-suave">
         {usuarios === null
           ? "Cargando..."
@@ -345,7 +352,7 @@ function AccesoCliente({ inv }) {
 // El número de WhatsApp de Sivú que manda los avisos, vinculado como
 // WhatsApp Web: se escanea el QR desde el celular de ese número (WhatsApp →
 // Dispositivos vinculados). Provisional mientras no esté la cuenta oficial.
-function WhatsappSivu() {
+export function WhatsappSivu() {
   const toast = useToast();
   const [wa, setWa] = useState(null);
   const [ocupado, setOcupado] = useState(false);
@@ -447,9 +454,9 @@ const ESTADO_AVISO = {
 
 // Avisos por WhatsApp: cuando un invitado responde desde su enlace, Sivú le
 // escribe al cliente aunque no tenga el panel abierto. Se prende por evento.
-function AvisosWhatsapp({ inv, onCambio }) {
+export function AvisosWhatsapp({ inv, onCambio, fijo = false }) {
   const toast = useToast();
-  const [abierto, setAbierto] = useState(false);
+  const [abierto, setAbierto] = useState(fijo);
   const [datos, setDatos] = useState(null);
   const [activo, setActivo] = useState(false);
   const [telefonos, setTelefonos] = useState("");
@@ -466,6 +473,10 @@ function AvisosWhatsapp({ inv, onCambio }) {
     setResumen(d.resumen);
     setHora(d.resumenHora);
   }
+
+  useEffect(() => {
+    if (fijo) api.obtenerAvisos(inv.id).then(cargar).catch((err) => toast(err.message, "error"));
+  }, [fijo, inv.id]);
 
   async function abrir() {
     if (!abierto) {
@@ -537,20 +548,22 @@ function AvisosWhatsapp({ inv, onCambio }) {
   }
 
   return (
-    <div className="border border-borde rounded-lg p-3 flex flex-col gap-2">
-      <div className="flex items-center justify-between">
-        <span className="etiqueta !mb-0">Avisos por WhatsApp</span>
-        <button onClick={() => setAbierto(false)} className="boton-texto !text-[11px]">
-          cerrar
-        </button>
-      </div>
+    <div className={fijo ? "flex flex-col gap-2" : "border border-borde rounded-lg p-3 flex flex-col gap-2"}>
+      {!fijo && (
+        <div className="flex items-center justify-between">
+          <span className="etiqueta !mb-0">Avisos por WhatsApp</span>
+          <button onClick={() => setAbierto(false)} className="boton-texto !text-[11px]">
+            cerrar
+          </button>
+        </div>
+      )}
       <p className="text-[11px] text-ink-suave">
         Cada vez que un invitado responda desde su enlace, el cliente recibe un WhatsApp diciendo si asiste o no.
         También puede recibir un resumen diario de cómo va.
       </p>
       {datos && !datos.configurado && (
         <p className="text-[11px] text-amber-700">
-          El WhatsApp de Sivú no está vinculado (recuadro de arriba): los avisos quedan anotados como «simulado» y no salen.
+          El WhatsApp de Sivú no está vinculado (Configuración → WhatsApp de Sivú): los avisos quedan anotados como «simulado» y no salen.
         </p>
       )}
       <form onSubmit={guardar} className="flex flex-col gap-2">
