@@ -27,9 +27,8 @@ import { ahoraEnBogota } from "./hora.js";
 
 const API = "https://graph.facebook.com/v21.0";
 const CADA_MS = 3 * 60 * 1000;
-// En la primera revisión no se le escribe a quien llenó el formulario hace
-// días: solo a los de las últimas 48 horas. Los viejos se anotan como vistos.
-const VENTANA_MS = 48 * 3600 * 1000;
+// La primera revisión solo anota como vistos los contactos que ya había (por
+// ejemplo, los de prueba): se escribe únicamente a los que lleguen después.
 const MAX_INTENTOS = 5;
 
 const OPCIONES = {
@@ -117,7 +116,7 @@ async function guardarNuevos() {
     const { data = [] } = await graph(`${formulario}/leads`, { fields: "id,created_time,field_data", limit: 100 });
     for (const lead of data) {
       const campos = leerCampos(lead);
-      const viejo = !hay && Date.now() - new Date(lead.created_time) > VENTANA_MS;
+      const viejo = !hay;
       await pool.query(
         `INSERT INTO leads_meta (id, formulario, creado_en, nombre, telefono, datos, saludado_en, avisado_en, detalle)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $7, $8)
