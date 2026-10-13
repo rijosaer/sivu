@@ -80,3 +80,5 @@ textarea.sv-campo{min-height:90px;resize:vertical;line-height:1.5}
 .sv-metodo-filas dd{margin:0;font-weight:600;text-align:right}
 .sv-ya-pague{margin-top:16px;padding-top:16px;border-top:1px solid var(--linea)}
 select.sv-campo{appearance:auto}
+.sv-qr{display:flex;gap:12px;align-items:center;margin-top:12px;background:#fff;border:1px dashed var(--linea);border-radius:12px;padding:10px}
+.sv-qr img{width:120px;height:120px;object-fit:contain;flex-shrink:0;image-rendering:pixelated}

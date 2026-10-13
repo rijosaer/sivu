@@ -225,6 +225,12 @@ export async function armarReporte() {
         (pend.seguimientos.length > 4 ? "…" : "")
     );
   }
+  const { rows: [{ n: porConfirmar }] } = await pool.query(
+    "SELECT count(*)::int AS n FROM pagos_reportados WHERE estado = 'pendiente'"
+  );
+  if (porConfirmar) {
+    hoy.push(`💵 ${plural(porConfirmar, "pago reportado", "pagos reportados")} por confirmar: revisa tu Nequi/banco y confírmalos en el panel`);
+  }
   if (pend.sinLeer.length) hoy.push(`💬 ${plural(pend.sinLeer.length, "cliente te escribió", "clientes te escribieron")} y no has leído en el panel`);
   for (const e of pend.atrasados.slice(0, 4)) {
     hoy.push(`⚠️ ${e.nombre}: faltan ${plural(e.dias, "día", "días")} y sigue ${ETAPA[e.etapa]}`);

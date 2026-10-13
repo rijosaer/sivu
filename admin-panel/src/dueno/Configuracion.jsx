@@ -93,6 +93,21 @@ const textoATelefonos = (t) =>
     .map((x) => x.replace(/\D/g, ""))
     .filter(Boolean);
 
+// El QR se guarda como imagen dentro de la configuración: se achica a 700 px
+// para que pese poco y se vea nítido en la cotización.
+async function achicarQr(file) {
+  const bmp = await createImageBitmap(file);
+  const escala = Math.min(1, 700 / Math.max(bmp.width, bmp.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(bmp.width * escala);
+  canvas.height = Math.round(bmp.height * escala);
+  const ctx = canvas.getContext("2d");
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(bmp, 0, 0, canvas.width, canvas.height);
+  return canvas.toDataURL("image/png");
+}
+const CON_QR = ["nequi", "daviplata", "bancolombia", "banco", "llave", "otro"];
+
 // Un método de pago: el tipo decide qué datos se piden.
 function MetodoPago({ m, onCambio, onQuitar, onSubir, primero }) {
   const t = TIPOS_PAGO[m.tipo] || TIPOS_PAGO.otro;
@@ -156,6 +171,33 @@ function MetodoPago({ m, onCambio, onQuitar, onSubir, primero }) {
               )
         )}
       </div>
+      {CON_QR.includes(m.tipo) && (
+        <div className="flex items-center gap-3 flex-wrap">
+          {m.qr ? (
+            <>
+              <img src={m.qr} alt="QR de pago" className="w-24 h-24 object-contain rounded-lg border border-borde bg-white" />
+              <button onClick={() => onCambio({ qr: "" })} className="boton-texto !text-[11px]">
+                quitar QR
+              </button>
+            </>
+          ) : (
+            <label className="boton-secundario !text-xs cursor-pointer">
+              Subir imagen del QR (opcional)
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={async (e) => {
+                  const f = e.target.files?.[0];
+                  e.target.value = "";
+                  if (f) onCambio({ qr: await achicarQr(f) });
+                }}
+              />
+            </label>
+          )}
+          <span className="ayuda">Ej. el QR de Nequi Negocios: el cliente lo guarda y lo paga desde su app.</span>
+        </div>
+      )}
     </div>
   );
 }

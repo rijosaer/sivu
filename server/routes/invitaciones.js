@@ -478,3 +478,33 @@ invitacionesRouter.delete(
     res.json({ ok: true });
   })
 );
+
+// Crea un evento con el contenido de arranque de su tipo (lo mismo que
+// «Nuevo evento» sin plantilla), dentro de una transacción ya abierta. Lo usa
+// «Confirmar pago» para convertir a un cliente en evento de un solo toque.
+export async function crearEventoBasico(client, { nombre, tipo_evento = "otro", fecha_evento = null, diseno = "clasico" }) {
+  const tipo = TIPOS_EVENTO.includes(tipo_evento) ? tipo_evento : "otro";
+  const disenoFinal = DISENOS.includes(diseno) ? diseno : "clasico";
+  const slug = await slugUnico(slugificar(nombre) || "invitacion");
+  const { rows: [invitacion] } = await client.query(
+    `INSERT INTO invitaciones (slug, nombre, tipo_evento, fecha_evento, diseno)
+     VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+    [slug, nombre.trim(), tipo, fecha_evento || null, disenoFinal]
+  );
+  for (const [clave, valor] of temaDeDiseno(disenoFinal)) {
+    await client.query("INSERT INTO tema (invitacion_id, clave, valor) VALUES ($1, $2, $3)", [invitacion.id, clave, valor]);
+  }
+  for (const d of decoracionesBase()) {
+    await client.query("INSERT INTO decoraciones (invitacion_id, clave, etiqueta, datos) VALUES ($1, $2, $3, NULL)", [
+      invitacion.id, d.clave, d.etiqueta,
+    ]);
+  }
+  for (const sec of plantillaSecciones(tipo, nombre.trim())) {
+    await client.query(
+      `INSERT INTO secciones (invitacion_id, tipo, titulo_panel, orden, activo, contenido)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [invitacion.id, sec.tipo, sec.titulo_panel, sec.orden, sec.activo, JSON.stringify(sec.contenido)]
+    );
+  }
+  return invitacion;
+}

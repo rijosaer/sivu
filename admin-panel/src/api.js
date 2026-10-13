@@ -169,6 +169,19 @@ export const api = {
       setTimeout(() => URL.revokeObjectURL(url), 5000);
     },
     mensajesInvitados: () => request("/api/admin/crm/mensajes-invitados"),
+    pagosPorConfirmar: (recientes) => request(`/api/admin/crm/pagos-por-confirmar${recientes ? "?recientes=1" : ""}`),
+    confirmarPago: (id, datos) =>
+      request(`/api/admin/crm/pagos-reportados/${id}/confirmar`, { method: "POST", body: JSON.stringify(datos) }),
+    rechazarPago: (id) => request(`/api/admin/crm/pagos-reportados/${id}/rechazar`, { method: "POST" }),
+    // El comprobante viaja con la sesión: se baja como blob para mostrarlo.
+    comprobante: async (id) => {
+      const res = await fetch(`${API_URL}/api/admin/crm/pagos-reportados/${id}/comprobante`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      if (!res.ok) throw new Error("Sin comprobante");
+      const blob = await res.blob();
+      return { url: URL.createObjectURL(blob), tipo: blob.type };
+    },
   },
 
   // ---------- Todo lo de abajo es del evento seleccionado (scoped()) ----------

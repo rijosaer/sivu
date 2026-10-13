@@ -10,6 +10,7 @@ import { enviarDesdePanel, etiquetarCliente, jidDe, etiquetar } from "../waOrden
 import { textoSaludo } from "../saludo.js";
 import { metricas, pendientesDeHoy, enviarReporte, armarReporte } from "../reporte.js";
 import { estadoLeads } from "../leadsMeta.js";
+import { crearEventoBasico } from "./invitaciones.js";
 
 // Todo lo del negocio de Sivú que está por encima de un evento: clientes
 // potenciales, configuración, cotizaciones y producción. Solo el dueño (lo
@@ -52,6 +53,7 @@ crmRouter.get(
           id: e.id, nombre: e.nombre, dias: e.dias, falta: Number(e.valor_total) - Number(e.pagado),
         })),
       },
+      pagosPorConfirmar: (await pool.query("SELECT count(*)::int AS n FROM pagos_reportados WHERE estado = 'pendiente'")).rows[0].n,
       whatsapp: whatsappConectado(),
       leads: estadoLeads(),
     });
@@ -371,7 +373,10 @@ crmRouter.put(
     if (Array.isArray(def) !== Array.isArray(valor) || typeof valor !== "object" || valor === null) {
       return res.status(400).json({ error: "Formato no válido" });
     }
-    if (JSON.stringify(valor).length > 100_000) return res.status(400).json({ error: "Demasiado largo" });
+    // Los métodos de pago pueden llevar la imagen del QR: más espacio.
+    if (JSON.stringify(valor).length > (clave === "pagos" ? 3_000_000 : 100_000)) {
+      return res.status(400).json({ error: "Demasiado largo" });
+    }
     if (clave === "avisos" || clave === "reporte") {
       valor.telefonos = [...new Set((valor.telefonos || []).map(normalizarTelefono).filter((t) => t.length >= 11))];
     }
@@ -567,5 +572,163 @@ crmRouter.get(
        ORDER BY m.creado_en DESC LIMIT 300`
     );
     res.json(rows);
+  })
+);
+
+// ---------- Pagos por confirmar («Ya pagué» desde la cotización) ----------
+
+const EVENTO_A_TIPO = {
+  boda: "boda", xv: "xv", bautizo: "bautizo", baby: "baby_shower", cumple: "cumpleanos",
+  grado: "otro", empresa: "corporativo", otro: "otro",
+};
+const NOMBRE_EVENTO = {
+  boda: "Boda", xv: "XV años", bautizo: "Bautizo", baby: "Baby shower", cumple: "Cumpleaños",
+  grado: "Grado", empresa: "Evento", otro: "Evento",
+};
+
+crmRouter.get(
+  "/pagos-por-confirmar",
+  capturar(async (req, res) => {
+    const { rows } = await pool.query(
+      `SELECT r.id, r.metodo, r.valor, r.estado, r.creado_en, (r.comprobante IS NOT NULL) AS tiene_comprobante,
+              r.comprobante_mime, c.total, c.cliente, c.evento AS cotizacion_evento, c.token,
+              p.id AS prospecto_id, p.nombre, p.telefono, p.evento, p.fecha_evento, p.invitacion_id, p.valor_ganado,
+              COALESCE((SELECT sum(valor) FROM pagos pg WHERE pg.invitacion_id = p.invitacion_id AND pg.id IS DISTINCT FROM r.pago_id), 0)::bigint AS pagado_antes
+       FROM pagos_reportados r
+       JOIN cotizaciones c ON c.id = r.cotizacion_id
+       LEFT JOIN prospectos p ON p.id = r.prospecto_id
+       WHERE r.estado = 'pendiente' OR ($1 AND r.resuelto_en > now() - interval '3 days')
+       ORDER BY r.estado = 'pendiente' DESC, r.creado_en DESC`,
+      [req.query.recientes === "1"]
+    );
+    res.json(
+      rows.map((r) => ({
+        ...r,
+        valor: Number(r.valor),
+        total: Number(r.total),
+        pagado_antes: Number(r.pagado_antes),
+        nombre_evento_sugerido: `${(r.nombre || r.cliente || "Cliente").split(/\s+/).slice(0, 2).join(" ")} — ${NOMBRE_EVENTO[r.evento] || "Evento"}`,
+        tipo_sugerido: EVENTO_A_TIPO[r.evento] || "otro",
+      }))
+    );
+  })
+);
+
+crmRouter.get(
+  "/pagos-reportados/:id/comprobante",
+  capturar(async (req, res) => {
+    const { rows: [r] } = await pool.query("SELECT comprobante, comprobante_mime FROM pagos_reportados WHERE id = $1", [req.params.id]);
+    if (!r?.comprobante) return res.status(404).json({ error: "Sin comprobante" });
+    res.setHeader("Content-Type", r.comprobante_mime || "application/octet-stream");
+    res.send(r.comprobante);
+  })
+);
+
+// Confirmar: la plata llegó. En una sola transacción se registra el pago, el
+// cliente pasa a ganado y, si aún no tiene evento, se crea y queda en
+// Producción con el valor de la cotización.
+crmRouter.post(
+  "/pagos-reportados/:id/confirmar",
+  capturar(async (req, res) => {
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      const { rows: [r] } = await client.query(
+        `SELECT r.*, c.total, c.cliente, c.prospecto_id AS cot_prospecto
+         FROM pagos_reportados r JOIN cotizaciones c ON c.id = r.cotizacion_id
+         WHERE r.id = $1 FOR UPDATE OF r`,
+        [req.params.id]
+      );
+      if (!r) {
+        await client.query("ROLLBACK");
+        return res.status(404).json({ error: "Ese pago no existe" });
+      }
+      if (r.estado !== "pendiente") {
+        await client.query("ROLLBACK");
+        return res.status(400).json({ error: "Ese pago ya se había resuelto" });
+      }
+      const valor = entero(req.body.valor) ?? Number(r.valor);
+      if (!valor) {
+        await client.query("ROLLBACK");
+        return res.status(400).json({ error: "Escribe el valor que llegó" });
+      }
+      const prospectoId = r.prospecto_id || r.cot_prospecto;
+      const { rows: [p] } = prospectoId
+        ? await client.query("SELECT * FROM prospectos WHERE id = $1 FOR UPDATE", [prospectoId])
+        : { rows: [] };
+
+      // El evento: el que ya tenía o uno nuevo.
+      let invitacionId = p?.invitacion_id || null;
+      let creado = null;
+      if (!invitacionId) {
+        const nombre = String(req.body.nombre || "").trim() ||
+          `${(p?.nombre || r.cliente || "Cliente").split(/\s+/).slice(0, 2).join(" ")} — ${NOMBRE_EVENTO[p?.evento] || "Evento"}`;
+        creado = await crearEventoBasico(client, {
+          nombre,
+          tipo_evento: req.body.tipo_evento || EVENTO_A_TIPO[p?.evento] || "otro",
+          fecha_evento: fecha(req.body.fecha_evento) || (p?.fecha_evento ? String(p.fecha_evento.toISOString?.() || p.fecha_evento).slice(0, 10) : null),
+          diseno: req.body.diseno || "clasico",
+        });
+        invitacionId = creado.id;
+      }
+      await client.query(
+        `UPDATE invitaciones SET
+           valor_total = COALESCE(valor_total, $2),
+           cliente_nombre = CASE WHEN cliente_nombre = '' THEN $3 ELSE cliente_nombre END,
+           cliente_telefono = CASE WHEN cliente_telefono = '' THEN $4 ELSE cliente_telefono END,
+           actualizado_en = now()
+         WHERE id = $1`,
+        [invitacionId, Number(r.total) || null, p?.nombre || r.cliente || "", p?.telefono || ""]
+      );
+      const { rows: [pago] } = await client.query(
+        "INSERT INTO pagos (invitacion_id, valor, fecha, nota, metodo) VALUES ($1, $2, CURRENT_DATE, $3, $4) RETURNING id",
+        [invitacionId, valor, "Reportado por el cliente desde la cotización", r.metodo]
+      );
+      await client.query(
+        "UPDATE pagos_reportados SET estado = 'confirmado', valor = $2, pago_id = $3, resuelto_en = now() WHERE id = $1",
+        [r.id, valor, pago.id]
+      );
+      if (p) {
+        await client.query(
+          `UPDATE prospectos SET estado = 'ganado', invitacion_id = $2,
+             ganado_en = COALESCE(ganado_en, now()),
+             valor_ganado = COALESCE(valor_ganado, $3),
+             proximo_seguimiento = NULL, actualizado_en = now()
+           WHERE id = $1`,
+          [p.id, invitacionId, Number(r.total) || valor]
+        );
+        await anotar(
+          p.id,
+          "pago",
+          `Pago confirmado: $${valor.toLocaleString("es-CO")}${r.metodo ? ` por ${r.metodo}` : ""}${creado ? ` · se creó el evento «${creado.nombre}»` : ""} · pasó a ganado`,
+          client
+        );
+      }
+      await client.query("COMMIT");
+      if (p?.telefono) etiquetarCliente(p.telefono);
+      res.json({ ok: true, invitacion_id: invitacionId, evento_creado: creado ? { id: creado.id, nombre: creado.nombre, slug: creado.slug } : null });
+    } catch (e) {
+      await client.query("ROLLBACK").catch(() => {});
+      throw e;
+    } finally {
+      client.release();
+    }
+  })
+);
+
+crmRouter.post(
+  "/pagos-reportados/:id/rechazar",
+  capturar(async (req, res) => {
+    const { rows: [r] } = await pool.query(
+      "UPDATE pagos_reportados SET estado = 'rechazado', resuelto_en = now() WHERE id = $1 AND estado = 'pendiente' RETURNING *",
+      [req.params.id]
+    );
+    if (!r) return res.status(400).json({ error: "Ese pago ya se había resuelto" });
+    // Si no llegó, la cotización vuelve a estar pendiente de pago.
+    await pool.query("UPDATE cotizaciones SET pago_reportado_en = NULL WHERE id = $1", [r.cotizacion_id]);
+    if (r.prospecto_id) {
+      await anotar(r.prospecto_id, "pago", `Pago reportado NO confirmado ($${Number(r.valor).toLocaleString("es-CO")}${r.metodo ? ` por ${r.metodo}` : ""}): no llegó`);
+    }
+    res.json({ ok: true });
   })
 );

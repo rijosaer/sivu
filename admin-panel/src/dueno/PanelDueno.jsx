@@ -50,6 +50,7 @@ export default function PanelDueno({ onElegir, onSalir }) {
   }, []);
 
   const badge = {
+    hoy: tablero?.pagosPorConfirmar || 0,
     clientes: tablero ? tablero.hoy.sinContactar + tablero.hoy.sinLeer + tablero.hoy.seguimientos : 0,
     produccion: tablero ? tablero.hoy.atrasados.length + tablero.hoy.saldos.length : 0,
   };
@@ -84,7 +85,7 @@ export default function PanelDueno({ onElegir, onSalir }) {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        {tab === "hoy" && <Hoy tablero={tablero} irA={irA} />}
+        {tab === "hoy" && <Hoy tablero={tablero} irA={irA} onCambio={cargarTablero} />}
         {tab === "clientes" && (
           <Clientes conteos={tablero?.conteos} onCambio={cargarTablero} onIrAProduccion={() => irA("produccion")} />
         )}

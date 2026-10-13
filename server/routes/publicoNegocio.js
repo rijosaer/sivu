@@ -96,7 +96,18 @@ publicoNegocioRouter.post(
     if (!c) return res.status(404).json({ error: "Esta cotización no existe" });
     const metodo = String(req.body?.metodo || "").slice(0, 80);
     const valor = Math.max(0, Math.round(Number(req.body?.valor) || 0));
-    const primero = !c.pago_reportado_en;
+    // La captura del comprobante (opcional pero lo normal): imagen o PDF.
+    let comprobante = null;
+    let mime = "";
+    if (req.body?.comprobante) {
+      const m = /^data:([^;,]+);base64,(.*)$/s.exec(req.body.comprobante);
+      if (!m || !/^(image\/(jpeg|png|webp|heic|heif)|application\/pdf)$/i.test(m[1])) {
+        return res.status(400).json({ error: "El comprobante debe ser una imagen o un PDF" });
+      }
+      comprobante = Buffer.from(m[2], "base64");
+      mime = m[1].toLowerCase();
+      if (comprobante.length > 8 * 1024 * 1024) return res.status(400).json({ error: "El comprobante pesa más de 8 MB" });
+    }
     // Pagar es aceptar: si no la había aceptado, queda aceptada también.
     await pool.query(
       `UPDATE cotizaciones SET pago_reportado_en = now(),
@@ -104,20 +115,27 @@ publicoNegocioRouter.post(
        WHERE id = $1`,
       [c.id]
     );
+    // Queda «por confirmar» en el panel hasta que el dueño revise su cuenta.
+    await pool.query(
+      `INSERT INTO pagos_reportados (cotizacion_id, prospecto_id, metodo, valor, comprobante, comprobante_mime)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [c.id, c.prospecto_id, metodo, valor, comprobante, mime]
+    );
+    const monto = valor ? ` $${valor.toLocaleString("es-CO")}` : "";
     if (c.prospecto_id) {
       await anotar(
         c.prospecto_id,
         "pago",
-        `Dice que pagó${valor ? ` $${valor.toLocaleString("es-CO")}` : ""}${metodo ? ` por ${metodo}` : ""}: revisa el comprobante`
+        `Reportó un pago de${monto || " (sin valor)"}${metodo ? ` por ${metodo}` : ""}${comprobante ? " con comprobante" : ""}: por confirmar`
       );
       await pool.query("UPDATE prospectos SET proximo_seguimiento = CURRENT_DATE, actualizado_en = now() WHERE id = $1", [c.prospecto_id]);
     }
-    if (primero) {
-      await avisarEquipo(
-        "pagoReportado",
-        `💵 *${c.cliente || "Un cliente"} dice que ya pagó*${valor ? ` $${valor.toLocaleString("es-CO")}` : ""}${metodo ? ` por ${metodo}` : ""}${c.evento ? ` (${c.evento})` : ""}.\nRevisa el comprobante y regístralo en Producción.`
-      );
-    }
+    await avisarEquipo(
+      "pagoReportado",
+      `💵 *${c.cliente || "Un cliente"} reportó un pago*${monto}${metodo ? ` por ${metodo}` : ""}${c.evento ? ` (${c.evento})` : ""}.\n` +
+        `Revisa en tu ${metodo || "cuenta"} que llegó y confírmalo en el panel → Hoy → Pagos por confirmar.` +
+        (process.env.PANEL_URL ? `\n${process.env.PANEL_URL}` : "")
+    );
     res.json({ ok: true, whatsapp: WHATSAPP_SIVU() });
   })
 );

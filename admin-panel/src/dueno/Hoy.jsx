@@ -2,6 +2,7 @@ import { useState } from "react";
 import { api } from "../api";
 import { useToast } from "../ui/Toast";
 import { EVENTOS, ORIGENES, peso } from "./comun";
+import PagosPorConfirmar from "./PagosPorConfirmar";
 
 // Pantalla de inicio del dueño: qué hay que hacer hoy y cómo va el negocio.
 // Cada tarjeta de «Para hoy» lleva a donde se resuelve.
@@ -51,7 +52,7 @@ function Barras({ titulo, filas, nombres }) {
   );
 }
 
-export default function Hoy({ tablero, irA }) {
+export default function Hoy({ tablero, irA, onCambio }) {
   const toast = useToast();
   const [reporte, setReporte] = useState(null);
   const [enviando, setEnviando] = useState(false);
@@ -138,6 +139,8 @@ export default function Hoy({ tablero, irA }) {
           {tablero.leads?.error && <p>⚠️ No se están pudiendo leer los formularios de Meta: {tablero.leads.error}. Hay que renovar el token.</p>}
         </div>
       )}
+
+      <PagosPorConfirmar key={tablero.pagosPorConfirmar} onCambio={onCambio} />
 
       <h3 className="bloque-titulo mb-2">Para hoy</h3>
       {tareas.length ? (

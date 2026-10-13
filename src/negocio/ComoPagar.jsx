@@ -63,6 +63,19 @@ function Metodo({ m }) {
         <span className="sv-metodo-ico">{t.emoji}</span>
         <b>{nombreDe(m)}</b>
       </div>
+      {m.qr && (
+        <div className="sv-qr">
+          <img src={m.qr} alt={`QR de ${nombreDe(m)}`} />
+          <div>
+            <p className="sv-ayuda" style={{ marginTop: 0 }}>
+              Escanéalo desde tu app. Si estás en el celular, guárdalo y en tu app elige «pagar con QR» desde la galería.
+            </p>
+            <a className="sv-copiar" style={{ display: "inline-block", marginTop: 8, textDecoration: "none" }} href={m.qr} download={`QR-${nombreDe(m)}.png`}>
+              Guardar QR
+            </a>
+          </div>
+        </div>
+      )}
       {m.numero && <Copiable etiqueta={t.numero || "Número"} valor={m.numero} />}
       {filas.length > 0 && (
         <dl className="sv-metodo-filas">
@@ -92,33 +105,69 @@ export default function ComoPagar({ c, token, aceptada, onPagado }) {
   const [metodo, setMetodo] = useState(metodos[0] ? nombreDe(metodos[0]) : "");
   const [valor, setValor] = useState(String(anticipo || c.total || ""));
   const [enviando, setEnviando] = useState(false);
-  const [reportado, setReportado] = useState(c.pagoReportado);
+  const [reportado, setReportado] = useState(c.pagoReportado ? "antes" : "");
+  const [comprobante, setComprobante] = useState(null); // { datos, nombre, vista }
 
   if (!metodos.length && !c.pago) return null;
+
+  async function elegirComprobante(file) {
+    if (!file) return;
+    if (file.type === "application/pdf") {
+      const datos = await new Promise((ok) => {
+        const r = new FileReader();
+        r.onload = () => ok(r.result);
+        r.readAsDataURL(file);
+      });
+      setComprobante({ datos, nombre: file.name, vista: "" });
+      return;
+    }
+    // La captura se achica (los celulares sacan imágenes enormes).
+    try {
+      const bmp = await createImageBitmap(file);
+      const escala = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(bmp.width * escala);
+      canvas.height = Math.round(bmp.height * escala);
+      canvas.getContext("2d").drawImage(bmp, 0, 0, canvas.width, canvas.height);
+      const datos = canvas.toDataURL("image/jpeg", 0.85);
+      setComprobante({ datos, nombre: file.name, vista: datos });
+    } catch {
+      alert("No pudimos abrir esa imagen. Prueba con una captura de pantalla en JPG o PNG.");
+    }
+  }
 
   async function reportar(e) {
     e.preventDefault();
     setEnviando(true);
     const monto = Number(valor.replace(/\D/g, "")) || 0;
-    // Se abre la ventana antes de la petición: en el celular, abrirla
-    // después de esperar la bloquea el navegador.
-    const ventana = window.open("", "_blank");
+    // Sin captura, el comprobante se manda por WhatsApp: la ventana se abre
+    // antes de la petición porque en el celular abrirla después la bloquea.
+    const ventana = comprobante ? null : window.open("", "_blank");
     try {
-      await fetch(`${API_URL}/api/public/cotizacion/${encodeURIComponent(token)}/pague`, {
+      const r = await fetch(`${API_URL}/api/public/cotizacion/${encodeURIComponent(token)}/pague`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ metodo, valor: monto }),
+        body: JSON.stringify({ metodo, valor: monto, comprobante: comprobante?.datos || null }),
       });
-    } catch {
-      /* el WhatsApp con el comprobante es lo importante */
+      if (!r.ok) {
+        const d = await r.json().catch(() => ({}));
+        throw new Error(d.error || "No se pudo enviar");
+      }
+    } catch (err) {
+      ventana?.close();
+      alert(`${err.message}. Inténtalo de nuevo o escríbenos por WhatsApp.`);
+      setEnviando(false);
+      return;
     }
-    const texto = `¡Hola Sivú! Ya hice el pago de ${peso(monto)}${metodo ? ` por ${metodo}` : ""} de mi cotización${
-      c.evento ? ` (${c.evento})` : ""
-    }. Te envío el comprobante 👇`;
-    const url = `https://wa.me/${c.whatsapp}?text=${encodeURIComponent(texto)}`;
-    if (ventana) ventana.location.href = url;
-    else window.location.href = url;
-    setReportado(true);
+    if (!comprobante) {
+      const texto = `¡Hola Sivú! Ya hice el pago de ${peso(monto)}${metodo ? ` por ${metodo}` : ""} de mi cotización${
+        c.evento ? ` (${c.evento})` : ""
+      }. Te envío el comprobante 👇`;
+      const url = `https://wa.me/${c.whatsapp}?text=${encodeURIComponent(texto)}`;
+      if (ventana) ventana.location.href = url;
+      else window.location.href = url;
+    }
+    setReportado(comprobante ? "con-comprobante" : "sin-comprobante");
     setAbierto(false);
     setEnviando(false);
     onPagado?.();
@@ -156,7 +205,14 @@ export default function ComoPagar({ c, token, aceptada, onPagado }) {
       {!c.vencida &&
         (reportado ? (
           <div className="sv-aviso sv-aviso-ok" style={{ marginTop: 14 }}>
-            ✓ Ya nos avisaste de tu pago. Si no enviaste el comprobante, mándalo por WhatsApp y te confirmamos.
+            {reportado === "con-comprobante" ? (
+              <>
+                <b>✓ Recibimos tu comprobante.</b> En cuanto confirmemos el pago te escribimos por WhatsApp para arrancar con tu
+                invitación 💌
+              </>
+            ) : (
+              "✓ Ya nos avisaste de tu pago. Si no enviaste el comprobante, mándalo por WhatsApp y te confirmamos."
+            )}
           </div>
         ) : abierto ? (
           <form onSubmit={reportar} className="sv-ya-pague">
@@ -180,9 +236,33 @@ export default function ComoPagar({ c, token, aceptada, onPagado }) {
                 />
               </label>
             </div>
+            <div style={{ marginTop: 12 }}>
+              <span className="sv-label">Captura del comprobante</span>
+              {comprobante ? (
+                <div className="sv-archivo">
+                  {comprobante.vista ? (
+                    <img src={comprobante.vista} alt="" style={{ width: 44, height: 44, objectFit: "cover", borderRadius: 8 }} />
+                  ) : (
+                    <span>📄</span>
+                  )}
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{comprobante.nombre}</span>
+                  <button type="button" onClick={() => setComprobante(null)}>
+                    Cambiar
+                  </button>
+                </div>
+              ) : (
+                <label className="sv-subir">
+                  📎 Adjuntar captura o PDF
+                  <input type="file" accept="image/*,application/pdf" hidden onChange={(e) => elegirComprobante(e.target.files?.[0])} />
+                </label>
+              )}
+              <span className="sv-ayuda">
+                {comprobante ? "Listo: te confirmamos apenas veamos el pago." : "Si no la tienes a mano, puedes enviarla después por WhatsApp."}
+              </span>
+            </div>
             <div className="sv-botones" style={{ marginTop: 12 }}>
               <button className="sv-btn sv-btn-oro" disabled={enviando}>
-                {enviando ? "Un momento..." : "Avisar y enviar comprobante"}
+                {enviando ? "Enviando..." : comprobante ? "Enviar comprobante" : "Avisar y enviar por WhatsApp"}
               </button>
               <button type="button" className="sv-btn sv-btn-borde" onClick={() => setAbierto(false)}>
                 Cancelar
