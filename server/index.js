@@ -8,6 +8,7 @@ import { manejadorDeErrores } from "./errores.js";
 import { reanudarWhatsapp } from "./whatsappWeb.js";
 import { iniciarResumenes } from "./resumenDiario.js";
 import { iniciarEnvios } from "./envioMasivo.js";
+import { iniciarLeads } from "./leadsMeta.js";
 import { cabecerasSeguras, corsOpciones, limitador } from "./seguridad.js";
 
 const app = express();
@@ -58,4 +59,6 @@ app.listen(PORT, () => {
   iniciarResumenes();
   // Cola del envío automático de invitaciones (sigue donde iba tras reiniciar).
   iniciarEnvios();
+  // Clientes potenciales de los anuncios de Meta → WhatsApp de Sivú.
+  iniciarLeads();
 });
