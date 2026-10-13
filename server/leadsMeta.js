@@ -27,8 +27,9 @@ import { ahoraEnBogota } from "./hora.js";
 
 const API = "https://graph.facebook.com/v21.0";
 const CADA_MS = 3 * 60 * 1000;
-// La primera revisión solo anota como vistos los contactos que ya había (por
-// ejemplo, los de prueba): se escribe únicamente a los que lleguen después.
+// Contactos de más de un día (por ejemplo, de antes de activar esto) se anotan
+// como vistos sin escribirles: un saludo tan tarde ya no tiene sentido.
+const VIGENCIA_MS = 24 * 3600 * 1000;
 const MAX_INTENTOS = 5;
 
 const OPCIONES = {
@@ -111,12 +112,11 @@ export function textoAviso(campos, telefono, creado) {
 
 async function guardarNuevos() {
   const ids = await formularios();
-  const { rows: [{ hay }] } = await pool.query("SELECT EXISTS (SELECT 1 FROM leads_meta) AS hay");
   for (const formulario of ids) {
     const { data = [] } = await graph(`${formulario}/leads`, { fields: "id,created_time,field_data", limit: 100 });
     for (const lead of data) {
       const campos = leerCampos(lead);
-      const viejo = !hay;
+      const viejo = Date.now() - new Date(lead.created_time) > VIGENCIA_MS;
       await pool.query(
         `INSERT INTO leads_meta (id, formulario, creado_en, nombre, telefono, datos, saludado_en, avisado_en, detalle)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $7, $8)
@@ -124,7 +124,7 @@ async function guardarNuevos() {
         [
           lead.id, formulario, lead.created_time, campos.full_name || "",
           normalizarTelefono(campos.phone_number), campos,
-          viejo ? new Date() : null, viejo ? "Anterior a la activación: no se escribió" : "",
+          viejo ? new Date() : null, viejo ? "Llegó hace más de un día: no se escribió" : "",
         ]
       );
     }
