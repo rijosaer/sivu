@@ -1,12 +1,18 @@
 import { Suspense, lazy, useEffect, useState } from "react";
 import { applyTema } from "../theme/applyTema";
 import { WHATSAPP } from "../landing/config";
+import { API_URL } from "../api/site";
 import "./demo.css";
 
 // Demostración pública de cada diseño: /plantillas/<diseño>. Muestra la
 // invitación completa con datos de ejemplo incluidos en el sitio (exportados
 // de una muestra real), sin tocar la base de datos: la confirmación se simula
 // y no guarda nada. Así la landing enseña las plantillas sin login ni eventos.
+//
+// <diseño> también puede ser una variante del catálogo (panel → Diseños): se
+// pide a la API su diseño base y sus colores, y se pinta el base con ellos.
+// ?t=<json> pisa colores y letras sin guardar: es la vista previa en vivo del
+// editor de variantes del panel.
 
 const DISENOS = {
   jardin: lazy(() => import("../disenos/jardin/Jardin")),
@@ -32,21 +38,47 @@ const MUESTRAS = {
 
 const NOMBRES = { jardin: "Jardín encantado", ensueno: "Ensueño", gala: "Gala", lazos: "Moños y perlas", coquette: "Coquette", paris: "París rosé", valle: "Valle de luna", "valle-claro": "Valle claro" };
 
+function temaDeUrl() {
+  try {
+    const t = new URLSearchParams(window.location.search).get("t");
+    return t ? JSON.parse(t) : {};
+  } catch {
+    return {};
+  }
+}
+
 export default function Demo({ diseno }) {
   const [datos, setDatos] = useState(null);
+  const [info, setInfo] = useState(null); // { base, nombre, tema }
+  const [noExiste, setNoExiste] = useState(false);
   const enVistaPrevia = new URLSearchParams(window.location.search).has("preview");
-  const Diseno = DISENOS[diseno];
+  const base = info?.base || diseno;
+  const Diseno = DISENOS[base];
+  const nombre = info?.nombre || NOMBRES[diseno] || diseno;
 
   useEffect(() => {
-    if (!MUESTRAS[diseno]) return;
-    MUESTRAS[diseno]().then((m) => {
-      applyTema(m.default.site.tema);
-      document.title = `Plantilla ${NOMBRES[diseno]} · Sivú`;
-      setDatos(m.default);
-    });
+    let vivo = true;
+    fetch(`${API_URL}/api/public/disenos/${encodeURIComponent(diseno)}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .catch(() => null)
+      .then((d) => {
+        if (!vivo) return;
+        const elegido = d || (DISENOS[diseno] ? { base: diseno, nombre: NOMBRES[diseno], tema: {} } : null);
+        if (!elegido || !MUESTRAS[elegido.base]) return setNoExiste(true);
+        setInfo(elegido);
+        MUESTRAS[elegido.base]().then((m) => {
+          if (!vivo) return;
+          applyTema({ ...m.default.site.tema, ...(elegido.tema || {}), ...temaDeUrl() });
+          document.title = `Plantilla ${elegido.nombre || diseno} · Sivú`;
+          setDatos(m.default);
+        });
+      });
+    return () => {
+      vivo = false;
+    };
   }, [diseno]);
 
-  if (!Diseno) {
+  if (noExiste || (info && !Diseno)) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 text-center px-6 font-body text-ink/70">
         <p>Esa plantilla no existe.</p>
@@ -59,7 +91,7 @@ export default function Demo({ diseno }) {
   const { site, invitado } = datos;
   const contenidoDe = (tipo) => site.secciones.find((s) => s.tipo === tipo)?.contenido || {};
   const wa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
-    `Hola, me gusta la plantilla «${NOMBRES[diseno]}» de Sivú para mi evento.`
+    `Hola, me gusta la plantilla «${nombre}» de Sivú para mi evento.`
   )}`;
 
   return (

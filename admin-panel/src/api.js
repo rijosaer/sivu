@@ -169,6 +169,13 @@ export const api = {
       setTimeout(() => URL.revokeObjectURL(url), 5000);
     },
     mensajesInvitados: () => request("/api/admin/crm/mensajes-invitados"),
+    // Catálogo de diseños (panel → Diseños).
+    disenos: () => request("/api/admin/crm/disenos"),
+    actualizarDiseno: (id, cambios) =>
+      request(`/api/admin/crm/disenos/${id}`, { method: "PUT", body: JSON.stringify(cambios) }),
+    crearVariante: (id, nombre) =>
+      request(`/api/admin/crm/disenos/${id}/variante`, { method: "POST", body: JSON.stringify({ nombre }) }),
+    borrarDiseno: (id) => request(`/api/admin/crm/disenos/${id}`, { method: "DELETE" }),
     // Bandeja de WhatsApp (como WhatsApp Web).
     chats: () => request("/api/admin/crm/bandeja/chats"),
     chat: (tel) => request(`/api/admin/crm/bandeja/chats/${tel}`),

@@ -3,6 +3,7 @@ import { api, setInvitacionActual, sitioUrlInvitacion } from "../api";
 import { TIPOS_EVENTO, NOMBRE_TIPO_EVENTO, DISENOS } from "../tiposEvento";
 import { useToast } from "../ui/Toast";
 import Icono from "../ui/Icono";
+import { useCatalogoDisenos } from "../catalogoDisenos";
 
 // Pantalla que ve el dueño justo después de entrar: el panel ya no
 // administra un solo evento, así que antes de tocar contenido hay que
@@ -93,6 +94,7 @@ export function FormularioNuevo({ plantillas, onCreado, onCancelar }) {
   // Solo se ofrecen plantillas del mismo tipo: una boda clonada en unos XV
   // traería secciones y textos de boda.
   const delTipo = plantillas.filter((p) => p.tipo_evento === tipoEvento);
+  const catalogo = useCatalogoDisenos();
   const nombreDiseno = (key) => DISENOS.find((d) => d.key === (key || "clasico"))?.nombre || key;
 
   async function crear(e) {
@@ -192,7 +194,7 @@ export function FormularioNuevo({ plantillas, onCreado, onCancelar }) {
         <label className="block mb-4">
           <span className="etiqueta">Diseño</span>
           <select className="campo" value={diseno} onChange={(e) => setDiseno(e.target.value)}>
-            {DISENOS.map((d) => (
+            {catalogo.map((d) => (
               <option key={d.key} value={d.key}>
                 {d.nombre}
               </option>

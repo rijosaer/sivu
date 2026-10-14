@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { api, getInvitacionActual } from "../api";
 import { ir } from "../ruta";
-import { DISENOS, NOMBRE_TIPO_EVENTO } from "../tiposEvento";
+import { NOMBRE_TIPO_EVENTO } from "../tiposEvento";
+import { useCatalogoDisenos } from "../catalogoDisenos";
 import { useToast } from "../ui/Toast";
 import { AccesoCliente, AvisosWhatsapp } from "./SelectorEventos";
 import { PERMISO_CLIENTE, PERMISOS } from "../permisos";
@@ -71,6 +72,7 @@ export default function AjustesEvento() {
   const [inv, setInv] = useState(null);
   const [guardando, setGuardando] = useState(false);
   const [borrar, setBorrar] = useState(false);
+  const catalogo = useCatalogoDisenos();
   const id = getInvitacionActual()?.id;
 
   useEffect(() => {
@@ -126,11 +128,11 @@ export default function AjustesEvento() {
         <Bloque titulo="Diseño base" ayuda="Cambia adornos, colores y letras de toda la invitación. Los textos, los invitados y las fotos se quedan igual.">
           <select
             className="campo sm:max-w-sm"
-            value={inv.diseno || "clasico"}
+            value={inv.diseno_variante || inv.diseno || "clasico"}
             disabled={guardando}
-            onChange={(e) => cambiar({ diseno: e.target.value }, `Diseño: ${DISENOS.find((d) => d.key === e.target.value)?.nombre}`)}
+            onChange={(e) => cambiar({ diseno: e.target.value }, `Diseño: ${catalogo.find((d) => d.key === e.target.value)?.nombre}`)}
           >
-            {DISENOS.map((d) => (
+            {catalogo.map((d) => (
               <option key={d.key} value={d.key}>
                 {d.nombre}
               </option>

@@ -12,6 +12,7 @@ import { metricas, pendientesDeHoy, enviarReporte, armarReporte } from "../repor
 import { estadoLeads } from "../leadsMeta.js";
 import { crearEventoBasico } from "./invitaciones.js";
 import { bandejaRouter } from "./bandeja.js";
+import { disenosRouter } from "../disenos.js";
 
 // Todo lo del negocio de Sivú que está por encima de un evento: clientes
 // potenciales, configuración, cotizaciones y producción. Solo el dueño (lo
@@ -19,6 +20,7 @@ import { bandejaRouter } from "./bandeja.js";
 export const crmRouter = Router();
 
 crmRouter.use("/bandeja", bandejaRouter);
+crmRouter.use("/disenos", disenosRouter);
 
 const token = () => crypto.randomBytes(9).toString("base64url");
 const entero = (v) => (v === "" || v === null || v === undefined ? null : Math.max(0, Math.round(Number(v) || 0)));

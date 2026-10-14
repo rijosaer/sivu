@@ -7,6 +7,7 @@ const Clientes = lazy(() => import("./Clientes"));
 const Eventos = lazy(() => import("./Produccion"));
 const Configuracion = lazy(() => import("./Configuracion"));
 const Bandeja = lazy(() => import("./Bandeja"));
+const Disenos = lazy(() => import("./Disenos"));
 
 // Lo que ve el dueño de Sivú al entrar. «Eventos» junta lo que antes eran
 // «Eventos» y «Producción» (la misma lista vista dos veces); «Mensajes» es la
@@ -17,6 +18,7 @@ const TABS = [
   { key: "clientes", label: "Clientes", icono: "persona", descripcion: "Quién escribió, a quién cotizaste y quién firmó." },
   { key: "mensajes", label: "Mensajes", icono: "chat", descripcion: "Lo que llega al WhatsApp de Sivú: clientes e invitados." },
   { key: "eventos", label: "Eventos", icono: "calendario", descripcion: "Cada evento contratado: etapa, datos y pagos." },
+  { key: "disenos", label: "Diseños", icono: "flor", descripcion: "Los diseños de invitación, su publicación y sus variantes." },
   { key: "configuracion", label: "Configuración", icono: "ajustes", descripcion: "Textos, horario, avisos, precios y pagos." },
 ];
 
@@ -72,6 +74,7 @@ export default function PanelDueno({ tramos = [], onElegir, onSalir }) {
         )}
         {tab === "mensajes" && <Bandeja sub={sub} />}
         {tab === "eventos" && <Eventos onElegirEvento={onElegir} />}
+        {tab === "disenos" && <Disenos />}
         {tab === "configuracion" && <Configuracion seccion={sub} />}
       </Suspense>
     </Marco>

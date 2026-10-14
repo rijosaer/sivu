@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import "dotenv/config";
 import { publicRouter } from "./routes/public.js";
+import { disenosPublicosRouter } from "./disenos.js";
 import { authRouter } from "./routes/auth.js";
 import { adminRouter } from "./routes/admin.js";
 import { manejadorDeErrores } from "./errores.js";
@@ -42,6 +43,7 @@ const limitePublico = limitador({
   mensaje: "Demasiadas solicitudes. Espera un momento.",
 });
 
+app.use("/api/public/disenos", limitePublico, disenosPublicosRouter);
 app.use("/api/public", limitePublico, publicRouter);
 app.use("/api/auth/login", limiteLogin);
 app.use("/api/auth", authRouter);

@@ -2,6 +2,7 @@ import { Router } from "express";
 import { pool } from "../db.js";
 import { capturar } from "../errores.js";
 import { temaDeDiseno } from "../plantillas.js";
+import { resolverDiseno } from "../disenos.js";
 import { soloDueno } from "../auth.js";
 import { RITMO } from "../envioMasivo.js";
 import { estadoWhatsapp } from "../whatsappWeb.js";
@@ -142,8 +143,10 @@ recursosRouter.get(
 recursosRouter.post(
   "/tema/restaurar",
   capturar(async (req, res) => {
-    const { rows } = await pool.query("SELECT diseno FROM invitaciones WHERE id = $1", [req.invitacionId]);
-    for (const [clave, valor] of temaDeDiseno(rows[0]?.diseno)) {
+    // Una variante vuelve a sus propios colores, no a los del diseño base.
+    const { rows } = await pool.query("SELECT diseno, diseno_variante FROM invitaciones WHERE id = $1", [req.invitacionId]);
+    const elegido = await resolverDiseno(rows[0]?.diseno_variante || rows[0]?.diseno);
+    for (const [clave, valor] of elegido?.tema || temaDeDiseno(rows[0]?.diseno)) {
       await pool.query(
         `INSERT INTO tema (invitacion_id, clave, valor) VALUES ($1, $2, $3)
          ON CONFLICT (invitacion_id, clave) DO UPDATE SET valor = EXCLUDED.valor`,

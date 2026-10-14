@@ -6,7 +6,8 @@ import { resolverInvitacionAdmin } from "../middlewareInvitacion.js";
 import { soloDueno } from "../auth.js";
 import { avisosListos, describirRespuesta, enviarAviso, telefonosDe } from "../avisosWhatsapp.js";
 import { enviarResumen } from "../resumenDiario.js";
-import { TIPOS_EVENTO, DISENOS, temaDeDiseno, decoracionesBase, plantillaSecciones } from "../plantillas.js";
+import { TIPOS_EVENTO, decoracionesBase, plantillaSecciones } from "../plantillas.js";
+import { resolverDiseno } from "../disenos.js";
 
 // CRUD de invitaciones (los "eventos" del sistema). Es lo que le permite al
 // dueño operar muchos clientes desde un solo panel: cada fila de aquí es una
@@ -62,7 +63,7 @@ invitacionesRouter.get(
     // El dueño ve todos los eventos; un cliente, solo el suyo.
     const soloUno = req.admin.invitacionId || null;
     const { rows } = await pool.query(
-      `SELECT id, slug, nombre, tipo_evento, diseno, fecha_evento, activo, es_plantilla, avisos_whatsapp, creado_en
+      `SELECT id, slug, nombre, tipo_evento, diseno, diseno_variante, fecha_evento, activo, es_plantilla, avisos_whatsapp, creado_en
        FROM invitaciones WHERE ($1::int IS NULL OR id = $1) ORDER BY creado_en DESC`,
       [soloUno]
     );
@@ -127,8 +128,10 @@ invitacionesRouter.post(
       if (!rows.length) return res.status(400).json({ error: "Esa plantilla no existe" });
       plantilla = rows[0];
     }
-    const disenoFinal = diseno || plantilla?.diseno || "clasico";
-    if (!DISENOS.includes(disenoFinal)) return res.status(400).json({ error: "Diseño no válido" });
+    // El diseño puede ser uno programado o una variante del catálogo.
+    const elegido = await resolverDiseno(diseno || plantilla?.diseno || "clasico");
+    if (!elegido) return res.status(400).json({ error: "Diseño no válido" });
+    const disenoFinal = elegido.base;
     const base = slugificar(slugPedido || nombre) || "invitacion";
     const slug = await slugUnico(base);
 
@@ -136,9 +139,9 @@ invitacionesRouter.post(
     try {
       await client.query("BEGIN");
       const { rows } = await client.query(
-        `INSERT INTO invitaciones (slug, nombre, tipo_evento, fecha_evento, diseno)
-         VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-        [slug, nombre.trim(), tipo_evento, fecha_evento || null, disenoFinal]
+        `INSERT INTO invitaciones (slug, nombre, tipo_evento, fecha_evento, diseno, diseno_variante)
+         VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+        [slug, nombre.trim(), tipo_evento, fecha_evento || null, disenoFinal, plantilla ? null : elegido.variante]
       );
       const invitacion = rows[0];
 
@@ -163,7 +166,7 @@ invitacionesRouter.post(
           [invitacion.id, plantilla.id]
         );
       } else {
-        for (const [clave, valor] of temaDeDiseno(disenoFinal)) {
+        for (const [clave, valor] of elegido.tema) {
           await client.query(
             "INSERT INTO tema (invitacion_id, clave, valor) VALUES ($1, $2, $3)",
             [invitacion.id, clave, valor]
@@ -349,7 +352,8 @@ invitacionesRouter.put(
     if (tipo_evento && !TIPOS_EVENTO.includes(tipo_evento)) {
       return res.status(400).json({ error: "Tipo de evento no válido" });
     }
-    if (diseno && !DISENOS.includes(diseno)) return res.status(400).json({ error: "Diseño no válido" });
+    const elegido = diseno ? await resolverDiseno(diseno) : null;
+    if (diseno && !elegido) return res.status(400).json({ error: "Diseño no válido" });
     let slug = null;
     if (slugPedido && slugPedido !== req.invitacion.slug) {
       const candidato = slugificar(slugPedido);
@@ -363,8 +367,9 @@ invitacionesRouter.put(
     }
     // Cambiar de diseño aplica su paquete de colores y letras; el resto del
     // tema (mensajes de WhatsApp, etc.) se conserva.
-    if (diseno && diseno !== req.invitacion.diseno) {
-      for (const [clave, valor] of temaDeDiseno(diseno)) {
+    const actual = req.invitacion.diseno_variante || req.invitacion.diseno;
+    if (elegido && diseno !== actual) {
+      for (const [clave, valor] of elegido.tema) {
         await pool.query(
           `INSERT INTO tema (invitacion_id, clave, valor) VALUES ($1, $2, $3)
            ON CONFLICT (invitacion_id, clave) DO UPDATE SET valor = EXCLUDED.valor`,
@@ -381,6 +386,7 @@ invitacionesRouter.put(
          activo = COALESCE($7, activo),
          es_plantilla = COALESCE($8, es_plantilla),
          diseno = COALESCE($9, diseno),
+         diseno_variante = CASE WHEN $9::text IS NULL THEN diseno_variante ELSE $10::text END,
          actualizado_en = now()
        WHERE id = $1 RETURNING *`,
       [
@@ -392,7 +398,8 @@ invitacionesRouter.put(
         fecha_evento || null,
         activo,
         es_plantilla,
-        diseno || null,
+        elegido?.base || null,
+        elegido?.variante || null,
       ]
     );
     res.json(rows[0]);
@@ -484,14 +491,15 @@ invitacionesRouter.delete(
 // «Confirmar pago» para convertir a un cliente en evento de un solo toque.
 export async function crearEventoBasico(client, { nombre, tipo_evento = "otro", fecha_evento = null, diseno = "clasico" }) {
   const tipo = TIPOS_EVENTO.includes(tipo_evento) ? tipo_evento : "otro";
-  const disenoFinal = DISENOS.includes(diseno) ? diseno : "clasico";
+  const elegido = (await resolverDiseno(diseno, client)) || (await resolverDiseno("clasico", client));
+  const disenoFinal = elegido.base;
   const slug = await slugUnico(slugificar(nombre) || "invitacion");
   const { rows: [invitacion] } = await client.query(
-    `INSERT INTO invitaciones (slug, nombre, tipo_evento, fecha_evento, diseno)
-     VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-    [slug, nombre.trim(), tipo, fecha_evento || null, disenoFinal]
+    `INSERT INTO invitaciones (slug, nombre, tipo_evento, fecha_evento, diseno, diseno_variante)
+     VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+    [slug, nombre.trim(), tipo, fecha_evento || null, disenoFinal, elegido.variante]
   );
-  for (const [clave, valor] of temaDeDiseno(disenoFinal)) {
+  for (const [clave, valor] of elegido.tema) {
     await client.query("INSERT INTO tema (invitacion_id, clave, valor) VALUES ($1, $2, $3)", [invitacion.id, clave, valor]);
   }
   for (const d of decoracionesBase()) {

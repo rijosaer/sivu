@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import "./landing.css";
 import { PRECIOS, waLink } from "./config";
+import { API_URL } from "../api/site";
 
 const ESTILOS = [
   { tipo: "Boda", nombre: "Camila & Andrés", fecha: "13 · 02 · 2027", fondo: "linear-gradient(170deg,#f3ece0 0%,#e9dccb 100%)", tinta: "#5C0F27", acento: "#B87F1E", flor: "#c98a9b" },
@@ -18,12 +19,27 @@ const AVISOS = [
 // Cada modelo se muestra como la invitación misma, funcionando dentro de un
 // celular: la boda carga la invitación de ejemplo (Ana & Diego) y los demás la
 // demostración pública de su diseño (/plantillas/<diseño>, sin base de datos).
-const MODELOS = [
+// Los modelos que se muestran los decide el panel (Diseños → «En la landing»).
+// Esta lista es el respaldo si la API no responde.
+const MODELOS_RESPALDO = [
   { estilo: "Clásico", vista: "/ana-y-diego" },
   { estilo: "Jardín encantado", vista: "/plantillas/jardin" },
   { estilo: "Ensueño", vista: "/plantillas/ensueno" },
   { estilo: "Gala", vista: "/plantillas/gala" },
 ];
+
+function useModelos() {
+  const [modelos, setModelos] = useState(MODELOS_RESPALDO);
+  useEffect(() => {
+    fetch(`${API_URL}/api/public/disenos`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((lista) => {
+        if (Array.isArray(lista) && lista.length) setModelos(lista.map((d) => ({ estilo: d.nombre, vista: d.vista })));
+      })
+      .catch(() => {});
+  }, []);
+  return modelos;
+}
 
 const PREGUNTAS = [
   ["¿Cuánto tarda en estar lista mi invitación?", "Normalmente entre 3 y 5 días hábiles desde que nos envías la información del evento y la lista de invitados."],
@@ -154,6 +170,7 @@ function Tablero() {
 }
 
 export default function Landing() {
+  const modelos = useModelos();
   const ref = useAparecer();
   useEffect(() => {
     document.title = "Sivú · Invitaciones digitales que enamoran";
@@ -282,7 +299,7 @@ export default function Landing() {
           <span className="cv-eyebrow cv-oro">Modelos</span>
           <h2 className="cv-crema">Un estilo para <span className="cv-script cv-oro">cada historia</span></h2>
           <div className="cv-telefonos">
-            {MODELOS.map((m) => (
+            {modelos.map((m) => (
               <div key={m.vista} className="cv-telefono-item" data-aparece>
                 <div className="cv-telefono">
                   <span className="cv-telefono-camara" aria-hidden="true" />
