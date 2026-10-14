@@ -23,6 +23,15 @@ const DISENOS = {
   paris: lazy(() => import("../disenos/paris/Paris")),
   valle: lazy(() => import("../disenos/valle/Valle")),
   "valle-claro": lazy(() => import("../disenos/valle/ValleClaro")),
+  eucalipto: lazy(() => import("../disenos/eucalipto/Eucalipto")),
+  luces: lazy(() => import("../disenos/luces/Luces")),
+  vals: lazy(() => import("../disenos/vals/Vals")),
+  luz: lazy(() => import("../disenos/luz/Luz")),
+  confeti: lazy(() => import("../disenos/confeti/Confeti")),
+  dulce: lazy(() => import("../disenos/dulce/Dulce")),
+  birrete: lazy(() => import("../disenos/birrete/Birrete")),
+  medianoche: lazy(() => import("../disenos/medianoche/Medianoche")),
+  osito: lazy(() => import("../disenos/osito/Osito")),
 };
 
 const MUESTRAS = {
@@ -34,9 +43,18 @@ const MUESTRAS = {
   paris: () => import("./muestras/paris.json"),
   valle: () => import("./muestras/valle.json"),
   "valle-claro": () => import("./muestras/valle-claro.json"),
+  eucalipto: () => import("./muestras/eucalipto.json"),
+  luces: () => import("./muestras/luces.json"),
+  vals: () => import("./muestras/vals.json"),
+  luz: () => import("./muestras/luz.json"),
+  confeti: () => import("./muestras/confeti.json"),
+  dulce: () => import("./muestras/dulce.json"),
+  birrete: () => import("./muestras/birrete.json"),
+  medianoche: () => import("./muestras/medianoche.json"),
+  osito: () => import("./muestras/osito.json"),
 };
 
-const NOMBRES = { jardin: "Jardín encantado", ensueno: "Ensueño", gala: "Gala", lazos: "Moños y perlas", coquette: "Coquette", paris: "París rosé", valle: "Valle de luna", "valle-claro": "Valle claro" };
+const NOMBRES = { jardin: "Jardín encantado", ensueno: "Ensueño", gala: "Gala", lazos: "Moños y perlas", coquette: "Coquette", paris: "París rosé", valle: "Valle de luna", "valle-claro": "Valle claro", eucalipto: "Eucalipto", luces: "Luces de verano", vals: "Vals rosa", luz: "Luz de bautizo", confeti: "Confeti", dulce: "Dulce 30", birrete: "Birrete", medianoche: "Medianoche", osito: "Osito" };
 
 function temaDeUrl() {
   try {

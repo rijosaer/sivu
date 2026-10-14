@@ -26,6 +26,15 @@ const DISENOS_ALTERNATIVOS = {
   "valle-claro": lazy(() => import("./disenos/valle/ValleClaro")),
   celebracion: lazy(() => import("./disenos/celebracion/Celebracion")),
   "celebracion-azul": lazy(() => import("./disenos/celebracion/CelebracionAzul")),
+  eucalipto: lazy(() => import("./disenos/eucalipto/Eucalipto")),
+  luces: lazy(() => import("./disenos/luces/Luces")),
+  vals: lazy(() => import("./disenos/vals/Vals")),
+  luz: lazy(() => import("./disenos/luz/Luz")),
+  confeti: lazy(() => import("./disenos/confeti/Confeti")),
+  dulce: lazy(() => import("./disenos/dulce/Dulce")),
+  birrete: lazy(() => import("./disenos/birrete/Birrete")),
+  medianoche: lazy(() => import("./disenos/medianoche/Medianoche")),
+  osito: lazy(() => import("./disenos/osito/Osito")),
 };
 
 function useInvitationCode() {

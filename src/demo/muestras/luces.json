@@ -1,0 +1,182 @@
+{
+  "site": {
+    "invitacion": {
+      "slug": "plantillas/luces",
+      "nombre": "Boda · Valentina & Sebastián",
+      "tipoEvento": "boda",
+      "diseno": "luces"
+    },
+    "tema": {
+      "color-paper": "#F7EFE3",
+      "color-ink": "#2A3346",
+      "color-gold": "#C9923F",
+      "color-gold-light": "#F0D5A4",
+      "color-gold-dark": "#8A5F22",
+      "color-marble": "#FFFAF2",
+      "color-seal": "#3E4C6E",
+      "fuente-guion": "Petit Formal Script",
+      "fuente-titulos": "Gloock",
+      "fuente-cuerpo": "Raleway"
+    },
+    "decoraciones": {
+      "scrollwork": null,
+      "bouquet": null,
+      "frame": null,
+      "column": null,
+      "divider": null
+    },
+    "ubicaciones": [],
+    "secciones": [
+      {
+        "id": 46,
+        "tipo": "welcome",
+        "contenido": {
+          "novioEl": "Sebastián",
+          "novioElla": "Valentina",
+          "fraseIntro": "Una mesa larga, velas encendidas y la gente que más queremos. Así soñamos el primer día del resto de nuestra vida.",
+          "padresTexto": "Con la bendición de nuestros padres",
+          "padreElPadre": "Jorge Andrés Restrepo",
+          "padreElMadre": "Claudia Patricia Mejía",
+          "padreEllaPadre": "Luis Fernando Arango",
+          "padreEllaMadre": "Ana María Salazar",
+          "bienvenidaTexto": "Nos casamos"
+        }
+      },
+      {
+        "id": 47,
+        "tipo": "informacion_boda",
+        "contenido": {
+          "fecha": "2027-08-14T16:30:00-05:00",
+          "lugar": "Hacienda Fagua",
+          "mapsUrl": "https://maps.google.com/?q=Hacienda+Fagua+Ch%C3%ADa+Cundinamarca",
+          "overline": "Cena al aire libre",
+          "direccion": "Km 5 vía Chía – Cajicá, Chía, Cundinamarca",
+          "mapaEmbed": "",
+          "cronograma": [
+            { "hora": "4:30 p. m.", "titulo": "Ceremonia en el jardín" },
+            { "hora": "5:30 p. m.", "titulo": "Cóctel al atardecer" },
+            { "hora": "7:00 p. m.", "titulo": "Entrada de los novios y brindis" },
+            { "hora": "7:30 p. m.", "titulo": "Cena en la mesa larga" },
+            { "hora": "9:00 p. m.", "titulo": "Primer baile" },
+            { "hora": "9:30 p. m.", "titulo": "Fiesta bajo las luces" },
+            { "hora": "1:00 a. m.", "titulo": "Despedida con bengalas" }
+          ],
+          "tituloSeccion": "Cuándo y dónde",
+          "cronogramaModo": "detallado",
+          "tituloItinerario": "Menú de la noche",
+          "cronogramaMensaje": "Les compartiremos el programa más cerca de la fecha.",
+          "mostrarRestriccion": true,
+          "mostrarObservaciones": true,
+          "telefonoConfirmar": "310 555 2741",
+          "fechaLimiteConfirmacion": "2027-07-15"
+        }
+      },
+      {
+        "id": 48,
+        "tipo": "padrinos",
+        "contenido": {
+          "titulo": "Nuestros padrinos",
+          "grupos": [
+            { "etiqueta": "Padrinos de velación", "personas": ["Mauricio Arango", "Carolina Vélez"] },
+            { "etiqueta": "Padrinos de anillos", "personas": ["Felipe Restrepo", "Laura Gómez"] },
+            { "etiqueta": "Padrinos de lazo", "personas": ["Juan Pablo Ochoa", "Isabel Cristina Ríos"] }
+          ]
+        }
+      },
+      {
+        "id": 49,
+        "tipo": "vestimenta",
+        "contenido": {
+          "titulo": "Formal de verano",
+          "nota": "La cena es sobre el césped: te recomendamos tacón ancho y un abrigo ligero para la noche.",
+          "permitidos": [
+            { "nombre": "Tierra y arena", "colores": ["#C8A27A", "#A9744F", "#E6D3B3"] },
+            { "nombre": "Verdes y azules suaves", "colores": ["#8FA58A", "#7D8FB0", "#B9C6D6"] }
+          ],
+          "evitar": [
+            { "nombre": "Blanco", "color": "#FFFFFF" },
+            { "nombre": "Marfil", "color": "#F3EBD8" }
+          ]
+        }
+      },
+      {
+        "id": 50,
+        "tipo": "regalos",
+        "contenido": {
+          "titulo": "Regalos",
+          "texto": "Lo más importante es que estés con nosotros. Si quieres darnos un detalle, nos ayudarás a construir nuestro primer hogar.",
+          "enlaces": [],
+          "datosTransferencia": "Bancolombia ahorros 123-456789-01 · Valentina Arango"
+        }
+      },
+      {
+        "id": 51,
+        "tipo": "info_importante",
+        "contenido": {
+          "nota": "",
+          "items": [
+            "La invitación es personal y válida solo para los pases indicados.",
+            "Celebraremos solo con adultos; gracias por entenderlo.",
+            "La ceremonia empieza puntual a las 4:30 p. m.: llega 20 minutos antes."
+          ]
+        }
+      },
+      {
+        "id": 52,
+        "tipo": "faq",
+        "contenido": {
+          "items": [
+            { "p": "¿Hay parqueadero?", "r": "Sí, la hacienda tiene parqueadero para invitados, sin costo." },
+            { "p": "¿Y si llueve?", "r": "La mesa larga tiene carpa transparente: las luces se verán igual de lindas." },
+            { "p": "¿Hay transporte de regreso?", "r": "Habrá una buseta a Bogotá (calle 100) a la 1:00 a. m. Avísanos al confirmar si la necesitas." }
+          ]
+        }
+      },
+      {
+        "id": 53,
+        "tipo": "historia",
+        "contenido": {
+          "titulo": "Nuestra historia",
+          "texto": "Nos conocimos en una cena de amigos en la que nadie quería levantarse de la mesa. Siete años después seguimos igual: las mejores conversaciones nos pasan alrededor de una mesa larga, con velas y sin afán. Por eso queremos casarnos así, compartiendo la cena contigo."
+        }
+      },
+      {
+        "id": 54,
+        "tipo": "sobres",
+        "contenido": {
+          "texto": "El día de la boda habrá una caja para sobres junto a la mesa de los novios."
+        }
+      },
+      {
+        "id": 55,
+        "tipo": "musica",
+        "contenido": {
+          "src": "",
+          "titulo": ""
+        }
+      }
+    ],
+    "fechaLimiteConfirmacion": "2027-07-15",
+    "fotosSubidas": [],
+    "audioUrl": null,
+    "fondoUrl": null
+  },
+  "invitado": {
+    "codigo": "DEMO",
+    "tipo": "cupos",
+    "nombre": "Camila Ortiz",
+    "familia": "",
+    "mensaje": "",
+    "cupos": 1,
+    "miembros": [
+      {
+        "id": -1,
+        "nombre": "Camila Ortiz",
+        "estado": "pendiente",
+        "restriccion": "",
+        "comentario": "",
+        "es_acompanante": false
+      }
+    ]
+  }
+}

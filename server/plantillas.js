@@ -22,7 +22,7 @@ export const TIPOS_EVENTO = [
 
 // Diseños con los que el sitio puede dibujar una invitación (columna
 // invitaciones.diseno). Tiene que coincidir con src/disenos del sitio.
-export const DISENOS = ["clasico", "jardin", "ensueno", "gala", "lazos", "coquette", "paris", "valle", "valle-claro", "celebracion", "celebracion-azul"];
+export const DISENOS = ["clasico", "jardin", "ensueno", "gala", "lazos", "coquette", "paris", "valle", "valle-claro", "celebracion", "celebracion-azul", "eucalipto", "luces", "vals", "luz", "confeti", "dulce", "birrete", "medianoche", "osito"];
 
 export const NOMBRE_TIPO_EVENTO = {
   boda: "Boda",
@@ -173,7 +173,133 @@ const TEMA_CELEBRACION_AZUL = [
   ["fuente-cuerpo", "Libre Baskerville"],
 ];
 
-const TEMAS_DISENO = { celebracion: TEMA_CELEBRACION, "celebracion-azul": TEMA_CELEBRACION_AZUL, valle: TEMA_VALLE, "valle-claro": TEMA_VALLE_CLARO, jardin: TEMA_JARDIN, ensueno: TEMA_ENSUENO, gala: TEMA_GALA, lazos: TEMA_LAZOS, coquette: TEMA_COQUETTE, paris: TEMA_PARIS };
+// Eucalipto: principal = verde eucalipto, claro = salvia pálida, oscuro = verde bosque, sello = oro viejo.
+const TEMA_EUCALIPTO = [
+  ["color-paper", "#F6F4EC"],
+  ["color-ink", "#2F3A33"],
+  ["color-gold", "#8FA58F"],
+  ["color-gold-light", "#D6E0D2"],
+  ["color-gold-dark", "#5C7262"],
+  ["color-marble", "#FFFFFF"],
+  ["color-seal", "#B89A5E"],
+  ["fuente-guion", "Allura"],
+  ["fuente-titulos", "Gilda Display"],
+  ["fuente-cuerpo", "Mulish"],
+];
+
+// Luces de verano: principal = ámbar de las bombillas, claro = luz cálida, oscuro = bronce, sello = azul crepúsculo.
+const TEMA_LUCES = [
+  ["color-paper", "#F7EFE3"],
+  ["color-ink", "#2A3346"],
+  ["color-gold", "#C9923F"],
+  ["color-gold-light", "#F0D5A4"],
+  ["color-gold-dark", "#8A5F22"],
+  ["color-marble", "#FFFAF2"],
+  ["color-seal", "#3E4C6E"],
+  ["fuente-guion", "Petit Formal Script"],
+  ["fuente-titulos", "Gloock"],
+  ["fuente-cuerpo", "Raleway"],
+];
+
+// Vals rosa: principal = rosa palo, claro = rubor, oscuro = rosa vino, sello = oro de las capitulares.
+const TEMA_VALS = [
+  ["color-paper", "#FBF1F1"],
+  ["color-ink", "#4A2E36"],
+  ["color-gold", "#D8A1AE"],
+  ["color-gold-light", "#F3D9DE"],
+  ["color-gold-dark", "#9C5C6C"],
+  ["color-marble", "#FFFFFF"],
+  ["color-seal", "#C2A15E"],
+  ["fuente-guion", "Norican"],
+  ["fuente-titulos", "Prata"],
+  ["fuente-cuerpo", "Karla"],
+];
+
+// Luz de bautizo: principal = oro suave, claro = luz de vela, oscuro = oro viejo, sello = verde olivo.
+const TEMA_LUZ = [
+  ["color-paper", "#FBF8F1"],
+  ["color-ink", "#3B3A33"],
+  ["color-gold", "#C7A86A"],
+  ["color-gold-light", "#EFE3C6"],
+  ["color-gold-dark", "#8C7238"],
+  ["color-marble", "#FFFFFF"],
+  ["color-seal", "#9DB39A"],
+  ["fuente-guion", "Satisfy"],
+  ["fuente-titulos", "Lora"],
+  ["fuente-cuerpo", "Nunito"],
+];
+
+// Confeti: principal = durazno, claro = durazno pálido, oscuro = terracota, sello = oro del confeti.
+const TEMA_CONFETI = [
+  ["color-paper", "#FCF4EE"],
+  ["color-ink", "#3D2C2E"],
+  ["color-gold", "#E5A88F"],
+  ["color-gold-light", "#F7DCCF"],
+  ["color-gold-dark", "#B0705B"],
+  ["color-marble", "#FFFFFF"],
+  ["color-seal", "#C9A04E"],
+  ["fuente-guion", "Cookie"],
+  ["fuente-titulos", "Abril Fatface"],
+  ["fuente-cuerpo", "Poppins"],
+];
+
+// Dulce 30: principal = rosa pastel, claro = rosa crema, oscuro = malva, sello = lila de los macarons.
+const TEMA_DULCE = [
+  ["color-paper", "#FBF3F5"],
+  ["color-ink", "#4B3440"],
+  ["color-gold", "#E2B4C2"],
+  ["color-gold-light", "#F6E1E8"],
+  ["color-gold-dark", "#A86F82"],
+  ["color-marble", "#FFFFFF"],
+  ["color-seal", "#C8AFD9"],
+  ["fuente-guion", "Yesteryear"],
+  ["fuente-titulos", "Italiana"],
+  ["fuente-cuerpo", "Montserrat"],
+];
+
+// Birrete: principal = oro, claro = oro pálido, oscuro = bronce, sello = azul tinta de las pestañas.
+const TEMA_BIRRETE = [
+  ["color-paper", "#F8F5EE"],
+  ["color-ink", "#1F2228"],
+  ["color-gold", "#B8913F"],
+  ["color-gold-light", "#E9D7A9"],
+  ["color-gold-dark", "#7C6024"],
+  ["color-marble", "#FFFFFF"],
+  ["color-seal", "#2E3A55"],
+  ["fuente-guion", "Imperial Script"],
+  ["fuente-titulos", "Cinzel Decorative"],
+  ["fuente-cuerpo", "EB Garamond"],
+];
+
+// Medianoche: fondo oscuro a propósito (gala de fin de año, como Gala). principal = oro, claro = champaña, oscuro = bronce, sello = champaña clara.
+const TEMA_MEDIANOCHE = [
+  ["color-paper", "#15161A"],
+  ["color-ink", "#F4EEDF"],
+  ["color-gold", "#C9A45A"],
+  ["color-gold-light", "#E8D6A6"],
+  ["color-gold-dark", "#8D6E2E"],
+  ["color-marble", "#22232A"],
+  ["color-seal", "#E7D8B4"],
+  ["fuente-guion", "Federo"],
+  ["fuente-titulos", "Federo"],
+  ["fuente-cuerpo", "DM Sans"],
+];
+
+// Osito: principal = beige osito, claro = crema, oscuro = café claro, sello = salvia.
+const TEMA_OSITO = [
+  ["color-paper", "#F8F3EA"],
+  ["color-ink", "#4A3F35"],
+  ["color-gold", "#B9A27F"],
+  ["color-gold-light", "#E8DCC8"],
+  ["color-gold-dark", "#7E6A4C"],
+  ["color-marble", "#FFFFFF"],
+  ["color-seal", "#9CAE96"],
+  ["fuente-guion", "Sofia"],
+  ["fuente-titulos", "Quattrocento"],
+  ["fuente-cuerpo", "Figtree"],
+];
+
+const TEMAS_DISENO = { celebracion: TEMA_CELEBRACION, "celebracion-azul": TEMA_CELEBRACION_AZUL, valle: TEMA_VALLE, "valle-claro": TEMA_VALLE_CLARO, jardin: TEMA_JARDIN, ensueno: TEMA_ENSUENO, gala: TEMA_GALA, lazos: TEMA_LAZOS, coquette: TEMA_COQUETTE, paris: TEMA_PARIS, eucalipto: TEMA_EUCALIPTO, luces: TEMA_LUCES, vals: TEMA_VALS, luz: TEMA_LUZ, confeti: TEMA_CONFETI, dulce: TEMA_DULCE, birrete: TEMA_BIRRETE, medianoche: TEMA_MEDIANOCHE, osito: TEMA_OSITO };
 
 export function temaDeDiseno(diseno) {
   const tema = TEMAS_DISENO[diseno];

@@ -17,7 +17,7 @@ export const CLAVES_TEMA = [
 
 // Diseños con demostración pública en /plantillas/<id> (src/demo del sitio).
 // El clásico se enseña con una boda real; Celebración aún no tiene muestra.
-const CON_DEMO = ["jardin", "ensueno", "gala", "lazos", "coquette", "paris", "valle", "valle-claro"];
+const CON_DEMO = ["jardin", "ensueno", "gala", "lazos", "coquette", "paris", "valle", "valle-claro", "eucalipto", "luces", "vals", "luz", "confeti", "dulce", "birrete", "medianoche", "osito"];
 
 export function vistaDe(d) {
   if (CON_DEMO.includes(d.base)) return `/plantillas/${d.id}`;

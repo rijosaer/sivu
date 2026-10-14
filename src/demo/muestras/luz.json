@@ -1,0 +1,192 @@
+{
+  "site": {
+    "invitacion": {
+      "slug": "plantillas/luz",
+      "nombre": "XV · Emilia",
+      "tipoEvento": "bautizo",
+      "diseno": "luz"
+    },
+    "tema": {
+      "color-paper": "#FBF8F1",
+      "color-ink": "#3B3A33",
+      "color-gold": "#C7A86A",
+      "color-gold-light": "#EFE3C6",
+      "color-gold-dark": "#8C7238",
+      "color-marble": "#FFFFFF",
+      "color-seal": "#9DB39A",
+      "fuente-guion": "Satisfy",
+      "fuente-titulos": "Lora",
+      "fuente-cuerpo": "Nunito"
+    },
+    "decoraciones": {
+      "scrollwork": null,
+      "bouquet": null,
+      "frame": null,
+      "column": null,
+      "divider": null
+    },
+    "ubicaciones": [],
+    "secciones": [
+      {
+        "id": 46,
+        "tipo": "welcome",
+        "contenido": {
+          "novioEl": "Emilia Durán",
+          "novioElla": "",
+          "fraseIntro": "Hay momentos que se sueñan toda la vida. Este es uno de ellos, y quiero vivirlo contigo.",
+          "padresTexto": "Con la bendición de mis padres",
+          "padreElMadre": "María Fernanda Gómez",
+          "padreElPadre": "Carlos Durán",
+          "padreEllaMadre": "",
+          "padreEllaPadre": "",
+          "bienvenidaTexto": "Mis XV años"
+        }
+      },
+      {
+        "id": 47,
+        "tipo": "informacion_boda",
+        "contenido": {
+          "fecha": "2027-03-20T21:00:00-05:00",
+          "lugar": "Hacienda Santa Clara",
+          "mapsUrl": "https://maps.google.com/?q=Hacienda+Santa+Clara+La+Calera",
+          "overline": "Mis quince años",
+          "direccion": "Km 4 vía La Calera, Bogotá",
+          "mapaEmbed": "",
+          "cronograma": [
+            {
+              "hora": "9:00 p. m.",
+              "titulo": "Recepción"
+            },
+            {
+              "hora": "9:45 p. m.",
+              "titulo": "Entrada de la quinceañera"
+            },
+            {
+              "hora": "10:15 p. m.",
+              "titulo": "Vals"
+            },
+            {
+              "hora": "11:00 p. m.",
+              "titulo": "Cena y fiesta"
+            }
+          ],
+          "tituloSeccion": "Información del evento",
+          "cronogramaModo": "detallado",
+          "tituloItinerario": "El programa",
+          "cronogramaMensaje": "Les compartiremos el programa más cerca de la fecha.",
+          "mostrarRestriccion": true,
+          "mostrarObservaciones": true,
+          "fechaLimiteConfirmacion": "2027-03-01"
+        }
+      },
+      {
+        "id": 48,
+        "tipo": "padrinos",
+        "contenido": {
+          "grupos": [
+            {
+              "etiqueta": "Y mis padrinos",
+              "personas": [
+                "Sandra Rojas",
+                "Andrés Rojas"
+              ]
+            }
+          ],
+          "titulo": "Padres y padrinos"
+        }
+      },
+      {
+        "id": 49,
+        "tipo": "vestimenta",
+        "contenido": {
+          "nota": "",
+          "evitar": [],
+          "titulo": "Elegante",
+          "permitidos": []
+        }
+      },
+      {
+        "id": 50,
+        "tipo": "regalos",
+        "contenido": {
+          "texto": "",
+          "titulo": "Mesa de regalos",
+          "enlaces": [],
+          "datosTransferencia": "Nequi 300 123 4567 · Emilia Durán"
+        }
+      },
+      {
+        "id": 51,
+        "tipo": "info_importante",
+        "contenido": {
+          "nota": "",
+          "items": [
+            "La invitación es personal y válida solo para los pases indicados.",
+            "Te pedimos llegar con 20 minutos de anticipación."
+          ]
+        }
+      },
+      {
+        "id": 52,
+        "tipo": "faq",
+        "contenido": {
+          "items": [
+            {
+              "p": "¿Puedo llevar a alguien más?",
+              "r": "Cada invitación indica sus pases. Si necesitas uno adicional, escríbenos antes de confirmar."
+            },
+            {
+              "p": "¿Hay parqueadero?",
+              "r": "Sí, la hacienda tiene parqueadero para invitados."
+            }
+          ]
+        }
+      },
+      {
+        "id": 53,
+        "tipo": "historia",
+        "contenido": {
+          "texto": "Desde pequeña soñé con una noche en París: luces, flores y la gente que más quiero. Hoy cumplo quince años y quiero que ese sueño lo vivamos juntos.",
+          "titulo": "Mi historia"
+        }
+      },
+      {
+        "id": 54,
+        "tipo": "sobres",
+        "contenido": {
+          "texto": "Tu presencia es mi mejor regalo. Si además quieres hacerme un obsequio, habrá un buzón de sobres en la fiesta."
+        }
+      },
+      {
+        "id": 55,
+        "tipo": "musica",
+        "contenido": {
+          "src": "",
+          "titulo": ""
+        }
+      }
+    ],
+    "fechaLimiteConfirmacion": "2027-03-01",
+    "fotosSubidas": [],
+    "audioUrl": null,
+    "fondoUrl": null
+  },
+  "invitado": {
+    "codigo": "DEMO",
+    "tipo": "cupos",
+    "nombre": "Laura Méndez",
+    "familia": "",
+    "mensaje": "",
+    "cupos": 1,
+    "miembros": [
+      {
+        "id": -1,
+        "nombre": "Laura Méndez",
+        "estado": "pendiente",
+        "restriccion": "",
+        "comentario": "",
+        "es_acompanante": false
+      }
+    ]
+  }
+}
