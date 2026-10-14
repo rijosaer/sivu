@@ -6,64 +6,142 @@
 <title>Política de privacidad · Sivú</title>
 <meta name="description" content="Cómo Sivú, de NOVA Optimiza, trata los datos personales de quienes nos escriben o solicitan una cotización.">
 <link rel="icon" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Fraunces:ital,opsz,wght@0,9..144,500..650;1,9..144,500&family=IBM+Plex+Mono:wght@500&family=Work+Sans:wght@400;500;600;700&display=swap">
 <style>
-  :root { --vino: #5C0F27; --tinta: #1C1712; --suave: #6B5F52; --crema: #FBF3E4; --oro: #B87F1E; }
+  :root { --crema:#FBF3E4; --papel:#FFFDF8; --tinta:#1C1712; --suave:#6B5F52; --linea:#EADFCA; --vino:#9B1F3E; --vino-osc:#5C0F27; --oro:#E3A63E; --coral:#E0553C; }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--crema); color: var(--tinta); font: 17px/1.65 system-ui, -apple-system, "Segoe UI", sans-serif; }
-  main { max-width: 760px; margin: 0 auto; padding: 48px 20px 72px; }
-  a { color: var(--vino); }
-  h1 { font: 600 34px/1.15 Georgia, serif; color: var(--vino); margin: 8px 0 6px; }
-  h2 { font: 600 21px/1.3 Georgia, serif; color: var(--vino); margin: 34px 0 6px; }
-  .marca { font: italic 26px Georgia, serif; color: var(--vino); text-decoration: none; }
-  .fecha { color: var(--suave); font-size: 15px; margin: 0 0 24px; }
-  ul { padding-left: 22px; }
-  li { margin: 4px 0; }
-  footer { margin-top: 48px; padding-top: 18px; border-top: 1px solid #e5d9c2; color: var(--suave); font-size: 15px; }
+  body { margin: 0; background: var(--crema); color: var(--tinta); font: 16.5px/1.7 "Work Sans", system-ui, -apple-system, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
+  a { color: var(--vino); text-decoration-color: rgba(155,31,62,.35); text-underline-offset: 3px; }
+  a:hover { color: var(--vino-osc); }
+  .pv-nav { position: sticky; top: 0; z-index: 10; background: rgba(251,243,228,.9); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(28,23,18,.08); }
+  .pv-nav-in, .pv-cont { max-width: 860px; margin: 0 auto; padding: 0 22px; }
+  .pv-nav-in { display: flex; align-items: center; justify-content: space-between; height: 66px; }
+  .pv-logo { font-family: "Alex Brush", cursive; font-size: 34px; color: var(--vino-osc); text-decoration: none; line-height: 1; }
+  .pv-volver { display: inline-flex; align-items: center; padding: 9px 18px; border-radius: 999px; border: 2px solid var(--vino-osc); color: var(--vino-osc); font-weight: 600; font-size: 14px; text-decoration: none; transition: background .18s, color .18s; }
+  .pv-volver:hover { background: var(--vino-osc); color: var(--crema); }
+  .pv-hero { position: relative; background: linear-gradient(135deg, var(--vino-osc) 0%, var(--vino) 55%, var(--coral) 115%); color: var(--crema); padding: 56px 0 96px; overflow: hidden; }
+  .pv-hero::after { content: ""; position: absolute; inset: 0; background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,.13) 1px, transparent 0); background-size: 26px 26px; pointer-events: none; }
+  .pv-hero .pv-cont { position: relative; z-index: 1; }
+  .pv-eyebrow { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: .18em; font-size: 12px; color: var(--oro); }
+  h1 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: clamp(36px, 6vw, 54px); line-height: 1.05; margin: 12px 0 14px; color: #fff; letter-spacing: -.01em; text-wrap: balance; }
+  h1 .pv-script { font-family: "Alex Brush", cursive; font-weight: 400; color: var(--oro); font-size: 1.15em; }
+  .pv-fecha { font-size: 14.5px; opacity: .85; margin: 0; }
+  .pv-tarjeta { position: relative; z-index: 2; margin-top: -60px; background: var(--papel); border: 1px solid var(--linea); border-radius: 26px; box-shadow: 0 24px 50px -30px rgba(60,20,20,.35); padding: 34px 30px 18px; }
+  .pv-intro { font-size: 17.5px; line-height: 1.7; margin: 0 0 10px; color: var(--tinta); }
+  .pv-sec { display: grid; grid-template-columns: 46px minmax(0,1fr); gap: 10px; padding: 24px 0; border-top: 1px solid var(--linea); }
+  .pv-num { font-family: "IBM Plex Mono", monospace; font-size: 13px; color: var(--oro); padding-top: 6px; }
+  h2 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 22px; line-height: 1.25; color: var(--vino-osc); margin: 0 0 8px; }
+  .pv-sec p { margin: 0 0 10px; color: #3a3029; }
+  ul { margin: 0 0 10px; padding-left: 20px; color: #3a3029; }
+  li { margin: 6px 0; }
+  li::marker { color: var(--oro); }
+  b { color: var(--tinta); }
+  .pv-ayuda { margin: 28px 0 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; background: var(--crema); border: 1px solid var(--linea); border-radius: 18px; padding: 20px 22px; }
+  .pv-ayuda p { margin: 0; font-size: 15px; color: var(--suave); }
+  .pv-ayuda strong { display: block; font-family: "Fraunces", serif; font-size: 18px; color: var(--vino-osc); }
+  .pv-wa { display: inline-flex; align-items: center; padding: 12px 22px; border-radius: 999px; background: var(--oro); color: var(--vino-osc); font-weight: 700; text-decoration: none; box-shadow: 0 12px 26px -12px rgba(0,0,0,.4); }
+  .pv-pie { background: var(--vino-osc); color: rgba(251,243,228,.8); margin-top: 64px; padding: 34px 0; text-align: center; font-size: 14px; }
+  .pv-pie .pv-logo { color: var(--crema); font-size: 38px; display: inline-block; margin-bottom: 6px; }
+  @media (max-width: 560px) { .pv-tarjeta { padding: 26px 18px 10px; border-radius: 22px; } .pv-sec { grid-template-columns: 1fr; gap: 2px; } .pv-num { padding-top: 0; } }
 </style>
 </head>
 <body>
-<main>
-  <a class="marca" href="/">Sivú</a>
-  <h1>Política de privacidad</h1>
-  <p class="fecha">Última actualización: 13 de octubre de 2026</p>
+<nav class="pv-nav">
+  <div class="pv-nav-in">
+    <a class="pv-logo" href="/">Sivú</a>
+    <a class="pv-volver" href="/">Volver al inicio</a>
+  </div>
+</nav>
 
-  <p>En Sivú, servicio de invitaciones digitales de <b>NOVA Optimiza</b> (en adelante, «Sivú»), cuidamos los datos personales de quienes nos escriben, solicitan una cotización o usan nuestras invitaciones. Esta política explica qué datos recogemos, para qué los usamos y cómo puedes ejercer tus derechos, de acuerdo con la Ley 1581 de 2012 y el Decreto 1377 de 2013 de Colombia.</p>
+<header class="pv-hero">
+  <div class="pv-cont">
+    <span class="pv-eyebrow">Tus datos, en buenas manos</span>
+    <h1>Política de <span class="pv-script">privacidad</span></h1>
+    <p class="pv-fecha">Última actualización: 13 de octubre de 2026</p>
+  </div>
+</header>
 
-  <h2>Responsable del tratamiento</h2>
-  <p>NOVA Optimiza, a través de su servicio Sivú. Contacto: WhatsApp <a href="https://wa.me/573236019372">+57 323 601 9372</a> y el sitio <a href="https://heysivu.com">heysivu.com</a>.</p>
-
-  <h2>Qué datos recogemos</h2>
-  <ul>
+<main class="pv-cont">
+  <article class="pv-tarjeta">
+    <p class="pv-intro">En Sivú, servicio de invitaciones digitales de <b>NOVA Optimiza</b> (en adelante, «Sivú»), cuidamos los datos personales de quienes nos escriben, solicitan una cotización o usan nuestras invitaciones. Esta política explica qué datos recogemos, para qué los usamos y cómo puedes ejercer tus derechos, de acuerdo con la Ley 1581 de 2012 y el Decreto 1377 de 2013 de Colombia.</p>
+      <section class="pv-sec">
+        <span class="pv-num">01</span>
+        <div>
+          <h2>Responsable del tratamiento</h2>
+          <p>NOVA Optimiza, a través de su servicio Sivú. Contacto: WhatsApp <a href="https://wa.me/573236019372">+57 323 601 9372</a> y el sitio <a href="https://heysivu.com">heysivu.com</a>.</p>
+        </div>
+      </section>
+      <section class="pv-sec">
+        <span class="pv-num">02</span>
+        <div>
+          <h2>Qué datos recogemos</h2>
+          <ul>
     <li><b>Cuando pides una cotización</b> (en nuestros formularios, incluidos los de anuncios en Facebook e Instagram, o por WhatsApp): nombre, teléfono o WhatsApp, correo electrónico si lo das, ciudad, tipo de evento, fecha aproximada y número estimado de invitados.</li>
     <li><b>Cuando contratas una invitación</b>: la información del evento que nos envías (textos, fotos, lugar, fecha) y la lista de invitados con sus nombres y teléfonos, que usamos solo para crear y enviar esa invitación.</li>
     <li><b>Cuando un invitado responde</b>: su confirmación de asistencia y, si las escribe, restricciones alimentarias u observaciones.</li>
   </ul>
-
-  <h2>Para qué los usamos</h2>
-  <ul>
+        </div>
+      </section>
+      <section class="pv-sec">
+        <span class="pv-num">03</span>
+        <div>
+          <h2>Para qué los usamos</h2>
+          <ul>
     <li>Responder tu solicitud, enviarte la cotización y mostrarte diseños.</li>
     <li>Crear, enviar y gestionar las invitaciones y confirmaciones de tu evento.</li>
     <li>Escribirte por WhatsApp, llamada o correo sobre tu solicitud o tu evento.</li>
     <li>Mejorar nuestro servicio con estadísticas generales que no te identifican.</li>
   </ul>
   <p>No vendemos ni alquilamos tus datos. Solo los compartimos con proveedores que necesitamos para prestar el servicio (alojamiento web, mensajería) y bajo deber de confidencialidad, o cuando la ley lo exija.</p>
-
-  <h2>Cuánto tiempo los guardamos</h2>
-  <p>Los datos de una cotización se conservan mientras haya una relación comercial posible y hasta por 12 meses. Los datos de un evento se conservan mientras el servicio esté activo y el tiempo necesario para atender reclamos o cumplir obligaciones legales; después se eliminan o se anonimizan.</p>
-
-  <h2>Tus derechos</h2>
-  <p>Puedes conocer, actualizar y rectificar tus datos, pedir prueba de tu autorización, saber cómo se han usado, revocar la autorización o pedir que los eliminemos, y presentar quejas ante la Superintendencia de Industria y Comercio. Para hacerlo, escríbenos por WhatsApp al <a href="https://wa.me/573236019372">+57 323 601 9372</a> indicando tu nombre y tu solicitud; respondemos en los plazos que fija la ley (10 días hábiles para consultas y 15 para reclamos).</p>
-
-  <h2>Autorización</h2>
-  <p>Al enviarnos tus datos por un formulario, por WhatsApp o al contratar el servicio, autorizas su tratamiento para las finalidades descritas aquí. Si nos entregas datos de terceros (por ejemplo, tu lista de invitados), declaras que cuentas con su autorización para hacerlo.</p>
-
-  <h2>Seguridad</h2>
-  <p>Protegemos la información con medidas técnicas y administrativas razonables: acceso restringido, conexiones cifradas y enlaces personales para cada invitado.</p>
-
-  <h2>Cambios</h2>
-  <p>Si cambiamos esta política, publicaremos la nueva versión en esta misma página con su fecha de actualización.</p>
-
-  <footer>Sivú · Invitaciones digitales · de NOVA Optimiza</footer>
+        </div>
+      </section>
+      <section class="pv-sec">
+        <span class="pv-num">04</span>
+        <div>
+          <h2>Cuánto tiempo los guardamos</h2>
+          <p>Los datos de una cotización se conservan mientras haya una relación comercial posible y hasta por 12 meses. Los datos de un evento se conservan mientras el servicio esté activo y el tiempo necesario para atender reclamos o cumplir obligaciones legales; después se eliminan o se anonimizan.</p>
+        </div>
+      </section>
+      <section class="pv-sec">
+        <span class="pv-num">05</span>
+        <div>
+          <h2>Tus derechos</h2>
+          <p>Puedes conocer, actualizar y rectificar tus datos, pedir prueba de tu autorización, saber cómo se han usado, revocar la autorización o pedir que los eliminemos, y presentar quejas ante la Superintendencia de Industria y Comercio. Para hacerlo, escríbenos por WhatsApp al <a href="https://wa.me/573236019372">+57 323 601 9372</a> indicando tu nombre y tu solicitud; respondemos en los plazos que fija la ley (10 días hábiles para consultas y 15 para reclamos).</p>
+        </div>
+      </section>
+      <section class="pv-sec">
+        <span class="pv-num">06</span>
+        <div>
+          <h2>Autorización</h2>
+          <p>Al enviarnos tus datos por un formulario, por WhatsApp o al contratar el servicio, autorizas su tratamiento para las finalidades descritas aquí. Si nos entregas datos de terceros (por ejemplo, tu lista de invitados), declaras que cuentas con su autorización para hacerlo.</p>
+        </div>
+      </section>
+      <section class="pv-sec">
+        <span class="pv-num">07</span>
+        <div>
+          <h2>Seguridad</h2>
+          <p>Protegemos la información con medidas técnicas y administrativas razonables: acceso restringido, conexiones cifradas y enlaces personales para cada invitado.</p>
+        </div>
+      </section>
+      <section class="pv-sec">
+        <span class="pv-num">08</span>
+        <div>
+          <h2>Cambios</h2>
+          <p>Si cambiamos esta política, publicaremos la nueva versión en esta misma página con su fecha de actualización.</p>
+        </div>
+      </section>
+    <aside class="pv-ayuda">
+      <p><strong>¿Tienes una pregunta sobre tus datos?</strong>Escríbenos y te respondemos en los plazos de ley.</p>
+      <a class="pv-wa" href="https://wa.me/573236019372" target="_blank" rel="noreferrer">Escribir por WhatsApp</a>
+    </aside>
+  </article>
 </main>
+
+<footer class="pv-pie">
+  <a class="pv-logo" href="/">Sivú</a>
+  <div>Invitaciones digitales · de NOVA Optimiza · <a href="/" style="color:inherit">heysivu.com</a></div>
+</footer>
 </body>
 </html>
