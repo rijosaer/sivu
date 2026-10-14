@@ -2,7 +2,7 @@
   "site": {
     "invitacion": {
       "slug": "plantillas/osito",
-      "nombre": "XV · Emilia",
+      "nombre": "Baby shower · Emma",
       "tipoEvento": "baby_shower",
       "diseno": "osito"
     },
@@ -31,52 +31,36 @@
         "id": 46,
         "tipo": "welcome",
         "contenido": {
-          "novioEl": "Emilia Durán",
+          "novioEl": "Emma",
           "novioElla": "",
-          "fraseIntro": "Hay momentos que se sueñan toda la vida. Este es uno de ellos, y quiero vivirlo contigo.",
-          "padresTexto": "Con la bendición de mis padres",
-          "padreElMadre": "María Fernanda Gómez",
-          "padreElPadre": "Carlos Durán",
+          "fraseIntro": "Valentina y Santiago, sus papás, te invitan a una tarde tierna para celebrar que muy pronto Emma estará en sus brazos.",
+          "padresTexto": "Con todo el amor de sus papás",
+          "padreElMadre": "Valentina Ospina",
+          "padreElPadre": "Santiago Restrepo",
           "padreEllaMadre": "",
           "padreEllaPadre": "",
-          "bienvenidaTexto": "Mis XV años"
+          "bienvenidaTexto": "Se acerca la llegada de"
         }
       },
       {
         "id": 47,
         "tipo": "informacion_boda",
         "contenido": {
-          "fecha": "2027-03-20T21:00:00-05:00",
-          "lugar": "Hacienda Santa Clara",
-          "mapsUrl": "https://maps.google.com/?q=Hacienda+Santa+Clara+La+Calera",
-          "overline": "Mis quince años",
-          "direccion": "Km 4 vía La Calera, Bogotá",
+          "fecha": "2027-04-17T15:00:00-05:00",
+          "lugar": "Museo El Castillo",
+          "mapsUrl": "https://maps.google.com/?q=Museo+El+Castillo+Medellin",
+          "overline": "Baby shower",
+          "direccion": "Calle 9 Sur #32-269, El Poblado, Medellín",
           "mapaEmbed": "",
-          "cronograma": [
-            {
-              "hora": "9:00 p. m.",
-              "titulo": "Recepción"
-            },
-            {
-              "hora": "9:45 p. m.",
-              "titulo": "Entrada de la quinceañera"
-            },
-            {
-              "hora": "10:15 p. m.",
-              "titulo": "Vals"
-            },
-            {
-              "hora": "11:00 p. m.",
-              "titulo": "Cena y fiesta"
-            }
-          ],
+          "cronograma": [],
           "tituloSeccion": "Información del evento",
-          "cronogramaModo": "detallado",
-          "tituloItinerario": "El programa",
-          "cronogramaMensaje": "Les compartiremos el programa más cerca de la fecha.",
+          "cronogramaModo": "mensaje",
+          "tituloItinerario": "La tarde",
+          "cronogramaMensaje": "Habrá onces, juegos para adivinar cómo será Emma y un rincón para dejarle un mensaje que leerá cuando crezca.",
           "mostrarRestriccion": true,
           "mostrarObservaciones": true,
-          "fechaLimiteConfirmacion": "2027-03-01"
+          "fechaLimiteConfirmacion": "2027-04-05",
+          "telefonoConfirmar": "300 456 7812"
         }
       },
       {
@@ -85,34 +69,56 @@
         "contenido": {
           "grupos": [
             {
-              "etiqueta": "Y mis padrinos",
+              "etiqueta": "Sus padrinos",
               "personas": [
-                "Sandra Rojas",
-                "Andrés Rojas"
+                "Camila Ospina",
+                "Julián Restrepo"
               ]
             }
           ],
-          "titulo": "Padres y padrinos"
+          "titulo": "Quienes la esperan"
         }
       },
       {
         "id": 49,
         "tipo": "vestimenta",
         "contenido": {
-          "nota": "",
+          "nota": "Ven cómodo y, si quieres, en tonos neutros para la foto de grupo.",
           "evitar": [],
-          "titulo": "Elegante",
-          "permitidos": []
+          "titulo": "Casual en tonos tierra",
+          "permitidos": [
+            { "nombre": "Beige", "colores": ["#E8DCC8", "#B9A27F"] },
+            { "nombre": "Salvia", "colores": ["#C9D3C3", "#9CAE96"] },
+            { "nombre": "Blanco", "colores": ["#FFFFFF", "#F3EEE4"] }
+          ]
+        }
+      },
+      {
+        "id": 53,
+        "tipo": "historia",
+        "contenido": {
+          "texto": "La esperamos desde mucho antes de saber su nombre. Ya tiene cuna, un osito que la cuida y una familia entera contando los días para conocerla.",
+          "titulo": "Esperándote"
         }
       },
       {
         "id": 50,
         "tipo": "regalos",
         "contenido": {
-          "texto": "",
-          "titulo": "Mesa de regalos",
-          "enlaces": [],
-          "datosTransferencia": "Nequi 300 123 4567 · Emilia Durán"
+          "texto": "Si quieres consentirla, armamos una lista con lo que más vamos a necesitar. Y si prefieres traer pañales, Emma usará talla 1 y 2.",
+          "titulo": "Lista de regalos",
+          "enlaces": [
+            { "tienda": "Lista en Falabella", "url": "https://www.falabella.com.co/falabella-co/" },
+            { "tienda": "Lista en Amazon", "url": "https://www.amazon.com/baby-reg/homepage" }
+          ],
+          "datosTransferencia": "Bancolombia ahorros 123-456789-01 · Valentina Ospina"
+        }
+      },
+      {
+        "id": 54,
+        "tipo": "sobres",
+        "contenido": {
+          "texto": "También tendremos lluvia de sobres: habrá una cajita junto a la cuna para dejar el tuyo."
         }
       },
       {
@@ -121,8 +127,8 @@
         "contenido": {
           "nota": "",
           "items": [
-            "La invitación es personal y válida solo para los pases indicados.",
-            "Te pedimos llegar con 20 minutos de anticipación."
+            "La invitación es personal y válida para los pases indicados.",
+            "Es un plan de adultos: gracias por dejar a los peques en casa."
           ]
         }
       },
@@ -132,29 +138,14 @@
         "contenido": {
           "items": [
             {
-              "p": "¿Puedo llevar a alguien más?",
-              "r": "Cada invitación indica sus pases. Si necesitas uno adicional, escríbenos antes de confirmar."
+              "p": "¿Hay parqueadero?",
+              "r": "Sí, el museo tiene parqueadero para visitantes."
             },
             {
-              "p": "¿Hay parqueadero?",
-              "r": "Sí, la hacienda tiene parqueadero para invitados."
+              "p": "¿Qué pañales llevo?",
+              "r": "Talla 1 o 2, de cualquier marca. Los de tela también son bienvenidos."
             }
           ]
-        }
-      },
-      {
-        "id": 53,
-        "tipo": "historia",
-        "contenido": {
-          "texto": "Desde pequeña soñé con una noche en París: luces, flores y la gente que más quiero. Hoy cumplo quince años y quiero que ese sueño lo vivamos juntos.",
-          "titulo": "Mi historia"
-        }
-      },
-      {
-        "id": 54,
-        "tipo": "sobres",
-        "contenido": {
-          "texto": "Tu presencia es mi mejor regalo. Si además quieres hacerme un obsequio, habrá un buzón de sobres en la fiesta."
         }
       },
       {
@@ -166,7 +157,7 @@
         }
       }
     ],
-    "fechaLimiteConfirmacion": "2027-03-01",
+    "fechaLimiteConfirmacion": "2027-04-05",
     "fotosSubidas": [],
     "audioUrl": null,
     "fondoUrl": null
