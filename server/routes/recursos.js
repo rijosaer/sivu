@@ -12,6 +12,50 @@ import { estadoWhatsapp } from "../whatsappWeb.js";
 // deja leer :invitacionId aunque este router se monte "adentro" de otro.
 export const recursosRouter = Router({ mergeParams: true });
 
+// Lo que el cliente de un evento puede cambiar lo decide el dueño en el panel
+// (Ajustes del evento → «Qué puede cambiar el cliente», clave
+// «permiso-cliente» del tema). Colores, diseño, decoraciones y el orden o la
+// visibilidad de las secciones son siempre de Sivú; los textos, fotos, música
+// y ubicaciones, solo si su paquete lo incluye («textos»). Los mensajes de
+// WhatsApp (claves whatsapp-*) y sus invitados los maneja siempre.
+// El panel ya esconde todo esto; aquí es donde de verdad se hace cumplir.
+async function permisoCliente(invitacionId) {
+  const { rows } = await pool.query(
+    "SELECT valor FROM tema WHERE invitacion_id = $1 AND clave = 'permiso-cliente'",
+    [invitacionId]
+  );
+  return rows[0]?.valor || "ver";
+}
+
+recursosRouter.use(
+  capturar(async (req, res, next) => {
+    if (!req.admin?.invitacionId || req.method === "GET") return next();
+    const ruta = req.path;
+    const deSivu = (texto) => res.status(403).json({ error: texto });
+
+    if (ruta.startsWith("/tema")) {
+      const clave = /^\/tema\/([^/]+)$/.exec(ruta)?.[1];
+      if (req.method === "PUT" && clave && decodeURIComponent(clave).startsWith("whatsapp-")) return next();
+      return deSivu("Los colores y el diseño de la invitación los define Sivú.");
+    }
+    if (ruta.startsWith("/decoraciones")) return deSivu("El diseño de la invitación lo define Sivú.");
+    if (ruta === "/secciones" || ruta === "/secciones/reordenar") {
+      return deSivu("El orden y las secciones de la invitación los define Sivú.");
+    }
+    if (ruta.startsWith("/secciones/") || ruta.startsWith("/medios") || ruta.startsWith("/ubicaciones")) {
+      if ((await permisoCliente(req.invitacionId)) !== "textos") {
+        return deSivu("Tu paquete no incluye cambios en la invitación. Escríbele a Sivú y lo ajustamos por ti.");
+      }
+      // Puede corregir el texto de una sección, no esconderla ni moverla.
+      if (ruta.startsWith("/secciones/") && req.body) {
+        delete req.body.activo;
+        delete req.body.orden;
+      }
+    }
+    next();
+  })
+);
+
 const MAX_BYTES = 12 * 1024 * 1024; // tope por archivo, ya decodificado
 
 // Acepta "data:image/png;base64,AAA..." y devuelve mime + bytes.
