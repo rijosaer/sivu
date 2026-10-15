@@ -303,7 +303,7 @@ function Ramita({ c, n = 7, s0 = 1, s1 = 0.6, tipo = "redonda", opuestas = false
 }
 
 // Gipsofila: tallitos finos que se abren en ramilletes de florecitas blancas.
-function Gipsofila({ x, y, a = 0, s = 1, semilla = 3, p }) {
+function Gipsofila({ x, y, a = 0, s = 1, semilla = 3, sombra = true, p }) {
   const r = azar(semilla);
   const eje = giroN(x, y, a);
   const largo = 30 * s;
@@ -326,7 +326,7 @@ function Gipsofila({ x, y, a = 0, s = 1, semilla = 3, p }) {
     }
   }
   return (
-    <g filter={`url(#${p}-sombra)`}>
+    <g filter={sombra ? `url(#${p}-sombra)` : undefined}>
       <path d={tallos.join("")} fill="none" stroke="#98A68C" strokeWidth=".7" strokeLinecap="round" />
       {flores.map(([fx, fy, fr], i) => (
         <g key={i}>
@@ -349,26 +349,28 @@ export function EuRama({ className = "" }) {
     <svg className={className} viewBox="0 0 340 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <Defs p={p} />
       <g filter={`url(#${p}-grano)`}>
+        <g filter={`url(#${p}-sombra)`}>
         {/* Fondo: eucalipto de hoja larga */}
-        <Ramita p={p} c={[-10, 150, 130, 70, 330, 24]} n={8} s0={1} s1={0.65} tipo="larga" semilla={11} />
-        <Ramita p={p} c={[-10, 480, 150, 440, 338, 372]} n={8} s0={1} s1={0.65} tipo="larga" semilla={12} />
-        <Ramita p={p} c={[-10, 830, 160, 890, 330, 950]} n={8} s0={1} s1={0.65} tipo="larga" semilla={13} />
+        <Ramita sombra={false} p={p} c={[-10, 150, 130, 70, 330, 24]} n={8} s0={1} s1={0.65} tipo="larga" semilla={11} />
+        <Ramita sombra={false} p={p} c={[-10, 480, 150, 440, 338, 372]} n={8} s0={1} s1={0.65} tipo="larga" semilla={12} />
+        <Ramita sombra={false} p={p} c={[-10, 830, 160, 890, 330, 950]} n={8} s0={1} s1={0.65} tipo="larga" semilla={13} />
         {/* Eucalipto dólar de plata */}
-        <Ramita p={p} c={[-10, 40, 110, 96, 262, 30]} n={8} s0={1.05} s1={0.55} opuestas semilla={21} />
-        <Ramita p={p} c={[-10, 270, 150, 310, 336, 228]} n={9} s0={1.1} s1={0.55} opuestas semilla={22} />
-        <Ramita p={p} c={[-10, 610, 170, 560, 334, 610]} n={9} s0={1.1} s1={0.55} opuestas semilla={23} />
-        <Ramita p={p} c={[-10, 720, 120, 690, 262, 770]} n={7} s0={1} s1={0.55} opuestas semilla={24} />
-        <Ramita p={p} c={[-10, 965, 140, 960, 310, 1006]} n={8} s0={1.05} s1={0.55} opuestas semilla={25} />
-        <Ramita p={p} c={[30, 400, 140, 350, 236, 300]} n={6} s0={0.95} s1={0.55} semilla={26} />
+        <Ramita sombra={false} p={p} c={[-10, 40, 110, 96, 262, 30]} n={8} s0={1.05} s1={0.55} opuestas semilla={21} />
+        <Ramita sombra={false} p={p} c={[-10, 270, 150, 310, 336, 228]} n={9} s0={1.1} s1={0.55} opuestas semilla={22} />
+        <Ramita sombra={false} p={p} c={[-10, 610, 170, 560, 334, 610]} n={9} s0={1.1} s1={0.55} opuestas semilla={23} />
+        <Ramita sombra={false} p={p} c={[-10, 720, 120, 690, 262, 770]} n={7} s0={1} s1={0.55} opuestas semilla={24} />
+        <Ramita sombra={false} p={p} c={[-10, 965, 140, 960, 310, 1006]} n={8} s0={1.05} s1={0.55} opuestas semilla={25} />
+        <Ramita sombra={false} p={p} c={[30, 400, 140, 350, 236, 300]} n={6} s0={0.95} s1={0.55} semilla={26} />
         {/* Gipsofila */}
-        <Gipsofila p={p} x={190} y={160} a={50} s={1.25} semilla={31} />
-        <Gipsofila p={p} x={276} y={300} a={70} s={1.15} semilla={32} />
-        <Gipsofila p={p} x={150} y={460} a={80} s={1.2} semilla={33} />
-        <Gipsofila p={p} x={292} y={540} a={40} s={1.15} semilla={34} />
-        <Gipsofila p={p} x={210} y={690} a={70} s={1.25} semilla={35} />
-        <Gipsofila p={p} x={290} y={860} a={30} s={1.15} semilla={36} />
-        <Gipsofila p={p} x={40} y={340} a={20} s={1.1} semilla={37} />
-        <Gipsofila p={p} x={60} y={900} a={60} s={1.1} semilla={38} />
+        <Gipsofila sombra={false} p={p} x={190} y={160} a={50} s={1.25} semilla={31} />
+        <Gipsofila sombra={false} p={p} x={276} y={300} a={70} s={1.15} semilla={32} />
+        <Gipsofila sombra={false} p={p} x={150} y={460} a={80} s={1.2} semilla={33} />
+        <Gipsofila sombra={false} p={p} x={292} y={540} a={40} s={1.15} semilla={34} />
+        <Gipsofila sombra={false} p={p} x={210} y={690} a={70} s={1.25} semilla={35} />
+        <Gipsofila sombra={false} p={p} x={290} y={860} a={30} s={1.15} semilla={36} />
+        <Gipsofila sombra={false} p={p} x={40} y={340} a={20} s={1.1} semilla={37} />
+        <Gipsofila sombra={false} p={p} x={60} y={900} a={60} s={1.1} semilla={38} />
+        </g>
         {/* Flores */}
         <Peonia p={p} x={92} y={160} s={1.15} a={-8} />
         <Rosa p={p} x={272} y={128} s={0.95} a={14} />
@@ -382,11 +384,13 @@ export function EuRama({ className = "" }) {
         <Rosa p={p} x={286} y={764} s={0.9} a={-6} />
         <Rosa p={p} x={204} y={924} s={1.0} a={30} />
         {/* Hojas delante para integrar el ramo */}
-        <Ramita p={p} c={[150, 236, 200, 250, 250, 240]} n={4} s0={0.75} s1={0.55} opuestas semilla={41} />
-        <Ramita p={p} c={[170, 690, 220, 700, 262, 684]} n={4} s0={0.75} s1={0.55} opuestas semilla={42} />
-        <Ramita p={p} c={[20, 640, 60, 610, 118, 612]} n={4} s0={0.75} s1={0.55} opuestas semilla={43} />
-        <Gipsofila p={p} x={236} y={470} a={110} s={1} semilla={44} />
-        <Gipsofila p={p} x={140} y={240} a={100} s={0.9} semilla={45} />
+        <g filter={`url(#${p}-sombra)`}>
+        <Ramita sombra={false} p={p} c={[150, 236, 200, 250, 250, 240]} n={4} s0={0.75} s1={0.55} opuestas semilla={41} />
+        <Ramita sombra={false} p={p} c={[170, 690, 220, 700, 262, 684]} n={4} s0={0.75} s1={0.55} opuestas semilla={42} />
+        <Ramita sombra={false} p={p} c={[20, 640, 60, 610, 118, 612]} n={4} s0={0.75} s1={0.55} opuestas semilla={43} />
+        <Gipsofila sombra={false} p={p} x={236} y={470} a={110} s={1} semilla={44} />
+        <Gipsofila sombra={false} p={p} x={140} y={240} a={100} s={0.9} semilla={45} />
+        </g>
       </g>
     </svg>
   );
@@ -399,15 +403,15 @@ export function EuRama({ className = "" }) {
 export function EuTallo({ className = "", espejo = false }) {
   const p = usePrefijo();
   const pares = [
-    [57.6, 52, -62, 58, 1],
-    [56.4, 150, -52, 68, 0.92],
-    [62.8, 252, -66, 54, 1.04],
-    [62.4, 352, -56, 64, 0.9],
+    [57.6, 52, -78, 70, 1.3],
+    [56.4, 150, -64, 84, 1.18],
+    [62.8, 252, -82, 66, 1.34],
+    [62.4, 352, -68, 80, 1.16],
   ];
   return (
     <svg className={className} viewBox="0 0 120 400" aria-hidden="true">
       <Defs p={p} />
-      <g filter={`url(#${p}-grano)`} transform={espejo ? "translate(120 0) scale(-1 1)" : undefined}>
+      <g transform={espejo ? "translate(120 0) scale(-1 1)" : undefined}>
         <g filter={`url(#${p}-sombra)`}>
           <path d="M60 0C52 100 68 300 60 400" fill="none" stroke={`url(#${p}-tallo)`} strokeWidth="2.6" />
           {pares.map(([x, y, a1, a2, s], i) => (

@@ -332,7 +332,7 @@
 .lu-grupos { display: grid; gap: 16px; }
 .lu-grupo p { margin-top: 4px; font-size: 17px; }
 
-.lu-historia { font-size: 15.5px; line-height: 1.75; color: var(--suave); text-align: left; text-wrap: pretty; }
+.lu-historia { font-size: 15.5px; hyphens: manual; line-height: 1.75; color: var(--suave); text-align: left; text-wrap: pretty; }
 .lu-firma { margin-top: 14px; font: 400 24px/1.4 var(--f-guion); color: var(--ambar-oscuro); text-align: right; }
 
 /* Fotos: marcos de pie sobre la mesa */
@@ -382,7 +382,7 @@
 .lu-final .lu-bombilla { --base: 200ms; --paso: 110ms; }
 .lu-final .lu-mesa { display: block; width: calc(100% + 40px); height: auto; margin: 0 -20px; }
 .lu-mesa-halo { transform-box: fill-box; transform-origin: center; animation: lu-respira 2.4s ease-in-out var(--d) infinite alternate; }
-.lu-te-esperamos { margin: 8px 0 6px; font: 400 clamp(26px, 7.6vw, 32px)/1.35 var(--f-guion); color: var(--ambar-oscuro); }
+.lu-te-esperamos { text-wrap: balance; margin: 8px 0 6px; font: 400 clamp(26px, 7.6vw, 32px)/1.35 var(--f-guion); color: var(--ambar-oscuro); }
 
 /* Aparición: la tarjeta se «posa» sobre la mesa. */
 .lu [data-reveal] {
@@ -423,10 +423,10 @@
   box-shadow: 0 30px 60px -20px rgb(0 0 0 / .5);
   animation: lu-posa .5s var(--curva) both;
 }
-.lu-modal-guion { text-align: center; font: 400 22px/1.4 var(--f-guion); color: var(--ambar-oscuro); padding: 0 34px; }
+.lu-modal-caja .lu-modal-guion { text-align: center; font: 400 22px/1.4 var(--f-guion); color: var(--ambar-oscuro); padding: 0 34px; }
 .lu-cerrar { position: absolute; top: 4px; right: 4px; width: 44px; height: 44px; border: 0; background: none; font-size: 28px; line-height: 1; color: var(--suave); cursor: pointer; z-index: 2; }
 .lu-modal-caja > section { padding-top: 20px; padding-bottom: 12px; border-top: 0; }
-.lu-modal-caja :is(h2, h3) { font-family: var(--f-titulos); font-weight: 400; color: var(--tinta); }
+.lu-modal-caja :is(h2, h3) { font-family: var(--f-titulos); font-weight: 400; color: var(--tinta); font-size: 26px; line-height: 1.2; }
 .lu-modal-caja :is(p, span, label, input, textarea, select, button) { font-family: var(--f-cuerpo); }
 .lu-modal-caja button[type="submit"] { border-radius: 999px; min-height: 48px; background: var(--ambar-oscuro); letter-spacing: .14em; }
 @keyframes lu-fundido { from { opacity: 0; } }

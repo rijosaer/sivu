@@ -60,50 +60,48 @@ function OroRadial({ id }) {
 /* Rosa de jardín (pieza interna de VrRosas y del vestido)             */
 /* ------------------------------------------------------------------ */
 
-// Dibujada en una unidad de radio 40; `tono` es el color base del pétalo.
+// Rosa de jardín vista desde arriba: anillos de pétalos superpuestos, cada
+// uno girado respecto al anterior, más hondos hacia el centro. Unidad: radio 40.
+const ANILLOS = [
+  { r: 40, n: 6, w: 21, giro: 0 },
+  { r: 32, n: 6, w: 17, giro: 30 },
+  { r: 24, n: 5, w: 14, giro: 12 },
+  { r: 17, n: 5, w: 10.5, giro: 48 },
+  { r: 11, n: 4, w: 7.5, giro: 20 },
+  { r: 6, n: 3, w: 4.6, giro: 70 },
+];
+const petalo = (r, w) =>
+  `M0 0 C ${-w} ${-r * 0.3} ${-w * 1.12} ${-r * 0.86} ${-w * 0.42} ${-r * 1.0} Q 0 ${-r * 1.08} ${w * 0.42} ${-r * 1.0} C ${w * 1.12} ${-r * 0.86} ${w} ${-r * 0.3} 0 0 Z`;
+
 function Rosa({ x, y, r, rot = 0, tono = col("gold"), sinSombra = false }) {
   const id = useUid();
-  const claro = `color-mix(in srgb, ${tono} 45%, white)`;
-  const hondo = `color-mix(in srgb, ${tono} 72%, rgb(var(--color-gold-dark)))`;
-  const muyHondo = `color-mix(in srgb, ${tono} 40%, rgb(var(--color-gold-dark)))`;
+  const claro = `color-mix(in srgb, ${tono} 40%, white)`;
+  const hondo = `color-mix(in srgb, ${tono} 62%, rgb(var(--color-gold-dark)))`;
+  const muyHondo = `color-mix(in srgb, ${tono} 30%, rgb(var(--color-gold-dark)))`;
   return (
     <g transform={`translate(${x} ${y}) rotate(${rot}) scale(${r / 40})`}>
       <defs>
-        <radialGradient id={id("fondo")} cx="50%" cy="46%" r="58%">
-          <Stop o="0" c={muyHondo} />
-          <Stop o=".55" c={tono} />
-          <Stop o="1" c={claro} />
-        </radialGradient>
-        <linearGradient id={id("frente")} x1="0" y1="0" x2="0" y2="1">
-          <Stop o="0" c={claro} />
-          <Stop o=".5" c={tono} />
-          <Stop o="1" c={hondo} />
-        </linearGradient>
-        <linearGradient id={id("dentro")} x1="0" y1="0" x2="0" y2="1">
-          <Stop o="0" c={tono} />
-          <Stop o="1" c={muyHondo} />
-        </linearGradient>
-        <radialGradient id={id("centro")} cx="50%" cy="60%" r="60%">
-          <Stop o="0" c={muyHondo} />
-          <Stop o="1" c={tono} />
-        </radialGradient>
+        {ANILLOS.map((_, k) => (
+          <linearGradient key={k} id={id(`p${k}`)} x1="0" y1="1" x2="0" y2="0">
+            <Stop o="0" c={k > 2 ? muyHondo : hondo} />
+            <Stop o=".55" c={k > 3 ? hondo : tono} />
+            <Stop o="1" c={k > 3 ? tono : claro} />
+          </linearGradient>
+        ))}
       </defs>
-      {!sinSombra && <ellipse cx="3" cy="8" rx="40" ry="36" fill={col("ink", 0.14)} style={{ filter: "blur(4px)" }} />}
-      {/* corona de pétalos de atrás */}
-      <path fill={`url(#${id("fondo")})`} d="M0 -40 C 16 -45 34 -35 37 -18 C 47 -8 45 14 33 24 C 27 38 7 45 -6 41 C -22 43 -39 31 -39 14 C -47 2 -41 -21 -27 -31 C -20 -39 -10 -41 0 -40 Z" />
-      <path fill="none" stroke={muyHondo} strokeOpacity=".35" strokeWidth="1.2" strokeLinecap="round" d="M-27 -31 C -20 -24 -17 -18 -16 -12 M37 -18 C 28 -14 24 -10 22 -4 M33 24 C 26 19 22 16 18 14 M-39 14 C -30 12 -25 10 -22 7 M-6 41 C -4 34 -3 30 -2 26" />
-      {/* interior del cáliz (sombra) */}
-      <path fill={`url(#${id("dentro")})`} d="M-29 2 C -28 -21 -11 -30 2 -28 C 19 -28 31 -15 29 3 C 21 -5 11 -9 0 -9 C -12 -9 -22 -5 -29 2 Z" />
-      {/* pétalos interiores en espiral */}
-      <path fill={`url(#${id("frente")})`} d="M-20 5 C -20 -11 -7 -18 4 -16 C 15 -14 20 -3 18 7 C 11 0 3 -3 -4 -1 C -11 1 -16 4 -20 5 Z" />
-      <path fill={`url(#${id("centro")})`} d="M-13 9 C -11 -4 0 -9 9 -7 C 15 -5 15 4 11 10 C 7 4 1 2 -4 4 Z" />
-      <path fill="none" stroke={muyHondo} strokeWidth="1.3" strokeLinecap="round" d="M-6 4 C -6 -2 0 -5 4 -3 C 7 -1 6 3 3 5" />
-      {/* copa del frente */}
-      <path fill={`url(#${id("frente")})`} d="M-33 -1 C -37 20 -20 37 0 37 C -10 29 -14 15 -12 5 C -19 3 -27 1 -33 -1 Z" />
-      <path fill={`url(#${id("frente")})`} d="M33 -1 C 37 20 20 37 0 37 C 10 29 14 15 12 5 C 19 3 27 1 33 -1 Z" />
-      <path fill={`url(#${id("frente")})`} d="M-14 6 C -10 14 10 14 14 6 C 16 20 10 32 0 36 C -10 32 -16 20 -14 6 Z" />
-      {/* brillos de borde */}
-      <path fill="none" stroke="white" strokeOpacity=".6" strokeWidth="1.1" strokeLinecap="round" d="M-31 1 C -29 -2 -22 2 -14 5 M31 1 C 28 -2 22 2 14 5 M-12 7 C -6 12 6 12 12 7 M-18 4 C -14 -8 -2 -14 8 -12" />
+      {!sinSombra && <circle cx="3" cy="7" r="40" fill={col("ink", 0.16)} style={{ filter: "blur(4px)" }} />}
+      {ANILLOS.map((a, k) => (
+        <g key={k} transform={`rotate(${a.giro + k * 7})`}>
+          {k > 0 && <circle r={a.r * 0.98} fill={muyHondo} fillOpacity=".28" style={{ filter: "blur(1.6px)" }} />}
+          {Array.from({ length: a.n }, (_, j) => (
+            <g key={j} transform={`rotate(${(360 / a.n) * j + (j % 2 ? 6 : -4)})`}>
+              <path d={petalo(a.r, a.w)} fill={`url(#${id(`p${k}`)})`} />
+              <path d={`M${-a.w * 0.42} ${-a.r * 1.0} Q 0 ${-a.r * 1.08} ${a.w * 0.42} ${-a.r * 1.0}`} fill="none" stroke="white" strokeOpacity={k < 3 ? 0.55 : 0.35} strokeWidth={k < 3 ? 1.1 : 0.7} strokeLinecap="round" />
+            </g>
+          ))}
+        </g>
+      ))}
+      <path d="M-2.5 1 C -3 -2 0 -3.5 2 -2 C 3.5 -.5 2.5 2 .5 2.2" fill="none" stroke={muyHondo} strokeWidth="1.1" strokeLinecap="round" />
     </g>
   );
 }
@@ -650,8 +648,8 @@ export function VrQuince({ className = "" }) {
       <ellipse cx="150" cy="452" rx="150" ry="16" fill={col("gold-dark", 0.35)} filter={`url(#${id("sombra")})`} />
       <g filter={`url(#${id("grano")})`}>
         {/* brazos */}
-        <path d="M104 106 C 94 116 90 140 90 162 C 90 184 92 200 96 214 C 98 220 104 220 104 213 C 102 196 102 178 104 160 C 106 142 112 126 114 116 Z" fill={`url(#${id("piel")})`} />
-        <path d="M196 106 C 206 116 210 140 210 162 C 210 184 208 200 204 214 C 202 220 196 220 196 213 C 198 196 198 178 196 160 C 194 142 188 126 186 116 Z" fill={`url(#${id("piel")})`} />
+        <path d="M112 104 C 103 104 98 112 97 124 C 95 140 92 152 92 164 C 92 182 95 196 96 208 C 96 216 98 222 101 223 C 104 223 105 218 104 210 C 103 196 102 180 103 166 C 104 150 108 136 112 124 Z" fill={`url(#${id("piel")})`} />
+        <path d="M188 104 C 197 104 202 112 203 124 C 205 140 208 152 208 164 C 208 182 205 196 204 208 C 204 216 202 222 199 223 C 196 223 195 218 196 210 C 197 196 198 180 197 166 C 196 150 192 136 188 124 Z" fill={`url(#${id("piel")})`} />
         {/* falda de baile */}
         <path d="M126 178 C 110 232 70 300 34 378 C 22 404 14 424 12 442 Q 150 470 288 442 C 286 424 278 404 266 378 C 230 300 190 232 174 178 Z" fill={`url(#${id("falda")})`} />
         <g filter={`url(#${id("difuso")})`} fill="none" strokeLinecap="round">
@@ -665,7 +663,7 @@ export function VrQuince({ className = "" }) {
         <path d="M30 392 C 70 380 110 400 150 392 C 190 400 230 380 270 392" fill="none" stroke="white" strokeOpacity=".7" strokeWidth="1.4" />
         <path d="M126 178 C 110 232 70 300 34 378 C 22 404 14 424 12 442 Q 150 470 288 442 C 286 424 278 404 266 378 C 230 300 190 232 174 178 Z" fill={`url(#${id("tul")})`} />
         {/* espalda y hombros */}
-        <path d="M139 66 C 139 80 134 88 122 92 C 110 96 102 100 100 110 L 120 124 L 180 124 L 200 110 C 198 100 190 96 178 92 C 166 88 161 80 161 66 Z" fill={`url(#${id("piel")})`} />
+        <path d="M139 66 C 139 80 134 88 122 92 C 112 95 104 98 101 106 C 100 112 104 118 112 122 L 188 122 C 196 118 200 112 199 106 C 196 98 188 95 178 92 C 166 88 161 80 161 66 Z" fill={`url(#${id("piel")})`} />
         <path d="M128 104 C 134 112 140 116 146 116 M172 104 C 166 112 160 116 154 116 M150 92 V122" fill="none" stroke="#b9826a" strokeOpacity=".45" strokeWidth="1.4" strokeLinecap="round" />
         {/* corsé */}
         <path d="M106 112 C 122 106 138 110 150 116 C 162 110 178 106 194 112 C 190 134 184 158 176 184 Q 150 190 124 184 C 116 158 110 134 106 112 Z" fill={`url(#${id("corse")})`} />
