@@ -81,3 +81,14 @@ test("webhooks a la red interna se rechazan", () => {
   }
   for (const h of ["example.com", "8.8.8.8", "172.32.0.1", "fcbank.com"]) assert.ok(!hostPrivado(h), h);
 });
+
+test("los videos largos se reparten en tramos parecidos", async () => {
+  const { tramos } = await import("../encadenar.js");
+  assert.deepEqual(tramos(5), [5]);
+  assert.deepEqual(tramos(12), [4, 4, 4]);
+  assert.deepEqual(tramos(11), [4, 4, 3]);
+  assert.deepEqual(tramos(60), Array(12).fill(5));
+  assert.throws(() => prepararGeneracion({ prompt: "x", duracion: 30 }, { hayImagen: false }), /duracion/);
+  assert.equal(prepararGeneracion({ prompt: "x", duracion: 30 }, { hayImagen: false, ilimitado: true }).parametros.duracion, 30);
+  assert.equal(prepararGeneracion({ prompt: "x", duracion: 300 }, { hayImagen: false, ilimitado: true }).parametros.duracion, 300);
+});

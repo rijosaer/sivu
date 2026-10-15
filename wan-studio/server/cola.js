@@ -4,7 +4,8 @@
 // Pensada para una sola instancia del servidor: con varias, SKIP LOCKED evita
 // que dos tomen el mismo trabajo, pero el motor mock guarda estado en memoria.
 import { pool } from "./db.js";
-import { descargarVideo, guardarVideo } from "./almacen.js";
+import { borrar, descargarVideo, guardarVideo } from "./almacen.js";
+import { tramos, ultimoCuadro, unir } from "./encadenar.js";
 import { motorActual, motorPorNombre } from "./motores/index.js";
 import { generacionPublica } from "./serializar.js";
 
@@ -39,8 +40,10 @@ async function revisarEnCurso() {
   );
   for (const gen of rows) {
     const minutos = (Date.now() - new Date(gen.iniciado_en).getTime()) / 60000;
-    if (minutos > LIMITE_MIN) {
-      await fallar(gen, `Se superó el tiempo límite de ${LIMITE_MIN} minutos`);
+    // Un video por tramos tiene el tiempo límite de cada tramo.
+    const limite = LIMITE_MIN * tramos(gen.parametros.duracion).length;
+    if (minutos > limite) {
+      await fallar(gen, `Se superó el tiempo límite de ${limite} minutos`);
       continue;
     }
     // Tomada pero nunca enviada: el proceso se cayó justo en medio.
@@ -51,7 +54,8 @@ async function revisarEnCurso() {
 
     let r;
     try {
-      r = await motorPorNombre(gen.motor).consultar(gen);
+      const motor = motorPorNombre(gen.motor);
+      r = gen.motor_estado.cadena ? await consultarCadena(gen, motor) : await motor.consultar(gen);
     } catch (e) {
       // Un fallo de red al consultar no condena el trabajo: se reintenta en el
       // siguiente ciclo y, si nunca se recupera, lo corta el tiempo límite.
@@ -82,6 +86,57 @@ async function guardar(gen, video) {
   return descargarVideo(gen.id, video.url, { headers: video.headers, ext });
 }
 
+// --- Videos por tramos -------------------------------------------------------
+// motor_estado = { cadena: { i, duraciones, partes, imagen, interno } }, donde
+// "interno" es el estado del motor para el tramo i.
+
+async function iniciar(motor, gen) {
+  const duraciones = tramos(gen.parametros.duracion);
+  if (duraciones.length === 1) return motor.enviar(gen);
+  const cadena = { i: 0, duraciones, partes: [], imagen: gen.imagen, interno: null };
+  cadena.interno = await motor.enviar(tramo(gen, cadena));
+  return { cadena };
+}
+
+// Cada tramo se presenta al motor como una generación más, con su propio id
+// (así sus archivos no chocan) y su imagen de inicio.
+const tramo = (gen, c) => ({
+  ...gen,
+  id: `${gen.id}-t${c.i}`,
+  imagen: c.imagen,
+  motor_estado: c.interno,
+  parametros: { ...gen.parametros, duracion: c.duraciones[c.i], semilla: gen.parametros.semilla + c.i },
+});
+
+async function consultarCadena(gen, motor) {
+  const c = gen.motor_estado.cadena;
+  const n = c.duraciones.length;
+  const actual = tramo(gen, c);
+  const r = await motor.consultar(actual);
+  if (r.estado === "error") return { estado: "error", error: `Tramo ${c.i + 1} de ${n}: ${r.error}` };
+  if (r.estado === "pendiente") return { estado: "pendiente", progreso: (c.i + (r.progreso ?? 0.5)) / n };
+
+  let final;
+  try {
+    c.partes.push(await guardar(actual, r.video));
+    if (c.i + 1 < n) {
+      c.imagen = await ultimoCuadro(c.partes.at(-1), `entradas/${gen.id}-t${c.i + 1}.png`);
+      c.i += 1;
+      c.interno = null;
+      c.interno = await motor.enviar(tramo(gen, c));
+      await pool.query("UPDATE generaciones SET motor_estado = $2, progreso = $3 WHERE id = $1", [gen.id, { cadena: c }, c.i / n]);
+      return { estado: "pendiente" };
+    }
+    final = await unir(c.partes, `videos/${gen.id}.mp4`);
+  } catch (e) {
+    return { estado: "error", error: `Tramo ${c.i + 1} de ${n}: ${e.message}` };
+  }
+  // Los tramos y los cuadros intermedios ya no hacen falta.
+  const cuadros = c.duraciones.slice(1).map((_, k) => `entradas/${gen.id}-t${k + 1}.png`);
+  await Promise.all([...c.partes, ...cuadros].map((rel) => borrar(rel).catch(() => {})));
+  return { estado: "listo", video: { rel: final } };
+}
+
 async function tomarNuevos() {
   const { rows } = await pool.query("SELECT count(*)::int AS n FROM generaciones WHERE estado = 'procesando'");
   let libres = SIMULTANEOS - rows[0].n;
@@ -99,7 +154,7 @@ async function tomarNuevos() {
     const gen = tomadas[0];
     if (!gen) return;
     try {
-      const estado = await motor.enviar(gen);
+      const estado = await iniciar(motor, gen);
       await pool.query("UPDATE generaciones SET motor_estado = $2 WHERE id = $1", [gen.id, estado]);
     } catch (e) {
       console.error(`El motor ${motor.nombre} rechazó ${gen.id}:`, e.message);

@@ -130,10 +130,22 @@ export const PRESETS = [
 
 export const ASPECTOS = ["16:9", "9:16", "1:1"];
 export const RESOLUCIONES = ["480p", "720p"];
-// Wan está entrenado para clips de ~5 s; hasta ~10 s funciona, pero la
-// calidad y la coherencia bajan conforme se alarga. Más allá conviene encadenar
-// clips. DURACION_MAX permite ajustarlo sin tocar código.
-export const DURACION = { min: 2, max: Number(process.env.DURACION_MAX) || 10, defecto: 5 };
+// Wan da su mejor calidad en clips de ~5 s: los videos más largos se generan
+// en tramos encadenados de como mucho "tramo" segundos (ver encadenar.js).
+//   max              tope para cuentas normales (DURACION_MAX)
+//   max_ilimitado    tope para cuentas ilimitadas: sin tope salvo que se fije
+//                    DURACION_MAX_ILIMITADO (null = sin tope)
+//   recomendado      lo que se sugiere en la web a las cuentas ilimitadas: más
+//                    allá funciona igual, pero cada 5 s es otro tramo de GPU y
+//                    la escena se va alejando de la imagen original
+export const DURACION = {
+  min: 2,
+  max: Number(process.env.DURACION_MAX) || 10,
+  max_ilimitado: Number(process.env.DURACION_MAX_ILIMITADO) || null,
+  recomendado: 60,
+  tramo: Number(process.env.TRAMO_SEG) || 5,
+  defecto: 5,
+};
 
 export const buscarPreset = (id) => PRESETS.find((p) => p.id === id);
 
@@ -174,7 +186,7 @@ export function hostPrivado(host) {
 
 // Valida el cuerpo de POST /v1/generaciones y arma todo lo que se guarda.
 // La imagen se valida aparte (almacen.js) porque implica escribir un archivo.
-export function prepararGeneracion(cuerpo, { hayImagen }) {
+export function prepararGeneracion(cuerpo, { hayImagen, ilimitado = false }) {
   const preset = buscarPreset(cuerpo.preset || "animar");
   if (!preset) throw new ErrorApi(400, `Preset desconocido: "${cuerpo.preset}"`);
 
@@ -202,7 +214,10 @@ export function prepararGeneracion(cuerpo, { hayImagen }) {
   const parametros = {
     aspecto,
     resolucion,
-    duracion: entero(cuerpo.duracion, DURACION.min, DURACION.max, "duracion") ?? DURACION.defecto,
+    duracion:
+      // Sin tope, solo el límite técnico de un día para no aceptar números absurdos.
+      entero(cuerpo.duracion, DURACION.min, ilimitado ? (DURACION.max_ilimitado ?? 86400) : DURACION.max, "duracion") ??
+      DURACION.defecto,
     semilla: entero(cuerpo.semilla, 0, 2 ** 31 - 1, "semilla") ?? Math.floor(Math.random() * 2 ** 31),
   };
   // Ajustes avanzados opcionales: si no vienen, cada motor usa los suyos.

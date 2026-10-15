@@ -50,11 +50,16 @@ export default function Crear({ catalogo, usuario, presetInicial, alCambiarCredi
   const preset = presets.find((p) => p.id === presetId) || presets[0];
   const modo = imagen ? "i2v" : "t2v";
   const compatible = preset.modos.includes(modo);
+  const minDuracion = opciones?.duracion.min ?? 2;
+  const recomendado = opciones?.duracion.recomendado ?? 60;
+  const maxBarra = usuario.ilimitado ? recomendado : (opciones?.duracion.max ?? 5);
+  const tramos = Math.max(1, Math.ceil(duracion / (opciones?.duracion.tramo || 5)));
   const costo = Math.ceil(duracion * (resolucion === "720p" ? 2 : 1) * (preset.multiplicador || 1));
   const nombres = useMemo(() => Object.fromEntries(presets.map((p) => [p.id, p.nombre])), [presets]);
 
   let bloqueo = "";
-  if (!compatible) bloqueo = modo === "i2v" ? "Este preset es solo de texto: quita la imagen." : "Este preset necesita una imagen.";
+  if (!(duracion >= minDuracion)) bloqueo = `La duración mínima es ${minDuracion} s.`;
+  else if (!compatible) bloqueo = modo === "i2v" ? "Este preset es solo de texto: quita la imagen." : "Este preset necesita una imagen.";
   else if (modo === "t2v" && !prompt.trim()) bloqueo = "Sin imagen, describe la escena en el prompt.";
   else if (!usuario.ilimitado && usuario.creditos < costo) bloqueo = `Te faltan créditos: cuesta ${costo} y tienes ${usuario.creditos}.`;
 
@@ -196,17 +201,44 @@ export default function Crear({ catalogo, usuario, presetInicial, alCambiarCredi
         <div>
           <label htmlFor="duracion" className="mb-2 flex justify-between text-sm font-semibold text-tenue">
             <span>Duración</span>
-            <span className="text-white">{duracion} s</span>
+            {usuario.ilimitado ? (
+              // Sin tope: la barra llega a lo recomendado y el número acepta más.
+              <span className="flex items-center gap-1 text-white">
+                <input
+                  type="number"
+                  min={minDuracion}
+                  value={duracion || ""}
+                  onChange={(e) => setDuracion(Math.floor(Number(e.target.value)) || 0)}
+                  className="w-20 rounded-lg border border-borde bg-fondo px-2 py-0.5 text-right text-white focus:border-acento focus:outline-none"
+                  aria-label="Duración en segundos"
+                />
+                s
+              </span>
+            ) : (
+              <span className="text-white">{duracion} s</span>
+            )}
           </label>
           <input
             id="duracion"
             type="range"
-            min={opciones?.duracion.min ?? 2}
-            max={opciones?.duracion.max ?? 5}
-            value={duracion}
+            min={minDuracion}
+            max={maxBarra}
+            value={Math.min(duracion, maxBarra)}
             onChange={(e) => setDuracion(Number(e.target.value))}
             className="w-full accent-acento"
           />
+          {usuario.ilimitado && (
+            <p className="mt-1 text-xs text-tenue">
+              Sin tope. Recomendado hasta {recomendado} s: más largo funciona, pero tarda más y la escena se va
+              alejando de la imagen original.
+            </p>
+          )}
+          {tramos > 1 && (
+            <p className={`mt-1 text-xs ${duracion > recomendado ? "text-amber-300" : "text-tenue"}`}>
+              Se genera en {tramos} tramos encadenados de ~{Math.round(duracion / tramos)} s: cada uno sigue desde el
+              último cuadro del anterior.
+            </p>
+          )}
         </div>
 
         {(error || bloqueo) && <p className={`text-sm ${error ? "text-red-300" : "text-tenue"}`}>{error || bloqueo}</p>}

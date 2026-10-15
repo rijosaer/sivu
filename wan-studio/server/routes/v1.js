@@ -43,7 +43,7 @@ v1Router.post(
   limiteCrearSalvoIlimitados,
   capturar(async (req, res) => {
     const imagen = req.body.imagen ? leerImagen(req.body.imagen) : null;
-    const g = prepararGeneracion(req.body, { hayImagen: !!imagen });
+    const g = prepararGeneracion(req.body, { hayImagen: !!imagen, ilimitado: req.usuario.ilimitado });
     // Las cuentas ilimitadas no pagan: costo 0 también hace que no haya nada
     // que devolver si la generación falla.
     if (req.usuario.ilimitado) g.costo = 0;
