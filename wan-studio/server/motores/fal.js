@@ -42,7 +42,8 @@ export const fal = {
       seed: p.semilla,
       resolution: p.resolucion,
       aspect_ratio: p.aspecto,
-      num_frames: cuadros(p.duracion, FPS),
+      // fal acepta hasta 161 cuadros (~10 s a 16 fps).
+      num_frames: Math.min(cuadros(p.duracion, FPS), 161),
       frames_per_second: FPS,
     };
     if (p.pasos) entrada.num_inference_steps = p.pasos;

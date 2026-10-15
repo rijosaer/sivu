@@ -130,7 +130,10 @@ export const PRESETS = [
 
 export const ASPECTOS = ["16:9", "9:16", "1:1"];
 export const RESOLUCIONES = ["480p", "720p"];
-export const DURACION = { min: 2, max: 5, defecto: 5 };
+// Wan está entrenado para clips de ~5 s; hasta ~10 s funciona, pero la
+// calidad y la coherencia bajan conforme se alarga. Más allá conviene encadenar
+// clips. DURACION_MAX permite ajustarlo sin tocar código.
+export const DURACION = { min: 2, max: Number(process.env.DURACION_MAX) || 10, defecto: 5 };
 
 export const buscarPreset = (id) => PRESETS.find((p) => p.id === id);
 

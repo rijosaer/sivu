@@ -109,7 +109,6 @@ const CAMPOS = [
   ["imagen", "data URI base64 PNG/JPEG/WebP, máx. 10 MB; sin ella es texto a video"],
   ["aspecto", "16:9 · 9:16 · 1:1"],
   ["resolucion", "480p · 720p (cuesta el doble)"],
-  ["duracion", "segundos, 2 a 5"],
   ["semilla", "entero, para repetir un resultado"],
   ["negativo", "lo que no quieres ver"],
   ["pasos, guia", "avanzado: pasos de muestreo y cfg"],
@@ -119,6 +118,9 @@ const CAMPOS = [
 export default function ApiDocs({ catalogo }) {
   const base = urlBase();
   const ids = catalogo.presets.map((p) => p.id).join(", ");
+  const dur = catalogo.opciones?.duracion;
+  const campos = [...CAMPOS];
+  campos.splice(5, 0, ["duracion", dur ? `segundos, ${dur.min} a ${dur.max}` : "segundos"]);
 
   return (
     <div className="grid gap-8 py-8 lg:grid-cols-[1fr_380px]">
@@ -186,7 +188,7 @@ const { id } = await r.json();
         <section>
           <h2 className="mb-3 text-lg font-semibold">Campos de POST /v1/generaciones</h2>
           <dl className="grid gap-x-4 gap-y-2 text-sm sm:grid-cols-[140px_1fr]">
-            {CAMPOS.map(([c, d]) => (
+            {campos.map(([c, d]) => (
               <div key={c} className="contents">
                 <dt className="font-mono text-xs text-white">{c}</dt>
                 <dd className="text-tenue">{d}</dd>

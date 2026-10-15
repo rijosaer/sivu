@@ -68,7 +68,7 @@ test("encuentra el video en las salidas de ComfyUI", () => {
 test("validación de generaciones", () => {
   assert.throws(() => prepararGeneracion({ preset: "cine" }, { hayImagen: false }), /prompt/);
   assert.throws(() => prepararGeneracion({ preset: "cine", prompt: "x" }, { hayImagen: true }), /no acepta imagen/);
-  assert.throws(() => prepararGeneracion({ prompt: "x", duracion: 9 }, { hayImagen: false }), /duracion/);
+  assert.throws(() => prepararGeneracion({ prompt: "x", duracion: 11 }, { hayImagen: false }), /duracion/);
   const g = prepararGeneracion({ preset: "crash-zoom", prompt: "a dog", resolucion: "720p", duracion: 4 }, { hayImagen: true });
   assert.equal(g.modo, "i2v");
   assert.equal(g.costo, 8);
