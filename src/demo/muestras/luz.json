@@ -2,7 +2,7 @@
   "site": {
     "invitacion": {
       "slug": "plantillas/luz",
-      "nombre": "XV · Emilia",
+      "nombre": "Bautizo · Matías",
       "tipoEvento": "bautizo",
       "diseno": "luz"
     },
@@ -31,88 +31,133 @@
         "id": 46,
         "tipo": "welcome",
         "contenido": {
-          "novioEl": "Emilia Durán",
+          "bienvenidaTexto": "Mi bautizo",
+          "novioEl": "Matías",
           "novioElla": "",
-          "fraseIntro": "Hay momentos que se sueñan toda la vida. Este es uno de ellos, y quiero vivirlo contigo.",
-          "padresTexto": "Con la bendición de mis padres",
-          "padreElMadre": "María Fernanda Gómez",
-          "padreElPadre": "Carlos Durán",
-          "padreEllaMadre": "",
+          "fraseIntro": "Con el corazón lleno de gratitud queremos compartir contigo el día en que Matías recibe la luz de Cristo por el sacramento del bautismo.",
+          "padresTexto": "hijo de",
+          "padreElPadre": "Santiago Restrepo",
+          "padreElMadre": "Valentina Ochoa",
           "padreEllaPadre": "",
-          "bienvenidaTexto": "Mis XV años"
+          "padreEllaMadre": "",
+          "versiculo": "Antes de formarte en el vientre, ya te conocía; antes de que nacieras, ya te había consagrado.",
+          "versiculoCita": "Jeremías 1, 5"
         }
       },
       {
         "id": 47,
         "tipo": "informacion_boda",
         "contenido": {
-          "fecha": "2027-03-20T21:00:00-05:00",
-          "lugar": "Hacienda Santa Clara",
-          "mapsUrl": "https://maps.google.com/?q=Hacienda+Santa+Clara+La+Calera",
-          "overline": "Mis quince años",
-          "direccion": "Km 4 vía La Calera, Bogotá",
+          "fecha": "2027-04-17T11:00:00-05:00",
+          "lugar": "Parroquia Nuestra Señora de Lourdes",
+          "direccion": "Carrera 13 # 63-27, Chapinero, Bogotá",
+          "mapsUrl": "https://maps.google.com/?q=Iglesia+Nuestra+Se%C3%B1ora+de+Lourdes+Bogot%C3%A1",
           "mapaEmbed": "",
+          "overline": "La ceremonia",
+          "tituloSeccion": "La ceremonia",
+          "tituloItinerario": "El programa",
+          "cronogramaModo": "detallado",
           "cronograma": [
             {
-              "hora": "9:00 p. m.",
-              "titulo": "Recepción"
+              "hora": "11:00 a. m.",
+              "titulo": "Ceremonia del bautizo"
             },
             {
-              "hora": "9:45 p. m.",
-              "titulo": "Entrada de la quinceañera"
+              "hora": "12:00 m.",
+              "titulo": "Fotos en el atrio"
             },
             {
-              "hora": "10:15 p. m.",
-              "titulo": "Vals"
-            },
-            {
-              "hora": "11:00 p. m.",
-              "titulo": "Cena y fiesta"
+              "hora": "1:00 p. m.",
+              "titulo": "Almuerzo en familia · Casa Quinta La Esperanza"
             }
           ],
-          "tituloSeccion": "Información del evento",
-          "cronogramaModo": "detallado",
-          "tituloItinerario": "El programa",
           "cronogramaMensaje": "Les compartiremos el programa más cerca de la fecha.",
           "mostrarRestriccion": true,
           "mostrarObservaciones": true,
-          "fechaLimiteConfirmacion": "2027-03-01"
+          "fechaLimiteConfirmacion": "2027-04-03",
+          "telefonoConfirmar": "300 555 0142"
         }
       },
       {
         "id": 48,
         "tipo": "padrinos",
         "contenido": {
+          "titulo": "Mis padrinos",
           "grupos": [
             {
-              "etiqueta": "Y mis padrinos",
+              "etiqueta": "Padrinos de bautismo",
               "personas": [
-                "Sandra Rojas",
-                "Andrés Rojas"
+                "Camila Ochoa",
+                "Juan Pablo Restrepo"
               ]
             }
-          ],
-          "titulo": "Padres y padrinos"
+          ]
         }
       },
       {
         "id": 49,
         "tipo": "vestimenta",
         "contenido": {
-          "nota": "",
-          "evitar": [],
-          "titulo": "Elegante",
-          "permitidos": []
+          "titulo": "Casual elegante",
+          "nota": "Te sugerimos tonos claros para acompañar la luz del día.",
+          "permitidos": [
+            {
+              "nombre": "Marfil",
+              "colores": [
+                "#F4EEDF"
+              ]
+            },
+            {
+              "nombre": "Beige",
+              "colores": [
+                "#E3D4B5"
+              ]
+            },
+            {
+              "nombre": "Verde salvia",
+              "colores": [
+                "#B9C7B0"
+              ]
+            },
+            {
+              "nombre": "Celeste",
+              "colores": [
+                "#CFDDE6"
+              ]
+            }
+          ],
+          "evitar": [
+            {
+              "nombre": "Blanco",
+              "color": "#FFFFFF"
+            }
+          ]
+        }
+      },
+      {
+        "id": 53,
+        "tipo": "historia",
+        "contenido": {
+          "titulo": "Mi llegada",
+          "texto": "Llegué en una mañana de septiembre y con mi primer llanto llené la casa de luz. Ahora mis papás quieren que esa luz no se apague nunca, y por eso me presentan ante Dios rodeado de las personas que más me quieren."
         }
       },
       {
         "id": 50,
         "tipo": "regalos",
         "contenido": {
-          "texto": "",
-          "titulo": "Mesa de regalos",
+          "titulo": "Un detalle para Matías",
+          "texto": "Tu compañía y tus oraciones son el mejor regalo. Si quieres tener un detalle conmigo, puedes hacerlo aquí.",
           "enlaces": [],
-          "datosTransferencia": "Nequi 300 123 4567 · Emilia Durán"
+          "datosTransferencia": "Nequi 300 555 0142 · Valentina Ochoa"
+        }
+      },
+      {
+        "id": 54,
+        "tipo": "sobres",
+        "activo": false,
+        "contenido": {
+          "texto": ""
         }
       },
       {
@@ -121,8 +166,8 @@
         "contenido": {
           "nota": "",
           "items": [
-            "La invitación es personal y válida solo para los pases indicados.",
-            "Te pedimos llegar con 20 minutos de anticipación."
+            "Te pedimos llegar 15 minutos antes para acomodarnos con calma en la parroquia.",
+            "La invitación es personal y válida solo para los pases indicados."
           ]
         }
       },
@@ -132,29 +177,14 @@
         "contenido": {
           "items": [
             {
-              "p": "¿Puedo llevar a alguien más?",
-              "r": "Cada invitación indica sus pases. Si necesitas uno adicional, escríbenos antes de confirmar."
+              "p": "¿Pueden ir niños?",
+              "r": "¡Claro! Los niños son bienvenidos en la ceremonia y en el almuerzo."
             },
             {
               "p": "¿Hay parqueadero?",
-              "r": "Sí, la hacienda tiene parqueadero para invitados."
+              "r": "Alrededor de la Plaza de Lourdes hay parqueaderos públicos; te recomendamos llegar con tiempo."
             }
           ]
-        }
-      },
-      {
-        "id": 53,
-        "tipo": "historia",
-        "contenido": {
-          "texto": "Desde pequeña soñé con una noche en París: luces, flores y la gente que más quiero. Hoy cumplo quince años y quiero que ese sueño lo vivamos juntos.",
-          "titulo": "Mi historia"
-        }
-      },
-      {
-        "id": 54,
-        "tipo": "sobres",
-        "contenido": {
-          "texto": "Tu presencia es mi mejor regalo. Si además quieres hacerme un obsequio, habrá un buzón de sobres en la fiesta."
         }
       },
       {
@@ -166,7 +196,7 @@
         }
       }
     ],
-    "fechaLimiteConfirmacion": "2027-03-01",
+    "fechaLimiteConfirmacion": "2027-04-03",
     "fotosSubidas": [],
     "audioUrl": null,
     "fondoUrl": null
@@ -174,14 +204,14 @@
   "invitado": {
     "codigo": "DEMO",
     "tipo": "cupos",
-    "nombre": "Laura Méndez",
+    "nombre": "Andrea Salazar",
     "familia": "",
     "mensaje": "",
     "cupos": 1,
     "miembros": [
       {
         "id": -1,
-        "nombre": "Laura Méndez",
+        "nombre": "Andrea Salazar",
         "estado": "pendiente",
         "restriccion": "",
         "comentario": "",
