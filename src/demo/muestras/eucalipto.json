@@ -2,7 +2,7 @@
   "site": {
     "invitacion": {
       "slug": "plantillas/eucalipto",
-      "nombre": "XV · Emilia",
+      "nombre": "Boda · Daniela & Mateo",
       "tipoEvento": "boda",
       "diseno": "eucalipto"
     },
@@ -31,130 +31,184 @@
         "id": 46,
         "tipo": "welcome",
         "contenido": {
-          "novioEl": "Emilia Durán",
-          "novioElla": "",
-          "fraseIntro": "Hay momentos que se sueñan toda la vida. Este es uno de ellos, y quiero vivirlo contigo.",
-          "padresTexto": "Con la bendición de mis padres",
-          "padreElMadre": "María Fernanda Gómez",
-          "padreElPadre": "Carlos Durán",
-          "padreEllaMadre": "",
-          "padreEllaPadre": "",
-          "bienvenidaTexto": "Mis XV años"
+          "bienvenidaTexto": "Nos casamos",
+          "novioElla": "Daniela",
+          "novioEl": "Mateo",
+          "fraseIntro": "Entre flores y eucaliptos queremos decir «sí» rodeados de la gente que más queremos.",
+          "padresTexto": "Con la bendición de",
+          "padreEllaPadre": "Jorge Restrepo Mejía",
+          "padreEllaMadre": "Claudia Vélez de Restrepo",
+          "padreElPadre": "Andrés Gaviria Ochoa",
+          "padreElMadre": "Natalia Londoño de Gaviria"
         }
       },
       {
         "id": 47,
         "tipo": "informacion_boda",
         "contenido": {
-          "fecha": "2027-03-20T21:00:00-05:00",
-          "lugar": "Hacienda Santa Clara",
-          "mapsUrl": "https://maps.google.com/?q=Hacienda+Santa+Clara+La+Calera",
-          "overline": "Mis quince años",
-          "direccion": "Km 4 vía La Calera, Bogotá",
+          "fecha": "2027-04-17T16:00:00-05:00",
+          "lugar": "Jardín Botánico de Medellín",
+          "direccion": "Calle 73 #51D-14, Medellín, Antioquia",
+          "mapsUrl": "https://maps.google.com/?q=Jard%C3%ADn+Bot%C3%A1nico+de+Medell%C3%ADn",
           "mapaEmbed": "",
+          "overline": "Ceremonia y recepción",
+          "tituloSeccion": "Cuándo y dónde",
+          "tituloItinerario": "Itinerario",
+          "cronogramaModo": "detallado",
           "cronograma": [
             {
-              "hora": "9:00 p. m.",
-              "titulo": "Recepción"
+              "hora": "4:00 p. m.",
+              "titulo": "Ceremonia en el jardín"
             },
             {
-              "hora": "9:45 p. m.",
-              "titulo": "Entrada de la quinceañera"
+              "hora": "5:15 p. m.",
+              "titulo": "Cóctel y fotos"
             },
             {
-              "hora": "10:15 p. m.",
-              "titulo": "Vals"
+              "hora": "6:30 p. m.",
+              "titulo": "Recepción y cena"
             },
             {
-              "hora": "11:00 p. m.",
-              "titulo": "Cena y fiesta"
+              "hora": "8:00 p. m.",
+              "titulo": "Primer baile"
+            },
+            {
+              "hora": "8:30 p. m.",
+              "titulo": "¡A bailar!"
             }
           ],
-          "tituloSeccion": "Información del evento",
-          "cronogramaModo": "detallado",
-          "tituloItinerario": "El programa",
-          "cronogramaMensaje": "Les compartiremos el programa más cerca de la fecha.",
+          "cronogramaMensaje": "Les compartiremos el itinerario más cerca de la fecha.",
           "mostrarRestriccion": true,
           "mostrarObservaciones": true,
-          "fechaLimiteConfirmacion": "2027-03-01"
+          "fechaLimiteConfirmacion": "2027-03-20",
+          "telefonoConfirmar": "300 123 4567"
         }
       },
       {
         "id": 48,
-        "tipo": "padrinos",
+        "tipo": "historia",
         "contenido": {
-          "grupos": [
-            {
-              "etiqueta": "Y mis padrinos",
-              "personas": [
-                "Sandra Rojas",
-                "Andrés Rojas"
-              ]
-            }
-          ],
-          "titulo": "Padres y padrinos"
+          "titulo": "Nuestra historia",
+          "texto": "Nos conocimos una tarde de lluvia en un café de Laureles, compartiendo la última mesa libre. Siete años, dos mudanzas y un perro después, Mateo se arrodilló entre los eucaliptos de Santa Elena. Ahora queremos celebrarlo contigo."
         }
       },
       {
         "id": 49,
         "tipo": "vestimenta",
         "contenido": {
-          "nota": "",
-          "evitar": [],
-          "titulo": "Elegante",
-          "permitidos": []
-        }
-      },
-      {
-        "id": 50,
-        "tipo": "regalos",
-        "contenido": {
-          "texto": "",
-          "titulo": "Mesa de regalos",
-          "enlaces": [],
-          "datosTransferencia": "Nequi 300 123 4567 · Emilia Durán"
-        }
-      },
-      {
-        "id": 51,
-        "tipo": "info_importante",
-        "contenido": {
-          "nota": "",
-          "items": [
-            "La invitación es personal y válida solo para los pases indicados.",
-            "Te pedimos llegar con 20 minutos de anticipación."
-          ]
-        }
-      },
-      {
-        "id": 52,
-        "tipo": "faq",
-        "contenido": {
-          "items": [
+          "titulo": "Formal",
+          "nota": "Para ellas, vestido largo o de coctel; para ellos, traje oscuro. Les pedimos reservar el blanco para la novia.",
+          "permitidos": [
             {
-              "p": "¿Puedo llevar a alguien más?",
-              "r": "Cada invitación indica sus pases. Si necesitas uno adicional, escríbenos antes de confirmar."
+              "nombre": "Salvia",
+              "colores": [
+                "#8FA58F",
+                "#B9C8B5"
+              ]
             },
             {
-              "p": "¿Hay parqueadero?",
-              "r": "Sí, la hacienda tiene parqueadero para invitados."
+              "nombre": "Arena",
+              "colores": [
+                "#D8CBB5",
+                "#B5A58C"
+              ]
+            },
+            {
+              "nombre": "Azul polvo",
+              "colores": [
+                "#9FB1C4"
+              ]
+            }
+          ],
+          "evitar": [
+            {
+              "nombre": "Blanco",
+              "color": "#FFFFFF"
+            },
+            {
+              "nombre": "Marfil",
+              "color": "#F1E7D2"
             }
           ]
         }
       },
       {
-        "id": 53,
-        "tipo": "historia",
+        "id": 50,
+        "tipo": "padrinos",
         "contenido": {
-          "texto": "Desde pequeña soñé con una noche en París: luces, flores y la gente que más quiero. Hoy cumplo quince años y quiero que ese sueño lo vivamos juntos.",
-          "titulo": "Mi historia"
+          "titulo": "Padrinos",
+          "grupos": [
+            {
+              "etiqueta": "De anillos",
+              "personas": [
+                "Juliana Restrepo",
+                "Santiago Arango"
+              ]
+            },
+            {
+              "etiqueta": "De lazo",
+              "personas": [
+                "Carolina Gaviria",
+                "Felipe Montoya"
+              ]
+            },
+            {
+              "etiqueta": "De arras",
+              "personas": [
+                "Mariana Uribe",
+                "Tomás Vélez"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": 51,
+        "tipo": "sobres",
+        "contenido": {
+          "texto": "Su presencia es nuestro mejor regalo. Si desean tener un detalle con nosotros, habrá una caja para la lluvia de sobres en la recepción."
+        }
+      },
+      {
+        "id": 52,
+        "tipo": "regalos",
+        "contenido": {
+          "titulo": "Mesa de regalos",
+          "texto": "Estamos armando nuestro primer hogar; cualquier aporte nos ayuda a llenarlo de recuerdos.",
+          "enlaces": [],
+          "datosTransferencia": "Nequi 300 123 4567 · Daniela Restrepo"
+        }
+      },
+      {
+        "id": 53,
+        "tipo": "info_importante",
+        "contenido": {
+          "items": [
+            "La invitación es personal y válida solo para los pases indicados.",
+            "La ceremonia es al aire libre sobre césped: les sugerimos tacón grueso.",
+            "Celebraremos solo con adultos; gracias por entenderlo."
+          ],
+          "nota": ""
         }
       },
       {
         "id": 54,
-        "tipo": "sobres",
+        "tipo": "faq",
         "contenido": {
-          "texto": "Tu presencia es mi mejor regalo. Si además quieres hacerme un obsequio, habrá un buzón de sobres en la fiesta."
+          "items": [
+            {
+              "p": "¿Hay parqueadero?",
+              "r": "Sí, el Jardín Botánico tiene parqueadero pagado sobre la Calle 73."
+            },
+            {
+              "p": "¿Qué pasa si llueve?",
+              "r": "La ceremonia se trasladará al Orquideorama, que está cubierto."
+            },
+            {
+              "p": "¿Puedo llevar a alguien más?",
+              "r": "Cada invitación indica sus pases. Si necesitas uno adicional, escríbenos antes de confirmar."
+            }
+          ]
         }
       },
       {
@@ -166,7 +220,7 @@
         }
       }
     ],
-    "fechaLimiteConfirmacion": "2027-03-01",
+    "fechaLimiteConfirmacion": "2027-03-20",
     "fotosSubidas": [],
     "audioUrl": null,
     "fondoUrl": null

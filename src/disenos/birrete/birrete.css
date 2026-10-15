@@ -84,7 +84,7 @@
 .bi .bi-btn-oro span { text-transform: none; letter-spacing: .04em; font-size: 16px; }
 @media (hover: hover) { .bi .bi-btn-oro:hover { filter: brightness(1.1); } }
 .bi .bi-botones { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
-.bi .bi-botones .bi-btn { flex: 1 1 130px; }
+.bi .bi-botones .bi-btn { flex: 1 1 120px; padding-inline: 12px; letter-spacing: .1em; white-space: nowrap; }
 
 /* ---------- Portada / entrada: el diploma ---------- */
 .bi .bi-portada {
@@ -127,7 +127,10 @@
 .bi .bi-pliego-in::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 28px; pointer-events: none;
   background: linear-gradient(to top, rgb(90 70 30 / .28), transparent); }
 .bi .bi-pliego-texto { position: relative; padding: 24px 20px 44px; display: flex; flex-direction: column; align-items: center;
-  box-shadow: inset 0 0 0 9px transparent, inset 0 0 0 10px color-mix(in srgb, var(--filete) 70%, transparent), inset 0 0 0 13px transparent, inset 0 0 0 14px color-mix(in srgb, var(--filete) 35%, transparent); }
+}
+.bi .bi-pliego-texto::before, .bi .bi-pliego-texto::after { content: ""; position: absolute; pointer-events: none; border: 1px solid color-mix(in srgb, var(--filete) 75%, transparent); }
+.bi .bi-pliego-texto::before { inset: 9px 9px 0; border-bottom: 0; }
+.bi .bi-pliego-texto::after { inset: 13px 13px 0; border-bottom: 0; opacity: .45; }
 
 .bi .bi-cresta { display: flex; align-items: flex-end; justify-content: center; gap: 0; height: 64px; margin-bottom: 4px; }
 .bi .bi-cresta-laurel { width: 30px; height: 56px; }
@@ -215,9 +218,10 @@
   position: relative; z-index: 1; min-height: calc(var(--tab) + 200px); padding: 22px 22px 26px; border-radius: 3px;
   background: var(--grano), linear-gradient(170deg, var(--tarjeta), var(--hoja) 70%);
   border: 1px solid color-mix(in srgb, var(--oro-claro) 90%, white);
-  box-shadow: inset 0 0 0 6px transparent, inset 0 0 0 7px color-mix(in srgb, var(--oro-claro) 70%, transparent), 0 16px 26px -20px rgb(60 45 15 / .55);
+  box-shadow: 0 16px 26px -20px rgb(60 45 15 / .55);
 }
-.bi .bi-folio { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; font: 400 12px/1 var(--f-titulo); letter-spacing: .2em; text-transform: uppercase; color: var(--oro); }
+.bi .bi-papel::after { content: ""; position: absolute; inset: 6px; pointer-events: none; border: 1px solid color-mix(in srgb, var(--oro-claro) 75%, transparent); }
+.bi .bi-folio { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; font: 500 13px/1 var(--f-texto); letter-spacing: .24em; font-variant: small-caps; text-transform: lowercase; color: var(--oro); }
 .bi .bi-folio::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--oro-claro), transparent); }
 
 /* Aparición: la hoja sube y la pestaña asoma desde debajo del papel. */
@@ -247,7 +251,6 @@
 .bi .bi-programa li::before { content: ""; position: absolute; left: -21px; top: 5px; width: 9px; height: 9px; background: var(--tarjeta); border: 1.5px solid var(--oro); transform: rotate(45deg); }
 .bi .bi-hora { font: 700 13px/1.3 var(--f-titulo); letter-spacing: .08em; color: var(--oro-osc); }
 .bi .bi-que { font-size: 19px; line-height: 1.3; }
-.bi .bi-copas-programa { display: block; width: 104px; height: auto; margin: 14px auto -6px; }
 
 .bi .bi-paleta { display: grid; gap: 10px; margin-top: 14px; }
 .bi .bi-paleta li { display: flex; align-items: center; gap: 12px; }
@@ -327,7 +330,7 @@
 .bi .bi-modal-cabeza p { font: 700 15px/1 var(--f-titulo); letter-spacing: .32em; color: var(--oro-osc); }
 .bi .bi-modal #rsvp { padding: 10px 22px 36px; border-top: 0; font-family: var(--f-texto); color: var(--tinta); }
 .bi .bi-modal #rsvp img { display: none; }
-.bi .bi-modal #rsvp .font-mono { font-family: var(--f-texto); letter-spacing: .2em; }
+.bi .bi-modal #rsvp .font-mono { font-family: var(--f-texto); letter-spacing: .16em; }
 .bi .bi-modal #rsvp p.font-mono, .bi .bi-modal #rsvp span.font-mono { font-size: 12.5px; font-weight: 600; color: var(--oro-osc); }
 .bi .bi-modal #rsvp h2 { font-family: var(--f-guion); font-weight: 400; font-size: clamp(36px, 10vw, 44px); line-height: 1.2; color: var(--azul); margin: 6px 0 4px; }
 .bi .bi-modal #rsvp .font-body { font-family: var(--f-texto); font-size: 18px; font-weight: 500; color: var(--tinta); }

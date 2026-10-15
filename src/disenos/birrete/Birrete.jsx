@@ -201,7 +201,6 @@ export default function Birrete({ site, contenidoDe, invitacion, onEnviarRSVP, e
           ) : (
             <p className="bi-lead">{mensajePrograma}</p>
           )}
-          <BiCopas className="bi-copas-programa" />
         </>
       ),
     });

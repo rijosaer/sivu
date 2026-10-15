@@ -66,11 +66,9 @@ function Arco({ id, ante, titulo, paloma, pieza, angosto, children }) {
         <Clave />
         <div className="lb-dentro">
           {pieza}
+          {paloma && <LbPaloma className="lb-paloma-titulo" ramita />}
           {ante && <p className="lb-ante">{ante}</p>}
-          <h2 className="lb-h2" id={id}>
-            {paloma && <LbPaloma className="lb-paloma-titulo" />}
-            <span>{titulo}</span>
-          </h2>
+          <h2 className="lb-h2" id={id}>{titulo}</h2>
           <Filete />
           {children}
         </div>

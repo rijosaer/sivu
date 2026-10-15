@@ -449,7 +449,6 @@ export function BiLibros({ className = "" }) {
         <path d="M125 30.1 L128 31 L125 31.9 Z" fill="#2b2b2b" />
         <rect x="48" y="28" width="5" height="6" fill={AZUL} />
       </g>
-      <rect x="0" y="0" width="170" height="130" fill="#fff" filter={`url(#${id("g")})`} opacity=".6" />
     </svg>
   );
 }

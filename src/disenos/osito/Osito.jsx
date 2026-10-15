@@ -40,7 +40,7 @@ const ICONO = {
   info: ic(<><circle cx="12" cy="12" r="9" /><path d="M12 11v5.5M12 7.6v.1" /></>),
   pregunta: ic(<><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5 C 9.5 6.5 14.5 6.5 14.5 9.5 C 14.5 11.5 12 11.5 12 13.8M12 17v.1" /></>),
   nota: ic(<><path d="M9 18V5.5l10-2v12.5" /><circle cx="6.5" cy="18" r="2.5" /><circle cx="16.5" cy="16" r="2.5" /></>),
-  chupo: ic(<><circle cx="12" cy="6" r="3.2" /><path d="M4 12 C 4 9.5 8 9 12 9 C 16 9 20 9.5 20 12 C 20 14.5 16 15 12 15 C 8 15 4 14.5 4 12 Z" /><path d="M10 15v2.5 C 10 20.5 14 20.5 14 17.5V15" /></>),
+  biberon: ic(<><path d="M10.5 7.5 C 10.5 4.5 11 2.8 12 2.8 C 13 2.8 13.5 4.5 13.5 7.5" /><path d="M8 7.5h8" /><path d="M8.8 7.5v11.2a2.3 2.3 0 0 0 2.3 2.3h1.8a2.3 2.3 0 0 0 2.3-2.3V7.5" /><path d="M8.8 12h2.4M8.8 15h2.4M8.8 18h2.4" /></>),
 };
 const UI = {
   pin: <svg viewBox="0 0 24 24" {...trazo} aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z" /><circle cx="12" cy="9.5" r="2.5" /></svg>,
@@ -68,8 +68,8 @@ const TONOS = ["beige", "salvia", "claro"];
 const GIROS = [-7, 5, -4, 8, -6, 4];
 
 // Una sección: el cubo con su ícono cae y se apila sobre la tarjeta.
-function Bloque({ n, icono, ante, titulo, id, children, className = "" }) {
-  const tono = TONOS[n % TONOS.length];
+function Bloque({ n, icono, ante, titulo, id, children, className = "", tono: fijo }) {
+  const tono = fijo || TONOS[n % TONOS.length];
   const lado = ["0px", "-86px", "86px"][n % 3];
   return (
     <section className={`os-bloque ${className}`} aria-labelledby={id} data-reveal>
@@ -143,7 +143,7 @@ function Entrada({ welcome, partes, invitacion, despierta, onDespertar }) {
 
       {!despierta && (
         <button type="button" className="os-despertar" onClick={onDespertar}>
-          <span className="os-despertar-estrella" aria-hidden="true">{ICONO.estrella}</span>
+          <svg className="os-despertar-estrella" viewBox="0 0 24 24" aria-hidden="true">{ICONO.estrella}</svg>
           Toca para despertar al móvil
         </button>
       )}
@@ -324,7 +324,7 @@ export default function Osito({ site, contenidoDe, invitacion, onEnviarRSVP, enE
               {grupos.map((g, i) => (
                 <div key={i} className="os-grupo">
                   {g.etiqueta && <p className="os-ante">{g.etiqueta}</p>}
-                  <p className="os-personas">{g.personas.filter(Boolean).join(" · ")}</p>
+                  <p className="os-personas">{g.personas.filter(Boolean).map((x, j) => <span key={j}>{x}</span>)}</p>
                 </div>
               ))}
             </Bloque>
@@ -397,7 +397,7 @@ export default function Osito({ site, contenidoDe, invitacion, onEnviarRSVP, enE
           )}
 
           {confirmar && (
-            <Bloque n={sig()} icono="chupo" ante="Confirmación" titulo="¿Nos acompañas?" id="os-confirmar" className="os-bloque-confirmar">
+            <Bloque n={sig()} icono="biberon" tono="salvia" ante="Confirmación" titulo="¿Nos acompañas?" id="os-confirmar" className="os-bloque-confirmar">
               {confirmar.href ? (
                 <a className="os-btn os-btn-grande" href={confirmar.href} target="_blank" rel="noopener noreferrer">
                   {UI.whatsapp} <span>{confirmar.texto} <b>{confirmar.grande}</b></span>
@@ -433,7 +433,7 @@ export default function Osito({ site, contenidoDe, invitacion, onEnviarRSVP, enE
         <div className="os-modal" role="dialog" aria-modal="true" aria-label="Confirmar asistencia" onClick={(e) => e.target === e.currentTarget && setRsvpAbierto(false)}>
           <div className="os-modal-caja">
             <button type="button" className="os-cerrar" onClick={() => setRsvpAbierto(false)} aria-label="Cerrar">×</button>
-            <div className="os-modal-cubo"><OsCubo tono="salvia">{ICONO.chupo}</OsCubo></div>
+            <div className="os-modal-cubo"><OsCubo tono="salvia">{ICONO.biberon}</OsCubo></div>
             <RSVP
               invitacion={invitacion}
               fechaLimite={info.fechaLimiteConfirmacion || site.fechaLimiteConfirmacion}

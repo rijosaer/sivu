@@ -373,10 +373,13 @@ export function OsCubo({ tono = "beige", letra, children, className = "" }) {
           <rect x="7" y="7" width="58" height="56" rx="7" fill={`url(#${panel})`} />
           <rect x="7" y="7" width="58" height="56" rx="7" fill="none" stroke="white" strokeOpacity=".5" strokeWidth="1.2" />
           {letra ? (
-            <text x="36" y="51" textAnchor="middle" style={{ fill: tintaIcono, font: "700 42px var(--f-titulos, Georgia, serif)" }}>{letra}</text>
+            <>
+              <text x="36.8" y="54.8" textAnchor="middle" fontSize="48" fontWeight="700" style={{ fill: C.tinta, fontFamily: "var(--f-titulos, Georgia, serif)" }} opacity=".18">{letra}</text>
+              <text x="36" y="54" textAnchor="middle" fontSize="48" fontWeight="700" style={{ fill: tintaIcono, fontFamily: "var(--f-titulos, Georgia, serif)" }}>{letra}</text>
+            </>
           ) : (
             <g transform="translate(17 16) scale(1.6)" style={{ color: tintaIcono }}>
-              <g transform="translate(.5 .7)" style={{ color: C.tinta }} opacity=".18">{children}</g>
+              <g transform="translate(.5 .7)" style={{ color: C.tinta }} opacity=".3">{children}</g>
               {children}
             </g>
           )}
@@ -507,20 +510,22 @@ function hebras(p0, c, p1, semilla, desde = 0.42) {
     return [x / l, y / l];
   };
   let d = "";
-  const n = 120;
+  const n = 230;
   for (let i = 0; i < n; i++) {
     const t = desde + ((1 - desde) * i) / n;
     const [x, y] = punto(t);
     const [tx, ty] = tangente(t);
     const lado = i % 2 ? 1 : -1;
     const k = (t - desde) / (1 - desde);
-    const largo = (6 + 16 * Math.sin(Math.PI * Math.min(1, k * 1.15))) * (0.7 + 0.5 * azar(semilla + i));
-    const nx = -ty * lado, ny = tx * lado;
-    const ex = x + nx * largo + tx * largo * 0.9, ey = y + ny * largo + ty * largo * 0.9;
-    const cx = x + nx * largo * 0.7, cy = y + ny * largo * 0.7;
+    const largo = (5 + 15 * Math.sin(Math.PI * Math.min(1, k * 1.1))) * (0.55 + 0.6 * azar(semilla + i));
+    const abre = 0.35 + 0.75 * azar(semilla + i + 999);
+    const nx = -ty * lado * abre, ny = tx * lado * abre;
+    const ex = x + nx * largo + tx * largo, ey = y + ny * largo + ty * largo;
+    const cx = x + nx * largo * 0.8 + tx * largo * 0.2, cy = y + ny * largo * 0.8 + ty * largo * 0.2;
     d += `M${x.toFixed(1)} ${y.toFixed(1)} Q${cx.toFixed(1)} ${cy.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`;
   }
-  return { d, tallo: `M${p0[0]} ${p0[1]} Q${c[0]} ${c[1]} ${p1[0]} ${p1[1]}`, centro: punto(desde + (1 - desde) * 0.55) };
+  const nubes = [0.2, 0.45, 0.7, 0.9].map((k) => punto(desde + (1 - desde) * k));
+  return { d, tallo: `M${p0[0]} ${p0[1]} Q${c[0]} ${c[1]} ${p1[0]} ${p1[1]}`, nubes };
 }
 const PENACHOS = [
   hebras([58, 262], [60, 150], [38, 22], 1),
@@ -554,7 +559,7 @@ export function OsPampas({ className = "", espejo = false }) {
         <Difuso id={s} d={5} />
       </defs>
       {/* Volumen suave detrás de cada penacho */}
-      {PENACHOS.map((p, i) => <circle key={i} cx={p.centro[0]} cy={p.centro[1]} r="20" style={{ fill: C.claro }} opacity=".7" filter={`url(#${s})`} />)}
+      {PENACHOS.map((p, i) => p.nubes.map(([x, y], j) => <circle key={`${i}-${j}`} cx={x} cy={y} r={[11, 15, 13, 8][j]} style={{ fill: C.claro }} opacity=".75" filter={`url(#${s})`} />))}
       {/* Eucalipto */}
       <g filter={`url(#${f})`}>
         <path d="M64 262 C 74 230 90 196 110 134" fill="none" stroke="#7F6A55" strokeWidth="1.6" strokeLinecap="round" />
@@ -568,8 +573,8 @@ export function OsPampas({ className = "", espejo = false }) {
       </g>
       <g filter={`url(#${f})`}>
         {PENACHOS.map((p, i) => <path key={`t${i}`} d={p.tallo} fill="none" style={{ stroke: C.oscuro }} strokeWidth="1.4" opacity=".7" />)}
-        {PENACHOS.map((p, i) => <path key={`a${i}`} d={p.d} fill="none" style={{ stroke: C.beige }} strokeWidth="1.8" strokeLinecap="round" opacity=".45" />)}
-        {PENACHOS.map((p, i) => <path key={`b${i}`} d={p.d} fill="none" stroke={`url(#${pluma})`} strokeWidth="1.1" strokeLinecap="round" opacity=".9" transform="translate(-.6 -.8)" />)}
+        {PENACHOS.map((p, i) => <path key={`a${i}`} d={p.d} fill="none" style={{ stroke: C.beige }} strokeWidth="1.3" strokeLinecap="round" opacity=".35" />)}
+        {PENACHOS.map((p, i) => <path key={`b${i}`} d={p.d} fill="none" stroke={`url(#${pluma})`} strokeWidth=".8" strokeLinecap="round" opacity=".85" transform="translate(-.6 -.8)" />)}
       </g>
     </svg>
   );

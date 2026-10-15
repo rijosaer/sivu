@@ -65,6 +65,8 @@ function Entrada({ welcome, invitacion, onTocar, onAbrir }) {
   // fase: espera → cuenta (3, 2, 1) → fuegos (revela empresa y evento)
   const [fase, setFase] = useState("espera");
   const [numero, setNumero] = useState(3);
+  // El reloj se retira del todo cuando termina de desvanecerse.
+  const [sinReloj, setSinReloj] = useState(false);
   const tiempos = useRef([]);
   const pases = pasesDe(invitacion);
 
@@ -77,6 +79,7 @@ function Entrada({ welcome, invitacion, onTocar, onAbrir }) {
     const t = (fn, ms) => tiempos.current.push(setTimeout(fn, ms));
     if (reducido) {
       setFase("fuegos");
+      t(() => setSinReloj(true), 400);
       t(onAbrir, 2200);
       return;
     }
@@ -85,6 +88,7 @@ function Entrada({ welcome, invitacion, onTocar, onAbrir }) {
     t(() => setNumero(2), 900);
     t(() => setNumero(1), 1800);
     t(() => setFase("fuegos"), 2700);
+    t(() => setSinReloj(true), 4300);
     t(onAbrir, 7600);
   }
 
@@ -104,9 +108,11 @@ function Entrada({ welcome, invitacion, onTocar, onAbrir }) {
       </div>
 
       <div className="md-escena">
-        <button type="button" className="md-reloj-boton" onClick={tocar} disabled={enHora} aria-label="Recibir el año y abrir la invitación">
-          <MdReloj className="md-reloj-entrada" hora={enHora ? 0 : ANTES.hora} minuto={enHora ? 0 : ANTES.minuto} />
-        </button>
+        {!sinReloj && (
+          <button type="button" className="md-reloj-boton" onClick={tocar} disabled={enHora} aria-label="Recibir el año y abrir la invitación">
+            <MdReloj className="md-reloj-entrada" hora={enHora ? 0 : ANTES.hora} minuto={enHora ? 0 : ANTES.minuto} />
+          </button>
+        )}
         {fase === "cuenta" && (
           <span key={numero} className="md-cuenta-grande" aria-live="assertive">{numero}</span>
         )}

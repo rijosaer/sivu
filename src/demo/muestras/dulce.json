@@ -2,7 +2,7 @@
   "site": {
     "invitacion": {
       "slug": "plantillas/dulce",
-      "nombre": "XV · Emilia",
+      "nombre": "Cumpleaños · Andrea",
       "tipoEvento": "cumpleanos",
       "diseno": "dulce"
     },
@@ -31,88 +31,102 @@
         "id": 46,
         "tipo": "welcome",
         "contenido": {
-          "novioEl": "Emilia Durán",
+          "bienvenidaTexto": "Celebremos el cumpleaños de",
+          "novioEl": "Andrea",
           "novioElla": "",
-          "fraseIntro": "Hay momentos que se sueñan toda la vida. Este es uno de ellos, y quiero vivirlo contigo.",
-          "padresTexto": "Con la bendición de mis padres",
-          "padreElMadre": "María Fernanda Gómez",
-          "padreElPadre": "Carlos Durán",
-          "padreEllaMadre": "",
+          "festejados": [
+            {
+              "nombre": "Andrea",
+              "edad": "30"
+            }
+          ],
+          "fraseIntro": "Treinta años merecen pastel, burbujas y mi gente favorita. Ven a brindar conmigo por esta nueva etapa.",
+          "padresTexto": "",
+          "padreElPadre": "",
+          "padreElMadre": "",
           "padreEllaPadre": "",
-          "bienvenidaTexto": "Mis XV años"
+          "padreEllaMadre": ""
         }
       },
       {
         "id": 47,
         "tipo": "informacion_boda",
         "contenido": {
-          "fecha": "2027-03-20T21:00:00-05:00",
-          "lugar": "Hacienda Santa Clara",
-          "mapsUrl": "https://maps.google.com/?q=Hacienda+Santa+Clara+La+Calera",
-          "overline": "Mis quince años",
-          "direccion": "Km 4 vía La Calera, Bogotá",
+          "fecha": "2027-05-22T19:30:00-05:00",
+          "lugar": "Terraza Provenza",
+          "direccion": "Carrera 35 #8A-30, El Poblado, Medellín",
+          "mapsUrl": "https://maps.google.com/?q=Carrera+35+%238A-30+El+Poblado+Medell%C3%ADn",
           "mapaEmbed": "",
+          "overline": "Mis 30",
+          "tituloSeccion": "La celebración",
+          "tituloItinerario": "El programa",
+          "cronogramaModo": "detallado",
           "cronograma": [
             {
-              "hora": "9:00 p. m.",
-              "titulo": "Recepción"
+              "hora": "7:30 p. m.",
+              "titulo": "Cóctel de bienvenida"
             },
             {
-              "hora": "9:45 p. m.",
-              "titulo": "Entrada de la quinceañera"
+              "hora": "8:30 p. m.",
+              "titulo": "Cena"
             },
             {
-              "hora": "10:15 p. m.",
-              "titulo": "Vals"
+              "hora": "9:30 p. m.",
+              "titulo": "Brindis y pastel"
             },
             {
-              "hora": "11:00 p. m.",
-              "titulo": "Cena y fiesta"
+              "hora": "10:00 p. m.",
+              "titulo": "¡A bailar!"
             }
           ],
-          "tituloSeccion": "Información del evento",
-          "cronogramaModo": "detallado",
-          "tituloItinerario": "El programa",
-          "cronogramaMensaje": "Les compartiremos el programa más cerca de la fecha.",
+          "cronogramaMensaje": "",
           "mostrarRestriccion": true,
           "mostrarObservaciones": true,
-          "fechaLimiteConfirmacion": "2027-03-01"
-        }
-      },
-      {
-        "id": 48,
-        "tipo": "padrinos",
-        "contenido": {
-          "grupos": [
-            {
-              "etiqueta": "Y mis padrinos",
-              "personas": [
-                "Sandra Rojas",
-                "Andrés Rojas"
-              ]
-            }
-          ],
-          "titulo": "Padres y padrinos"
+          "fechaLimiteConfirmacion": "2027-05-08",
+          "telefonoConfirmar": "300 456 7890"
         }
       },
       {
         "id": 49,
         "tipo": "vestimenta",
         "contenido": {
-          "nota": "",
-          "evitar": [],
-          "titulo": "Elegante",
-          "permitidos": []
+          "titulo": "Cóctel en tonos pastel",
+          "nota": "Rosa, lila, durazno, menta o vainilla: elige tu favorito.",
+          "permitidos": [
+            {
+              "nombre": "Tonos pastel",
+              "colores": [
+                "#F4C7D3",
+                "#D9C6EA",
+                "#F8D8C0",
+                "#CFE8DC",
+                "#F3EAD3"
+              ]
+            }
+          ],
+          "evitar": [
+            {
+              "nombre": "Negro",
+              "color": "#2B2427"
+            }
+          ]
         }
       },
       {
         "id": 50,
         "tipo": "regalos",
         "contenido": {
-          "texto": "",
-          "titulo": "Mesa de regalos",
+          "titulo": "Regalos",
+          "texto": "Tu compañía es mi mejor regalo. Si quieres consentirme con algo más, aquí te dejo cómo.",
           "enlaces": [],
-          "datosTransferencia": "Nequi 300 123 4567 · Emilia Durán"
+          "datosTransferencia": "Nequi 300 456 7890 · Andrea Salcedo"
+        }
+      },
+      {
+        "id": 54,
+        "tipo": "sobres",
+        "contenido": {
+          "texto": "También habrá lluvia de sobres durante la fiesta."
         }
       },
       {
@@ -121,8 +135,8 @@
         "contenido": {
           "nota": "",
           "items": [
-            "La invitación es personal y válida solo para los pases indicados.",
-            "Te pedimos llegar con 20 minutos de anticipación."
+            "Solo adultos: es una noche para nosotros, ¡gracias por dejar a los peques en casa!",
+            "La invitación es personal y válida para los pases indicados."
           ]
         }
       },
@@ -132,29 +146,14 @@
         "contenido": {
           "items": [
             {
-              "p": "¿Puedo llevar a alguien más?",
-              "r": "Cada invitación indica sus pases. Si necesitas uno adicional, escríbenos antes de confirmar."
+              "p": "¿Hay parqueadero?",
+              "r": "Sí, hay parqueadero público a media cuadra de la terraza."
             },
             {
-              "p": "¿Hay parqueadero?",
-              "r": "Sí, la hacienda tiene parqueadero para invitados."
+              "p": "¿Puedo llevar a alguien más?",
+              "r": "Cada invitación indica sus pases. Si necesitas uno adicional, escríbeme antes de confirmar."
             }
           ]
-        }
-      },
-      {
-        "id": 53,
-        "tipo": "historia",
-        "contenido": {
-          "texto": "Desde pequeña soñé con una noche en París: luces, flores y la gente que más quiero. Hoy cumplo quince años y quiero que ese sueño lo vivamos juntos.",
-          "titulo": "Mi historia"
-        }
-      },
-      {
-        "id": 54,
-        "tipo": "sobres",
-        "contenido": {
-          "texto": "Tu presencia es mi mejor regalo. Si además quieres hacerme un obsequio, habrá un buzón de sobres en la fiesta."
         }
       },
       {
@@ -166,7 +165,7 @@
         }
       }
     ],
-    "fechaLimiteConfirmacion": "2027-03-01",
+    "fechaLimiteConfirmacion": "2027-05-08",
     "fotosSubidas": [],
     "audioUrl": null,
     "fondoUrl": null
@@ -174,14 +173,14 @@
   "invitado": {
     "codigo": "DEMO",
     "tipo": "cupos",
-    "nombre": "Laura Méndez",
+    "nombre": "Camila Restrepo",
     "familia": "",
     "mensaje": "",
     "cupos": 1,
     "miembros": [
       {
         "id": -1,
-        "nombre": "Laura Méndez",
+        "nombre": "Camila Restrepo",
         "estado": "pendiente",
         "restriccion": "",
         "comentario": "",

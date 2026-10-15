@@ -131,7 +131,7 @@
 .cf .cf-entrada {
   position: fixed; inset: 0; z-index: 50; overflow: hidden auto;
   display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-  padding: max(34px, env(safe-area-inset-top)) 20px 34px; text-align: center;
+  padding: max(34px, env(safe-area-inset-top)) 20px 92px; text-align: center;
   background:
     var(--grano),
     radial-gradient(60% 40% at 50% 52%, color-mix(in srgb, var(--rubor) 85%, transparent), transparent 75%),
@@ -200,7 +200,7 @@
 /* ---------- Tarjeta (lo que descubre el confeti) ---------- */
 .cf .cf-cuerpo { max-width: 520px; margin: 0 auto; padding: 70px 16px 110px; }
 .cf .cf-portada { position: relative; padding-top: 34px; }
-.cf .cf-portada-ramo { position: absolute; z-index: 2; right: -14px; top: -40px; width: 132px; height: auto; transform: rotate(8deg);
+.cf .cf-portada-ramo { position: absolute; z-index: 2; right: 10px; top: -40px; width: 118px; height: auto; transform: rotate(8deg);
   filter: drop-shadow(0 12px 14px color-mix(in srgb, var(--terracota) 22%, transparent)); animation: cf-ramo 6s ease-in-out infinite alternate; transform-origin: 50% 100%; }
 @keyframes cf-ramo { from { transform: rotate(6deg) translateY(0); } to { transform: rotate(10deg) translateY(-8px); } }
 .cf .cf-tarjeta {
@@ -246,7 +246,7 @@
 }
 .cf .cf-izq .cf-polaroid { margin-left: 1%; }
 .cf .cf-der .cf-polaroid { margin-left: 9%; }
-.cf .cf-pinza { position: absolute; z-index: 3; left: 50%; top: -26px; width: 20px; height: 50px; margin-left: -10px; }
+.cf .cf-pinza { position: absolute; z-index: 3; left: 50%; top: -28px; width: 22px; height: 54px; margin-left: -11px; }
 /* La «foto» de la instantánea: un fondo cálido con brillo, como papel fotográfico. */
 .cf .cf-foto {
   position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 26px 18px 24px; text-align: center;
@@ -279,7 +279,7 @@
 @keyframes cf-halo-llama { from { opacity: .7; } to { opacity: 1; } }
 .cf .cf-cuenta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; width: 100%; margin-top: 4px; }
 .cf .cf-cuenta div { display: flex; flex-direction: column; align-items: center; padding: 10px 0 8px; border-radius: 4px; background: rgb(255 255 255 / .62); }
-.cf .cf-cuenta .n { font: 400 30px/1.1 var(--f-titulo); color: var(--tinta); font-variant-numeric: tabular-nums; }
+.cf .cf-cuenta .n { font: 400 27px/1.1 var(--f-titulo); color: var(--tinta); font-variant-numeric: tabular-nums; }
 .cf .cf-cuenta .l { font: 500 10.5px/1.4 var(--f-texto); letter-spacing: .16em; text-transform: uppercase; color: var(--rotulo); }
 
 .cf .cf-icono-grande { display: grid; place-items: center; width: 50px; height: 50px; border-radius: 50%; background: rgb(255 255 255 / .7); color: var(--rotulo); margin-bottom: 4px; }
@@ -369,9 +369,9 @@
 .cf .cf-modal-pinza { position: absolute; left: 50%; top: -6px; width: 18px; height: 44px; margin-left: -9px; }
 .cf .cf-cerrar { position: absolute; z-index: 2; top: 12px; right: 12px; width: 44px; height: 44px; border: 0; border-radius: 50%; background: color-mix(in srgb, var(--rubor) 60%, white);
   color: var(--rotulo); font-size: 26px; line-height: 1; cursor: pointer; }
-.cf .cf-modal #rsvp { padding: 44px 22px 36px; border-top: 0; font-family: var(--f-texto); color: var(--tinta); background: transparent; }
+.cf .cf-modal #rsvp { padding: 64px 22px 36px; border-top: 0; font-family: var(--f-texto); color: var(--tinta); background: transparent; }
 .cf .cf-modal #rsvp img { display: none; }
-.cf .cf-modal #rsvp .font-mono { font-family: var(--f-texto); letter-spacing: .2em; }
+.cf .cf-modal #rsvp .font-mono { font-family: var(--f-texto); letter-spacing: .14em; }
 .cf .cf-modal #rsvp p.font-mono, .cf .cf-modal #rsvp span.font-mono { font-size: 11.5px; font-weight: 600; color: var(--rotulo); }
 .cf .cf-modal #rsvp h2 { font-family: var(--f-guion); font-weight: 400; font-size: clamp(42px, 12vw, 50px); line-height: 1.05; color: var(--rotulo); margin: 6px 0 4px; }
 .cf .cf-modal #rsvp h2 + p.font-mono, .cf .cf-modal #rsvp h2 + div + p.font-mono { margin-top: 14px !important; margin-bottom: 22px !important; }
