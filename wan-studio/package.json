@@ -1,0 +1,12 @@
+{
+  "name": "wan-studio",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "npm --prefix server ci && npm --prefix web ci && npm --prefix web run build",
+    "start": "npm --prefix server start",
+    "migrar": "npm --prefix server run migrar"
+  }
+}

@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .boton {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-40;
+  }
+  .boton-acento {
+    @apply boton bg-acento text-black hover:bg-acento-oscuro;
+  }
+  .boton-suave {
+    @apply boton border border-borde bg-panel text-white hover:border-tenue;
+  }
+  .campo {
+    @apply w-full rounded-xl border border-borde bg-fondo px-3 py-2.5 text-sm text-white placeholder:text-tenue focus:border-acento focus:outline-none;
+  }
+  .ficha {
+    @apply rounded-lg border px-3 py-1.5 text-sm transition;
+  }
+  .ficha-activa {
+    @apply border-acento bg-acento/10 text-acento;
+  }
+  .ficha-inactiva {
+    @apply border-borde text-tenue hover:border-tenue hover:text-white;
+  }
+}
+
+/* Vista previa animada de cada preset: una escena dibujada con CSS que se
+   mueve como lo hará la cámara. No usa videos, así carga al instante. */
+.escena {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  background: #10131c;
+  perspective: 600px;
+}
+.mundo {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(circle at 62% 38%, #ffe7a8 0 5%, #ffb35c55 6%, transparent 14%),
+    linear-gradient(180deg, #1d2b64 0%, #6b4d8c 45%, #f08a5d 70%, #2a1a2e 70.5%, #120c16 100%);
+  transform-origin: 50% 50%;
+}
+.mundo::before,
+.mundo::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 22%;
+  height: 18%;
+  background: #24182c;
+  clip-path: polygon(0 100%, 0 60%, 12% 20%, 25% 70%, 40% 10%, 55% 65%, 70% 25%, 85% 70%, 100% 35%, 100% 100%);
+}
+.mundo::after {
+  bottom: 18%;
+  background: #170f1c;
+  clip-path: polygon(0 100%, 0 70%, 20% 40%, 35% 80%, 60% 30%, 80% 75%, 100% 50%, 100% 100%);
+}
+.sujeto {
+  position: absolute;
+  left: 46%;
+  bottom: 30%;
+  width: 8%;
+  aspect-ratio: 1 / 2;
+  border-radius: 999px 999px 30% 30%;
+  background: linear-gradient(180deg, #c8f560, #6e8f1f);
+  box-shadow: 0 0 30px #c8f56066;
+}
+
+.anim-respirar { animation: respirar 4s ease-in-out infinite alternate; }
+.anim-crash-zoom { animation: crash 2.4s cubic-bezier(0.7, 0, 0.9, 0.4) infinite; }
+.anim-dolly-atras { animation: dolly 4s ease-out infinite; }
+.anim-orbita { animation: orbita 5s ease-in-out infinite alternate; }
+.anim-dron { animation: dron 3s ease-in infinite; }
+.anim-temblor { animation: temblor 0.9s steps(6) infinite; }
+.anim-luz { animation: luz 3s linear infinite; }
+
+@keyframes respirar { from { transform: scale(1); } to { transform: scale(1.07) translateY(-1%); } }
+@keyframes crash { 0%, 30% { transform: scale(1); filter: blur(0); } 85% { transform: scale(2.1); filter: blur(1.5px); } 100% { transform: scale(2.2); filter: blur(0); } }
+@keyframes dolly { from { transform: scale(1.8); } to { transform: scale(1); } }
+@keyframes orbita { from { transform: rotateY(-14deg) translateX(-9%) scale(1.15); } to { transform: rotateY(14deg) translateX(9%) scale(1.15); } }
+@keyframes dron { from { transform: scale(1) translateY(0) rotate(-2deg); } to { transform: scale(1.9) translateY(12%) rotate(3deg); } }
+@keyframes temblor {
+  0% { transform: scale(1.06) translate(0, 0); }
+  33% { transform: scale(1.06) translate(0.6%, -0.4%); }
+  66% { transform: scale(1.06) translate(-0.5%, 0.5%); }
+  100% { transform: scale(1.06) translate(0.3%, 0.2%); }
+}
+@keyframes luz { 0% { filter: hue-rotate(0deg) brightness(1); } 50% { filter: hue-rotate(-40deg) brightness(0.6); } 100% { filter: hue-rotate(0deg) brightness(1); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .mundo { animation: none !important; }
+}

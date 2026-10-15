@@ -1,0 +1,16 @@
+# Postgres para desarrollo: docker compose up -d
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: wanstudio
+      POSTGRES_USER: wan
+      POSTGRES_PASSWORD: wan
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
