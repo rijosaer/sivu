@@ -41,7 +41,7 @@ async function revisarEnCurso() {
   for (const gen of rows) {
     const minutos = (Date.now() - new Date(gen.iniciado_en).getTime()) / 60000;
     // Un video por tramos tiene el tiempo límite de cada tramo.
-    const limite = LIMITE_MIN * tramos(gen.parametros.duracion).length;
+    const limite = LIMITE_MIN * planTramos(gen).length;
     if (minutos > limite) {
       await fallar(gen, `Se superó el tiempo límite de ${limite} minutos`);
       continue;
@@ -90,9 +90,13 @@ async function guardar(gen, video) {
 // motor_estado = { cadena: { i, duraciones, partes, imagen, interno } }, donde
 // "interno" es el estado del motor para el tramo i.
 
+// Con escenas, cada escena es un tramo; si no, la duración se reparte sola.
+const planTramos = (gen) =>
+  gen.parametros.escenas ? gen.parametros.escenas.map((e) => e.duracion) : tramos(gen.parametros.duracion);
+
 async function iniciar(motor, gen) {
-  const duraciones = tramos(gen.parametros.duracion);
-  if (duraciones.length === 1) return motor.enviar(gen);
+  const duraciones = planTramos(gen);
+  if (duraciones.length === 1 && !gen.parametros.escenas) return motor.enviar(gen);
   const cadena = { i: 0, duraciones, partes: [], imagen: gen.imagen, interno: null };
   cadena.interno = await motor.enviar(tramo(gen, cadena));
   return { cadena };
@@ -102,6 +106,10 @@ async function iniciar(motor, gen) {
 // (así sus archivos no chocan) y su imagen de inicio.
 const tramo = (gen, c) => ({
   ...gen,
+  ...(gen.parametros.escenas && {
+    preset: gen.parametros.escenas[c.i].preset,
+    prompt_final: gen.parametros.escenas[c.i].prompt_final,
+  }),
   id: `${gen.id}-t${c.i}`,
   imagen: c.imagen,
   motor_estado: c.interno,
@@ -113,7 +121,8 @@ async function consultarCadena(gen, motor) {
   const n = c.duraciones.length;
   const actual = tramo(gen, c);
   const r = await motor.consultar(actual);
-  if (r.estado === "error") return { estado: "error", error: `Tramo ${c.i + 1} de ${n}: ${r.error}` };
+  const etiqueta = gen.parametros.escenas ? "Escena" : "Tramo";
+  if (r.estado === "error") return { estado: "error", error: `${etiqueta} ${c.i + 1} de ${n}: ${r.error}` };
   if (r.estado === "pendiente") return { estado: "pendiente", progreso: (c.i + (r.progreso ?? 0.5)) / n };
 
   let final;
@@ -129,7 +138,7 @@ async function consultarCadena(gen, motor) {
     }
     final = await unir(c.partes, `videos/${gen.id}.mp4`);
   } catch (e) {
-    return { estado: "error", error: `Tramo ${c.i + 1} de ${n}: ${e.message}` };
+    return { estado: "error", error: `${etiqueta} ${c.i + 1} de ${n}: ${e.message}` };
   }
   // Los tramos y los cuadros intermedios ya no hacen falta.
   const cuadros = c.duraciones.slice(1).map((_, k) => `entradas/${gen.id}-t${k + 1}.png`);

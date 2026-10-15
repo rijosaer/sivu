@@ -130,8 +130,9 @@ export const PRESETS = [
 
 export const ASPECTOS = ["16:9", "9:16", "1:1"];
 export const RESOLUCIONES = ["480p", "720p"];
-// Wan da su mejor calidad en clips de ~5 s: los videos más largos se generan
-// en tramos encadenados de como mucho "tramo" segundos (ver encadenar.js).
+// Los videos largos se generan en tramos encadenados de como mucho "tramo"
+// segundos (ver encadenar.js), como hace Gemini con tramos de ~10 s. Wan da su
+// mejor calidad en ~5 s: con TRAMO_SEG=5 los tramos salen más fieles.
 //   max              tope para cuentas normales (DURACION_MAX)
 //   max_ilimitado    tope para cuentas ilimitadas: sin tope salvo que se fije
 //                    DURACION_MAX_ILIMITADO (null = sin tope)
@@ -143,8 +144,17 @@ export const DURACION = {
   max: Number(process.env.DURACION_MAX) || 10,
   max_ilimitado: Number(process.env.DURACION_MAX_ILIMITADO) || null,
   recomendado: 60,
-  tramo: Number(process.env.TRAMO_SEG) || 5,
+  tramo: Number(process.env.TRAMO_SEG) || 10,
   defecto: 5,
+};
+
+// Modo escenas (guion): cada escena tiene su texto, su duración y su preset;
+// se generan en orden, cada una desde el último cuadro de la anterior, y se
+// unen en un solo video. El número de escenas depende del plan.
+export const ESCENAS = {
+  max: Number(process.env.MAX_ESCENAS) || 3,
+  max_ilimitado: Number(process.env.MAX_ESCENAS_ILIMITADO) || null,
+  duracion: { min: 2, max: 10, defecto: 8 },
 };
 
 export const buscarPreset = (id) => PRESETS.find((p) => p.id === id);
@@ -200,9 +210,12 @@ export function prepararGeneracion(cuerpo, { hayImagen, ilimitado = false }) {
     );
   }
 
+  const conEscenas = Array.isArray(cuerpo.escenas) && cuerpo.escenas.length > 0;
   const prompt = String(cuerpo.prompt ?? "").trim();
   if (prompt.length > 2000) throw new ErrorApi(400, "El prompt no puede pasar de 2000 caracteres");
-  if (modo === "t2v" && !prompt) throw new ErrorApi(400, "Sin imagen hace falta un prompt que describa la escena");
+  if (modo === "t2v" && !prompt && !conEscenas) {
+    throw new ErrorApi(400, "Sin imagen hace falta un prompt que describa la escena");
+  }
 
   const aspecto = cuerpo.aspecto || "16:9";
   if (!ASPECTOS.includes(aspecto)) throw new ErrorApi(400, `"aspecto" debe ser uno de: ${ASPECTOS.join(", ")}`);
@@ -229,7 +242,17 @@ export function prepararGeneracion(cuerpo, { hayImagen, ilimitado = false }) {
     parametros.guia = guia;
   }
 
-  const promptFinal = preset.plantilla.replace("{prompt}", prompt).trim();
+  let promptFinal = preset.plantilla.replace("{prompt}", prompt).trim();
+  let promptGuardado = prompt;
+  let costo = calcularCosto(parametros, preset);
+  if (conEscenas) {
+    const escenas = prepararEscenas(cuerpo.escenas, { preset, modo, ilimitado });
+    parametros.escenas = escenas.map((e) => ({ prompt: e.prompt, prompt_final: e.prompt_final, duracion: e.duracion, preset: e.preset.id }));
+    parametros.duracion = escenas.reduce((s, e) => s + e.duracion, 0);
+    promptFinal = escenas[0].prompt_final;
+    promptGuardado = escenas.map((e, i) => `${i + 1}. ${e.prompt}`).join("\n").slice(0, 2000);
+    costo = escenas.reduce((s, e) => s + calcularCosto({ duracion: e.duracion, resolucion }, e.preset), 0);
+  }
   const negativo = [NEGATIVO_BASE, preset.negativo, String(cuerpo.negativo ?? "").trim()]
     .filter(Boolean)
     .join(", ")
@@ -255,11 +278,38 @@ export function prepararGeneracion(cuerpo, { hayImagen, ilimitado = false }) {
   return {
     preset,
     modo,
-    prompt,
+    prompt: promptGuardado,
     promptFinal,
     negativo,
     parametros,
-    costo: calcularCosto(parametros, preset),
+    costo,
     webhookUrl,
   };
+}
+
+function prepararEscenas(lista, { preset, modo, ilimitado }) {
+  const max = ilimitado ? (ESCENAS.max_ilimitado ?? 500) : ESCENAS.max;
+  if (lista.length > max) {
+    throw new ErrorApi(400, `Tu plan permite hasta ${max} escenas por video (enviaste ${lista.length})`);
+  }
+  const { min, max: maxSeg, defecto } = ESCENAS.duracion;
+  return lista.map((e, i) => {
+    const n = i + 1;
+    const texto = String(e?.prompt ?? "").trim();
+    if (!texto) throw new ErrorApi(400, `La escena ${n} necesita un prompt`);
+    if (texto.length > 1000) throw new ErrorApi(400, `El prompt de la escena ${n} pasa de 1000 caracteres`);
+    const p = e.preset ? buscarPreset(e.preset) : preset;
+    if (!p) throw new ErrorApi(400, `Preset desconocido en la escena ${n}: "${e.preset}"`);
+    // Solo la primera escena puede ser texto a video; las demás siempre
+    // arrancan del último cuadro de la anterior.
+    if (i === 0 && !p.modos.includes(modo)) {
+      throw new ErrorApi(400, `El preset "${p.id}" de la escena 1 no sirve ${modo === "i2v" ? "con imagen" : "sin imagen"}`);
+    }
+    return {
+      prompt: texto,
+      prompt_final: p.plantilla.replace("{prompt}", texto).trim(),
+      duracion: entero(e.duracion, min, maxSeg, `escenas[${i}].duracion`) ?? defecto,
+      preset: p,
+    };
+  });
 }

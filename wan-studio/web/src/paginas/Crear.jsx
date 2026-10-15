@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import { api } from "../api.js";
 import Escena from "../componentes/Escena.jsx";
+import EditorEscenas from "../componentes/EditorEscenas.jsx";
 import TarjetaGeneracion from "../componentes/TarjetaGeneracion.jsx";
 import { useGeneraciones } from "../componentes/useGeneraciones.js";
 
@@ -40,6 +41,11 @@ export default function Crear({ catalogo, usuario, presetInicial, alCambiarCredi
   const [aspecto, setAspecto] = useState("16:9");
   const [resolucion, setResolucion] = useState("480p");
   const [duracion, setDuracion] = useState(opciones?.duracion.defecto ?? 5);
+  const [forma, setForma] = useState("clip"); // "clip" | "escenas"
+  const opcEscenas = opciones?.escenas ?? { max: 3, max_ilimitado: null, duracion: { min: 2, max: 10, defecto: 8 } };
+  const [escenas, setEscenas] = useState(() => [
+    { id: crypto.randomUUID(), prompt: "", duracion: opcEscenas.duracion.defecto, preset: null },
+  ]);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState("");
   const [arrastrando, setArrastrando] = useState(false);
@@ -54,14 +60,27 @@ export default function Crear({ catalogo, usuario, presetInicial, alCambiarCredi
   const recomendado = opciones?.duracion.recomendado ?? 60;
   const maxBarra = usuario.ilimitado ? recomendado : (opciones?.duracion.max ?? 5);
   const tramos = Math.max(1, Math.ceil(duracion / (opciones?.duracion.tramo || 5)));
-  const costo = Math.ceil(duracion * (resolucion === "720p" ? 2 : 1) * (preset.multiplicador || 1));
+  const factor = resolucion === "720p" ? 2 : 1;
+  const maxEscenas = usuario.ilimitado ? (opcEscenas.max_ilimitado ?? Infinity) : opcEscenas.max;
+  const presetDe = (e) => presets.find((p) => p.id === (e.preset ?? preset.id)) || preset;
+  const costo =
+    forma === "escenas"
+      ? escenas.reduce((s, e) => s + Math.ceil(e.duracion * factor * (presetDe(e).multiplicador || 1)), 0)
+      : Math.ceil(duracion * factor * (preset.multiplicador || 1));
   const nombres = useMemo(() => Object.fromEntries(presets.map((p) => [p.id, p.nombre])), [presets]);
 
+  const primera = presetDe(escenas[0]);
+  const vacia = escenas.findIndex((e) => !e.prompt.trim());
   let bloqueo = "";
-  if (!(duracion >= minDuracion)) bloqueo = `La duración mínima es ${minDuracion} s.`;
+  if (forma === "escenas") {
+    if (vacia >= 0) bloqueo = `Escribe qué pasa en la escena ${vacia + 1}.`;
+    else if (!primera.modos.includes(modo)) {
+      bloqueo = `El preset de la escena 1 ${modo === "i2v" ? "es solo de texto: quita la imagen" : "necesita una imagen"}.`;
+    }
+  } else if (!(duracion >= minDuracion)) bloqueo = `La duración mínima es ${minDuracion} s.`;
   else if (!compatible) bloqueo = modo === "i2v" ? "Este preset es solo de texto: quita la imagen." : "Este preset necesita una imagen.";
   else if (modo === "t2v" && !prompt.trim()) bloqueo = "Sin imagen, describe la escena en el prompt.";
-  else if (!usuario.ilimitado && usuario.creditos < costo) bloqueo = `Te faltan créditos: cuesta ${costo} y tienes ${usuario.creditos}.`;
+  if (!bloqueo && !usuario.ilimitado && usuario.creditos < costo) bloqueo = `Te faltan créditos: cuesta ${costo} y tienes ${usuario.creditos}.`;
 
   const elegirArchivo = async (archivo) => {
     setError("");
@@ -83,7 +102,15 @@ export default function Crear({ catalogo, usuario, presetInicial, alCambiarCredi
     try {
       await api("/v1/generaciones", {
         metodo: "POST",
-        cuerpo: { preset: preset.id, prompt, aspecto, resolucion, duracion, ...(imagen ? { imagen } : {}) },
+        cuerpo: {
+          preset: preset.id,
+          aspecto,
+          resolucion,
+          ...(forma === "escenas"
+            ? { escenas: escenas.map((e) => ({ prompt: e.prompt, duracion: e.duracion, preset: e.preset ?? preset.id })) }
+            : { prompt, duracion }),
+          ...(imagen ? { imagen } : {}),
+        },
       });
       await Promise.all([recargar(), alCambiarCreditos()]);
     } catch (err) {
@@ -96,6 +123,13 @@ export default function Crear({ catalogo, usuario, presetInicial, alCambiarCredi
   return (
     <div className="grid gap-8 py-8 lg:grid-cols-[400px_1fr]">
       <form onSubmit={generar} className="space-y-6 lg:sticky lg:top-20 lg:self-start">
+        {catalogo.motor === "mock" && (
+          <div className="rounded-xl border border-amber-400/40 bg-amber-400/10 p-3 text-sm text-amber-200">
+            <strong>Modo demostración:</strong> los videos todavía no usan IA. Solo se mueve la cámara sobre tu imagen
+            (o un fondo animado si no hay imagen), así que el texto no se dibuja. Para generar con Wan, configura un motor
+            real (fal, RunPod o tu GPU).
+          </div>
+        )}
         <div>
           <h2 className="mb-2 text-sm font-semibold text-tenue">Imagen de inicio (opcional)</h2>
           <div
@@ -172,6 +206,32 @@ export default function Crear({ catalogo, usuario, presetInicial, alCambiarCredi
           <p className="mt-2 text-xs text-tenue">{preset.descripcion}</p>
         </div>
 
+        <div className="grid grid-cols-2 gap-1 rounded-xl border border-borde bg-panel p-1 text-sm">
+          {[
+            ["clip", "Un clip"],
+            ["escenas", "Escenas (guion)"],
+          ].map(([v, t]) => (
+            <button
+              type="button"
+              key={v}
+              onClick={() => setForma(v)}
+              className={`rounded-lg py-1.5 font-medium transition ${forma === v ? "bg-acento text-black" : "text-tenue hover:text-white"}`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+
+        {forma === "escenas" ? (
+          <EditorEscenas
+            escenas={escenas}
+            setEscenas={setEscenas}
+            presets={presets}
+            presetBase={preset.id}
+            maxEscenas={maxEscenas}
+            duracion={opcEscenas.duracion}
+          />
+        ) : (
         <div>
           <label htmlFor="prompt" className="mb-2 block text-sm font-semibold text-tenue">
             Prompt {modo === "i2v" && <span className="font-normal">(opcional)</span>}
@@ -187,6 +247,8 @@ export default function Crear({ catalogo, usuario, presetInicial, alCambiarCredi
           />
         </div>
 
+        )}
+
         <div className="grid grid-cols-2 gap-4">
           <div>
             <h2 className="mb-2 text-sm font-semibold text-tenue">Formato</h2>
@@ -198,6 +260,7 @@ export default function Crear({ catalogo, usuario, presetInicial, alCambiarCredi
           </div>
         </div>
 
+        {forma === "clip" && (
         <div>
           <label htmlFor="duracion" className="mb-2 flex justify-between text-sm font-semibold text-tenue">
             <span>Duración</span>
@@ -240,6 +303,7 @@ export default function Crear({ catalogo, usuario, presetInicial, alCambiarCredi
             </p>
           )}
         </div>
+        )}
 
         {(error || bloqueo) && <p className={`text-sm ${error ? "text-red-300" : "text-tenue"}`}>{error || bloqueo}</p>}
 

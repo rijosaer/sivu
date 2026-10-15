@@ -5,7 +5,7 @@ import { randomUUID } from "node:crypto";
 import { pool } from "../db.js";
 import { requiereUsuario } from "../auth.js";
 import { capturar, ErrorApi } from "../errores.js";
-import { ASPECTOS, DURACION, PRESETS, RESOLUCIONES, prepararGeneracion, presetPublico } from "../presets.js";
+import { ASPECTOS, DURACION, ESCENAS, PRESETS, RESOLUCIONES, prepararGeneracion, presetPublico } from "../presets.js";
 import { borrar, guardarImagen, leerImagen } from "../almacen.js";
 import { generacionPublica } from "../serializar.js";
 import { fallar } from "../cola.js";
@@ -19,7 +19,9 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 v1Router.get("/presets", (_req, res) => {
   res.json({
     presets: PRESETS.map(presetPublico),
-    opciones: { aspectos: ASPECTOS, resoluciones: RESOLUCIONES, duracion: DURACION },
+    // "mock" = modo demostración: los videos no usan IA.
+    motor: process.env.MOTOR || "mock",
+    opciones: { aspectos: ASPECTOS, resoluciones: RESOLUCIONES, duracion: DURACION, escenas: ESCENAS },
     costo: "créditos = segundos × (2 si es 720p, 1 si es 480p) × multiplicador del preset",
   });
 });

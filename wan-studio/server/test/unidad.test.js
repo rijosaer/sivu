@@ -85,10 +85,29 @@ test("webhooks a la red interna se rechazan", () => {
 test("los videos largos se reparten en tramos parecidos", async () => {
   const { tramos } = await import("../encadenar.js");
   assert.deepEqual(tramos(5), [5]);
-  assert.deepEqual(tramos(12), [4, 4, 4]);
-  assert.deepEqual(tramos(11), [4, 4, 3]);
-  assert.deepEqual(tramos(60), Array(12).fill(5));
+  assert.deepEqual(tramos(12, 5), [4, 4, 4]);
+  assert.deepEqual(tramos(11, 5), [4, 4, 3]);
+  assert.deepEqual(tramos(25), [9, 8, 8]);
+  assert.deepEqual(tramos(60), Array(6).fill(10));
   assert.throws(() => prepararGeneracion({ prompt: "x", duracion: 30 }, { hayImagen: false }), /duracion/);
   assert.equal(prepararGeneracion({ prompt: "x", duracion: 30 }, { hayImagen: false, ilimitado: true }).parametros.duracion, 30);
   assert.equal(prepararGeneracion({ prompt: "x", duracion: 300 }, { hayImagen: false, ilimitado: true }).parametros.duracion, 300);
+});
+
+test("modo escenas: límite por plan, costo por escena y preset por escena", () => {
+  const escenas = [
+    { prompt: "a girl walks into a forest", duracion: 10 },
+    { prompt: "she finds a glowing door", duracion: 6, preset: "crash-zoom" },
+  ];
+  const g = prepararGeneracion({ preset: "animar", escenas }, { hayImagen: false });
+  assert.equal(g.parametros.duracion, 16);
+  assert.equal(g.costo, 16);
+  assert.equal(g.parametros.escenas[1].preset, "crash-zoom");
+  assert.match(g.parametros.escenas[1].prompt_final, /Crash zoom.*glowing door/);
+  assert.match(g.prompt, /^1\. a girl/);
+  const muchas = Array.from({ length: 4 }, () => ({ prompt: "x" }));
+  assert.throws(() => prepararGeneracion({ escenas: muchas }, { hayImagen: false }), /hasta 3 escenas/);
+  assert.equal(prepararGeneracion({ escenas: muchas }, { hayImagen: false, ilimitado: true }).parametros.escenas.length, 4);
+  assert.throws(() => prepararGeneracion({ escenas: [{ prompt: "" }] }, { hayImagen: false }), /escena 1 necesita/);
+  assert.throws(() => prepararGeneracion({ escenas: [{ prompt: "x", duracion: 11 }] }, { hayImagen: false }), /duracion/);
 });

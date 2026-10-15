@@ -83,6 +83,7 @@ export default function TarjetaGeneracion({ g, nombrePreset, alCambiar, alBorrar
         </div>
         {g.prompt && <p className="line-clamp-2 text-tenue">{g.prompt}</p>}
         <p className="text-xs text-tenue">
+          {g.parametros?.escenas && `${g.parametros.escenas.length} escenas · `}
           {g.parametros?.duracion}s · {g.parametros?.resolucion} · {g.parametros?.aspecto} · {g.costo} cr
         </p>
         {aviso && <p className="text-xs text-red-300">{aviso}</p>}
