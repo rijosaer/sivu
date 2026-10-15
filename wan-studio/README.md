@@ -9,7 +9,7 @@ wan-studio/
 ├── web/      → sitio (React + Vite + Tailwind). Puerto 5180 en desarrollo.
 ├── server/   → API + cola de trabajos (Node + Express + Postgres). Puerto 4100.
 │   └── motores/  → dónde se genera el video: mock · comfyui · runpod · fal
-└── railway.json  → despliegue en un solo servicio (la API sirve la web compilada)
+└── package.json  → build y start para desplegar en un solo servicio (la API sirve la web)
 ```
 
 ```
@@ -174,8 +174,9 @@ por usarla.
 
 ## 5. Desplegar en Railway
 
-1. Crea un servicio desde este repositorio con **Root Directory = `wan-studio`**
-   (`railway.json` ya trae el build, el start y las migraciones).
+1. Crea un servicio desde este repositorio con **Root Directory = `/wan-studio`**,
+   Build Command `npm run build`, Start Command `npm start` y Pre-deploy
+   `npm run migrar` (Railway no lee un `railway.json` dentro del Root Directory).
 2. Agrega Postgres al proyecto y pasa `DATABASE_URL` al servicio.
 3. Agrega un **volumen** montado en `/datos` y define `DATOS_DIR=/datos`. Sin él,
    los videos se pierden en cada despliegue.
