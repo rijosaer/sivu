@@ -1,0 +1,472 @@
+/* Diseño «Luz de bautizo»: marfil, oro suave y olivo bajo una luz cálida.
+   Entrada: la vela que se enciende (penumbra marfil → halo de luz). Cuerpo:
+   arcos de capilla con filete dorado y luz que entra desde arriba.
+   Letras propias: Satisfy (guion, nombres), Lora (títulos y cifras) y
+   Nunito (texto). El tema puede cambiarlas: fuente-guion, fuente-titulos,
+   fuente-cuerpo. Todo el color sale del tema. */
+
+@property --lb-radio {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: -200px;
+}
+
+.lb {
+  /* Colores del tema: principal = oro suave, claro = oro pálido, oscuro =
+     oro viejo, papel = marfil, mármol = blanco de las ventanas, sello = olivo. */
+  --papel: rgb(var(--color-paper));
+  --tinta: rgb(var(--color-ink));
+  --oro: rgb(var(--color-gold));
+  --oro-claro: rgb(var(--color-gold-light));
+  --oro-oscuro: rgb(var(--color-gold-dark));
+  --blanco: rgb(var(--color-marble));
+  --olivo: rgb(var(--color-seal));
+  --olivo-oscuro: color-mix(in srgb, var(--olivo) 55%, var(--tinta));
+  --suave: color-mix(in srgb, var(--tinta) 76%, white);
+  --filete: color-mix(in srgb, var(--oro) 85%, white);
+  --oro-brillo: linear-gradient(135deg, color-mix(in srgb, var(--oro) 80%, white), var(--oro) 40%, var(--oro-oscuro));
+  --penumbra: color-mix(in srgb, var(--papel) 60%, color-mix(in srgb, var(--oro-oscuro) 40%, var(--tinta)));
+  --grano: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .4 0 0 0 0 .34 0 0 0 0 .22 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+
+  --f-guion: var(--fuente-guion, "Satisfy"), "Dancing Script", cursive;
+  --f-titulos: var(--fuente-titulos, "Lora"), Georgia, serif;
+  --f-cuerpo: var(--fuente-cuerpo, "Nunito"), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --curva: cubic-bezier(.16, 1, .3, 1);
+
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow-x: hidden;
+  color: var(--tinta);
+  font-family: var(--f-cuerpo);
+  font-size: 16.5px;
+  line-height: 1.6;
+  background:
+    var(--grano),
+    radial-gradient(90% 30% at 50% 0%, color-mix(in srgb, var(--oro-claro) 55%, transparent), transparent 70%),
+    radial-gradient(70% 30% at 0% 60%, color-mix(in srgb, var(--olivo) 12%, transparent), transparent 70%),
+    radial-gradient(70% 30% at 100% 85%, color-mix(in srgb, var(--oro-claro) 40%, transparent), transparent 70%),
+    var(--papel);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+.lb *, .lb *::before, .lb *::after { box-sizing: border-box; }
+.lb h1, .lb h2, .lb p, .lb figure, .lb blockquote { margin: 0; }
+.lb ol, .lb ul { margin: 0; padding: 0; list-style: none; }
+.lb svg[aria-hidden="true"] { pointer-events: none; }
+.lb :focus-visible { outline: 2px solid var(--oro-oscuro); outline-offset: 3px; }
+.lb b { font-weight: 700; }
+
+/* =================== Entrada: la vela que se enciende =================== */
+.lb-portada {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: max(26px, env(safe-area-inset-top)) 16px 26px;
+  overflow: hidden;
+  text-align: center;
+  background:
+    var(--grano),
+    radial-gradient(70% 45% at 50% 42%, color-mix(in srgb, var(--oro-claro) 60%, var(--papel)), transparent 75%),
+    var(--papel);
+}
+
+/* Penumbra marfil: se abre en círculo desde la llama (máscara animada) y al
+   final se desvanece. Sin @property, el fundido basta. */
+.lb-penumbra {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  --lb-radio: -200px;
+  background:
+    radial-gradient(130% 90% at 50% 45%, transparent 35%, color-mix(in srgb, var(--penumbra) 70%, var(--tinta)) 100%),
+    var(--penumbra);
+  opacity: .93;
+  -webkit-mask-image: radial-gradient(circle at var(--lb-x, 50%) var(--lb-y, 30%), transparent var(--lb-radio), #000 calc(var(--lb-radio) + 160px));
+  mask-image: radial-gradient(circle at var(--lb-x, 50%) var(--lb-y, 30%), transparent var(--lb-radio), #000 calc(var(--lb-radio) + 160px));
+  transition: --lb-radio 2.8s cubic-bezier(.55, 0, .25, 1) .55s, opacity 1.2s ease 2.6s;
+}
+.lb-encendida .lb-penumbra { --lb-radio: 170vmax; opacity: 0; }
+
+/* Calidez que deja la llama en el fondo cuando ya está encendida. */
+.lb-calidez {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--lb-x, 50%) var(--lb-y, 30%), color-mix(in srgb, var(--oro-claro) 75%, #FFF3D6) 0, color-mix(in srgb, var(--oro-claro) 40%, transparent) 30%, transparent 62%);
+  opacity: 0;
+  transition: opacity 2.4s ease .8s;
+}
+.lb-encendida .lb-calidez { opacity: 1; }
+
+.lb-portada-arriba, .lb-portada-abajo { position: relative; z-index: 3; width: 100%; max-width: 420px; }
+.lb-invitado { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.lb-invitado-ante { font: 700 11.5px/1.4 var(--f-cuerpo); letter-spacing: .3em; text-transform: uppercase; color: var(--tinta); opacity: .78; }
+.lb-invitado-nombre { font: 400 clamp(30px, 9vw, 40px)/1.2 var(--f-guion); color: var(--tinta); overflow-wrap: anywhere; transition: color 1.6s ease 1.4s; }
+.lb-encendida .lb-invitado-nombre { color: var(--oro-oscuro); }
+.lb-pases {
+  margin-top: 6px; padding: 5px 16px; border-radius: 999px;
+  font: 700 12.5px/1.3 var(--f-cuerpo); letter-spacing: .08em;
+  color: var(--tinta); background: color-mix(in srgb, var(--blanco) 55%, transparent);
+  border: 1px solid color-mix(in srgb, var(--oro) 70%, transparent);
+  transition: background-color 1.6s ease 1.4s;
+}
+.lb-encendida .lb-pases { background: var(--blanco); }
+
+/* Escena: vela alta sobre palmatoria y dos ramas de olivo en la mesa. */
+.lb-escena { position: relative; flex: 1 1 auto; display: flex; align-items: center; justify-content: center; width: 100%; min-height: 0; }
+.lb-vela-caja { position: relative; height: min(46svh, 430px); aspect-ratio: 200 / 540; }
+.lb-vela { display: block; width: 100%; height: 100%; overflow: visible; }
+.lb-escena-olivo { position: absolute; width: min(36vw, 150px); bottom: calc(50% - min(23svh, 215px) - 4px); filter: drop-shadow(0 4px 6px rgb(60 50 30 / .12)); }
+.lb-escena-olivo-1 { right: calc(50% + 18px); transform: scaleX(-1) rotate(-8deg); }
+.lb-escena-olivo-2 { left: calc(50% + 18px); transform: rotate(-8deg); }
+
+.lb-vela .lb-vela-luz { opacity: 0; transition: opacity 1.6s ease .3s; }
+.lb-vela .lb-vela-brasa { opacity: 0; transition: opacity .3s ease; }
+.lb-encendida .lb-vela .lb-vela-luz { opacity: 1; }
+.lb-encendida .lb-vela .lb-vela-brasa { opacity: 1; }
+
+/* La llama: el pie de la llama coincide con la punta de la mecha (y = 61/540). */
+.lb-llama-sitio {
+  position: absolute; z-index: 4; left: 49.7%; top: -2.6%; width: 21%;
+  transform: translateX(-50%); pointer-events: none;
+}
+.lb-llama { display: block; width: 100%; height: auto; overflow: visible; opacity: 0; transform: scale(.15); transform-origin: 50% 80%; }
+.lb-encendida .lb-llama { animation: lb-prender 1s var(--curva) forwards; }
+.lb-llama .lb-llama-fuego { transform-box: view-box; transform-origin: 30px 102px; }
+.lb-encendida .lb-llama .lb-llama-fuego { animation: lb-titilar 2.6s ease-in-out 1s infinite; }
+.lb-encendida .lb-llama .lb-llama-aura { animation: lb-aura 3.2s ease-in-out 1s infinite; transform-box: view-box; transform-origin: 30px 74px; }
+
+/* Halo cálido que nace de la llama. */
+.lb-halo {
+  position: absolute; z-index: 3; left: 49.7%; top: 8%; width: 120%; aspect-ratio: 1;
+  border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgb(255 244 214 / .95) 0, color-mix(in srgb, var(--oro-claro) 70%, transparent) 30%, transparent 68%);
+  transform: translate(-50%, -50%) scale(.1); opacity: 0;
+}
+.lb-encendida .lb-halo { animation: lb-halo 3.4s cubic-bezier(.3, .1, .2, 1) .35s forwards; }
+
+/* Mecha tocable con un pulso que invita. */
+.lb-mecha {
+  position: absolute; z-index: 5; left: 49.7%; top: 11.3%; width: 72px; height: 72px;
+  transform: translate(-50%, -62%); border: 0; border-radius: 50%; padding: 0;
+  background: transparent; cursor: pointer;
+}
+.lb-mecha span { position: absolute; inset: 14px; border-radius: 50%; border: 1.5px solid color-mix(in srgb, var(--oro-claro) 80%, white);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--oro-claro) 80%, transparent), inset 0 0 10px color-mix(in srgb, var(--oro-claro) 60%, transparent);
+  animation: lb-latido 2.2s ease-in-out infinite; }
+.lb-mecha span::after { content: ""; position: absolute; inset: 15px; border-radius: 50%; background: radial-gradient(circle, rgb(255 236 190 / .9), transparent 70%); }
+.lb-mecha:disabled { cursor: default; }
+.lb-encendida .lb-mecha span { animation: none; opacity: 0; transition: opacity .3s; }
+
+/* Pista y nombre revelado comparten lugar: uno se va, el otro llega. */
+.lb-portada-abajo { display: grid; align-items: end; justify-items: center; min-height: 168px; }
+.lb-portada-abajo > * { grid-area: 1 / 1; }
+.lb-pista {
+  display: inline-flex; flex-direction: column; align-items: center; gap: 6px; min-height: 48px; padding: 8px 18px;
+  border: 0; background: none; cursor: pointer;
+  font: 400 clamp(25px, 7.4vw, 30px)/1.2 var(--f-guion); color: var(--tinta);
+  align-self: center;
+  transition: opacity .5s ease, transform .5s ease;
+}
+.lb-pista svg { width: 22px; height: 22px; color: var(--oro-oscuro); animation: lb-subir 1.8s ease-in-out infinite; }
+.lb-encendida .lb-pista { opacity: 0; transform: translateY(-8px); pointer-events: none; }
+
+.lb-revelado { display: flex; flex-direction: column; align-items: center; gap: 2px; opacity: 0; transform: translateY(14px); filter: blur(8px);
+  transition: opacity 1.4s ease 1.9s, transform 1.6s var(--curva) 1.9s, filter 1.4s ease 1.9s; }
+.lb-encendida .lb-revelado { opacity: 1; transform: none; filter: none; }
+.lb-revelado-ante { font: 700 12px/1.4 var(--f-cuerpo); letter-spacing: .34em; text-transform: uppercase; color: var(--olivo-oscuro); }
+.lb-nombre {
+  font: 400 clamp(60px, 19vw, 84px)/1.08 var(--f-guion); color: var(--oro-oscuro);
+  text-shadow: 0 0 28px rgb(255 240 205 / .9), 0 1px 0 rgb(255 255 255 / .6);
+  padding: 0 .1em; overflow-wrap: anywhere;
+}
+.lb-revelado-fecha { display: flex; align-items: center; gap: 12px; margin-top: 2px; font: 400 15px/1.3 var(--f-titulos); color: var(--tinta); }
+.lb-revelado-fecha span { text-transform: capitalize; color: var(--suave); }
+.lb-revelado-fecha b { font-weight: 500; padding: 2px 12px; border-inline: 1px solid var(--filete); }
+
+.lb-desliza { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; margin-top: 10px; font: 700 10.5px/1 var(--f-cuerpo);
+  letter-spacing: .3em; text-transform: uppercase; color: var(--suave); opacity: 0; transition: opacity 1s ease 3.4s; }
+.lb-desliza svg { width: 20px; height: 20px; color: var(--oro); animation: lb-bajar 1.8s ease-in-out infinite; }
+.lb-encendida .lb-desliza { opacity: 1; }
+
+/* En el panel: ya encendida, sin animación de entrada. */
+.lb-instantanea .lb-penumbra { display: none; }
+.lb-instantanea :is(.lb-calidez, .lb-revelado, .lb-desliza, .lb-invitado-nombre, .lb-pases, .lb-vela-luz) { transition: none !important; }
+.lb-instantanea .lb-llama { animation: none !important; opacity: 1; transform: none; }
+.lb-instantanea .lb-halo { animation: none !important; opacity: .75; transform: translate(-50%, -50%) scale(3.2); }
+
+@keyframes lb-prender {
+  0% { opacity: 0; transform: scale(.1, .05); }
+  35% { opacity: 1; transform: scale(.55, .7); }
+  70% { transform: scale(1.06, 1.12); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes lb-titilar {
+  0%, 100% { transform: scale(1, 1) skewX(0deg); }
+  18% { transform: scale(.97, 1.04) skewX(1.6deg); }
+  34% { transform: scale(1.02, .97) skewX(-1deg); }
+  52% { transform: scale(.98, 1.06) skewX(-2deg); }
+  70% { transform: scale(1.01, .99) skewX(1deg); }
+  86% { transform: scale(.99, 1.03) skewX(-.6deg); }
+}
+@keyframes lb-aura { 0%, 100% { opacity: .9; transform: scale(1); } 50% { opacity: 1; transform: scale(1.08); } }
+@keyframes lb-halo {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.1); }
+  25% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: .75; transform: translate(-50%, -50%) scale(3.2); }
+}
+@keyframes lb-latido { 0%, 100% { transform: scale(.85); opacity: .55; } 50% { transform: scale(1.12); opacity: 1; } }
+@keyframes lb-subir { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes lb-bajar { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+
+/* =================== Cuerpo: arcos de capilla =================== */
+.lb-cuerpo { position: relative; max-width: 520px; margin: 0 auto; padding: 18px 16px 120px; display: grid; gap: 44px; }
+
+.lb-seccion { position: relative; }
+.lb-ventana {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  /* radio enorme = medio punto exacto, sea cual sea el ancho */
+  border-radius: 999px 999px 6px 6px;
+  background: var(--blanco);
+  border: 1px solid var(--filete);
+  box-shadow: 0 26px 40px -30px color-mix(in srgb, var(--oro-oscuro) 70%, transparent), 0 0 0 5px color-mix(in srgb, var(--blanco) 70%, transparent);
+}
+/* Segundo filete, por dentro */
+.lb-ventana::before {
+  content: ""; position: absolute; inset: 7px; z-index: 2; pointer-events: none;
+  border-radius: 999px 999px 3px 3px; border: 1px solid color-mix(in srgb, var(--filete) 60%, transparent);
+}
+/* Luz que entra desde arriba */
+.lb-luz {
+  position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(60% 34% at 50% 0%, rgb(255 248 228 / .95), transparent 75%),
+    linear-gradient(180deg, color-mix(in srgb, var(--oro-claro) 75%, white) 0%, color-mix(in srgb, var(--oro-claro) 28%, var(--blanco)) 34%, var(--blanco) 62%);
+  opacity: 0; transform: translateY(-24%);
+  transition: opacity 1.6s ease .15s, transform 1.9s var(--curva) .15s;
+}
+.lb-rayos {
+  position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: conic-gradient(from 152deg at 50% -4%,
+    transparent 0deg, rgb(255 255 255 / .75) 6deg, transparent 11deg,
+    transparent 18deg, rgb(255 255 255 / .6) 22deg, transparent 27deg,
+    transparent 31deg, rgb(255 255 255 / .8) 35deg, transparent 41deg,
+    transparent 47deg, rgb(255 255 255 / .55) 50deg, transparent 55deg, transparent 360deg);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 58%);
+  mask-image: linear-gradient(180deg, #000 0%, transparent 58%);
+  opacity: 0; transition: opacity 2.2s ease .7s;
+}
+.lb-seccion.is-in .lb-luz { opacity: 1; transform: none; }
+.lb-seccion.is-in .lb-rayos { opacity: 1; animation: lb-rayos 9s ease-in-out 3s infinite; }
+@keyframes lb-rayos { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+
+.lb-clave { position: absolute; z-index: 3; top: 15px; left: 50%; width: 22px; height: 22px; transform: translateX(-50%); color: var(--oro); }
+.lb-dentro { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 64px 24px 36px; text-align: center; }
+.lb-alfeizar {
+  display: block; height: 11px; margin: -1px -8px 0; border-radius: 2px 2px 4px 4px;
+  background: linear-gradient(180deg, var(--blanco), color-mix(in srgb, var(--oro-claro) 80%, var(--oro)) 70%, color-mix(in srgb, var(--oro) 60%, var(--oro-claro)));
+  border: 1px solid color-mix(in srgb, var(--filete) 80%, transparent);
+  box-shadow: 0 10px 16px -10px color-mix(in srgb, var(--oro-oscuro) 80%, transparent);
+}
+.lb-angosto { width: 88%; margin-inline: auto; }
+
+.lb-ante { font: 700 11.5px/1.4 var(--f-cuerpo); letter-spacing: .3em; text-transform: uppercase; color: var(--olivo-oscuro); }
+.lb-ante::first-letter { text-transform: uppercase; }
+.lb-h2 {
+  position: relative; display: inline-block; max-width: calc(100% - 48px);
+  font: 500 clamp(22px, 6.4vw, 26px)/1.3 var(--f-titulos); color: var(--tinta); overflow-wrap: anywhere;
+}
+.lb-paloma-titulo { position: absolute; width: 46px; height: auto; right: -44px; top: -30px; animation: lb-vuelo 4.8s ease-in-out infinite; }
+@keyframes lb-vuelo { 0%, 100% { transform: translate(0, 0) rotate(-4deg); } 50% { transform: translate(3px, -5px) rotate(2deg); } }
+.lb-filete { width: 150px; height: 12px; color: var(--oro); margin: 2px 0 6px; }
+
+.lb-texto { color: var(--suave); max-width: 32ch; }
+.lb-texto b { color: var(--tinta); }
+.lb-padres-2 { font: 500 20px/1.3 var(--f-titulos); color: var(--tinta); margin-top: -6px; }
+
+.lb-versiculo { margin-top: 6px; padding: 16px 18px 14px; max-width: 34ch; border-radius: 14px;
+  background: color-mix(in srgb, var(--oro-claro) 30%, var(--blanco)); border: 1px solid color-mix(in srgb, var(--filete) 50%, transparent); }
+.lb-versiculo p { font: italic 400 16.5px/1.55 var(--f-titulos); color: var(--tinta); }
+.lb-versiculo cite { display: block; margin-top: 8px; font: 700 11px/1.4 var(--f-cuerpo); font-style: normal; letter-spacing: .26em; text-transform: uppercase; color: var(--oro-oscuro); }
+
+/* Cuenta regresiva: cuatro arquitos */
+.lb-cuenta { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; width: 100%; max-width: 290px; }
+.lb-cuenta > div { display: flex; flex-direction: column; align-items: center; padding: 14px 2px 10px; border-radius: 999px 999px 4px 4px;
+  border: 1px solid color-mix(in srgb, var(--filete) 75%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--oro-claro) 55%, var(--blanco)), var(--blanco)); }
+.lb-cuenta .n { font: 500 clamp(22px, 6.6vw, 27px)/1.1 var(--f-titulos); color: var(--oro-oscuro); font-variant-numeric: tabular-nums; }
+.lb-cuenta .l { margin-top: 4px; font: 700 10px/1 var(--f-cuerpo); letter-spacing: .14em; text-transform: uppercase; color: var(--suave); }
+
+/* Ceremonia */
+.lb-pila { width: 156px; height: auto; margin: -8px 0 2px; }
+.lb-pila .lb-ondas { transform-box: fill-box; transform-origin: center; }
+.lb-seccion.is-in .lb-pila .lb-ondas { animation: lb-ondas 4.5s ease-in-out infinite; }
+@keyframes lb-ondas { 0%, 100% { transform: scale(.94); opacity: .7; } 50% { transform: scale(1.04); opacity: 1; } }
+.lb-cuando { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 4px 12px; margin: 2px 0; font: 400 15px/1.3 var(--f-titulos); color: var(--suave); }
+.lb-cuando span { text-transform: capitalize; }
+.lb-cuando b { font-weight: 500; font-size: 17px; color: var(--tinta); text-transform: capitalize; padding: 2px 12px; border-inline: 1px solid var(--filete); }
+.lb-mapa { width: 100%; aspect-ratio: 4 / 3; border-radius: 120px 120px 8px 8px; overflow: hidden; border: 1px solid var(--filete); }
+.lb-mapa iframe { width: 100%; height: 100%; border: 0; display: block; }
+
+/* Programa: velitas en una línea de oro */
+.lb-programa { position: relative; display: grid; gap: 18px; width: 100%; max-width: 310px; margin-top: 4px; }
+.lb-programa::before { content: ""; position: absolute; left: 96px; top: 10px; bottom: 10px; width: 1px; background: linear-gradient(180deg, transparent, var(--filete) 12%, var(--filete) 88%, transparent); }
+.lb-programa li { position: relative; display: grid; grid-template-columns: 82px 28px 1fr; align-items: start; text-align: left; }
+.lb-programa-hora { font: 500 15px/1.4 var(--f-titulos); color: var(--oro-oscuro); text-align: right; white-space: nowrap; }
+.lb-programa-punto { justify-self: center; margin-top: 4px; width: 9px; height: 14px; border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+  background: radial-gradient(circle at 50% 70%, #fff 0 20%, #FFD98A 45%, #F2A54A 100%);
+  box-shadow: 0 0 10px 3px rgb(255 214 140 / .55); }
+.lb-programa-que { font-size: 16px; line-height: 1.45; color: var(--tinta); }
+
+/* Padrinos */
+.lb-grupo { display: flex; flex-direction: column; align-items: center; gap: 0; }
+.lb-grupo + .lb-grupo { margin-top: 14px; }
+.lb-etiqueta { font: 700 11px/1.4 var(--f-cuerpo); letter-spacing: .26em; text-transform: uppercase; color: var(--olivo-oscuro); margin-bottom: 4px; }
+.lb-persona { font: 400 clamp(28px, 8.4vw, 34px)/1.25 var(--f-guion); color: var(--oro-oscuro); overflow-wrap: anywhere; }
+
+/* Vestimenta */
+.lb-colores { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px 18px; margin-top: 4px; }
+.lb-colores li { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 13.5px; color: var(--suave); }
+.lb-muestras { display: flex; }
+.lb-muestras i, .lb-evitar i { display: block; width: 34px; height: 34px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--filete) 80%, transparent);
+  box-shadow: inset 0 -4px 8px rgb(0 0 0 / .06), 0 4px 8px -4px rgb(60 50 30 / .3); }
+.lb-muestras i + i { margin-left: -10px; }
+.lb-evitar { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px; font-size: 14px; color: var(--suave); }
+.lb-evitar span { display: inline-flex; align-items: center; gap: 6px; }
+.lb-evitar i { width: 20px; height: 20px; position: relative; }
+.lb-evitar i::after { content: ""; position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1.5px; background: var(--oro-oscuro); transform: rotate(45deg); }
+
+/* Historia */
+.lb-carta { font: italic 400 17px/1.65 var(--f-titulos); color: var(--tinta); max-width: 32ch; }
+.lb-firma { font: 400 34px/1 var(--f-guion); color: var(--oro-oscuro); margin-top: 4px; }
+
+/* Fotos en arquitos */
+.lb-fotos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; width: 100%; }
+.lb-fotos-una { grid-template-columns: minmax(0, 220px); justify-content: center; }
+.lb-fotos figure { aspect-ratio: 3 / 4; border-radius: 999px 999px 6px 6px; overflow: hidden; border: 1px solid var(--filete); padding: 4px; background: var(--blanco); }
+.lb-fotos img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 999px 999px 4px 4px; }
+
+/* Regalos */
+.lb-transferir { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; margin-top: 6px; padding: 16px 14px;
+  border-radius: 14px; border: 1px dashed color-mix(in srgb, var(--oro) 80%, transparent); background: color-mix(in srgb, var(--oro-claro) 22%, var(--blanco)); }
+.lb-dato { font: 500 17px/1.4 var(--f-titulos); color: var(--tinta); overflow-wrap: anywhere; }
+.lb-botones { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+
+/* Información importante y preguntas */
+.lb-lista { display: grid; gap: 12px; text-align: left; max-width: 32ch; }
+.lb-lista li { position: relative; padding-left: 22px; color: var(--suave); }
+.lb-lista li::before { content: ""; position: absolute; left: 2px; top: .55em; width: 8px; height: 8px; background: var(--oro); transform: rotate(45deg); }
+.lb-faq { width: 100%; text-align: left; }
+.lb-faq details { border-bottom: 1px solid color-mix(in srgb, var(--filete) 50%, transparent); }
+.lb-faq details:last-child { border-bottom: 0; }
+.lb-faq summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 8px 0; cursor: pointer; list-style: none;
+  font: 500 16.5px/1.4 var(--f-titulos); color: var(--tinta); }
+.lb-faq summary::-webkit-details-marker { display: none; }
+.lb-faq summary::after { content: "+"; flex: none; font: 400 22px/1 var(--f-titulos); color: var(--oro); transition: transform .3s var(--curva); }
+.lb-faq details[open] summary::after { transform: rotate(45deg); }
+.lb-faq details p { padding: 0 0 14px; color: var(--suave); }
+
+/* Botones */
+.lb-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 10px 22px; border-radius: 999px;
+  font: 700 14.5px/1.2 var(--f-cuerpo); letter-spacing: .04em; text-decoration: none; cursor: pointer;
+  transition: transform .2s var(--curva), background-color .2s, box-shadow .2s;
+}
+.lb-btn svg { width: 18px; height: 18px; flex: none; }
+.lb-btn:active { transform: scale(.97); }
+.lb-btn-linea { color: var(--oro-oscuro); background: var(--blanco); border: 1px solid var(--oro); }
+@media (hover: hover) { .lb-btn-linea:hover { background: color-mix(in srgb, var(--oro-claro) 35%, var(--blanco)); } }
+.lb-btn-oro { position: relative; width: 100%; max-width: 300px; min-height: 54px; margin-top: 6px; border: 0; color: #fff; background: var(--oro-brillo);
+  font-size: 15.5px; letter-spacing: .06em; text-shadow: 0 1px 2px color-mix(in srgb, var(--oro-oscuro) 70%, transparent);
+  box-shadow: 0 16px 26px -16px var(--oro-oscuro), inset 0 1px 0 rgb(255 255 255 / .5); }
+.lb-btn-oro::after { content: ""; position: absolute; inset: 4px; border-radius: inherit; border: 1px solid rgb(255 255 255 / .45); pointer-events: none; }
+.lb-btn-oro span { display: inline; }
+.lb-limite { font-size: 14.5px; color: var(--suave); }
+.lb-limite b { color: var(--tinta); }
+
+/* Final */
+.lb-final { display: flex; flex-direction: column; align-items: center; gap: 6px; padding-top: 4px; text-align: center; }
+.lb-final-paloma { width: 92px; height: auto; animation: lb-vuelo 5.4s ease-in-out infinite; }
+.lb-final-gracias { font: 400 clamp(46px, 14vw, 60px)/1.15 var(--f-guion); color: var(--oro-oscuro); }
+.lb-final-olivo { width: 150px; margin-top: 6px; }
+
+/* Aparición: la ventana sube y la luz entra en ella */
+.lb [data-reveal] { opacity: 0; transform: translateY(26px); transition: opacity .9s var(--curva), transform 1s var(--curva); }
+.lb [data-reveal].is-in { opacity: 1; transform: none; }
+
+/* Música */
+.lb-musica {
+  position: fixed; z-index: 40; top: max(12px, env(safe-area-inset-top)); right: 12px;
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px 0 13px; border-radius: 999px;
+  border: 1px solid var(--filete); background: color-mix(in srgb, var(--blanco) 86%, transparent); backdrop-filter: blur(6px);
+  color: var(--oro-oscuro); font: 700 13px/1 var(--f-cuerpo); letter-spacing: .04em; cursor: pointer;
+  box-shadow: 0 8px 18px -12px var(--oro-oscuro);
+}
+.lb-musica svg { width: 18px; height: 18px; }
+
+.lb-aviso { position: fixed; z-index: 90; left: 16px; right: 16px; bottom: 76px; max-width: 420px; margin: 0 auto; padding: 12px 16px; border-radius: 999px;
+  background: var(--tinta); color: #fff; font: 700 14px/1.4 var(--f-cuerpo); text-align: center; opacity: 0; transform: translateY(12px); pointer-events: none; transition: opacity .2s, transform .2s; }
+.lb-aviso.is-visible { opacity: 1; transform: none; }
+
+/* ---------- Formulario de confirmación con la ropa del diseño ----------
+   El RSVP es un componente común (Tailwind, letra mono pequeña). */
+.lb-modal { position: fixed; inset: 0; z-index: 80; display: flex; align-items: flex-end; justify-content: center;
+  background: color-mix(in srgb, var(--tinta) 45%, transparent); animation: lb-fundido .25s ease; }
+.lb-modal-caja { position: relative; width: 100%; max-width: 520px; max-height: 92svh; overflow: auto; padding-top: 22px;
+  border-radius: 200px 200px 0 0 / 60px 60px 0 0; border-top: 1px solid var(--filete);
+  background: var(--grano), linear-gradient(180deg, color-mix(in srgb, var(--oro-claro) 50%, var(--blanco)), var(--papel) 180px); animation: lb-subir-caja .4s var(--curva); }
+@media (min-width: 600px) { .lb-modal { align-items: center; } .lb-modal-caja { border: 1px solid var(--filete); border-radius: 200px 200px 10px 10px / 60px 60px 10px 10px; } }
+.lb-cerrar { position: absolute; z-index: 2; top: 14px; right: 16px; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--filete);
+  background: var(--blanco); color: var(--oro-oscuro); font-size: 24px; line-height: 1; cursor: pointer; }
+.lb-modal-paloma { display: block; width: 70px; height: auto; margin: 4px auto -6px; }
+.lb-modal #rsvp { padding: 6px 22px 36px; border-top: 0; font-family: var(--f-cuerpo); color: var(--tinta); }
+.lb-modal #rsvp img { display: none; }
+.lb-modal #rsvp .font-mono { font-family: var(--f-cuerpo); letter-spacing: .2em; }
+.lb-modal #rsvp p.font-mono, .lb-modal #rsvp span.font-mono { font-size: 11.5px; font-weight: 700; color: var(--olivo-oscuro); }
+.lb-modal #rsvp h2 { font-family: var(--f-guion); font-weight: 400; font-size: clamp(36px, 10vw, 44px); line-height: 1.2; color: var(--oro-oscuro); margin: 4px 0; }
+.lb-modal #rsvp h2 + p.font-mono, .lb-modal #rsvp h2 + div + p.font-mono { margin-top: 12px !important; margin-bottom: 22px !important; }
+.lb-modal #rsvp .font-body { font-family: var(--f-cuerpo); font-size: 17px; font-weight: 600; color: var(--tinta); }
+.lb-modal #rsvp p.text-xs, .lb-modal #rsvp p.text-sm { font-size: 15px; line-height: 1.55; color: var(--suave); }
+.lb-modal #rsvp .divide-y > * { padding-block: 16px; }
+.lb-modal #rsvp .divide-y, .lb-modal #rsvp .divide-y > * + * { border-color: color-mix(in srgb, var(--filete) 45%, transparent); }
+.lb-modal #rsvp button[aria-pressed] { width: 64px; min-height: 44px; border-radius: 999px; font: 700 14px/1 var(--f-cuerpo); letter-spacing: .08em; text-transform: uppercase;
+  border: 1px solid var(--oro); background: var(--blanco); color: var(--oro-oscuro); }
+.lb-modal #rsvp button[aria-pressed="true"]:first-child { background: var(--oro-brillo); color: #fff; border-color: transparent; }
+.lb-modal #rsvp button[aria-pressed="true"]:last-child { background: var(--tinta); color: #fff; border-color: var(--tinta); }
+.lb-modal #rsvp form > div > button[type="button"]:not([aria-pressed]), .lb-modal #rsvp .border-dashed {
+  border-radius: 999px; min-height: 44px; padding: 11px 18px; font: 700 13px/1.2 var(--f-cuerpo); letter-spacing: .08em; }
+.lb-modal #rsvp input[type="text"], .lb-modal #rsvp textarea { font: 16px/1.4 var(--f-cuerpo); color: var(--tinta);
+  padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--oro-claro) 60%, var(--oro)); border-radius: 12px; background: var(--blanco); }
+.lb-modal #rsvp input[type="text"]:focus, .lb-modal #rsvp textarea:focus { border-color: var(--oro); box-shadow: 0 0 0 3px color-mix(in srgb, var(--oro) 20%, transparent); }
+.lb-modal #rsvp label > span.font-mono { display: block; margin-bottom: 4px; }
+.lb-modal #rsvp button[type="submit"] { min-height: 54px; border-radius: 999px; border: 0; font: 700 14px/1.2 var(--f-cuerpo); letter-spacing: .18em; color: #fff;
+  background: var(--oro-brillo); box-shadow: 0 14px 24px -14px var(--oro-oscuro); }
+.lb-modal #rsvp button[type="submit"]:disabled { opacity: .45; }
+.lb-modal #rsvp .border-gold\/40 { border-color: var(--filete); background: var(--blanco); border-radius: 14px; }
+@keyframes lb-fundido { from { opacity: 0; } to { opacity: 1; } }
+@keyframes lb-subir-caja { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* Movimiento reducido: la luz llega sin viaje y nada titila. */
+@media (prefers-reduced-motion: reduce) {
+  .lb-penumbra { transition: opacity .4s ease; }
+  .lb-calidez, .lb-revelado, .lb-desliza, .lb-vela-luz, .lb-invitado-nombre, .lb-pases { transition-duration: .4s !important; transition-delay: 0s !important; }
+  .lb-revelado { filter: none; transform: none; }
+  .lb-encendida .lb-llama { animation: none; opacity: 1; transform: none; }
+  .lb-encendida .lb-llama .lb-llama-fuego, .lb-encendida .lb-llama .lb-llama-aura { animation: none; }
+  .lb-encendida .lb-halo { animation: none; opacity: .75; transform: translate(-50%, -50%) scale(3.2); }
+  .lb-mecha span, .lb-pista svg, .lb-desliza svg, .lb-paloma-titulo, .lb-final-paloma { animation: none; }
+  .lb [data-reveal], .lb-luz { opacity: 1; transform: none; transition: none; }
+  .lb-rayos { opacity: 1; transition: none; }
+  .lb-seccion.is-in .lb-rayos, .lb-seccion.is-in .lb-pila .lb-ondas { animation: none; }
+}

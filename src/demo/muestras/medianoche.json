@@ -2,7 +2,7 @@
   "site": {
     "invitacion": {
       "slug": "plantillas/medianoche",
-      "nombre": "XV · Emilia",
+      "nombre": "Cena anual · Nortex Colombia",
       "tipoEvento": "corporativo",
       "diseno": "medianoche"
     },
@@ -31,88 +31,80 @@
         "id": 46,
         "tipo": "welcome",
         "contenido": {
-          "novioEl": "Emilia Durán",
+          "novioEl": "Nortex Colombia",
           "novioElla": "",
-          "fraseIntro": "Hay momentos que se sueñan toda la vida. Este es uno de ellos, y quiero vivirlo contigo.",
-          "padresTexto": "Con la bendición de mis padres",
-          "padreElMadre": "María Fernanda Gómez",
-          "padreElPadre": "Carlos Durán",
+          "fraseIntro": "Cerramos el año como se merece: una noche de gala para celebrar lo logrado juntos y brindar por lo que viene.",
+          "padresTexto": "",
+          "padreElMadre": "",
+          "padreElPadre": "",
           "padreEllaMadre": "",
           "padreEllaPadre": "",
-          "bienvenidaTexto": "Mis XV años"
+          "bienvenidaTexto": "Cena de fin de año"
         }
       },
       {
         "id": 47,
         "tipo": "informacion_boda",
         "contenido": {
-          "fecha": "2027-03-20T21:00:00-05:00",
-          "lugar": "Hacienda Santa Clara",
-          "mapsUrl": "https://maps.google.com/?q=Hacienda+Santa+Clara+La+Calera",
-          "overline": "Mis quince años",
-          "direccion": "Km 4 vía La Calera, Bogotá",
+          "fecha": "2027-12-10T19:30:00-05:00",
+          "lugar": "Hotel InterContinental Medellín",
+          "direccion": "Calle 16 # 28-51, El Poblado, Medellín",
+          "mapsUrl": "https://maps.google.com/?q=Hotel+InterContinental+Medellin",
           "mapaEmbed": "",
+          "overline": "Salón de eventos",
+          "tituloSeccion": "El lugar",
+          "tituloItinerario": "La noche",
+          "cronogramaModo": "detallado",
           "cronograma": [
             {
-              "hora": "9:00 p. m.",
-              "titulo": "Recepción"
+              "hora": "7:30 p. m.",
+              "titulo": "Cóctel de bienvenida"
             },
             {
-              "hora": "9:45 p. m.",
-              "titulo": "Entrada de la quinceañera"
+              "hora": "8:30 p. m.",
+              "titulo": "Cena de gala"
             },
             {
-              "hora": "10:15 p. m.",
-              "titulo": "Vals"
+              "hora": "10:00 p. m.",
+              "titulo": "Premiación del año"
             },
             {
               "hora": "11:00 p. m.",
-              "titulo": "Cena y fiesta"
+              "titulo": "Fiesta"
             }
           ],
-          "tituloSeccion": "Información del evento",
-          "cronogramaModo": "detallado",
-          "tituloItinerario": "El programa",
-          "cronogramaMensaje": "Les compartiremos el programa más cerca de la fecha.",
+          "cronogramaMensaje": "",
           "mostrarRestriccion": true,
           "mostrarObservaciones": true,
-          "fechaLimiteConfirmacion": "2027-03-01"
+          "fechaLimiteConfirmacion": "2027-11-26",
+          "telefonoConfirmar": ""
         }
       },
       {
         "id": 48,
         "tipo": "padrinos",
+        "activo": true,
         "contenido": {
+          "titulo": "Anfitriones",
           "grupos": [
             {
-              "etiqueta": "Y mis padrinos",
+              "etiqueta": "Les reciben",
               "personas": [
-                "Sandra Rojas",
-                "Andrés Rojas"
+                "La Gerencia General",
+                "El Comité Directivo"
               ]
             }
-          ],
-          "titulo": "Padres y padrinos"
+          ]
         }
       },
       {
         "id": 49,
         "tipo": "vestimenta",
         "contenido": {
-          "nota": "",
+          "titulo": "Gala",
+          "nota": "Traje oscuro o esmoquin · vestido largo o de cóctel.",
           "evitar": [],
-          "titulo": "Elegante",
           "permitidos": []
-        }
-      },
-      {
-        "id": 50,
-        "tipo": "regalos",
-        "contenido": {
-          "texto": "",
-          "titulo": "Mesa de regalos",
-          "enlaces": [],
-          "datosTransferencia": "Nequi 300 123 4567 · Emilia Durán"
         }
       },
       {
@@ -121,8 +113,9 @@
         "contenido": {
           "nota": "",
           "items": [
-            "La invitación es personal y válida solo para los pases indicados.",
-            "Te pedimos llegar con 20 minutos de anticipación."
+            "Parqueadero disponible en el hotel, sin costo para los invitados.",
+            "Sin acompañantes: asisten solo las personas nombradas en la invitación.",
+            "Presentar documento de identidad en el registro de la entrada."
           ]
         }
       },
@@ -132,29 +125,14 @@
         "contenido": {
           "items": [
             {
-              "p": "¿Puedo llevar a alguien más?",
-              "r": "Cada invitación indica sus pases. Si necesitas uno adicional, escríbenos antes de confirmar."
+              "p": "¿Hasta qué hora es la celebración?",
+              "r": "La fiesta va hasta la 1:00 a. m. Habrá transporte de regreso hacia El Poblado y Laureles."
             },
             {
-              "p": "¿Hay parqueadero?",
-              "r": "Sí, la hacienda tiene parqueadero para invitados."
+              "p": "¿Hay opciones de menú especiales?",
+              "r": "Sí. Cuéntanos tu restricción alimentaria al confirmar y la cocina la tendrá en cuenta."
             }
           ]
-        }
-      },
-      {
-        "id": 53,
-        "tipo": "historia",
-        "contenido": {
-          "texto": "Desde pequeña soñé con una noche en París: luces, flores y la gente que más quiero. Hoy cumplo quince años y quiero que ese sueño lo vivamos juntos.",
-          "titulo": "Mi historia"
-        }
-      },
-      {
-        "id": 54,
-        "tipo": "sobres",
-        "contenido": {
-          "texto": "Tu presencia es mi mejor regalo. Si además quieres hacerme un obsequio, habrá un buzón de sobres en la fiesta."
         }
       },
       {
@@ -166,22 +144,30 @@
         }
       }
     ],
-    "fechaLimiteConfirmacion": "2027-03-01",
+    "fechaLimiteConfirmacion": "2027-11-26",
     "fotosSubidas": [],
     "audioUrl": null,
     "fondoUrl": null
   },
   "invitado": {
     "codigo": "DEMO",
-    "tipo": "cupos",
-    "nombre": "Laura Méndez",
-    "familia": "",
+    "tipo": "familia",
+    "nombre": "Laura Méndez y Andrés Pardo",
+    "familia": "Equipo Comercial",
     "mensaje": "",
-    "cupos": 1,
+    "cupos": 0,
     "miembros": [
       {
         "id": -1,
         "nombre": "Laura Méndez",
+        "estado": "pendiente",
+        "restriccion": "",
+        "comentario": "",
+        "es_acompanante": false
+      },
+      {
+        "id": -2,
+        "nombre": "Andrés Pardo",
         "estado": "pendiente",
         "restriccion": "",
         "comentario": "",

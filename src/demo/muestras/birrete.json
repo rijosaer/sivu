@@ -2,7 +2,7 @@
   "site": {
     "invitacion": {
       "slug": "plantillas/birrete",
-      "nombre": "XV · Emilia",
+      "nombre": "Grado · Camila",
       "tipoEvento": "otro",
       "diseno": "birrete"
     },
@@ -31,98 +31,150 @@
         "id": 46,
         "tipo": "welcome",
         "contenido": {
-          "novioEl": "Emilia Durán",
+          "bienvenidaTexto": "Mi grado",
+          "novioEl": "Camila Restrepo",
           "novioElla": "",
-          "fraseIntro": "Hay momentos que se sueñan toda la vida. Este es uno de ellos, y quiero vivirlo contigo.",
-          "padresTexto": "Con la bendición de mis padres",
-          "padreElMadre": "María Fernanda Gómez",
-          "padreElPadre": "Carlos Durán",
-          "padreEllaMadre": "",
+          "fraseIntro": "Me gradúo como Arquitecta de la Universidad Nacional y quiero celebrarlo contigo.",
+          "padresTexto": "Gracias a mis padres, que creyeron en cada plano y en cada madrugada.",
+          "padreElPadre": "Jorge Restrepo",
+          "padreElMadre": "Beatriz Mejía",
           "padreEllaPadre": "",
-          "bienvenidaTexto": "Mis XV años"
+          "padreEllaMadre": ""
         }
       },
       {
         "id": 47,
         "tipo": "informacion_boda",
         "contenido": {
-          "fecha": "2027-03-20T21:00:00-05:00",
-          "lugar": "Hacienda Santa Clara",
-          "mapsUrl": "https://maps.google.com/?q=Hacienda+Santa+Clara+La+Calera",
-          "overline": "Mis quince años",
-          "direccion": "Km 4 vía La Calera, Bogotá",
+          "fecha": "2027-03-12T10:00:00-05:00",
+          "lugar": "Auditorio León de Greiff",
+          "direccion": "Universidad Nacional de Colombia, Carrera 45 # 26-85, Bogotá",
+          "mapsUrl": "https://maps.google.com/?q=Auditorio+León+de+Greiff+Universidad+Nacional+Bogotá",
           "mapaEmbed": "",
+          "overline": "Ceremonia de grado",
+          "tituloSeccion": "Ceremonia de grado",
+          "tituloItinerario": "El programa",
+          "cronogramaModo": "detallado",
           "cronograma": [
             {
+              "hora": "9:30 a. m.",
+              "titulo": "Llegada de invitados"
+            },
+            {
+              "hora": "10:00 a. m.",
+              "titulo": "Ceremonia de grado"
+            },
+            {
+              "hora": "12:30 p. m.",
+              "titulo": "Fotos en el campus"
+            },
+            {
+              "hora": "7:00 p. m.",
+              "titulo": "Cena de celebración"
+            },
+            {
               "hora": "9:00 p. m.",
-              "titulo": "Recepción"
-            },
-            {
-              "hora": "9:45 p. m.",
-              "titulo": "Entrada de la quinceañera"
-            },
-            {
-              "hora": "10:15 p. m.",
-              "titulo": "Vals"
-            },
-            {
-              "hora": "11:00 p. m.",
-              "titulo": "Cena y fiesta"
+              "titulo": "Brindis y baile"
             }
           ],
-          "tituloSeccion": "Información del evento",
-          "cronogramaModo": "detallado",
-          "tituloItinerario": "El programa",
           "cronogramaMensaje": "Les compartiremos el programa más cerca de la fecha.",
           "mostrarRestriccion": true,
           "mostrarObservaciones": true,
-          "fechaLimiteConfirmacion": "2027-03-01"
+          "fechaLimiteConfirmacion": "2027-02-26",
+          "telefonoConfirmar": "300 456 7812"
         }
       },
       {
         "id": 48,
         "tipo": "padrinos",
         "contenido": {
+          "titulo": "Gratitud",
           "grupos": [
             {
-              "etiqueta": "Y mis padrinos",
+              "etiqueta": "Y a mis hermanos",
               "personas": [
-                "Sandra Rojas",
-                "Andrés Rojas"
+                "Tomás Restrepo",
+                "Sara Restrepo"
               ]
             }
-          ],
-          "titulo": "Padres y padrinos"
+          ]
         }
       },
       {
         "id": 49,
         "tipo": "vestimenta",
         "contenido": {
-          "nota": "",
-          "evitar": [],
-          "titulo": "Elegante",
-          "permitidos": []
+          "titulo": "Formal",
+          "nota": "Para la cena, traje oscuro o vestido de cóctel. En la ceremonia, calzado cómodo: el campus se recorre a pie.",
+          "permitidos": [
+            {
+              "nombre": "Azules y neutros",
+              "colores": [
+                "#2E3A55",
+                "#8C9BB5",
+                "#D8CFC0"
+              ]
+            },
+            {
+              "nombre": "Tonos tierra",
+              "colores": [
+                "#7C6024",
+                "#B8913F",
+                "#E9D7A9"
+              ]
+            }
+          ],
+          "evitar": [
+            {
+              "nombre": "Blanco total",
+              "color": "#FFFFFF"
+            }
+          ]
+        }
+      },
+      {
+        "id": 53,
+        "tipo": "historia",
+        "contenido": {
+          "titulo": "Cinco años de planos",
+          "texto": "Entré a la Nacional con un lápiz y muchas preguntas. Salgo con maquetas, noches en vela, amigos para siempre y la certeza de que quiero diseñar espacios donde la gente se encuentre. Este título también es de ustedes."
+        }
+      },
+      {
+        "id": 56,
+        "tipo": "fotos",
+        "contenido": {
+          "titulo": "Momentos",
+          "subtitulo": "Comparte tus fotos del día con #GradoCamila y armemos juntos el álbum.",
+          "urls": []
         }
       },
       {
         "id": 50,
         "tipo": "regalos",
         "contenido": {
+          "titulo": "Un detalle",
           "texto": "",
-          "titulo": "Mesa de regalos",
           "enlaces": [],
-          "datosTransferencia": "Nequi 300 123 4567 · Emilia Durán"
+          "datosTransferencia": "Nequi 300 456 7812 · Camila Restrepo"
+        }
+      },
+      {
+        "id": 54,
+        "tipo": "sobres",
+        "contenido": {
+          "texto": "Tu compañía es el mejor regalo. Si quieres tener un detalle conmigo, en la cena habrá un buzón de sobres."
         }
       },
       {
         "id": 51,
         "tipo": "info_importante",
         "contenido": {
-          "nota": "",
+          "nota": "La ubicación de la cena en Usaquén te llegará por WhatsApp al confirmar.",
           "items": [
-            "La invitación es personal y válida solo para los pases indicados.",
-            "Te pedimos llegar con 20 minutos de anticipación."
+            "El auditorio tiene cupo limitado: tu invitación es personal y válida solo para los pases indicados.",
+            "Llega con 30 minutos de anticipación; el ingreso a la universidad es por la entrada de la Calle 26.",
+            "Lleva tu documento de identidad para entrar al campus."
           ]
         }
       },
@@ -133,28 +185,17 @@
           "items": [
             {
               "p": "¿Puedo llevar a alguien más?",
-              "r": "Cada invitación indica sus pases. Si necesitas uno adicional, escríbenos antes de confirmar."
+              "r": "Cada invitación indica sus pases. Por el cupo del auditorio no podemos agregar más."
             },
             {
               "p": "¿Hay parqueadero?",
-              "r": "Sí, la hacienda tiene parqueadero para invitados."
+              "r": "Sí, en la universidad hay parqueadero de visitantes por la Carrera 45, sujeto a disponibilidad."
+            },
+            {
+              "p": "¿Puedo ir solo a la cena?",
+              "r": "¡Claro! Confírmalo en las observaciones para tenerlo en cuenta."
             }
           ]
-        }
-      },
-      {
-        "id": 53,
-        "tipo": "historia",
-        "contenido": {
-          "texto": "Desde pequeña soñé con una noche en París: luces, flores y la gente que más quiero. Hoy cumplo quince años y quiero que ese sueño lo vivamos juntos.",
-          "titulo": "Mi historia"
-        }
-      },
-      {
-        "id": 54,
-        "tipo": "sobres",
-        "contenido": {
-          "texto": "Tu presencia es mi mejor regalo. Si además quieres hacerme un obsequio, habrá un buzón de sobres en la fiesta."
         }
       },
       {
@@ -166,7 +207,7 @@
         }
       }
     ],
-    "fechaLimiteConfirmacion": "2027-03-01",
+    "fechaLimiteConfirmacion": "2027-02-26",
     "fotosSubidas": [],
     "audioUrl": null,
     "fondoUrl": null

@@ -1,0 +1,360 @@
+/* Diseño «Birrete»: graduación académica y elegante en claro. Marfil, tinta y
+   oro con detalles en azul tinta. Entrada: diploma enrollado que se
+   desenrolla. Cuerpo: portafolio de hojas marfil con pestañas laterales.
+   Letras propias: Imperial Script (nombres y firmas), Cinzel Decorative
+   (títulos, pestañas y cifras) y EB Garamond (texto). El tema del evento puede
+   cambiarlas (fuente-guion, fuente-titulos, fuente-cuerpo). */
+.bi {
+  /* Colores del tema: principal = oro, claro = oro pálido, oscuro = oro viejo,
+     papel = marfil, mármol = blanco de tarjeta, sello = azul tinta. */
+  --papel: rgb(var(--color-paper));
+  --tinta: rgb(var(--color-ink));
+  --oro: rgb(var(--color-gold));
+  --oro-claro: rgb(var(--color-gold-light));
+  --oro-osc: rgb(var(--color-gold-dark));
+  --tarjeta: rgb(var(--color-marble));
+  --azul: rgb(var(--color-seal));
+  --suave: color-mix(in srgb, var(--tinta) 74%, var(--papel));
+  --filete: color-mix(in srgb, var(--oro) 75%, var(--oro-claro));
+  --hoja: color-mix(in srgb, var(--tarjeta) 72%, var(--papel));
+  --brillo-oro: linear-gradient(135deg, color-mix(in srgb, var(--oro-claro) 80%, white), var(--oro) 50%, var(--oro-osc));
+  --grano: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .4 0 0 0 0 .32 0 0 0 0 .2 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+
+  --f-guion: var(--fuente-guion, "Imperial Script"), "Great Vibes", cursive;
+  --f-titulo: var(--fuente-titulos, "Cinzel Decorative"), "Cinzel", Georgia, serif;
+  --f-texto: var(--fuente-cuerpo, "EB Garamond"), "Cormorant Garamond", Georgia, serif;
+  --curva: cubic-bezier(.16, 1, .3, 1);
+  --rollo: cubic-bezier(.5, .05, .25, 1);
+
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow-x: hidden;
+  color: var(--tinta);
+  font-family: var(--f-texto);
+  font-size: 17px;
+  line-height: 1.55;
+  background:
+    var(--grano),
+    radial-gradient(70% 34% at 50% 0%, color-mix(in srgb, var(--oro-claro) 45%, transparent), transparent 75%),
+    radial-gradient(60% 30% at 0% 60%, color-mix(in srgb, var(--oro-claro) 22%, transparent), transparent 70%),
+    radial-gradient(60% 30% at 100% 90%, color-mix(in srgb, var(--azul) 7%, transparent), transparent 70%),
+    var(--papel);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+.bi *, .bi *::before, .bi *::after { box-sizing: border-box; }
+.bi h1, .bi h2, .bi p, .bi figure, .bi ol, .bi ul { margin: 0; }
+.bi ol, .bi ul { padding: 0; list-style: none; }
+.bi svg[aria-hidden="true"] { pointer-events: none; user-select: none; }
+.bi :focus-visible { outline: 2px solid var(--azul); outline-offset: 3px; }
+
+/* ---------- Piezas comunes ---------- */
+.bi .bi-k { display: block; font: 600 12px/1.4 var(--f-texto); letter-spacing: .26em; text-transform: uppercase; color: var(--oro-osc); }
+.bi .bi-v { font: 500 23px/1.25 var(--f-texto); color: var(--tinta); overflow-wrap: anywhere; margin-top: 4px; }
+.bi .bi-v-chica { font-size: 19px; }
+.bi .bi-lead { font-size: 17.5px; line-height: 1.6; }
+.bi .bi-italica { font-style: italic; }
+.bi .bi-centro { text-align: center; }
+.bi .bi-ayuda { color: var(--suave); font-size: 16px; line-height: 1.5; }
+.bi .bi-ayuda b { color: var(--tinta); font-weight: 600; }
+.bi .bi-guion { font: 400 46px/1.15 var(--f-guion); color: var(--azul); }
+
+.bi .bi-filete { display: flex; align-items: center; justify-content: center; gap: 9px; width: 150px; margin: 6px auto 12px; }
+.bi .bi-filete::before, .bi .bi-filete::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--filete)); }
+.bi .bi-filete::after { background: linear-gradient(270deg, transparent, var(--filete)); }
+.bi .bi-filete i { width: 6px; height: 6px; background: var(--oro); transform: rotate(45deg); box-shadow: 0 0 0 3px var(--hoja), 0 0 0 4px var(--oro-claro); }
+
+.bi .bi-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 10px 18px; border-radius: 2px; border: 1px solid transparent;
+  font: 600 14px/1.2 var(--f-texto); letter-spacing: .14em; text-transform: uppercase; text-decoration: none; cursor: pointer;
+  transition: background-color .15s, color .15s, transform .15s var(--curva), filter .15s;
+}
+.bi .bi-btn:active { transform: scale(.97); }
+.bi .bi-btn svg { width: 18px; height: 18px; flex: none; }
+.bi .bi-btn-linea { color: var(--oro-osc); background: var(--tarjeta); border-color: var(--oro); }
+@media (hover: hover) { .bi .bi-btn-linea:hover { background: color-mix(in srgb, var(--oro-claro) 30%, var(--tarjeta)); } }
+/* Botón principal: azul tinta con filete interior dorado, como un sello. */
+.bi .bi-btn-oro { position: relative; width: 100%; min-height: 56px; color: var(--papel); letter-spacing: .2em;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--azul) 82%, white), var(--azul) 55%, color-mix(in srgb, var(--azul) 80%, black));
+  box-shadow: 0 14px 24px -14px var(--azul); }
+.bi .bi-btn-oro::after { content: ""; position: absolute; inset: 5px; border: 1px solid color-mix(in srgb, var(--oro-claro) 80%, transparent); pointer-events: none; }
+.bi .bi-btn-oro b { font-weight: 700; letter-spacing: .08em; }
+.bi .bi-btn-oro span { text-transform: none; letter-spacing: .04em; font-size: 16px; }
+@media (hover: hover) { .bi .bi-btn-oro:hover { filter: brightness(1.1); } }
+.bi .bi-botones { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.bi .bi-botones .bi-btn { flex: 1 1 130px; }
+
+/* ---------- Portada / entrada: el diploma ---------- */
+.bi .bi-portada {
+  position: relative; min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 18px; padding: 36px 16px 30px; text-align: center;
+}
+/* Marco doble de diploma alrededor de la pantalla */
+.bi .bi-portada::before, .bi .bi-portada::after { content: ""; position: absolute; pointer-events: none; border: 1px solid var(--filete); opacity: .55; }
+.bi .bi-portada::before { inset: 10px; }
+.bi .bi-portada::after { inset: 15px; opacity: .3; }
+
+.bi .bi-invitado { display: grid; gap: 4px; justify-items: center; }
+.bi .bi-invitado-nombre { font: 400 clamp(34px, 10vw, 44px)/1.15 var(--f-guion); color: var(--azul); overflow-wrap: anywhere; }
+.bi .bi-pases {
+  display: inline-block; margin-top: 4px; padding: 5px 16px; border-radius: 999px; font: 600 13px/1.3 var(--f-texto); letter-spacing: .12em; text-transform: uppercase;
+  color: var(--oro-osc); background: var(--tarjeta); border: 1px solid var(--oro); box-shadow: inset 0 0 0 3px var(--tarjeta), inset 0 0 0 4px var(--oro-claro);
+}
+
+.bi .bi-diploma { position: relative; width: min(100%, 360px); display: flex; flex-direction: column; align-items: center; }
+
+/* Rizo del borde de arriba: aparece cuando el papel empieza a bajar. */
+.bi .bi-rizo { width: 100%; height: auto; margin-bottom: -2.5%; position: relative; z-index: 2; opacity: 0; transform: scaleY(.3); transform-origin: bottom;
+  transition: opacity .3s ease, transform .5s var(--curva); }
+.bi .bi-rizo svg { display: block; width: 100%; height: auto; }
+.bi-fase-abierto .bi-rizo { opacity: 1; transform: none; }
+
+/* El pliego crece de 0 a su alto real (grid 0fr → 1fr). */
+.bi .bi-pliego { display: grid; grid-template-rows: 0fr; width: 85%; position: relative; z-index: 1;
+  transition: grid-template-rows 1.8s var(--rollo); }
+.bi-fase-abierto .bi-pliego { grid-template-rows: 1fr; }
+.bi .bi-pliego-in {
+  min-height: 0; overflow: hidden; position: relative;
+  background:
+    var(--grano),
+    linear-gradient(90deg, rgb(150 120 70 / .14), transparent 7%, transparent 93%, rgb(150 120 70 / .14)),
+    radial-gradient(120% 70% at 50% 30%, color-mix(in srgb, var(--tarjeta) 80%, var(--papel)), color-mix(in srgb, var(--papel) 70%, var(--oro-claro)));
+  box-shadow: 0 18px 30px -20px rgb(60 45 15 / .5);
+}
+/* Sombra que el rollo proyecta sobre el papel, en el borde de abajo. */
+.bi .bi-pliego-in::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 28px; pointer-events: none;
+  background: linear-gradient(to top, rgb(90 70 30 / .28), transparent); }
+.bi .bi-pliego-texto { position: relative; padding: 24px 20px 44px; display: flex; flex-direction: column; align-items: center;
+  box-shadow: inset 0 0 0 9px transparent, inset 0 0 0 10px color-mix(in srgb, var(--filete) 70%, transparent), inset 0 0 0 13px transparent, inset 0 0 0 14px color-mix(in srgb, var(--filete) 35%, transparent); }
+
+.bi .bi-cresta { display: flex; align-items: flex-end; justify-content: center; gap: 0; height: 64px; margin-bottom: 4px; }
+.bi .bi-cresta-laurel { width: 30px; height: 56px; }
+.bi .bi-cresta-birrete { width: 68px; height: 56px; margin: 0 -2px; }
+.bi .bi-antetitulo { font: 700 14px/1.3 var(--f-titulo); letter-spacing: .24em; text-transform: uppercase; color: var(--oro-osc); }
+.bi .bi-nombre { font: 400 clamp(46px, 14vw, 60px)/1.08 var(--f-guion); color: var(--azul); margin-top: 6px; overflow-wrap: anywhere; }
+.bi .bi-y { color: var(--oro); }
+.bi .bi-frase { font-size: 18px; line-height: 1.5; font-style: italic; color: var(--tinta); max-width: 26ch; }
+.bi .bi-fecha { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 16px; font: 700 12.5px/1.2 var(--f-titulo); letter-spacing: .14em; text-transform: uppercase; color: var(--oro-osc); }
+.bi .bi-fecha span { padding: 6px 0; border-block: 1px solid var(--filete); min-width: 76px; }
+.bi .bi-fecha b { font: 700 34px/1 var(--f-titulo); color: var(--azul); letter-spacing: 0; }
+.bi .bi-sello { width: 82px; height: auto; margin-top: 12px; margin-bottom: -26px; filter: drop-shadow(0 4px 4px rgb(60 40 10 / .2)); }
+
+/* Rollo: botón grande; baja con el borde del papel y adelgaza. */
+.bi .bi-rollo { position: relative; z-index: 3; display: block; width: 100%; margin-top: -9%; padding: 0; border: 0; background: none; cursor: pointer;
+  animation: bi-flotar 3.6s ease-in-out infinite; }
+.bi .bi-rollo:disabled { cursor: default; animation: none; }
+.bi .bi-rollo svg { display: block; width: 100%; height: auto; overflow: visible; transform-origin: 50% 40%; transition: transform 1.8s var(--rollo); }
+.bi-fase-suelto .bi-rollo svg { transform: scale(1.02); }
+.bi-fase-abierto .bi-rollo svg { transform: scale(.9, .82); }
+.bi-fase-abierto .bi-diploma-sombra { opacity: .4; }
+
+/* La cinta se suelta: el lazo se abre y cae, la banda se desliza. */
+.bi .bi-cinta > g { transform-box: fill-box; transform-origin: 50% 0; transition: transform .7s cubic-bezier(.55, 0, .8, .4), opacity .6s ease .1s; }
+.bi-fase-suelto .bi-cinta-lazo { transform: translate(-10px, 70px) rotate(-30deg); opacity: 0; }
+.bi-fase-suelto .bi-cinta-colas { transform: translate(14px, 90px) rotate(18deg); opacity: 0; }
+.bi-fase-suelto .bi-cinta-banda { transform: translateY(40px) scaleY(.4); opacity: 0; }
+.bi-fase-abierto .bi-cinta { display: none; }
+
+.bi .bi-pie-entrada { position: relative; height: 56px; display: grid; place-items: center; }
+.bi .bi-pie-entrada > * { grid-area: 1 / 1; }
+.bi .bi-desenrollar {
+  min-height: 48px; padding: 10px 26px; border: 1px solid var(--oro); border-radius: 999px; cursor: pointer;
+  font: 600 14px/1.2 var(--f-texto); letter-spacing: .2em; text-transform: uppercase; color: var(--azul); background: color-mix(in srgb, var(--tarjeta) 80%, transparent);
+  box-shadow: inset 0 0 0 3px var(--tarjeta), inset 0 0 0 4px var(--oro-claro), 0 10px 20px -14px var(--oro-osc);
+  transition: opacity .35s ease, transform .35s var(--curva);
+  animation: bi-latido 2.4s ease-in-out infinite;
+}
+.bi:not(.bi-fase-enrollado) .bi-desenrollar { opacity: 0; transform: translateY(8px); pointer-events: none; animation: none; }
+.bi .bi-desliza { display: flex; flex-direction: column; align-items: center; gap: 0; font: 600 12px/1 var(--f-texto); letter-spacing: .3em; text-transform: uppercase; color: var(--oro-osc);
+  opacity: 0; transition: opacity .6s ease 1.6s; }
+.bi .bi-desliza svg { width: 22px; height: 22px; animation: bi-bajar 1.8s ease-in-out infinite; }
+.bi-fase-abierto .bi-desliza { opacity: 1; }
+
+@keyframes bi-flotar { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes bi-latido { 0%, 100% { box-shadow: inset 0 0 0 3px var(--tarjeta), inset 0 0 0 4px var(--oro-claro), 0 10px 20px -14px var(--oro-osc), 0 0 0 0 color-mix(in srgb, var(--oro) 35%, transparent); }
+  50% { box-shadow: inset 0 0 0 3px var(--tarjeta), inset 0 0 0 4px var(--oro-claro), 0 10px 20px -14px var(--oro-osc), 0 0 0 8px transparent; } }
+@keyframes bi-bajar { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+
+/* ---------- Cuerpo: portafolio con pestañas ---------- */
+.bi .bi-cuerpo { max-width: 520px; margin: 0 auto; padding: 14px 16px 96px; }
+
+.bi .bi-emblema { display: flex; align-items: center; justify-content: center; gap: 4px; margin: 4px 0 30px; text-align: center; }
+.bi .bi-emblema-laurel { width: 40px; height: 74px; flex: none; }
+.bi .bi-emblema-birrete { display: block; width: 74px; height: 60px; margin: 0 auto 2px; }
+.bi .bi-emblema-titulo { font: 700 22px/1.2 var(--f-titulo); letter-spacing: .1em; color: var(--azul); }
+.bi .bi-emblema-sub { font-size: 16px; font-style: italic; color: var(--suave); }
+
+.bi .bi-carpeta { display: grid; gap: 30px; }
+
+.bi .bi-hoja { position: relative; padding-right: 36px; }
+/* Hoja de debajo que asoma, girada apenas. */
+.bi .bi-hoja::before {
+  content: ""; position: absolute; z-index: 0; top: 0; bottom: 0; left: 0; right: 36px; border-radius: 3px;
+  background: var(--grano), color-mix(in srgb, var(--papel) 70%, var(--oro-claro));
+  border: 1px solid color-mix(in srgb, var(--oro-claro) 80%, transparent);
+  box-shadow: 0 12px 22px -16px rgb(60 45 15 / .45);
+  transform: translate(5px, 7px) rotate(var(--giro));
+  transition: transform .9s var(--curva) .15s;
+}
+.bi .bi-pestana {
+  position: absolute; z-index: 0; right: 0; top: calc(22px + var(--tab)); width: 42px; padding: 18px 0 16px;
+  writing-mode: vertical-rl; text-orientation: mixed;
+  font: 700 13px/1 var(--f-titulo); letter-spacing: .16em; text-transform: uppercase; white-space: nowrap;
+  border-radius: 0 10px 10px 0; box-shadow: 4px 6px 12px -8px rgb(40 30 10 / .45), inset -1px 0 0 rgb(255 255 255 / .25);
+  transition: transform .7s var(--curva) .35s;
+}
+.bi .bi-pestana span { display: block; padding-left: 4px; }
+.bi .bi-tono-0 .bi-pestana { color: var(--tinta); background: linear-gradient(90deg, color-mix(in srgb, var(--oro) 80%, black), var(--oro) 30%, color-mix(in srgb, var(--oro) 70%, var(--oro-claro))); }
+.bi .bi-tono-1 .bi-pestana { color: var(--papel); background: linear-gradient(90deg, color-mix(in srgb, var(--azul) 75%, black), var(--azul) 30%, color-mix(in srgb, var(--azul) 85%, white)); }
+.bi .bi-tono-2 .bi-pestana { color: var(--oro-osc); background: linear-gradient(90deg, color-mix(in srgb, var(--oro-claro) 75%, var(--oro)), var(--oro-claro) 30%, color-mix(in srgb, var(--oro-claro) 70%, white)); }
+.bi .bi-tono-3 .bi-pestana { color: var(--papel); background: linear-gradient(90deg, color-mix(in srgb, var(--oro-osc) 75%, black), var(--oro-osc) 30%, color-mix(in srgb, var(--oro-osc) 85%, white)); }
+
+.bi .bi-papel {
+  position: relative; z-index: 1; min-height: calc(var(--tab) + 200px); padding: 22px 22px 26px; border-radius: 3px;
+  background: var(--grano), linear-gradient(170deg, var(--tarjeta), var(--hoja) 70%);
+  border: 1px solid color-mix(in srgb, var(--oro-claro) 90%, white);
+  box-shadow: inset 0 0 0 6px transparent, inset 0 0 0 7px color-mix(in srgb, var(--oro-claro) 70%, transparent), 0 16px 26px -20px rgb(60 45 15 / .55);
+}
+.bi .bi-folio { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; font: 400 12px/1 var(--f-titulo); letter-spacing: .2em; text-transform: uppercase; color: var(--oro); }
+.bi .bi-folio::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--oro-claro), transparent); }
+
+/* Aparición: la hoja sube y la pestaña asoma desde debajo del papel. */
+.bi .bi-hoja[data-reveal] { opacity: 0; transform: translateY(22px); transition: opacity .7s var(--curva), transform .8s var(--curva); }
+.bi .bi-hoja[data-reveal] .bi-pestana { transform: translateX(-34px); }
+.bi .bi-hoja[data-reveal]::before { transform: none; }
+.bi .bi-hoja[data-reveal].is-in { opacity: 1; transform: none; }
+.bi .bi-hoja[data-reveal].is-in .bi-pestana { transform: none; }
+.bi .bi-hoja[data-reveal].is-in::before { transform: translate(5px, 7px) rotate(var(--giro)); }
+.bi .bi-emblema[data-reveal], .bi .bi-final[data-reveal] { opacity: 0; transform: translateY(16px); transition: opacity .8s var(--curva), transform .8s var(--curva); }
+.bi .bi-emblema[data-reveal].is-in, .bi .bi-final[data-reveal].is-in { opacity: 1; transform: none; }
+
+/* Contenido de las hojas */
+.bi .bi-fecha-larga { margin-top: 6px; font: 700 18px/1.35 var(--f-titulo); color: var(--azul); }
+.bi .bi-fecha-larga span { text-transform: capitalize; }
+.bi .bi-cuenta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 16px; }
+.bi .bi-cuenta > div { display: grid; justify-items: center; gap: 4px; padding: 10px 2px 8px; background: var(--tarjeta); border: 1px solid var(--oro-claro); box-shadow: inset 0 0 0 3px var(--tarjeta), inset 0 0 0 4px color-mix(in srgb, var(--oro-claro) 55%, transparent); }
+.bi .bi-cuenta .n { font: 700 25px/1 var(--f-titulo); color: var(--azul); font-variant-numeric: tabular-nums; }
+.bi .bi-cuenta .l { font: 600 11px/1 var(--f-texto); letter-spacing: .16em; text-transform: uppercase; color: var(--oro-osc); }
+.bi .bi-llego { margin-top: 12px; font: 400 40px/1.2 var(--f-guion); color: var(--azul); }
+
+.bi .bi-mapa { display: block; width: 100%; height: 190px; margin-top: 14px; border: 1px solid var(--oro-claro); }
+
+.bi .bi-programa { position: relative; margin-top: 12px; padding-left: 22px; display: grid; gap: 14px; }
+.bi .bi-programa::before { content: ""; position: absolute; left: 5px; top: 8px; bottom: 8px; width: 1px; background: linear-gradient(var(--oro), var(--oro-claro)); }
+.bi .bi-programa li { position: relative; display: grid; gap: 1px; }
+.bi .bi-programa li::before { content: ""; position: absolute; left: -21px; top: 5px; width: 9px; height: 9px; background: var(--tarjeta); border: 1.5px solid var(--oro); transform: rotate(45deg); }
+.bi .bi-hora { font: 700 13px/1.3 var(--f-titulo); letter-spacing: .08em; color: var(--oro-osc); }
+.bi .bi-que { font-size: 19px; line-height: 1.3; }
+.bi .bi-copas-programa { display: block; width: 104px; height: auto; margin: 14px auto -6px; }
+
+.bi .bi-paleta { display: grid; gap: 10px; margin-top: 14px; }
+.bi .bi-paleta li { display: flex; align-items: center; gap: 12px; }
+.bi .bi-muestras { display: flex; }
+.bi .bi-muestras i { width: 28px; height: 28px; border-radius: 50%; box-shadow: 0 0 0 2px var(--tarjeta), 0 0 0 3px var(--oro-claro), inset 0 -4px 6px rgb(0 0 0 / .12); }
+.bi .bi-muestras i + i { margin-left: -6px; }
+.bi .bi-k-evitar { margin-top: 18px; }
+.bi .bi-evitar .bi-muestras i { position: relative; }
+.bi .bi-evitar .bi-muestras i::after { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1.5px; background: var(--tinta); transform: rotate(45deg); }
+
+.bi .bi-firmas { display: grid; gap: 0; margin-top: 10px; }
+.bi .bi-firmas span { font: 400 clamp(32px, 9vw, 38px)/1.25 var(--f-guion); color: var(--azul); }
+.bi .bi-grupo { margin-top: 16px; padding-top: 14px; border-top: 1px solid color-mix(in srgb, var(--oro-claro) 80%, transparent); }
+
+.bi .bi-libros { display: block; width: 140px; height: auto; margin: 0 auto 10px; }
+.bi .bi-firma { margin-top: 6px; text-align: right; font: 400 42px/1.1 var(--f-guion); color: var(--azul); }
+
+.bi .bi-fotos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.bi .bi-fotos.is-una { grid-template-columns: 1fr; }
+.bi .bi-fotos figure { padding: 6px 6px 18px; background: var(--tarjeta); box-shadow: 0 8px 16px -10px rgb(40 30 10 / .5); }
+.bi .bi-fotos figure:nth-child(odd) { transform: rotate(-1.2deg); }
+.bi .bi-fotos figure:nth-child(even) { transform: rotate(1.2deg); }
+.bi .bi-fotos img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; }
+.bi .bi-fotos + .bi-lead { margin-top: 14px; }
+
+.bi .bi-transferir { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 16px; padding: 14px; border: 1px dashed var(--oro); background: var(--tarjeta); }
+.bi .bi-transferir > div { flex: 1 1 160px; min-width: 0; display: grid; gap: 4px; }
+.bi .bi-dato { font: 600 18px/1.35 var(--f-texto); overflow-wrap: anywhere; }
+.bi .bi-transferir .bi-btn { flex: 1 1 100%; }
+
+.bi .bi-lista { display: grid; gap: 10px; }
+.bi .bi-lista li { position: relative; padding-left: 22px; }
+.bi .bi-lista li::before { content: ""; position: absolute; left: 2px; top: .55em; width: 7px; height: 7px; background: var(--oro); transform: rotate(45deg); }
+.bi .bi-lista + .bi-ayuda { margin-top: 12px; }
+
+.bi .bi-faq details { padding: 12px 0; border-bottom: 1px solid color-mix(in srgb, var(--oro-claro) 80%, transparent); }
+.bi .bi-faq details:first-child { padding-top: 0; }
+.bi .bi-faq details:last-child { border-bottom: 0; padding-bottom: 0; }
+.bi .bi-faq summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 12px; min-height: 32px; font-weight: 600; font-size: 17.5px; }
+.bi .bi-faq summary::-webkit-details-marker { display: none; }
+.bi .bi-faq summary::after { content: "+"; flex: none; font: 700 20px/1 var(--f-titulo); color: var(--oro); }
+.bi .bi-faq details[open] summary::after { content: "–"; }
+.bi .bi-faq p { margin-top: 6px; color: var(--suave); }
+
+.bi .bi-hoja-rsvp .bi-papel { background: var(--grano), linear-gradient(170deg, var(--tarjeta), color-mix(in srgb, var(--azul) 6%, var(--hoja)) 80%); }
+.bi .bi-rsvp { display: grid; justify-items: center; gap: 8px; text-align: center; padding-top: 4px; }
+.bi .bi-rsvp .bi-ayuda { margin-bottom: 10px; }
+.bi .bi-limite { margin-top: 6px; font-size: 15.5px; color: var(--suave); }
+.bi .bi-limite b { color: var(--tinta); }
+
+.bi .bi-final { margin-top: 56px; text-align: center; }
+.bi .bi-final-arte { display: flex; align-items: flex-end; justify-content: center; gap: 0; }
+.bi .bi-final-laurel { width: 46px; height: 84px; }
+.bi .bi-final-copas { width: 130px; height: auto; margin: 0 -4px; }
+.bi .bi-te-espero { margin-top: 10px; font: 400 clamp(40px, 12vw, 52px)/1.15 var(--f-guion); color: var(--azul); }
+.bi .bi-suena { margin-top: 10px; font-size: 14px; font-style: italic; color: var(--suave); }
+
+/* Música */
+.bi .bi-musica {
+  position: fixed; right: 14px; bottom: 14px; z-index: 20; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px;
+  border: 1px solid var(--oro); border-radius: 999px; background: color-mix(in srgb, var(--tarjeta) 90%, transparent); backdrop-filter: blur(6px);
+  color: var(--azul); font: 600 13px var(--f-texto); letter-spacing: .12em; text-transform: uppercase; cursor: pointer; box-shadow: 0 8px 18px -12px rgb(40 30 10 / .5);
+}
+.bi .bi-musica svg { width: 18px; height: 18px; }
+
+.bi .bi-aviso { position: fixed; z-index: 30; left: 16px; right: 16px; bottom: 70px; max-width: 420px; margin: 0 auto; padding: 12px 16px; border-radius: 2px;
+  background: var(--azul); color: var(--papel); font: 600 15px/1.4 var(--f-texto); text-align: center; opacity: 0; transform: translateY(12px); pointer-events: none; transition: opacity .2s, transform .2s; }
+.bi .bi-aviso.is-visible { opacity: 1; transform: none; }
+
+/* ---------- Modal RSVP: el formulario común con la ropa del diseño ---------- */
+.bi .bi-modal { position: fixed; inset: 0; z-index: 80; display: flex; align-items: flex-end; justify-content: center; background: rgb(25 30 45 / .5); animation: bi-fundido .25s ease; }
+.bi .bi-modal-caja { position: relative; width: 100%; max-width: 520px; max-height: 92svh; overflow: auto; background: var(--grano), var(--papel); border-top: 3px solid var(--azul); animation: bi-subir .4s var(--curva); }
+@media (min-width: 600px) { .bi .bi-modal { align-items: center; } .bi .bi-modal-caja { border: 1px solid var(--filete); border-top: 3px solid var(--azul); } }
+.bi .bi-cerrar { position: absolute; z-index: 2; top: 10px; right: 12px; width: 44px; height: 44px; border: 1px solid var(--oro-claro); border-radius: 2px; background: var(--tarjeta); color: var(--azul); font-size: 26px; line-height: 1; cursor: pointer; }
+.bi .bi-modal-cabeza { display: grid; justify-items: center; gap: 2px; padding-top: 22px; }
+.bi .bi-modal-birrete { width: 64px; height: 52px; }
+.bi .bi-modal-cabeza p { font: 700 15px/1 var(--f-titulo); letter-spacing: .32em; color: var(--oro-osc); }
+.bi .bi-modal #rsvp { padding: 10px 22px 36px; border-top: 0; font-family: var(--f-texto); color: var(--tinta); }
+.bi .bi-modal #rsvp img { display: none; }
+.bi .bi-modal #rsvp .font-mono { font-family: var(--f-texto); letter-spacing: .2em; }
+.bi .bi-modal #rsvp p.font-mono, .bi .bi-modal #rsvp span.font-mono { font-size: 12.5px; font-weight: 600; color: var(--oro-osc); }
+.bi .bi-modal #rsvp h2 { font-family: var(--f-guion); font-weight: 400; font-size: clamp(36px, 10vw, 44px); line-height: 1.2; color: var(--azul); margin: 6px 0 4px; }
+.bi .bi-modal #rsvp .font-body { font-family: var(--f-texto); font-size: 18px; font-weight: 500; color: var(--tinta); }
+.bi .bi-modal #rsvp p.text-xs, .bi .bi-modal #rsvp p.text-sm { font-size: 16px; line-height: 1.55; color: var(--suave); }
+.bi .bi-modal #rsvp .divide-y > * { padding-block: 16px; }
+.bi .bi-modal #rsvp .divide-y, .bi .bi-modal #rsvp .divide-y > * + * { border-color: color-mix(in srgb, var(--oro-claro) 90%, transparent); }
+.bi .bi-modal #rsvp button[aria-pressed] { width: 64px; min-height: 44px; border-radius: 2px; font: 600 14px/1 var(--f-texto); letter-spacing: .12em; text-transform: uppercase;
+  border: 1px solid var(--oro); background: var(--tarjeta); color: var(--oro-osc); }
+.bi .bi-modal #rsvp button[aria-pressed="true"]:first-child { background: var(--azul); color: var(--papel); border-color: var(--azul); }
+.bi .bi-modal #rsvp button[aria-pressed="true"]:last-child { background: var(--oro-osc); color: var(--papel); border-color: var(--oro-osc); }
+.bi .bi-modal #rsvp form > div > button[type="button"]:not([aria-pressed]), .bi .bi-modal #rsvp .border-dashed {
+  min-height: 44px; border-radius: 2px; padding: 11px 18px; font: 600 13.5px/1.2 var(--f-texto); letter-spacing: .1em; color: var(--oro-osc); border-color: var(--oro); }
+.bi .bi-modal #rsvp input[type="text"], .bi .bi-modal #rsvp textarea { font: 17px/1.4 var(--f-texto); color: var(--tinta);
+  padding: 12px 14px; border: 1px solid var(--oro-claro); border-radius: 2px; background: var(--tarjeta); }
+.bi .bi-modal #rsvp input[type="text"]:focus, .bi .bi-modal #rsvp textarea:focus { border-color: var(--oro); box-shadow: 0 0 0 3px color-mix(in srgb, var(--oro) 18%, transparent); }
+.bi .bi-modal #rsvp label > span.font-mono { display: block; margin-bottom: 4px; }
+.bi .bi-modal #rsvp button[type="submit"] { position: relative; min-height: 56px; border-radius: 2px; border: 0; font: 600 14px/1.2 var(--f-texto); letter-spacing: .24em; color: var(--papel);
+  background: var(--azul); box-shadow: inset 0 0 0 5px var(--azul), inset 0 0 0 6px color-mix(in srgb, var(--oro-claro) 75%, transparent), 0 14px 24px -14px var(--azul); }
+.bi .bi-modal #rsvp button[type="submit"]:disabled { opacity: .4; }
+.bi .bi-modal #rsvp .border-gold\/40 { border-color: var(--filete); background: var(--tarjeta); }
+@keyframes bi-fundido { from { opacity: 0; } to { opacity: 1; } }
+@keyframes bi-subir { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .bi .bi-rollo, .bi .bi-desenrollar, .bi .bi-desliza svg { animation: none; }
+  .bi .bi-pliego, .bi .bi-rollo svg, .bi .bi-rizo, .bi .bi-cinta > g, .bi .bi-desliza { transition: none; }
+  .bi .bi-hoja[data-reveal], .bi .bi-emblema[data-reveal], .bi .bi-final[data-reveal], .bi .bi-hoja[data-reveal] .bi-pestana { opacity: 1; transform: none; transition: none; }
+  .bi .bi-hoja::before { transition: none; }
+  .bi .bi-hoja[data-reveal]::before { transform: translate(5px, 7px) rotate(var(--giro)); }
+}

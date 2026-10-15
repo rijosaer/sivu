@@ -209,6 +209,7 @@ export function MdFuegos({ className = "" }) {
             <line className="md-cohete" x1={e.x + (k % 2 ? 10 : -10)} y1="430" x2={e.x} y2={e.y} pathLength="100" stroke={color} strokeWidth="1.4" strokeLinecap="round" />
             <g transform={`translate(${e.x} ${e.y})`}>
               <circle className="md-destello" r={e.r * 0.5} fill={`url(#${id.centro})`} />
+              <circle className="md-nucleo" r="3.2" fill="#FFF8E6" />
               <g filter={`url(#${id.brillo})`}>
                 {Array.from({ length: e.n }, (_, i) => {
                   const ang = (360 / e.n) * i + azar(k * 40 + i) * 8;
@@ -217,7 +218,7 @@ export function MdFuegos({ className = "" }) {
                     <g key={i} transform={`rotate(${ang})`}>
                       <g className="md-caida">
                         <line className="md-estela" x1="4" y1="0" x2={largo} y2="0" pathLength="100" stroke={color} strokeWidth={i % 3 ? 1.1 : 1.6} strokeLinecap="round" />
-                        <circle className="md-chispa" cx={largo} cy="0" r={i % 3 ? 1.5 : 2.2} fill={i % 2 ? "#FFF7E2" : color} />
+                        <circle className="md-chispa" cx="0" cy="0" r={i % 3 ? 1.5 : 2.2} fill={i % 2 ? "#FFF7E2" : color} style={{ "--l": `${largo.toFixed(1)}px` }} />
                       </g>
                     </g>
                   );

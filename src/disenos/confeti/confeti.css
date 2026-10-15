@@ -1,0 +1,405 @@
+/* Diseño «Confeti»: cumpleaños alegre pero elegante. Globos durazno, rubor,
+   crema y oro sobre papel crema, confeti dorado y polaroids colgadas de un
+   cordel con pinzas de madera.
+   Letras propias: Cookie (cursiva de pincel con cuerpo: nombres y títulos a
+   mano en las polaroids), Abril Fatface (display con mucho contraste: la edad
+   y las cifras) y Poppins (texto). El tema puede cambiarlas (fuente-guion,
+   fuente-titulos, fuente-cuerpo). Todo el color sale del tema. */
+.cf {
+  /* principal = durazno, claro = rubor, oscuro = terracota, papel = crema,
+     mármol = blanco de las polaroids, sello = oro del confeti. */
+  --papel: rgb(var(--color-paper));
+  --tinta: rgb(var(--color-ink));
+  --durazno: rgb(var(--color-gold));
+  --rubor: rgb(var(--color-gold-light));
+  --terracota: rgb(var(--color-gold-dark));
+  --blanco: rgb(var(--color-marble));
+  --oro: rgb(var(--color-seal));
+  --suave: color-mix(in srgb, var(--tinta) 74%, white);
+  --rotulo: color-mix(in srgb, var(--terracota) 78%, var(--tinta));
+  --oro-brillo: linear-gradient(135deg, color-mix(in srgb, var(--oro) 40%, white) 0%, var(--oro) 42%, color-mix(in srgb, var(--oro) 72%, var(--tinta)) 100%);
+  --boton: linear-gradient(135deg, color-mix(in srgb, var(--terracota) 92%, white), color-mix(in srgb, var(--terracota) 80%, var(--tinta)));
+  --grano: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .3 0 0 0 0 .25 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  /* Confeti impreso muy suave en el papel de fondo */
+  --motas:
+    radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--oro) 55%, transparent) 0 2px, transparent 2.5px),
+    radial-gradient(circle at 78% 9%, color-mix(in srgb, var(--durazno) 60%, transparent) 0 2.5px, transparent 3px),
+    radial-gradient(circle at 92% 46%, color-mix(in srgb, var(--oro) 50%, transparent) 0 1.8px, transparent 2.3px),
+    radial-gradient(circle at 30% 64%, color-mix(in srgb, var(--durazno) 50%, transparent) 0 2px, transparent 2.5px),
+    radial-gradient(circle at 6% 88%, color-mix(in srgb, var(--oro) 50%, transparent) 0 2.2px, transparent 2.7px),
+    radial-gradient(circle at 60% 82%, color-mix(in srgb, var(--rubor) 90%, transparent) 0 3px, transparent 3.5px);
+
+  --f-guion: var(--fuente-guion, "Cookie"), "Great Vibes", cursive;
+  --f-titulo: var(--fuente-titulos, "Abril Fatface"), "Playfair Display", Georgia, serif;
+  --f-texto: var(--fuente-cuerpo, "Poppins"), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --curva: cubic-bezier(.16, 1, .3, 1);
+
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow-x: hidden;
+  color: var(--tinta);
+  font-family: var(--f-texto);
+  font-size: 15.5px;
+  font-weight: 400;
+  line-height: 1.6;
+  background:
+    var(--grano),
+    var(--motas),
+    radial-gradient(70% 30% at 100% 0%, color-mix(in srgb, var(--rubor) 70%, transparent), transparent 70%),
+    radial-gradient(70% 30% at 0% 60%, color-mix(in srgb, var(--rubor) 50%, transparent), transparent 70%),
+    var(--papel);
+  background-size: 180px 180px, 240px 300px, 100% 100%, 100% 100%, auto;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+.cf *, .cf *::before, .cf *::after { box-sizing: border-box; }
+.cf h1, .cf h2, .cf p, .cf figure, .cf ol, .cf ul { margin: 0; }
+.cf ol, .cf ul { padding: 0; list-style: none; }
+.cf svg[aria-hidden="true"] { pointer-events: none; }
+.cf :focus-visible { outline: 2px solid var(--terracota); outline-offset: 3px; }
+.cf .cf-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Piezas comunes ---------- */
+.cf .cf-etiqueta { font: 500 11.5px/1.4 var(--f-texto); letter-spacing: .3em; text-transform: uppercase; color: var(--rotulo); }
+.cf .cf-k { font: 600 11px/1.4 var(--f-texto); letter-spacing: .24em; text-transform: uppercase; color: var(--rotulo); }
+.cf .cf-v { font: 400 23px/1.25 var(--f-titulo); color: var(--tinta); overflow-wrap: anywhere; }
+.cf .cf-texto { color: var(--suave); font-size: 14.5px; line-height: 1.55; }
+.cf .cf-lead { font-size: 15.5px; line-height: 1.6; color: var(--tinta); }
+
+.cf .cf-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 46px; padding: 10px 20px; border: 0; border-radius: 999px; cursor: pointer;
+  font: 500 14px/1.2 var(--f-texto); letter-spacing: .02em; color: #fff; background: var(--boton); text-decoration: none;
+  box-shadow: 0 10px 18px -12px var(--terracota);
+  transition: transform .2s var(--curva), filter .2s var(--curva);
+}
+.cf .cf-btn svg { width: 18px; height: 18px; flex: none; }
+.cf .cf-btn:active { transform: scale(.97); }
+@media (hover: hover) { .cf .cf-btn:hover { filter: brightness(1.06); } }
+.cf .cf-btn-linea { color: var(--rotulo); background: var(--blanco); border: 1.5px solid var(--durazno); box-shadow: none; }
+.cf .cf-botones { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 16px; }
+
+.cf .cf-musica {
+  position: fixed; z-index: 45; top: 12px; right: 12px;
+  display: inline-flex; align-items: center; gap: 7px; height: 44px; padding: 0 16px 0 12px;
+  border: 1px solid color-mix(in srgb, var(--durazno) 70%, transparent); border-radius: 999px;
+  background: color-mix(in srgb, var(--blanco) 92%, transparent); color: var(--rotulo);
+  font: 500 13px/1 var(--f-texto); cursor: pointer; backdrop-filter: blur(6px);
+  box-shadow: 0 6px 18px -10px var(--terracota);
+}
+.cf .cf-musica svg { width: 18px; height: 18px; }
+.cf .cf-musica[aria-pressed="true"] { background: var(--boton); color: #fff; border-color: transparent; }
+
+/* ---------- Confeti (piezas) ---------- */
+.cf .cf-pieza { position: absolute; display: block; width: calc(8px * var(--tam)); height: calc(14px * var(--tam)); }
+.cf .cf-pieza b { display: block; width: 100%; height: 100%; border-radius: 1.5px; background: var(--color-pieza); }
+.cf .cf-punto { height: calc(8px * var(--tam)); }
+.cf .cf-punto b { border-radius: 50%; }
+.cf .cf-rombo { width: calc(9px * var(--tam)); height: calc(9px * var(--tam)); }
+.cf .cf-rombo b { transform: rotate(45deg) scale(.8); border-radius: 1px; }
+/* Serpentina rizada: un arco de cinta */
+.cf .cf-rizo { width: calc(16px * var(--tam)); height: calc(10px * var(--tam)); }
+.cf .cf-rizo b { background: none; border: calc(2.6px * var(--tam)) solid var(--color-solido); border-color: var(--color-solido) transparent transparent transparent; border-radius: 50%; }
+.cf .cf-c-oro { --color-pieza: var(--oro-brillo); --color-solido: var(--oro); }
+.cf .cf-c-durazno { --color-pieza: linear-gradient(135deg, color-mix(in srgb, var(--durazno) 70%, white), var(--durazno)); --color-solido: var(--durazno); }
+.cf .cf-c-claro { --color-pieza: var(--rubor); --color-solido: color-mix(in srgb, var(--rubor) 70%, var(--durazno)); }
+.cf .cf-c-oscuro { --color-pieza: color-mix(in srgb, var(--terracota) 80%, var(--durazno)); --color-solido: var(--terracota); }
+.cf .cf-c-blanco { --color-pieza: linear-gradient(135deg, #fff, color-mix(in srgb, var(--rubor) 40%, white)); --color-solido: #fff; }
+
+.cf .cf-lluvia { position: fixed; inset: 0; z-index: 60; overflow: hidden; pointer-events: none; }
+.cf .cf-lluvia .cf-pieza b { animation: cf-aleteo var(--aleteo) linear infinite; }
+/* Primera ola: sale del globo hacia afuera y luego cae girando. */
+.cf .cf-sale { left: 50%; top: 52%; opacity: 0; animation: cf-estallido var(--dur) forwards; }
+@keyframes cf-estallido {
+  0% { opacity: 1; transform: translate(0, 0) scale(.3); animation-timing-function: cubic-bezier(.1, .75, .3, 1); }
+  16% { opacity: 1; transform: translate(var(--bx), var(--by)) scale(1) rotate(calc(var(--gira) * .2)); animation-timing-function: cubic-bezier(.45, 0, .85, .6); }
+  88% { opacity: 1; }
+  100% { opacity: 0; transform: translate(calc(var(--bx) + var(--sx)), 62svh) rotate(var(--gira)); }
+}
+/* Segunda ola: lluvia desde arriba, con un vaivén lateral. */
+.cf .cf-cae { top: -24px; opacity: 0; animation: cf-cae var(--dur) cubic-bezier(.35, .05, .65, 1) var(--retraso) forwards; }
+@keyframes cf-cae {
+  0% { opacity: 1; transform: translate(0, 0) rotate(0); }
+  50% { transform: translate(calc(var(--sx) * -.5), 55svh) rotate(calc(var(--gira) * .5)); }
+  90% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--sx), 108svh) rotate(var(--gira)); }
+}
+@keyframes cf-aleteo { from { transform: rotate3d(1, .4, 0, 0deg); } to { transform: rotate3d(1, .4, 0, 360deg); } }
+
+/* ---------- Entrada: «¡Revienta el globo!» ---------- */
+.cf .cf-entrada {
+  position: fixed; inset: 0; z-index: 50; overflow: hidden auto;
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  padding: max(34px, env(safe-area-inset-top)) 20px 34px; text-align: center;
+  background:
+    var(--grano),
+    radial-gradient(60% 40% at 50% 52%, color-mix(in srgb, var(--rubor) 85%, transparent), transparent 75%),
+    radial-gradient(90% 30% at 50% 100%, color-mix(in srgb, var(--rubor) 60%, transparent), transparent 80%),
+    var(--papel);
+  background-size: 180px 180px, auto, auto, auto;
+}
+.cf .cf-entrada.cf-reventado { animation: cf-desvanece .7s ease .55s forwards; }
+@keyframes cf-desvanece { to { opacity: 0; visibility: hidden; } }
+.cf .cf-fondo-globos { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.cf .cf-globito { position: absolute; width: 74px; opacity: .55; filter: blur(.6px); animation: cf-sube 9s ease-in-out infinite alternate; }
+.cf .cf-globito-1 { left: -12px; top: 22%; width: 82px; }
+.cf .cf-globito-2 { right: -8px; top: 10%; width: 64px; animation-delay: -3s; opacity: .5; }
+.cf .cf-globito-3 { right: 14px; bottom: 6%; width: 70px; animation-delay: -6s; opacity: .6; }
+@keyframes cf-sube { from { transform: translateY(0) rotate(-4deg); } to { transform: translateY(-26px) rotate(4deg); } }
+
+.cf .cf-entrada-arriba, .cf .cf-entrada-abajo { position: relative; z-index: 2; transition: opacity .3s ease, transform .3s ease; }
+.cf .cf-reventado .cf-entrada-arriba, .cf .cf-reventado .cf-entrada-abajo { opacity: 0; transform: scale(.96); }
+.cf .cf-invitado { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.cf .cf-invitado-nombre { font: 400 clamp(40px, 12vw, 52px)/1.1 var(--f-guion); color: var(--rotulo); overflow-wrap: anywhere; }
+.cf .cf-pases {
+  display: inline-block; margin-top: 8px; padding: 6px 16px; border-radius: 999px;
+  font: 500 13px/1.3 var(--f-texto); color: var(--rotulo); background: var(--blanco);
+  border: 1px solid color-mix(in srgb, var(--oro) 70%, transparent); box-shadow: 0 6px 16px -10px var(--terracota);
+}
+
+.cf .cf-globo-zona { position: relative; z-index: 1; flex: 1; display: grid; place-items: center; width: 100%; min-height: 300px; }
+.cf .cf-halo { position: absolute; left: 50%; top: 46%; width: 240px; height: 240px; transform: translate(-50%, -50%); border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--durazno) 35%, transparent), transparent); animation: cf-latido 2.8s ease-in-out infinite; }
+@keyframes cf-latido { 0%, 100% { opacity: .55; transform: translate(-50%, -50%) scale(.92); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.06); } }
+.cf .cf-globo-btn { position: relative; padding: 0; border: 0; background: none; cursor: pointer; width: min(220px, 56vw); touch-action: manipulation;
+  transform-origin: 50% 100%; animation: cf-vaiven 4.6s ease-in-out infinite; }
+.cf .cf-globo-grande { display: block; width: 100%; height: auto; filter: drop-shadow(0 22px 22px color-mix(in srgb, var(--terracota) 30%, transparent)); transform-origin: 50% 35%; }
+@keyframes cf-vaiven {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-14px) rotate(3deg); }
+}
+@media (hover: hover) { .cf .cf-globo-btn:hover .cf-globo-grande { transform: scale(1.03); transition: transform .3s var(--curva); } }
+/* Al tocarlo: se infla de golpe y desaparece. */
+.cf .cf-reventado .cf-globo-btn { animation-play-state: paused; pointer-events: none; }
+.cf .cf-reventado .cf-globo-grande { animation: cf-revienta .26s cubic-bezier(.5, 0, .9, .5) forwards; }
+@keyframes cf-revienta {
+  0% { transform: scale(1); opacity: 1; }
+  70% { transform: scale(1.14, 1.1); opacity: 1; }
+  100% { transform: scale(1.32); opacity: 0; }
+}
+/* El ¡pum!: un anillo de aire y un destello. */
+.cf .cf-pum { position: absolute; left: 50%; top: 38%; width: 180px; height: 180px; margin: -90px 0 0 -90px; border-radius: 50%; opacity: 0; pointer-events: none;
+  border: 3px solid color-mix(in srgb, var(--oro) 80%, white);
+  background: radial-gradient(closest-side, rgb(255 255 255 / .9), color-mix(in srgb, var(--rubor) 50%, transparent) 60%, transparent); }
+.cf .cf-reventado .cf-pum { animation: cf-pum .55s ease-out .2s forwards; }
+@keyframes cf-pum { 0% { opacity: 1; transform: scale(.4); } 100% { opacity: 0; transform: scale(2.2); border-width: 1px; } }
+.cf .cf-pedazos { position: absolute; left: 50%; top: 38%; width: 0; height: 0; pointer-events: none; }
+.cf .cf-pedazos svg { position: absolute; width: 26px; height: 20px; margin: -10px 0 0 -13px; opacity: 0; fill: var(--durazno);
+  filter: drop-shadow(0 2px 2px color-mix(in srgb, var(--terracota) 40%, transparent)); }
+.cf .cf-reventado .cf-pedazos svg { animation: cf-pedazo .6s cubic-bezier(.15, .8, .35, 1) .22s forwards; }
+@keyframes cf-pedazo {
+  0% { opacity: 1; transform: translate(0, 0) rotate(0) scale(.6); }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), calc(var(--dy) + 30px)) rotate(var(--gira)) scale(1); }
+}
+
+.cf .cf-revienta { font: 400 clamp(44px, 13vw, 54px)/1.05 var(--f-guion); color: var(--rotulo); }
+.cf .cf-pista { margin-top: 6px; font: 400 13.5px/1.4 var(--f-texto); letter-spacing: .04em; color: var(--suave); }
+
+/* ---------- Tarjeta (lo que descubre el confeti) ---------- */
+.cf .cf-cuerpo { max-width: 520px; margin: 0 auto; padding: 70px 16px 110px; }
+.cf .cf-portada { position: relative; padding-top: 34px; }
+.cf .cf-portada-ramo { position: absolute; z-index: 2; right: -14px; top: -40px; width: 132px; height: auto; transform: rotate(8deg);
+  filter: drop-shadow(0 12px 14px color-mix(in srgb, var(--terracota) 22%, transparent)); animation: cf-ramo 6s ease-in-out infinite alternate; transform-origin: 50% 100%; }
+@keyframes cf-ramo { from { transform: rotate(6deg) translateY(0); } to { transform: rotate(10deg) translateY(-8px); } }
+.cf .cf-tarjeta {
+  position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 46px 22px 30px; border-radius: 6px; background: var(--grano), var(--blanco);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--rubor) 80%, transparent), 0 24px 40px -26px color-mix(in srgb, var(--terracota) 70%, transparent), 0 4px 12px -6px rgb(0 0 0 / .08);
+  animation: cf-descubre 1s var(--curva) .35s both;
+}
+.cf .cf-tarjeta::before { content: ""; position: absolute; inset: 9px; border: 1px solid color-mix(in srgb, var(--oro) 70%, transparent); border-radius: 3px; pointer-events: none; }
+@keyframes cf-descubre { from { opacity: 0; transform: translateY(26px) scale(.94); } to { opacity: 1; transform: none; } }
+.cf .cf-impreso { opacity: .8; }
+.cf .cf-tarjeta > :not(.cf-impreso) { position: relative; }
+.cf .cf-nombre { margin-top: 8px; font: 400 clamp(64px, 20vw, 84px)/.95 var(--f-guion); color: var(--rotulo); overflow-wrap: anywhere; }
+.cf .cf-edad { display: flex; align-items: flex-end; justify-content: center; gap: 6px; margin-top: 2px; }
+.cf .cf-edad b {
+  font: 400 clamp(110px, 34vw, 140px)/.9 var(--f-titulo); letter-spacing: -.01em;
+  background: var(--oro-brillo); -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 6px 8px color-mix(in srgb, var(--oro) 30%, transparent));
+}
+.cf .cf-edad span { margin-bottom: 18px; font: 400 34px/1 var(--f-guion); color: var(--rotulo); }
+.cf .cf-festejados { display: grid; gap: 14px; width: 100%; margin-top: 10px; }
+.cf .cf-festejados li { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.cf .cf-festejados li + li { padding-top: 12px; border-top: 1px dashed color-mix(in srgb, var(--oro) 60%, transparent); }
+.cf .cf-nombre-chico { margin: 0; font-size: clamp(44px, 13vw, 54px); }
+.cf .cf-edad-chica { margin: 0; }
+.cf .cf-edad-chica b { font-size: 62px; }
+.cf .cf-edad-chica span { font-size: 24px; margin-bottom: 8px; }
+.cf .cf-frase { max-width: 290px; margin-top: 14px; color: var(--suave); font-size: 15px; line-height: 1.6; }
+.cf .cf-fecha { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 14px; width: 100%; max-width: 300px; margin-top: 22px; }
+.cf .cf-fecha span { padding: 8px 0; border-block: 1px solid color-mix(in srgb, var(--oro) 70%, transparent); font: 500 12px/1.3 var(--f-texto); letter-spacing: .18em; text-transform: uppercase; color: var(--rotulo); }
+.cf .cf-fecha b { font: 400 54px/1 var(--f-titulo); color: var(--tinta); }
+.cf .cf-fecha em { grid-column: 1 / -1; font: 500 12.5px/1 var(--f-texto); font-style: normal; letter-spacing: .32em; text-transform: uppercase; color: var(--suave); }
+
+/* ---------- Cuerpo: polaroids colgadas del cordel ---------- */
+.cf .cf-tendedero { display: grid; gap: 34px; margin-top: 50px; }
+.cf .cf-colgada { position: relative; padding-top: 26px; }
+.cf .cf-cordel { position: absolute; left: 0; top: 0; width: 100%; height: 40px; overflow: visible; }
+.cf .cf-cordel path { fill: none; stroke: color-mix(in srgb, var(--terracota) 55%, var(--oro)); stroke-width: 1.3px; stroke-linecap: round; }
+.cf .cf-polaroid {
+  position: relative; width: 90%; padding: 14px 14px 0; background: var(--grano), var(--blanco); border-radius: 2px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / .06), 0 18px 30px -18px color-mix(in srgb, var(--terracota) 65%, transparent), 0 6px 12px -8px rgb(0 0 0 / .12);
+  transform-origin: 50% -12px; rotate: var(--giro);
+}
+.cf .cf-izq .cf-polaroid { margin-left: 1%; }
+.cf .cf-der .cf-polaroid { margin-left: 9%; }
+.cf .cf-pinza { position: absolute; z-index: 3; left: 50%; top: -26px; width: 20px; height: 50px; margin-left: -10px; }
+/* La «foto» de la instantánea: un fondo cálido con brillo, como papel fotográfico. */
+.cf .cf-foto {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 26px 18px 24px; text-align: center;
+  background:
+    var(--grano),
+    radial-gradient(120% 70% at 20% 0%, rgb(255 255 255 / .75), transparent 60%),
+    radial-gradient(90% 80% at 100% 100%, color-mix(in srgb, var(--durazno) 28%, transparent), transparent 70%),
+    color-mix(in srgb, var(--rubor) 55%, var(--papel));
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / .04), inset 0 2px 10px color-mix(in srgb, var(--terracota) 14%, transparent);
+}
+.cf .cf-pie { display: flex; align-items: center; justify-content: center; min-height: 72px; padding: 6px 8px 10px; font: 400 38px/1 var(--f-guion); color: var(--rotulo); text-align: center; rotate: -1.5deg; }
+
+/* Aparición: la polaroid baja y se mece hasta quedar quieta. */
+.cf .cf-colgada[data-reveal] { opacity: 0; transition: opacity .5s ease; }
+.cf .cf-colgada[data-reveal].is-in { opacity: 1; }
+.cf .cf-colgada.is-in .cf-polaroid { animation: cf-columpio 1.8s var(--curva) both; }
+@keyframes cf-columpio {
+  0% { rotate: calc(var(--giro) + 10deg); translate: 0 -18px; }
+  28% { rotate: calc(var(--giro) - 6deg); translate: 0 0; }
+  52% { rotate: calc(var(--giro) + 3deg); }
+  74% { rotate: calc(var(--giro) - 1.2deg); }
+  100% { rotate: var(--giro); }
+}
+
+/* Contenido de cada polaroid */
+.cf .cf-pastel { width: 150px; height: auto; margin: -6px 0 2px; filter: drop-shadow(0 8px 10px color-mix(in srgb, var(--terracota) 20%, transparent)); }
+.cf .cf-llama { transform-box: fill-box; transform-origin: 50% 100%; animation: cf-llama 1.4s ease-in-out infinite alternate; }
+.cf .cf-llama-halo { animation: cf-halo-llama 1.4s ease-in-out infinite alternate; }
+@keyframes cf-llama { from { transform: scale(1, 1) skewX(-3deg); } to { transform: scale(.9, 1.1) skewX(3deg); } }
+@keyframes cf-halo-llama { from { opacity: .7; } to { opacity: 1; } }
+.cf .cf-cuenta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; width: 100%; margin-top: 4px; }
+.cf .cf-cuenta div { display: flex; flex-direction: column; align-items: center; padding: 10px 0 8px; border-radius: 4px; background: rgb(255 255 255 / .62); }
+.cf .cf-cuenta .n { font: 400 30px/1.1 var(--f-titulo); color: var(--tinta); font-variant-numeric: tabular-nums; }
+.cf .cf-cuenta .l { font: 500 10.5px/1.4 var(--f-texto); letter-spacing: .16em; text-transform: uppercase; color: var(--rotulo); }
+
+.cf .cf-icono-grande { display: grid; place-items: center; width: 50px; height: 50px; border-radius: 50%; background: rgb(255 255 255 / .7); color: var(--rotulo); margin-bottom: 4px; }
+.cf .cf-icono-grande svg { width: 24px; height: 24px; }
+.cf .cf-mapa { width: 100%; height: 180px; margin-top: 10px; border: 0; border-radius: 4px; }
+
+.cf .cf-programa { width: 100%; text-align: left; }
+.cf .cf-programa li { position: relative; display: grid; grid-template-columns: 92px 1fr; align-items: baseline; gap: 12px; padding: 10px 0 10px; }
+.cf .cf-programa li + li { border-top: 1px dashed color-mix(in srgb, var(--terracota) 30%, transparent); }
+.cf .cf-hora { font: 600 12.5px/1.3 var(--f-texto); letter-spacing: .06em; color: var(--rotulo); text-align: right; white-space: nowrap; }
+.cf .cf-que { font: 400 18px/1.25 var(--f-titulo); color: var(--tinta); }
+
+.cf .cf-paletas { display: grid; gap: 10px; margin-top: 10px; }
+.cf .cf-paletas li { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 13.5px; color: var(--suave); }
+.cf .cf-gotas { display: flex; gap: 6px; }
+.cf .cf-gotas i { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 6px rgb(0 0 0 / .14); }
+.cf .cf-evitar { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 12px; margin-top: 12px; font-size: 13.5px; color: var(--suave); }
+.cf .cf-evitar-item { display: inline-flex; align-items: center; gap: 6px; }
+.cf .cf-evitar-item i { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid #fff; box-shadow: 0 1px 4px rgb(0 0 0 / .18); }
+
+.cf .cf-grupo + .cf-grupo { margin-top: 12px; }
+.cf .cf-persona { font: 400 20px/1.35 var(--f-titulo); color: var(--tinta); }
+
+.cf .cf-carta { font-size: 15.5px; line-height: 1.75; color: var(--tinta); text-align: left; }
+.cf .cf-firma { align-self: flex-end; margin-top: 4px; font: 400 34px/1 var(--f-guion); color: var(--rotulo); }
+
+.cf .cf-regalo { width: 132px; height: auto; margin: -4px 0 4px; filter: drop-shadow(0 8px 10px color-mix(in srgb, var(--terracota) 18%, transparent)); }
+.cf .cf-transferir { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; margin-top: 12px; padding: 14px 12px; border-radius: 4px;
+  background: rgb(255 255 255 / .72); border: 1px dashed color-mix(in srgb, var(--oro) 80%, transparent); }
+.cf .cf-transferir-v { font: 400 18px/1.35 var(--f-titulo); color: var(--tinta); overflow-wrap: anywhere; }
+.cf .cf-transferir .cf-btn { margin-top: 4px; }
+
+.cf .cf-lista { display: grid; gap: 10px; text-align: left; }
+.cf .cf-lista li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.55; }
+.cf .cf-lista li::before { content: ""; position: absolute; left: 2px; top: .45em; width: 9px; height: 9px; border-radius: 1px; background: var(--oro-brillo); rotate: 45deg; }
+
+.cf .cf-faq { width: 100%; text-align: left; }
+.cf .cf-faq details { border-bottom: 1px dashed color-mix(in srgb, var(--terracota) 30%, transparent); }
+.cf .cf-faq details:last-child { border-bottom: 0; }
+.cf .cf-faq summary { position: relative; display: flex; align-items: center; min-height: 48px; padding: 10px 30px 10px 0; font-weight: 500; font-size: 15px; line-height: 1.4; cursor: pointer; list-style: none; }
+.cf .cf-faq summary::-webkit-details-marker { display: none; }
+.cf .cf-faq summary::after { content: "+"; position: absolute; right: 4px; font: 400 24px/1 var(--f-titulo); color: var(--rotulo); transition: rotate .25s var(--curva); }
+.cf .cf-faq details[open] summary::after { rotate: 45deg; }
+.cf .cf-faq details p { padding: 0 0 14px; color: var(--suave); font-size: 14.5px; }
+
+.cf .cf-btn-grande { width: 100%; min-height: 54px; margin-top: 12px; font-size: 15px; font-weight: 600; letter-spacing: .03em; }
+.cf .cf-btn-grande b { font-weight: 600; white-space: nowrap; }
+.cf .cf-btn-grande span { font-weight: 400; }
+.cf .cf-limite { margin-top: 10px; font-size: 13.5px; color: var(--suave); }
+.cf .cf-limite b { color: var(--tinta); font-weight: 600; }
+
+/* Fotos del evento: polaroids pequeñas, de a dos por cordel. */
+.cf .cf-album { display: grid; gap: 10px; text-align: center; }
+.cf .cf-album[data-reveal] { opacity: 0; transform: translateY(16px); transition: opacity .7s var(--curva), transform .7s var(--curva); }
+.cf .cf-album[data-reveal].is-in { opacity: 1; transform: none; }
+.cf .cf-letrero { font: 400 46px/1 var(--f-guion); color: var(--rotulo); }
+.cf .cf-album-sub { margin-top: -4px; }
+.cf .cf-fila { position: relative; display: grid; grid-template-columns: 1fr 1fr; column-gap: 6%; padding: 26px 2.5% 6px; }
+.cf .cf-fila-una { grid-template-columns: 56%; justify-content: center; }
+.cf .cf-polaroid-foto { width: 100%; padding: 8px 8px 0; }
+.cf .cf-polaroid-foto .cf-pinza { width: 16px; height: 40px; margin-left: -8px; top: -22px; }
+.cf .cf-polaroid-foto img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; background: var(--rubor); }
+.cf .cf-polaroid-foto figcaption { min-height: 38px; display: grid; place-items: center; font: 400 22px/1 var(--f-titulo); color: var(--oro); }
+.cf .cf-album.is-in .cf-polaroid-foto { animation: cf-columpio 1.8s var(--curva) both; }
+.cf .cf-album.is-in .cf-fila .cf-polaroid-foto:nth-child(3) { animation-delay: .15s; }
+
+/* Pie */
+.cf .cf-final { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 56px; text-align: center; }
+.cf .cf-final[data-reveal] { opacity: 0; transform: translateY(16px); transition: opacity .8s var(--curva), transform .8s var(--curva); }
+.cf .cf-final[data-reveal].is-in { opacity: 1; transform: none; }
+.cf .cf-final-ramo { width: 128px; height: auto; margin-bottom: 4px; filter: drop-shadow(0 10px 12px color-mix(in srgb, var(--terracota) 20%, transparent)); }
+.cf .cf-te-espero { font: 400 52px/1 var(--f-guion); color: var(--rotulo); }
+
+/* Aviso de copiado */
+.cf .cf-aviso { position: fixed; z-index: 90; left: 16px; right: 16px; bottom: 70px; max-width: 420px; margin: 0 auto; padding: 12px 16px; border-radius: 999px;
+  background: var(--tinta); color: #fff; font: 500 14px/1.4 var(--f-texto); text-align: center; opacity: 0; transform: translateY(12px); pointer-events: none; transition: opacity .2s, transform .2s; }
+.cf .cf-aviso.is-visible { opacity: 1; transform: none; }
+
+/* ---------- Formulario de confirmación con la ropa del diseño ----------
+   El RSVP es un componente común (Tailwind, letra mono de 10-11 px): aquí
+   toma Poppins, Cookie para el título y los botones de píldora. */
+.cf .cf-modal { position: fixed; inset: 0; z-index: 80; display: flex; align-items: flex-end; justify-content: center; padding-top: 30px;
+  background: color-mix(in srgb, var(--tinta) 45%, transparent); animation: cf-fundido .25s ease; }
+.cf .cf-modal-caja { position: relative; width: 100%; max-width: 520px; max-height: 90svh; overflow: auto; border-radius: 22px 22px 0 0;
+  background: var(--grano), var(--blanco); animation: cf-subir .4s var(--curva); }
+@media (min-width: 600px) { .cf .cf-modal { align-items: center; } .cf .cf-modal-caja { border-radius: 18px; } }
+.cf .cf-modal-pinza { position: absolute; left: 50%; top: -6px; width: 18px; height: 44px; margin-left: -9px; }
+.cf .cf-cerrar { position: absolute; z-index: 2; top: 12px; right: 12px; width: 44px; height: 44px; border: 0; border-radius: 50%; background: color-mix(in srgb, var(--rubor) 60%, white);
+  color: var(--rotulo); font-size: 26px; line-height: 1; cursor: pointer; }
+.cf .cf-modal #rsvp { padding: 44px 22px 36px; border-top: 0; font-family: var(--f-texto); color: var(--tinta); background: transparent; }
+.cf .cf-modal #rsvp img { display: none; }
+.cf .cf-modal #rsvp .font-mono { font-family: var(--f-texto); letter-spacing: .2em; }
+.cf .cf-modal #rsvp p.font-mono, .cf .cf-modal #rsvp span.font-mono { font-size: 11.5px; font-weight: 600; color: var(--rotulo); }
+.cf .cf-modal #rsvp h2 { font-family: var(--f-guion); font-weight: 400; font-size: clamp(42px, 12vw, 50px); line-height: 1.05; color: var(--rotulo); margin: 6px 0 4px; }
+.cf .cf-modal #rsvp h2 + p.font-mono, .cf .cf-modal #rsvp h2 + div + p.font-mono { margin-top: 14px !important; margin-bottom: 22px !important; }
+.cf .cf-modal #rsvp .font-body { font-family: var(--f-texto); font-size: 16px; font-weight: 500; color: var(--tinta); }
+.cf .cf-modal #rsvp p.text-xs, .cf .cf-modal #rsvp p.text-sm { font-size: 14.5px; line-height: 1.55; color: var(--suave); }
+.cf .cf-modal #rsvp .divide-y > * { padding-block: 16px; }
+.cf .cf-modal #rsvp .divide-y, .cf .cf-modal #rsvp .divide-y > * + * { border-color: color-mix(in srgb, var(--durazno) 40%, transparent); }
+.cf .cf-modal #rsvp button[aria-pressed] { width: 64px; min-height: 44px; border-radius: 999px; font: 600 14px/1 var(--f-texto);
+  border: 1.5px solid var(--durazno); background: var(--blanco); color: var(--rotulo); }
+.cf .cf-modal #rsvp button[aria-pressed="true"]:first-child { background: var(--boton); color: #fff; border-color: transparent; }
+.cf .cf-modal #rsvp button[aria-pressed="true"]:last-child { background: var(--tinta); color: #fff; border-color: var(--tinta); }
+.cf .cf-modal #rsvp form > div > button[type="button"]:not([aria-pressed]), .cf .cf-modal #rsvp .border-dashed {
+  border-radius: 999px; padding: 11px 18px; font: 500 13.5px/1.2 var(--f-texto); }
+.cf .cf-modal #rsvp input[type="text"], .cf .cf-modal #rsvp textarea { font: 16px/1.4 var(--f-texto); color: var(--tinta);
+  padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--rubor) 60%, var(--durazno)); border-radius: 12px; background: color-mix(in srgb, var(--papel) 60%, white); }
+.cf .cf-modal #rsvp input[type="text"]:focus, .cf .cf-modal #rsvp textarea:focus { border-color: var(--durazno); box-shadow: 0 0 0 3px color-mix(in srgb, var(--durazno) 25%, transparent); outline: none; }
+.cf .cf-modal #rsvp label > span.font-mono { display: block; margin-bottom: 2px; }
+.cf .cf-modal #rsvp button[type="submit"] { min-height: 54px; border-radius: 999px; border: 0; font: 600 15px/1.2 var(--f-texto); letter-spacing: .04em; color: #fff;
+  background: var(--boton); box-shadow: 0 12px 20px -12px var(--terracota); }
+.cf .cf-modal #rsvp button[type="submit"]:disabled { opacity: .45; }
+.cf .cf-modal #rsvp .border-gold\/40 { border-color: color-mix(in srgb, var(--oro) 60%, transparent); background: color-mix(in srgb, var(--papel) 60%, white); }
+@keyframes cf-fundido { from { opacity: 0; } to { opacity: 1; } }
+@keyframes cf-subir { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ---------- Movimiento reducido ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .cf .cf-globo-btn, .cf .cf-globito, .cf .cf-halo, .cf .cf-portada-ramo, .cf .cf-llama, .cf .cf-llama-halo { animation: none; }
+  .cf .cf-tarjeta { animation: none; }
+  .cf .cf-colgada[data-reveal], .cf .cf-album[data-reveal], .cf .cf-final[data-reveal] { opacity: 1; transform: none; transition: none; }
+  .cf .cf-colgada.is-in .cf-polaroid, .cf .cf-album.is-in .cf-polaroid-foto { animation: none; }
+}
