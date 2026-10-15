@@ -185,16 +185,14 @@ const TONOS = { claro: CLARO, oro: ORO, acento: ACENTO };
 // SDXL: md_fuegos
 // Fuegos artificiales dorados: cada estallido sube como un trazo, se abre en
 // rayos con estela que se apagan y deja chispas que titilan. Se animan solo
-// cuando el contenedor recibe la clase `md-fuegos-on`.
+// cuando el contenedor recibe la clase `md-fuegos-on`. El resplandor va en
+// CSS (drop-shadow sobre el SVG entero): un desenfoque SVG por estallido
+// dejaba cuadros negros al animarse.
 export function MdFuegos({ className = "" }) {
-  const id = useIds("brillo", "centro");
+  const id = useIds("centro");
   return (
     <svg className={`md-fuegos ${className}`} viewBox="0 0 400 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <defs>
-        <filter id={id.brillo} x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="1.6" result="b" />
-          <feMerge><feMergeNode in="b" /><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
-        </filter>
         <radialGradient id={id.centro}>
           <stop offset="0" stopColor="#fff" stopOpacity=".95" />
           <stop offset=".35" stopColor={CLARO} stopOpacity=".55" />
@@ -208,9 +206,9 @@ export function MdFuegos({ className = "" }) {
             {/* Cohete que sube */}
             <line className="md-cohete" x1={e.x + (k % 2 ? 10 : -10)} y1="430" x2={e.x} y2={e.y} pathLength="100" stroke={color} strokeWidth="1.4" strokeLinecap="round" />
             <g transform={`translate(${e.x} ${e.y})`}>
-              <circle className="md-destello" r={e.r * 0.5} fill={`url(#${id.centro})`} />
+              <circle className="md-destello" r={e.r * 0.32} fill={`url(#${id.centro})`} />
               <circle className="md-nucleo" r="3.2" fill="#FFF8E6" />
-              <g filter={`url(#${id.brillo})`}>
+              <g>
                 {Array.from({ length: e.n }, (_, i) => {
                   const ang = (360 / e.n) * i + azar(k * 40 + i) * 8;
                   const largo = e.r * (0.78 + azar(k * 70 + i) * 0.3);

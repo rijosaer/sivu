@@ -201,7 +201,7 @@ export const VELAS = [
 ];
 const ALTO_VELA = 34;
 export function DlPastel({ className = "", topper = false }) {
-  const g = useIds("cil", "vertical", "tapa", "perla", "marmol", "marmolPie", "oro", "oroV", "sombra", "sombraPiso",
+  const g = useIds("cil", "vertical", "tapa", "perla", "marmol", "marmolPie", "oro", "sombra", "sombraPiso",
     "grano", "petalo", "sombraRosa", "hoja", "llama", "halo", "vela", "c2", "m1", "m2", "m3");
   const p1 = { cx: 160, arriba: 252, abajo: 330, rx: 110, ry: 15 };
   const p2 = { cx: 160, arriba: 182, abajo: 254, rx: 80, ry: 12 };
@@ -269,7 +269,6 @@ export function DlPastel({ className = "", topper = false }) {
           <Parada o="1" c="#CFC5C9" />
         </linearGradient>
         <OroLineal id={g.oro} />
-        <OroLineal id={g.oroV} vertical />
         <Sombra id={g.sombra} opacidad={0.35} />
         <Sombra id={g.sombraPiso} opacidad={0.4} />
         <linearGradient id={g.vela} x1="0" y1="0" x2="1" y2="0">
@@ -349,7 +348,7 @@ export function DlPastel({ className = "", topper = false }) {
         {/* Palillos dorados del topper. */}
         {topper && (
           <g>
-            <path d="M151 116 L151 76 M169 116 L169 76" stroke={url(g.oroV)} strokeWidth="1.8" strokeLinecap="round" />
+            <path d="M151 116 L151 76 M169 116 L169 76" stroke={ORO.claro} strokeWidth="1.8" strokeLinecap="round" />
             <path d="M151 116 L151 76 M169 116 L169 76" stroke={ORO.oscuro} strokeWidth=".5" opacity=".6" transform="translate(.7 0)" />
           </g>
         )}
@@ -736,11 +735,11 @@ export function DlCordon({ className = "" }) {
 
 // Filete dorado con un macaron diminuto al centro.
 export function DlFilete({ className = "" }) {
-  const g = useIds("oro", "m");
+  const g = useIds("m");
   return (
     <svg className={className} viewBox="0 0 200 24" aria-hidden="true">
-      <defs><OroLineal id={g.oro} /></defs>
-      <path d="M8 12 H82 M118 12 H192" stroke={url(g.oro)} strokeWidth="1.2" />
+      <path d="M8 12 H82 M118 12 H192" stroke={ORO.medio} strokeWidth="1.2" />
+      <path d="M8 11.5 H82 M118 11.5 H192" stroke={ORO.luz} strokeWidth=".4" />
       <circle cx="6" cy="12" r="2" fill={ORO.medio} />
       <circle cx="194" cy="12" r="2" fill={ORO.medio} />
       <Macaron x={100} y={13} r={9} color={T.rosa} id={g.m} />

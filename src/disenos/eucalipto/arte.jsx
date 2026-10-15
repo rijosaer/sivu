@@ -210,7 +210,7 @@ function Rosa({ x, y, s = 1, a = 0, p }) {
         <g key={k}>
           {capa.map((pt, i) => (
             <g key={i}>
-              <path d={pt.d} fill={`url(#${p}-rosa)`} stroke="#BFB59E" strokeOpacity=".7" strokeWidth=".6" />
+              <path d={pt.d} fill={`url(#${p}-rosa)`} stroke="#B3A88E" strokeOpacity=".45" strokeWidth=".6" />
               <path d={pt.d} fill={`url(#${p}-luz)`} />
               <path d={pt.rizo} fill="none" stroke="#FFFFFF" strokeWidth="1.4" strokeLinecap="round" opacity=".95" />
             </g>
@@ -236,7 +236,7 @@ function Peonia({ x, y, s = 1, a = 0, p }) {
         <g key={k}>
           {capa.map((pt, i) => (
             <g key={i}>
-              <path d={pt.d} fill={`url(#${p}-peonia)`} stroke="#C2B8A2" strokeOpacity=".65" strokeWidth=".6" />
+              <path d={pt.d} fill={`url(#${p}-peonia)`} stroke="#B3A88E" strokeOpacity=".4" strokeWidth=".6" />
               <path d={pt.d} fill={`url(#${p}-luz)`} />
               <path d={`${pt.pliegues[0]}${pt.pliegues[1]}`} fill="none" stroke="#CFC5B0" strokeOpacity=".55" strokeWidth=".6" strokeLinecap="round" />
             </g>

@@ -429,7 +429,7 @@ export function LuMesa({ className = "" }) {
   const yFila = (k) => 262 - k * 26 + k * k * 1.2;
   const xLado = (k, lado) => 200 + lado * (70 - k * 10);
   return (
-    <svg className={`lu-mesa ${className}`} viewBox="0 0 400 300" aria-hidden="true">
+    <svg className={`lu-mesa ${className}`} viewBox="0 70 400 230" aria-hidden="true">
       <defs>
         <linearGradient id={id("mantel")} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#EFE5D3" />

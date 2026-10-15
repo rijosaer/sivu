@@ -71,7 +71,7 @@ function Entrada({ welcome, partes, invitacion, onTirar, onEntrar }) {
   }
 
   return (
-    <section className={`lu-entrada ${fase ? "lu-luces-on" : ""} ${fase === 2 ? "lu-lista" : ""}`} aria-label="Abrir invitación">
+    <section className={`lu-entrada ${fase ? "lu-luces-on" : ""} ${fase === 2 ? "lu-entrar-listo" : ""}`} aria-label="Abrir invitación">
       <LuCielo />
       <div className="lu-entrada-luces" aria-hidden="true">
         <LuGuirnalda className="lu-guirnalda-lejos" n={8} alto={34} r={4.2} inicio={1} />
@@ -293,7 +293,7 @@ export default function Luces({ site, contenidoDe, invitacion, onEnviarRSVP, enE
                     </li>
                   ))}
                 </ol>
-                <p className="lu-menu-pie">Bon appétit</p>
+                <p className="lu-menu-pie">¡Buen provecho!</p>
               </div>
               <LuVela className="lu-menu-vela lu-menu-vela-der" />
             </section>
@@ -437,6 +437,7 @@ export default function Luces({ site, contenidoDe, invitacion, onEnviarRSVP, enE
           )}
 
           <footer className="lu-final" data-reveal>
+            <div className="lu-final-luces" aria-hidden="true"><LuGuirnalda n={12} alto={34} r={5} /></div>
             <LuMesa />
             <p className="lu-te-esperamos">Te esperamos en la mesa</p>
             {nombres.length > 0 && <p className="lu-etiqueta">{nombres.join(" & ")}</p>}
