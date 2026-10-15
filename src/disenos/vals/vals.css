@@ -64,7 +64,7 @@
 .vr-hero-fecha span { color: var(--antiguo); }
 
 .vr-quince {
-  position: absolute; z-index: 1; left: 50%; bottom: 2svh; height: min(50svh, 460px); width: auto; aspect-ratio: 300 / 470;
+  position: absolute; z-index: 1; left: 50%; bottom: 2svh; height: min(47svh, 440px); width: auto; aspect-ratio: 300 / 470;
   transform: translateX(-50%) scale(.94); transform-origin: 50% 100%; transition: transform 3s var(--curva) .5s;
 }
 .vr-escena-rosas { position: absolute; z-index: 6; bottom: -3svh; width: min(52vw, 230px); opacity: 0; transform: translateY(30px); transition: opacity 1s ease 1.6s, transform 1.4s var(--curva) 1.6s; }
@@ -87,12 +87,12 @@
 .vr-tela-svg { display: block; width: 100%; height: 100%; }
 .vr-telon-izq .vr-tela { transform-origin: 0 50%; clip-path: polygon(0 0, 100% 0, 100% 18%, 100% 42%, 100% 58%, 100% 100%, 0 100%); }
 .vr-telon-der .vr-tela { transform-origin: 100% 50%; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 58%, 0 42%, 0 18%); }
-.is-abierto .vr-telon-izq .vr-tela { transform: scaleX(.36); clip-path: polygon(0 0, 100% 0, 100% 16%, 82% 40%, 48% 58%, 66% 100%, 0 100%); }
-.is-abierto .vr-telon-der .vr-tela { transform: scaleX(.36); clip-path: polygon(0 0, 100% 0, 100% 100%, 34% 100%, 52% 58%, 18% 40%, 0 16%); }
+.is-abierto .vr-telon-izq .vr-tela { transform: scaleX(.44); clip-path: polygon(0 0, 100% 0, 100% 9%, 66% 34%, 30% 57%, 58% 100%, 0 100%); }
+.is-abierto .vr-telon-der .vr-tela { transform: scaleX(.44); clip-path: polygon(0 0, 100% 0, 100% 100%, 42% 100%, 70% 57%, 34% 34%, 0 9%); }
 
-.vr-amarre { position: absolute; z-index: 6; top: 54svh; width: 46px; height: auto; opacity: 0; transition: opacity .6s ease 1.5s; }
-.vr-amarre-izq { left: 3.5vw; }
-.vr-amarre-der { right: 3.5vw; transform: scaleX(-1); }
+.vr-amarre { position: absolute; z-index: 6; top: 53svh; width: 44px; height: auto; opacity: 0; transition: opacity .6s ease 1.5s; }
+.vr-amarre-izq { left: 1.5vw; }
+.vr-amarre-der { right: 1.5vw; transform: scaleX(-1); }
 .vr-cenefa { position: absolute; z-index: 7; top: 0; left: 0; width: 100%; height: min(30vw, 150px); filter: drop-shadow(0 6px 10px rgb(var(--color-ink) / .3)); }
 
 .is-abierto .vr-hero { opacity: 1; transform: none; }
@@ -140,9 +140,8 @@
 
 /* ---------------- El libro de cuento ---------------- */
 .vr-libro { max-width: 480px; margin: 0 auto; padding: 56px 16px 72px; display: grid; gap: 64px; }
-.vr-pagina { perspective: 1500px; }
 .vr-hoja {
-  position: relative; padding: 64px 24px 30px; text-align: center; border-radius: 3px 10px 10px 3px;
+  position: relative; padding: 74px 24px 30px; text-align: center; border-radius: 3px 10px 10px 3px;
   background:
     linear-gradient(90deg, rgb(var(--color-ink) / .09), transparent 7%),
     var(--grano),
@@ -167,10 +166,10 @@
 .vr-esq-4 { bottom: 12px; left: 12px; transform: rotate(270deg); }
 .vr-vineta { position: absolute; pointer-events: none; }
 .vr-vineta-ramo { top: -46px; left: 50%; width: 170px; transform: translateX(-50%); }
-.vr-vineta-rama { top: -36px; right: -18px; width: 150px; transform: scaleY(-1) rotate(8deg); }
+.vr-vineta-rama { top: -40px; right: -6px; width: 140px; transform: scaleY(-1) rotate(10deg); }
 .vr-capitulo { font: 600 11.5px/1.2 var(--f-cuerpo); letter-spacing: .3em; text-transform: uppercase; color: var(--oro-osc); }
 .vr-titulo {
-  display: grid; grid-template-columns: auto 1fr; align-items: end; gap: 6px; margin: 14px 0 20px; text-align: left;
+  display: grid; grid-template-columns: auto 1fr; align-items: end; gap: 6px; margin: 14px 0 22px; text-align: left;
   font: 400 26px/1.15 var(--f-titulos); color: var(--tinta);
 }
 .vr-titulo span { padding-bottom: 4px; overflow-wrap: anywhere; }
@@ -180,9 +179,9 @@
 .vr-folio-filete { width: 120px; color: var(--oro); }
 
 /* Pasar la página: gira sobre su lomo (alterna izquierda y derecha). */
-.vr [data-reveal] .vr-hoja { opacity: 0; transform: rotateY(calc(var(--lado) * -92deg)); transition: transform 1.2s cubic-bezier(.25, .8, .25, 1), opacity .35s ease; }
+.vr [data-reveal] .vr-hoja { opacity: 0; transform: perspective(1500px) rotateY(calc(var(--lado) * -92deg)); transition: transform 1.2s cubic-bezier(.25, .8, .25, 1), opacity .35s ease; }
 .vr [data-reveal] .vr-hoja::after { opacity: 1; transition: opacity 1.2s ease; }
-.vr [data-reveal].is-in .vr-hoja { opacity: 1; transform: none; }
+.vr [data-reveal].is-in .vr-hoja { opacity: 1; transform: perspective(1500px) rotateY(0deg); }
 .vr [data-reveal].is-in .vr-hoja::after { opacity: 0; }
 
 /* Contenido de las páginas */
@@ -221,7 +220,6 @@
 .vr-evitar i::after { content: ""; position: absolute; left: -3px; right: -3px; top: 50%; height: 2px; background: var(--antiguo); transform: rotate(-45deg); }
 
 .vr-cuento { text-align: justify; hyphens: auto; color: var(--tinta); font-size: 16.5px; line-height: 1.75; }
-.vr-cuento::first-letter { font: 400 44px/.9 var(--f-titulos); float: left; margin: 4px 8px 0 0; color: var(--oro-osc); }
 .vr-firma { justify-self: end; font: 400 34px/1 var(--f-guion); color: var(--antiguo); }
 
 .vr-fotos { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
@@ -297,6 +295,7 @@
 .vr .vr-modal #rsvp .font-mono { font-family: var(--f-cuerpo); letter-spacing: .18em; }
 .vr .vr-modal #rsvp p.font-mono, .vr .vr-modal #rsvp span.font-mono { font-size: 12px; font-weight: 700; color: var(--oro-osc); }
 .vr .vr-modal #rsvp h2 { font-family: var(--f-guion); font-weight: 400; font-size: clamp(34px, 10vw, 42px); line-height: 1.2; color: var(--antiguo); margin: 4px 0; }
+.vr .vr-modal #rsvp h2 + p.font-mono, .vr .vr-modal #rsvp h2 + div + p.font-mono { margin-top: 12px !important; margin-bottom: 22px !important; }
 .vr .vr-modal #rsvp .font-body { font-family: var(--f-cuerpo); font-size: 17px; color: var(--tinta); }
 .vr .vr-modal #rsvp p.text-xs, .vr .vr-modal #rsvp p.text-sm { font-size: 15px; line-height: 1.55; color: var(--suave); }
 .vr .vr-modal #rsvp .divide-y > * { padding-block: 16px; }

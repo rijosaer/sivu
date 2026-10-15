@@ -141,7 +141,7 @@ function Defs({ p }) {
       <linearGradient id={`${p}-luz`} gradientUnits="userSpaceOnUse" x1="-46" y1="-50" x2="46" y2="52">
         <stop offset="0" stopColor="#FFFFFF" stopOpacity=".65" />
         <stop offset=".46" stopColor="#FFFFFF" stopOpacity="0" />
-        <stop offset="1" stopColor="#6A604B" stopOpacity=".22" />
+        <stop offset="1" stopColor="#6A604B" stopOpacity=".3" />
       </linearGradient>
       <radialGradient id={`${p}-cupula`} gradientUnits="userSpaceOnUse" cx="0" cy="0" r="17">
         <stop offset="0" stopColor="#C7BCA2" />
@@ -346,7 +346,7 @@ function Gipsofila({ x, y, a = 0, s = 1, semilla = 3, sombra = true, p }) {
 export function EuRama({ className = "" }) {
   const p = usePrefijo();
   return (
-    <svg className={className} viewBox="0 0 340 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <svg className={className} viewBox="0 0 340 1000" overflow="visible" aria-hidden="true">
       <Defs p={p} />
       <g filter={`url(#${p}-grano)`}>
         <g filter={`url(#${p}-sombra)`}>
@@ -374,12 +374,12 @@ export function EuRama({ className = "" }) {
         {/* Flores */}
         <Peonia p={p} x={92} y={160} s={1.15} a={-8} />
         <Rosa p={p} x={272} y={128} s={0.95} a={14} />
-        <Rosa p={p} x={318} y={258} s={0.46} a={40} />
+        <Rosa p={p} x={300} y={256} s={0.46} a={40} />
         <Rosa p={p} x={178} y={318} s={0.85} a={-20} />
         <Peonia p={p} x={292} y={432} s={0.98} a={22} />
         <Rosa p={p} x={78} y={520} s={1.0} a={6} />
         <Rosa p={p} x={232} y={606} s={0.8} a={-30} />
-        <Rosa p={p} x={330} y={662} s={0.44} a={10} />
+        <Rosa p={p} x={306} y={664} s={0.44} a={10} />
         <Peonia p={p} x={110} y={772} s={1.15} a={12} />
         <Rosa p={p} x={286} y={764} s={0.9} a={-6} />
         <Rosa p={p} x={204} y={924} s={1.0} a={30} />
@@ -613,8 +613,8 @@ export function EuSello({ iniciales = "", className = "" }) {
           const [hx, hy] = pt.split(" ").map(Number);
           return <ellipse key={i} cx={hx} cy={hy} rx="2.2" ry="4.4" transform={`rotate(${(i / 16) * 360 + 30} ${hx} ${hy})`} fill="#FFFFFF" opacity=".22" />;
         })}
-        <text x="60" y="71" textAnchor="middle" fontSize="34" style={{ fontFamily: "var(--fuente-guion, 'Allura'), cursive", fill: tema("--color-gold-dark", "70%, #1d2620") }}>{iniciales}</text>
-        <text x="59.2" y="70" textAnchor="middle" fontSize="34" style={{ fontFamily: "var(--fuente-guion, 'Allura'), cursive", fill: tema("--color-gold-light") }} opacity=".85">{iniciales}</text>
+        <text x="60.8" y="71.2" textAnchor="middle" fontSize="36" style={{ fontFamily: "var(--fuente-guion, 'Allura'), cursive", fill: tema("--color-gold-dark", "55%, #141b16") }}>{iniciales}</text>
+        <text x="60" y="70" textAnchor="middle" fontSize="36" style={{ fontFamily: "var(--fuente-guion, 'Allura'), cursive", fill: tema("--color-gold-light", "85%, white") }}>{iniciales}</text>
         <path d="M30 34C38 24 50 19 62 19" fill="none" stroke="#FFFFFF" strokeOpacity=".4" strokeWidth="2.2" strokeLinecap="round" />
       </g>
     </svg>
