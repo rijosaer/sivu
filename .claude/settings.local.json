@@ -6,7 +6,8 @@
       "Bash(cd /c/Users/ricar/OneDrive/Documents/GitHub/restaurant-pos && grep -n \"class SubscriptionInvoice\" -A 25 backend/apps/tenants/models.py | head -35; echo \"=== estados de acceso ===\"; sed -n '/def access_state/,/^    def [a-z_]*\\(self\\)/p' backend/apps/tenants/models.py | head -40)",
       "Read(//c/Users/ricar/royal-prestige-crm/**)",
       "Bash(node -e ' *)",
-      "Bash(npx prisma *)"
+      "Bash(npx prisma *)",
+      "mcp__claude-code-remote__send_message"
     ],
     "additionalDirectories": [
       "c:\\Users\\ricar\\Downloads\\invitacion-postgres-v1\\invitacion\\backend\\apps\\tenants"
