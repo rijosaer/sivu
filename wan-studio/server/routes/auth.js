@@ -1,7 +1,7 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
 import { pool } from "../db.js";
-import { firmarToken, requiereUsuario } from "../auth.js";
+import { conPermisos, firmarToken, requiereUsuario } from "../auth.js";
 import { capturar, ErrorApi } from "../errores.js";
 
 export const authRouter = Router();
@@ -18,7 +18,7 @@ const credenciales = (cuerpo) => {
 
 const respuesta = (u) => ({
   token: firmarToken(u),
-  usuario: { id: u.id, email: u.email, creditos: u.creditos, es_admin: u.es_admin },
+  usuario: conPermisos(u),
 });
 
 authRouter.post(

@@ -56,7 +56,7 @@ export default function Crear({ catalogo, usuario, presetInicial, alCambiarCredi
   let bloqueo = "";
   if (!compatible) bloqueo = modo === "i2v" ? "Este preset es solo de texto: quita la imagen." : "Este preset necesita una imagen.";
   else if (modo === "t2v" && !prompt.trim()) bloqueo = "Sin imagen, describe la escena en el prompt.";
-  else if (usuario.creditos < costo) bloqueo = `Te faltan créditos: cuesta ${costo} y tienes ${usuario.creditos}.`;
+  else if (!usuario.ilimitado && usuario.creditos < costo) bloqueo = `Te faltan créditos: cuesta ${costo} y tienes ${usuario.creditos}.`;
 
   const elegirArchivo = async (archivo) => {
     setError("");
@@ -212,7 +212,7 @@ export default function Crear({ catalogo, usuario, presetInicial, alCambiarCredi
         {(error || bloqueo) && <p className={`text-sm ${error ? "text-red-300" : "text-tenue"}`}>{error || bloqueo}</p>}
 
         <button type="submit" disabled={!!bloqueo || enviando} className="boton-acento w-full py-3 text-base">
-          {enviando ? "Enviando…" : `Generar · ${costo} créditos`}
+          {enviando ? "Enviando…" : usuario.ilimitado ? "Generar" : `Generar · ${costo} créditos`}
         </button>
       </form>
 

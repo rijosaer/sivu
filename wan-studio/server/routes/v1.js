@@ -27,7 +27,7 @@ v1Router.get("/presets", (_req, res) => {
 v1Router.use(requiereUsuario());
 
 v1Router.get("/cuenta", (req, res) => {
-  res.json({ email: req.usuario.email, creditos: req.usuario.creditos });
+  res.json({ email: req.usuario.email, creditos: req.usuario.creditos, ilimitado: req.usuario.ilimitado });
 });
 
 const limiteCrear = limitador({
@@ -36,13 +36,17 @@ const limiteCrear = limitador({
   mensaje: "Demasiadas generaciones por minuto. Espera un momento.",
   clave: (req) => `u${req.usuario.id}`,
 });
+const limiteCrearSalvoIlimitados = (req, res, next) => (req.usuario.ilimitado ? next() : limiteCrear(req, res, next));
 
 v1Router.post(
   "/generaciones",
-  limiteCrear,
+  limiteCrearSalvoIlimitados,
   capturar(async (req, res) => {
     const imagen = req.body.imagen ? leerImagen(req.body.imagen) : null;
     const g = prepararGeneracion(req.body, { hayImagen: !!imagen });
+    // Las cuentas ilimitadas no pagan: costo 0 también hace que no haya nada
+    // que devolver si la generación falla.
+    if (req.usuario.ilimitado) g.costo = 0;
     const id = randomUUID();
     const rutaImagen = imagen ? await guardarImagen(id, imagen) : null;
 
@@ -56,7 +60,7 @@ v1Router.post(
         "SELECT count(*)::int AS n FROM generaciones WHERE usuario_id = $1 AND estado IN ('en_cola', 'procesando')",
         [req.usuario.id]
       );
-      if (p[0].n >= MAX_PENDIENTES) {
+      if (!req.usuario.ilimitado && p[0].n >= MAX_PENDIENTES) {
         throw new ErrorApi(429, `Ya tienes ${p[0].n} generaciones en curso; espera a que termine alguna`);
       }
       if (u[0].creditos < g.costo) {

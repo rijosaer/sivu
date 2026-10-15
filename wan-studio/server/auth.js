@@ -1,7 +1,7 @@
 // Dos formas de identificarse, ambas con "Authorization: Bearer ...":
 //  - La web usa un JWT que obtiene al iniciar sesión.
 //  - La API pública usa llaves "ws_..." creadas desde la web.
-// Las dos terminan en req.usuario = { id, email, creditos, es_admin }.
+// Las dos terminan en req.usuario = { id, email, creditos, es_admin, ilimitado }.
 import { createHash, randomBytes } from "node:crypto";
 import jwt from "jsonwebtoken";
 import { pool } from "./db.js";
@@ -39,7 +39,18 @@ async function usuarioPorId(id) {
     "SELECT id, email, creditos, es_admin FROM usuarios WHERE id = $1",
     [id]
   );
-  return rows[0] || null;
+  return rows[0] ? conPermisos(rows[0]) : null;
+}
+
+// Administradores: la primera cuenta registrada y los correos de ADMIN_EMAILS
+// (separados por comas). No gastan créditos ni tienen límites de uso.
+export function conPermisos(u) {
+  const admins = (process.env.ADMIN_EMAILS || "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  const es_admin = u.es_admin || admins.includes(u.email);
+  return { id: u.id, email: u.email, creditos: u.creditos, es_admin, ilimitado: es_admin };
 }
 
 // soloSesion: rutas que una llave de API no debe tocar (p. ej. crear llaves).

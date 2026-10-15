@@ -28,8 +28,11 @@ export default function Nav({ pagina, usuario, alSalir }) {
         </nav>
         {usuario ? (
           <div className="flex items-center gap-3 text-sm">
-            <span className="rounded-lg border border-acento/40 bg-acento/10 px-2.5 py-1 font-semibold text-acento" title="Créditos disponibles">
-              {usuario.creditos} cr
+            <span
+              className="rounded-lg border border-acento/40 bg-acento/10 px-2.5 py-1 font-semibold text-acento"
+              title={usuario.ilimitado ? "Cuenta sin límites" : "Créditos disponibles"}
+            >
+              {usuario.ilimitado ? "∞ ilimitado" : `${usuario.creditos} cr`}
             </span>
             <button onClick={alSalir} className="text-tenue hover:text-white">
               Salir
