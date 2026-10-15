@@ -168,7 +168,7 @@
 }
 .bi:not(.bi-fase-enrollado) .bi-desenrollar { opacity: 0; transform: translateY(8px); pointer-events: none; animation: none; }
 .bi .bi-desliza { display: flex; flex-direction: column; align-items: center; gap: 0; font: 600 12px/1 var(--f-texto); letter-spacing: .3em; text-transform: uppercase; color: var(--oro-osc);
-  opacity: 0; transition: opacity .6s ease 1.6s; }
+  opacity: 0; pointer-events: none; transition: opacity .6s ease 1.6s; }
 .bi .bi-desliza svg { width: 22px; height: 22px; animation: bi-bajar 1.8s ease-in-out infinite; }
 .bi-fase-abierto .bi-desliza { opacity: 1; }
 

@@ -65,10 +65,8 @@ function plieguePeonia(cx, cy, ang, L, W, lado) {
   return `M${p(0.22 * L, lado * 0.08 * W)}Q${p(0.55 * L, lado * 0.32 * W)} ${p(0.86 * L, lado * 0.42 * W)}`;
 }
 function arco(r, a0, a1) {
-  const p = giro(0, 0, 0);
   const q0 = giro(0, 0, a0)(r, 0);
   const q1 = giro(0, 0, a1)(r, 0);
-  void p;
   return `M${q0}A${r} ${r} 0 ${a1 - a0 > 180 ? 1 : 0} 1 ${q1}`;
 }
 
