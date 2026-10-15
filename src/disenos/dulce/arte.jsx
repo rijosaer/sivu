@@ -462,17 +462,17 @@ function Copa({ x, y, giro, g }) {
       <ellipse cx="0" cy="96" rx="26" ry="5" fill={url(g.sombra)} />
       <ellipse cx="0" cy="90" rx="22" ry="4.6" fill="#fff" fillOpacity=".55" stroke="#fff" strokeWidth="1" />
       <path d="M-22 90 A22 4.6 0 0 0 22 90" fill="none" style={{ stroke: T.oscuro }} strokeOpacity=".35" strokeWidth=".8" />
-      <path d="M-1.6 22 C -1.6 50 -2.2 70 -2.8 88 L 2.8 88 C 2.2 70 1.6 50 1.6 22 Z" fill="#fff" fillOpacity=".75" style={{ stroke: T.oscuro }} strokeOpacity=".25" strokeWidth=".6" />
+      <path d="M-1.6 22 C -1.6 50 -2.2 70 -2.8 88 L 2.8 88 C 2.2 70 1.6 50 1.6 22 Z" fill="#fff" fillOpacity=".85" style={{ stroke: T.oscuro }} strokeOpacity=".45" strokeWidth=".8" />
       <ellipse cx="0" cy="44" rx="3.2" ry="2.2" fill="#fff" fillOpacity=".85" />
       {/* Copa vacía (vidrio) y champaña. */}
-      <path d="M-40 0 C -38 24 38 24 40 0 Z" fill="#fff" fillOpacity=".28" />
+      <path d="M-40 0 C -38 24 38 24 40 0 Z" fill="#fff" fillOpacity=".45" />
       <path d="M-36 6 C -33 22 33 22 36 6 Z" fill={url(g.champana)} />
       <ellipse cx="0" cy="6" rx="36" ry="5.4" fill={url(g.superficie)} />
       {[[-14, 13, 1.3], [-6, 16, 1], [4, 12, 1.4], [12, 15, 1], [20, 10, 1.1], [-22, 9, 1]].map(([bx, by, br], i) => (
         <circle key={i} cx={bx} cy={by} r={br} fill="#fff" fillOpacity=".8" />
       ))}
       <path d="M-40 0 C -38 24 38 24 40 0" fill="none" stroke="#fff" strokeOpacity=".95" strokeWidth="1.3" />
-      <path d="M-40 0 C -38 24 38 24 40 0" fill="none" style={{ stroke: T.oscuro }} strokeOpacity=".28" strokeWidth=".6" transform="translate(0 1)" />
+      <path d="M-40 0 C -38 24 38 24 40 0" fill="none" style={{ stroke: T.oscuro }} strokeOpacity=".45" strokeWidth=".8" transform="translate(0 1)" />
       <ellipse cx="0" cy="0" rx="40" ry="6.4" fill="none" stroke={url(g.oro)} strokeWidth="1.8" />
       <path d="M-31 6 C -29 13 -22 17 -14 19" fill="none" stroke="#fff" strokeOpacity=".9" strokeWidth="2" strokeLinecap="round" />
     </g>
@@ -484,8 +484,8 @@ export function DlCopas({ className = "" }) {
     <svg className={className} viewBox="0 0 220 170" aria-hidden="true">
       <defs>
         <linearGradient id={g.champana} x1="0" y1="0" x2="0" y2="1">
-          <Parada o="0" c={mezcla(T.rosa, "#F8D6BE", 45)} />
-          <Parada o="1" c={mezcla(T.oscuro, "#F2B9A4", 45)} />
+          <Parada o="0" c={mezcla(T.rosa, "#F6C3A8", 70)} />
+          <Parada o="1" c={mezcla(T.oscuro, "#E8957E", 75)} />
         </linearGradient>
         <radialGradient id={g.superficie} cx=".4" cy=".4" r=".8">
           <Parada o="0" c="#FFF7F1" />
@@ -567,7 +567,7 @@ export function DlTarta({ className = "" }) {
         <ellipse cx="104" cy="128" rx="62" ry="10" fill={url(g.sombra)} />
 
         {/* Tenedor dorado. */}
-        <g transform="translate(176 126) rotate(-14)">
+        <g transform="translate(192 124) rotate(-10)">
           <path d="M-2 0 L-1.4 -36 C -1.4 -40 -5 -42 -5 -48 L -5 -60 M-1.6 -48 L-1.6 -60 M1.6 -48 L1.6 -60 M5 -48 L5 -60" fill="none" stroke={ORO.oscuro} strokeWidth="1.3" strokeLinecap="round" />
           <path d="M-5 -48 C -5 -42 -1.4 -40 -1.4 -36 L-2.2 4 Q 0 7 2.2 4 L 1.4 -36 C 1.4 -40 5 -42 5 -48 Z" fill={url(g.oro)} />
         </g>

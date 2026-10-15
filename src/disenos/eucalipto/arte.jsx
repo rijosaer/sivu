@@ -181,8 +181,8 @@ function Defs({ p }) {
         <feDropShadow dx="1" dy="3" stdDeviation="2.6" floodColor="#2F3A33" floodOpacity=".2" />
       </filter>
       <filter id={`${p}-grano`} x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
-        <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="5" result="ruido" />
-        <feColorMatrix in="ruido" type="matrix" values="0 0 0 0 .32  0 0 0 0 .3  0 0 0 0 .24  .6 0 0 0 -.22" result="grano" />
+        <feTurbulence type="fractalNoise" baseFrequency=".75" numOctaves="2" seed="5" result="ruido" />
+        <feColorMatrix in="ruido" type="matrix" values="0 0 0 0 .32  0 0 0 0 .3  0 0 0 0 .24  .28 0 0 0 -.1" result="grano" />
         <feComposite in="grano" in2="SourceAlpha" operator="in" result="granoDentro" />
         <feMerge>
           <feMergeNode in="SourceGraphic" />

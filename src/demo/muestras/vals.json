@@ -2,7 +2,7 @@
   "site": {
     "invitacion": {
       "slug": "plantillas/vals",
-      "nombre": "XV · Emilia",
+      "nombre": "XV · Valentina",
       "tipoEvento": "xv",
       "diseno": "vals"
     },
@@ -31,88 +31,137 @@
         "id": 46,
         "tipo": "welcome",
         "contenido": {
-          "novioEl": "Emilia Durán",
+          "novioEl": "Valentina Restrepo",
           "novioElla": "",
-          "fraseIntro": "Hay momentos que se sueñan toda la vida. Este es uno de ellos, y quiero vivirlo contigo.",
+          "bienvenidaTexto": "Mis XV años",
+          "fraseIntro": "Toda princesa sueña con una noche así: un salón lleno de luz, un vals y la gente que más quiere. Quiero que estés en mi cuento.",
           "padresTexto": "Con la bendición de mis padres",
-          "padreElMadre": "María Fernanda Gómez",
-          "padreElPadre": "Carlos Durán",
-          "padreEllaMadre": "",
+          "padreElPadre": "Andrés Restrepo",
+          "padreElMadre": "Catalina Ortiz",
           "padreEllaPadre": "",
-          "bienvenidaTexto": "Mis XV años"
+          "padreEllaMadre": ""
         }
       },
       {
         "id": 47,
         "tipo": "informacion_boda",
         "contenido": {
-          "fecha": "2027-03-20T21:00:00-05:00",
-          "lugar": "Hacienda Santa Clara",
-          "mapsUrl": "https://maps.google.com/?q=Hacienda+Santa+Clara+La+Calera",
-          "overline": "Mis quince años",
-          "direccion": "Km 4 vía La Calera, Bogotá",
+          "fecha": "2027-03-13T20:00:00-05:00",
+          "lugar": "Hotel InterContinental Medellín",
+          "direccion": "Calle 16 # 28-51, Variante Las Palmas, Medellín",
+          "mapsUrl": "https://maps.google.com/?q=Hotel+InterContinental+Medell%C3%ADn",
           "mapaEmbed": "",
+          "overline": "Mis quince años",
+          "tituloSeccion": "El lugar",
+          "tituloItinerario": "El programa",
+          "cronogramaModo": "detallado",
           "cronograma": [
             {
-              "hora": "9:00 p. m.",
+              "hora": "8:00 p. m.",
               "titulo": "Recepción"
             },
             {
-              "hora": "9:45 p. m.",
+              "hora": "8:45 p. m.",
               "titulo": "Entrada de la quinceañera"
             },
             {
-              "hora": "10:15 p. m.",
+              "hora": "9:15 p. m.",
               "titulo": "Vals"
             },
             {
+              "hora": "10:00 p. m.",
+              "titulo": "Cena"
+            },
+            {
               "hora": "11:00 p. m.",
-              "titulo": "Cena y fiesta"
+              "titulo": "¡Fiesta!"
             }
           ],
-          "tituloSeccion": "Información del evento",
-          "cronogramaModo": "detallado",
-          "tituloItinerario": "El programa",
-          "cronogramaMensaje": "Les compartiremos el programa más cerca de la fecha.",
+          "cronogramaMensaje": "",
           "mostrarRestriccion": true,
           "mostrarObservaciones": true,
-          "fechaLimiteConfirmacion": "2027-03-01"
+          "fechaLimiteConfirmacion": "2027-02-20",
+          "telefonoConfirmar": ""
         }
       },
       {
         "id": 48,
         "tipo": "padrinos",
         "contenido": {
+          "titulo": "Mi familia",
           "grupos": [
             {
-              "etiqueta": "Y mis padrinos",
+              "etiqueta": "Padrinos de honor",
               "personas": [
-                "Sandra Rojas",
-                "Andrés Rojas"
+                "Jorge Ortiz",
+                "Lucía Mejía"
+              ]
+            },
+            {
+              "etiqueta": "Padrino de vals",
+              "personas": [
+                "Santiago Restrepo"
+              ]
+            },
+            {
+              "etiqueta": "Padrinos del anillo",
+              "personas": [
+                "Felipe Ortiz",
+                "Daniela Ríos"
               ]
             }
-          ],
-          "titulo": "Padres y padrinos"
+          ]
         }
       },
       {
         "id": 49,
         "tipo": "vestimenta",
         "contenido": {
-          "nota": "",
-          "evitar": [],
-          "titulo": "Elegante",
-          "permitidos": []
+          "titulo": "Formal",
+          "nota": "Evita el rosa palo: es el color de la quinceañera.",
+          "permitidos": [
+            {
+              "nombre": "Tonos sugeridos",
+              "colores": [
+                "#2F3E55",
+                "#7A8B99",
+                "#C9B79C",
+                "#6E5A7E",
+                "#8C6F5A"
+              ]
+            }
+          ],
+          "evitar": [
+            {
+              "nombre": "Rosa palo",
+              "color": "#D8A1AE"
+            }
+          ]
+        }
+      },
+      {
+        "id": 53,
+        "tipo": "historia",
+        "contenido": {
+          "titulo": "Érase una vez",
+          "texto": "Érase una vez una niña que bailaba en la sala de su casa soñando con un salón de candelabros. Quince años después, ese salón existe, el vestido está listo y solo falta que llegues tú para que empiece el vals."
         }
       },
       {
         "id": 50,
         "tipo": "regalos",
         "contenido": {
-          "texto": "",
           "titulo": "Mesa de regalos",
+          "texto": "Tu compañía es mi mejor regalo. Si quieres tener un detalle conmigo, puedes hacerlo aquí:",
           "enlaces": [],
-          "datosTransferencia": "Nequi 300 123 4567 · Emilia Durán"
+          "datosTransferencia": "Nequi 300 000 0000 · Valentina Restrepo"
+        }
+      },
+      {
+        "id": 54,
+        "tipo": "sobres",
+        "contenido": {
+          "texto": "Durante la fiesta habrá un buzón para tu sobre. ¡Gracias por consentirme!"
         }
       },
       {
@@ -122,7 +171,8 @@
           "nota": "",
           "items": [
             "La invitación es personal y válida solo para los pases indicados.",
-            "Te pedimos llegar con 20 minutos de anticipación."
+            "Te pedimos llegar 20 minutos antes de la entrada de la quinceañera.",
+            "El hotel tiene parqueadero con tarifa para invitados."
           ]
         }
       },
@@ -136,25 +186,10 @@
               "r": "Cada invitación indica sus pases. Si necesitas uno adicional, escríbenos antes de confirmar."
             },
             {
-              "p": "¿Hay parqueadero?",
-              "r": "Sí, la hacienda tiene parqueadero para invitados."
+              "p": "¿A qué hora termina?",
+              "r": "La fiesta va hasta las 2:00 a. m."
             }
           ]
-        }
-      },
-      {
-        "id": 53,
-        "tipo": "historia",
-        "contenido": {
-          "texto": "Desde pequeña soñé con una noche en París: luces, flores y la gente que más quiero. Hoy cumplo quince años y quiero que ese sueño lo vivamos juntos.",
-          "titulo": "Mi historia"
-        }
-      },
-      {
-        "id": 54,
-        "tipo": "sobres",
-        "contenido": {
-          "texto": "Tu presencia es mi mejor regalo. Si además quieres hacerme un obsequio, habrá un buzón de sobres en la fiesta."
         }
       },
       {
@@ -162,11 +197,11 @@
         "tipo": "musica",
         "contenido": {
           "src": "",
-          "titulo": ""
+          "titulo": "Mi vals"
         }
       }
     ],
-    "fechaLimiteConfirmacion": "2027-03-01",
+    "fechaLimiteConfirmacion": "2027-02-20",
     "fotosSubidas": [],
     "audioUrl": null,
     "fondoUrl": null

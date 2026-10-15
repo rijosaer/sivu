@@ -89,7 +89,7 @@
 /* ---------- Portada: cortina de flores ---------- */
 .eu .eu-portada { position: relative; min-height: 100svh; display: grid; place-items: center; overflow: hidden; }
 .eu .eu-marco { position: absolute; inset: 0; max-width: 600px; margin: 0 auto; overflow: hidden; pointer-events: none; }
-.eu .eu-rama { position: absolute; top: 0; height: 100%; aspect-ratio: 340 / 1000; will-change: transform;
+.eu .eu-rama { position: absolute; top: 0; height: 100svh; min-height: 600px; width: calc(max(100svh, 600px) * .34); will-change: transform;
   transition: transform 1.9s var(--suelta); }
 .eu .eu-rama svg { display: block; width: 100%; height: 100%; }
 /* Cerrada: cada rama cubre casi tres cuartos de la pantalla y se cruzan al centro. */
