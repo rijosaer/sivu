@@ -1,9 +1,33 @@
 export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 export const SITIO_URL = import.meta.env.VITE_SITIO_URL || "http://localhost:5173";
+// Origen del sitio incrustado en la vista previa: es el único del que se
+// aceptan mensajes y el único al que se le mandan.
+export const ORIGEN_SITIO = new URL(SITIO_URL).origin;
+
+// ¿Este mensaje viene de verdad del sitio que está dentro de este iframe?
+// Sin esta comprobación, cualquier página que abriera el panel en otra
+// pestaña podía mandarle órdenes («mueve esta decoración») que el panel
+// guardaba con la sesión del usuario.
+export function mensajeDelSitio(e, iframe) {
+  return e.origin === ORIGEN_SITIO && Boolean(iframe) && e.source === iframe.contentWindow;
+}
 
 // El servidor devuelve rutas relativas para imágenes y audio.
 export function urlMedia(ruta) {
   return ruta ? `${API_URL}${ruta}` : ruta;
+}
+
+// Un archivo que llega de afuera (WhatsApp, comprobantes) se convierte en un
+// blob: con el origen del panel. Si fuera HTML o SVG y se abriera en una
+// pestaña, correría con la sesión del dueño. Solo se conserva el tipo si es
+// imagen, audio, video o PDF; lo demás queda como binario (se descarga).
+const TIPOS_VISIBLES = /^(image\/(jpeg|png|gif|webp|avif|heic|heif)|audio\/[a-z0-9.+-]+|video\/(mp4|webm|3gpp|quicktime)|application\/pdf)$/;
+async function blobSeguro(res) {
+  const blob = await res.blob();
+  const tipo = blob.type.split(";")[0].trim().toLowerCase();
+  return TIPOS_VISIBLES.test(tipo) && tipo !== "image/svg+xml"
+    ? blob
+    : new Blob([blob], { type: "application/octet-stream" });
 }
 
 function getToken() {
@@ -161,7 +185,7 @@ export const api = {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
       if (!res.ok) throw new Error("No se pudo descargar");
-      const url = URL.createObjectURL(await res.blob());
+      const url = URL.createObjectURL(await blobSeguro(res));
       const a = document.createElement("a");
       a.href = url;
       a.download = nombre || "archivo";
@@ -191,7 +215,7 @@ export const api = {
         headers: getToken() ? { Authorization: `Bearer ${getToken()}` } : {},
       });
       if (!res.ok) throw new Error("No se pudo abrir el archivo");
-      return URL.createObjectURL(await res.blob());
+      return URL.createObjectURL(await blobSeguro(res));
     },
     pagosPorConfirmar: (recientes) => request(`/api/admin/crm/pagos-por-confirmar${recientes ? "?recientes=1" : ""}`),
     confirmarPago: (id, datos) =>
@@ -203,7 +227,7 @@ export const api = {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
       if (!res.ok) throw new Error("Sin comprobante");
-      const blob = await res.blob();
+      const blob = await blobSeguro(res);
       return { url: URL.createObjectURL(blob), tipo: blob.type };
     },
   },
@@ -284,7 +308,17 @@ export const api = {
 export function setToken(token) {
   localStorage.setItem("admin_token", token);
 }
+// Salir avisa al servidor, que invalida el token ahí mismo: si alguien lo
+// hubiera copiado, deja de servirle. Si la llamada falla, igual se sale.
 export function clearToken() {
+  const token = getToken();
+  if (token) {
+    fetch(`${API_URL}/api/auth/logout`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      keepalive: true,
+    }).catch(() => {});
+  }
   localStorage.removeItem("admin_token");
   localStorage.removeItem("evento_fijo");
 }

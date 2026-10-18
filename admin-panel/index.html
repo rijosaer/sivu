@@ -18,14 +18,9 @@
 
     <meta name="robots" content="noindex, nofollow" />
 
-    <!-- Anti-clickjacking sin depender del servidor: si la página se carga
-         dentro de un iframe (window !== top), se rompe el marco y se navega
-         fuera. Complementa la cabecera X-Frame-Options del servidor. -->
-    <script>
-      if (window.top !== window.self) {
-        window.top.location = window.self.location;
-      }
-    </script>
+    <!-- Anti-clickjacking sin depender del servidor (ver public/antimarco.js).
+         Complementa la cabecera X-Frame-Options / frame-ancestors del borde. -->
+    <script src="/antimarco.js"></script>
   </head>
   <body class="bg-lienzo text-ink">
     <div id="root"></div>

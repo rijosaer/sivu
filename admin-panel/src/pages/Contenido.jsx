@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { api, SITIO_BASE, esEventoFijo } from "../api";
+import { api, SITIO_BASE, esEventoFijo, ORIGEN_SITIO } from "../api";
 import CampoValor, { etiquetaDe } from "./EditorCampos";
 import { vocabulario, etiquetaCampo, campoVisible } from "../vocabulario";
 import GestorFotos from "./GestorFotos";
@@ -237,7 +237,7 @@ export default function Contenido() {
   const arrastrado = useRef(null);
 
   const avisarVista = useCallback((mensaje) => {
-    iframeRef.current?.contentWindow?.postMessage({ fuente: FUENTE, ...mensaje }, "*");
+    iframeRef.current?.contentWindow?.postMessage({ fuente: FUENTE, ...mensaje }, ORIGEN_SITIO);
   }, []);
 
   async function cargar() {

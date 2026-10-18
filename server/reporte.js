@@ -54,7 +54,7 @@ export async function anuncios(desde, hasta) {
   url.searchParams.set("limit", "100");
   url.searchParams.set("access_token", token);
   try {
-    const r = await fetch(url);
+    const r = await fetch(url, { signal: AbortSignal.timeout(20_000) });
     const json = await r.json();
     if (json.error) throw new Error(json.error.message);
     const filtro = sinAcentos(filtroCampana || "");

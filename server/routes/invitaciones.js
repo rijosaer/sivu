@@ -75,11 +75,11 @@ invitacionesRouter.get(
 // por WhatsApp y sin sorpresas de teclado.
 const USUARIO_RE = /^[a-z0-9._-]{3,40}$/;
 function validarAccesoCliente(usuario, password) {
-  if (!USUARIO_RE.test(usuario || "")) {
+  if (typeof usuario !== "string" || !USUARIO_RE.test(usuario)) {
     return "El usuario solo puede tener minúsculas, números, punto, guion y guion bajo (3 a 40 caracteres)";
   }
-  if (!password || String(password).length < 6) {
-    return "La contraseña del cliente necesita mínimo 6 caracteres";
+  if (typeof password !== "string" || password.length < 10 || password.length > 200) {
+    return "La contraseña del cliente necesita entre 10 y 200 caracteres";
   }
   return null;
 }
@@ -91,11 +91,12 @@ async function guardarUsuarioCliente(client, invitacionId, usuario, password) {
   if (previo.rows.length && previo.rows[0].invitacion_id === null) {
     return { error: `"${usuario}" es el usuario administrador del sistema; elige otro nombre` };
   }
-  const hash = bcrypt.hashSync(String(password), 10);
+  const hash = bcrypt.hashSync(String(password), 12);
   await client.query(
     `INSERT INTO admin_usuarios (usuario, password_hash, invitacion_id) VALUES ($1, $2, $3)
      ON CONFLICT (usuario) DO UPDATE
-       SET password_hash = EXCLUDED.password_hash, invitacion_id = EXCLUDED.invitacion_id`,
+       SET password_hash = EXCLUDED.password_hash, invitacion_id = EXCLUDED.invitacion_id,
+         sesion_version = admin_usuarios.sesion_version + 1`,
     [usuario, hash, invitacionId]
   );
   return { usuario };

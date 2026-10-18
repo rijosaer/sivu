@@ -9,7 +9,7 @@ import Anuncio from "./components/Anuncio";
 import Servidores, { personaDelEnlace } from "./components/Servidores";
 import { getSite, getInvitado, submitRSVP, registrarApertura } from "./api/site";
 import { DecorProvider } from "./theme/DecorContext";
-import { EditorProvider, editorActivo, editandoPortada } from "./editor/EditorContext";
+import { EditorProvider, editorActivo, editandoPortada, mensajeDelPanel } from "./editor/EditorContext";
 import { applyTema } from "./theme/applyTema";
 import { renderSeccion } from "./SectionRenderer";
 
@@ -117,6 +117,7 @@ export default function App() {
   useEffect(() => {
     if (!enEditor) return;
     function alRecibir(e) {
+      if (!mensajeDelPanel(e)) return;
       const d = e.data;
       if (!d || d.fuente !== "invitacion-editor") return;
       if (d.tipo === "previsualizar" && d.seccionTipo) {

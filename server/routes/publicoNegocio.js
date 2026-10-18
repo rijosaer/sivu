@@ -1,9 +1,10 @@
-import { Router } from "express";
+import express, { Router } from "express";
 import { pool } from "../db.js";
 import { capturar } from "../errores.js";
 import { enviarTexto, whatsappConectado } from "../whatsappWeb.js";
 import { leerAjuste, telefonosAviso } from "../ajustes.js";
 import { anotar } from "../prospectos.js";
+import { limitador } from "../seguridad.js";
 
 // Páginas públicas del negocio (sin sesión, con un enlace imposible de
 // adivinar):
@@ -11,6 +12,51 @@ import { anotar } from "../prospectos.js";
 //   /datos/<token>      → el formulario donde el cliente que ya firmó llena
 //                          los datos de su evento y sube fotos, música y lista.
 export const publicoNegocioRouter = Router();
+
+// Los tokens son 9 bytes al azar en base64url (12 caracteres, ver crm.js).
+// Uno con otra forma ni se busca; y quien prueba tokens que no existen se
+// frena rápido (los válidos no cuentan).
+const TOKEN_RE = /^[A-Za-z0-9_-]{12,64}$/;
+const limiteTokens = limitador({
+  ventanaMs: 10 * 60 * 1000,
+  maximo: 15,
+  soloFallos: true,
+  mensaje: "Demasiados intentos. Espera unos minutos.",
+});
+publicoNegocioRouter.param("token", (req, res, next, token) => {
+  if (!TOKEN_RE.test(token)) return res.status(404).json({ error: "Este enlace no existe" });
+  next();
+});
+publicoNegocioRouter.use(["/cotizacion", "/datos"], limiteTokens);
+
+// Las dos rutas que reciben archivos (comprobante y archivos del formulario)
+// son las únicas públicas que aceptan un cuerpo grande. Antes de leerlo se
+// comprueba que el token exista: sin un enlace válido, nadie puede mandar
+// megas para ocupar la memoria del servidor. Se monta en index.js antes del
+// lector de JSON pequeño de /api/public.
+const jsonSubidas = express.json({ limit: "15mb", strict: true });
+export const subidasNegocio = Router();
+subidasNegocio.post(
+  ["/cotizacion/:token/pague", "/datos/:token/archivos"],
+  limiteTokens,
+  capturar(async (req, res, next) => {
+    const { token } = req.params;
+    if (!TOKEN_RE.test(token)) return res.status(404).json({ error: "Este enlace no existe" });
+    const sql = req.path.startsWith("/cotizacion/")
+      ? "SELECT 1 FROM cotizaciones WHERE token = $1"
+      : "SELECT 1 FROM invitaciones WHERE datos_token = $1";
+    const { rowCount } = await pool.query(sql, [token]);
+    if (!rowCount) return res.status(404).json({ error: "Este enlace no existe" });
+    next();
+  }),
+  jsonSubidas
+);
+// Subidas (comprobantes, fotos del cliente): pocas por persona.
+const limiteSubidas = limitador({
+  ventanaMs: 10 * 60 * 1000,
+  maximo: 40,
+  mensaje: "Demasiados archivos seguidos. Espera un momento.",
+});
 
 const WHATSAPP_SIVU = () => process.env.WHATSAPP_SIVU || "573236019372";
 
@@ -91,6 +137,7 @@ publicoNegocioRouter.post(
 // Queda en la ficha y le llega el aviso al equipo para revisar el comprobante.
 publicoNegocioRouter.post(
   "/cotizacion/:token/pague",
+  limiteSubidas,
   capturar(async (req, res) => {
     const { rows: [c] } = await pool.query("SELECT * FROM cotizaciones WHERE token = $1", [req.params.token]);
     if (!c) return res.status(404).json({ error: "Esta cotización no existe" });
@@ -206,17 +253,18 @@ publicoNegocioRouter.post(
 
 const LIMITES = {
   foto: { bytes: 8 * 1024 * 1024, max: 40, mime: /^image\/(jpeg|png|webp|heic|heif)$/ },
-  audio: { bytes: 10 * 1024 * 1024, max: 3, mime: /^audio\// },
+  audio: { bytes: 10 * 1024 * 1024, max: 3, mime: /^audio\/(mpeg|mp3|mp4|x-m4a|m4a|aac|x-aac|ogg|wav|x-wav|webm)$/ },
   lista: {
     bytes: 5 * 1024 * 1024,
     max: 5,
     mime: /^(application\/vnd\.openxmlformats-officedocument\.spreadsheetml\.sheet|application\/vnd\.ms-excel|text\/csv|application\/pdf|application\/octet-stream)$/,
   },
-  otro: { bytes: 8 * 1024 * 1024, max: 10, mime: /^(image\/|application\/pdf)/ },
+  otro: { bytes: 8 * 1024 * 1024, max: 10, mime: /^(image\/(jpeg|png|webp|gif|heic|heif)|application\/pdf)$/ },
 };
 
 publicoNegocioRouter.post(
   "/datos/:token/archivos",
+  limiteSubidas,
   capturar(async (req, res) => {
     const inv = await eventoPorToken(req.params.token);
     if (!inv) return res.status(404).json({ error: "Este enlace no existe" });
@@ -250,6 +298,7 @@ publicoNegocioRouter.delete(
   capturar(async (req, res) => {
     const inv = await eventoPorToken(req.params.token);
     if (!inv) return res.status(404).json({ error: "Este enlace no existe" });
+    if (!/^\d{1,10}$/.test(req.params.id)) return res.status(404).json({ error: "Ese archivo no existe" });
     await pool.query("DELETE FROM datos_archivos WHERE id = $1 AND invitacion_id = $2 AND NOT usado", [req.params.id, inv.id]);
     res.status(204).end();
   })

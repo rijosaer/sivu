@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api, urlMedia, SITIO_BASE } from "../api";
+import { api, urlMedia, SITIO_BASE, ORIGEN_SITIO, mensajeDelSitio } from "../api";
 import { comprimirDecoracion } from "../archivos";
 import GestorFondo from "./GestorFondo";
 
@@ -59,7 +59,7 @@ export default function Decoraciones() {
   const guardadoPendiente = useRef({});
 
   const avisarAlSitio = useCallback((mensaje) => {
-    iframeRef.current?.contentWindow?.postMessage({ fuente: FUENTE, ...mensaje }, "*");
+    iframeRef.current?.contentWindow?.postMessage({ fuente: FUENTE, ...mensaje }, ORIGEN_SITIO);
   }, []);
 
   const cargar = useCallback(async () => {
@@ -88,6 +88,7 @@ export default function Decoraciones() {
   // Mensajes que llegan del sitio incrustado.
   useEffect(() => {
     function alRecibir(e) {
+      if (!mensajeDelSitio(e, iframeRef.current)) return;
       const d = e.data;
       if (!d || d.fuente !== FUENTE) return;
       if (d.tipo === "seleccionar") setSeleccionadaId(d.id ?? null);

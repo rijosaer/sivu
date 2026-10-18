@@ -4,6 +4,8 @@ import { capturar } from "../errores.js";
 import { resolverInvitacionPublica } from "../middlewareInvitacion.js";
 import { avisarRespuesta, fotoRespuestas } from "../avisosWhatsapp.js";
 import { publicoNegocioRouter } from "./publicoNegocio.js";
+import { enviarArchivo, firmaValida, urlMedio } from "../archivos.js";
+import { CLAVE_RE, CODIGO_RE, esIdValido, limitador, texto } from "../seguridad.js";
 
 export const publicRouter = Router();
 
@@ -15,8 +17,26 @@ publicRouter.use(publicoNegocioRouter);
 function partirDataUrl(dataUrl) {
   const m = /^data:([^;,]+);base64,(.*)$/s.exec(dataUrl || "");
   if (!m) return null;
-  return { mime: m[1], buffer: Buffer.from(m[2], "base64") };
+  return { mime: m[1].toLowerCase(), buffer: Buffer.from(m[2], "base64") };
 }
+
+const codigoValido = (c) => typeof c === "string" && CODIGO_RE.test(c);
+
+// Adivinar códigos de invitado: cada código que no existe cuenta. 20 fallos
+// en 10 minutos bastan para quien se equivoca escribiendo; para recorrer los
+// ~mil millones de códigos posibles harían falta siglos.
+const limiteCodigos = limitador({
+  ventanaMs: 10 * 60 * 1000,
+  maximo: 20,
+  soloFallos: true,
+  mensaje: "Demasiados códigos incorrectos. Espera unos minutos.",
+});
+// Confirmar asistencia: nadie necesita mandar más de unas cuantas por minuto.
+const limiteRsvp = limitador({
+  ventanaMs: 10 * 60 * 1000,
+  maximo: 30,
+  mensaje: "Demasiadas confirmaciones seguidas. Espera un momento.",
+});
 
 // Todo lo de una invitación puntual cuelga de su slug:
 // /api/public/invitaciones/:slug/... . resolverInvitacionPublica ya validó
@@ -80,10 +100,10 @@ invitacionRouter.get(
       // tiene que conocerlo en ese caso. Si no, el invitado vería el formulario
       // abierto y recibiría un 403 al confirmar.
       fechaLimiteConfirmacion: limite.rows[0]?.limite || null,
-      fotosSubidas: fotos.rows.map((r) => `/api/public/medio/${r.id}`),
-      audioUrl: audio.rows.length ? `/api/public/medio/${audio.rows[0].id}` : null,
+      fotosSubidas: fotos.rows.map((r) => urlMedio(r.id)),
+      audioUrl: audio.rows.length ? urlMedio(audio.rows[0].id) : null,
       // null = usar el papel dibujado por CSS que trae el sitio.
-      fondoUrl: fondo.rows.length ? `/api/public/medio/${fondo.rows[0].id}` : null,
+      fondoUrl: fondo.rows.length ? urlMedio(fondo.rows[0].id) : null,
     });
   })
 );
@@ -92,21 +112,23 @@ invitacionRouter.get(
 invitacionRouter.get(
   "/decoracion/:clave",
   capturar(async (req, res) => {
+    if (!CLAVE_RE.test(req.params.clave)) return res.status(404).json({ error: "Decoración no encontrada" });
     const { rows } = await pool.query(
       "SELECT datos FROM decoraciones WHERE clave = $1 AND invitacion_id = $2",
       [req.params.clave, req.invitacionId]
     );
     const partes = rows.length ? partirDataUrl(rows[0].datos) : null;
     if (!partes) return res.status(404).json({ error: "Decoración no encontrada" });
-    res.set("Cache-Control", "public, max-age=31536000, immutable");
-    res.type(partes.mime).send(partes.buffer);
+    enviarArchivo(res, partes.mime, partes.buffer);
   })
 );
 
 // La invitación de un código, con todas las personas que cubre.
 invitacionRouter.get(
   "/invitado/:codigo",
+  limiteCodigos,
   capturar(async (req, res) => {
+    if (!codigoValido(req.params.codigo)) return res.status(404).json({ error: "Invitación no encontrada" });
     const { rows } = await pool.query(
       "SELECT id, codigo, tipo, nombre, familia, mensaje, cupos FROM invitados WHERE codigo = $1 AND invitacion_id = $2",
       [req.params.codigo, req.invitacionId]
@@ -172,10 +194,23 @@ async function plazoVencido(invitacionId) {
 // el invitado escribe para ocupar los cupos que se le dieron.
 invitacionRouter.post(
   "/rsvp",
+  limiteRsvp,
+  limiteCodigos,
   capturar(async (req, res) => {
-    const { codigo, respuestas, acompanantes } = req.body;
-    if (!codigo || !Array.isArray(respuestas) || !respuestas.length) {
+    const { codigo, respuestas, acompanantes } = req.body || {};
+    if (!codigoValido(codigo) || !Array.isArray(respuestas) || !respuestas.length || respuestas.length > 100) {
       return res.status(400).json({ error: "Faltan datos para confirmar" });
+    }
+    // Cada respuesta: id numérico y textos con tope. Lo que no venga así se
+    // rechaza entero antes de tocar la base.
+    const limpias = respuestas.map((r) => ({
+      id: r?.id,
+      estado: r?.estado,
+      restriccion: texto(r?.restriccion, 500),
+      comentario: texto(r?.comentario, 1000),
+    }));
+    if (limpias.some((r) => !esIdValido(r.id) || r.restriccion === null || r.comentario === null)) {
+      return res.status(400).json({ error: "La respuesta no llegó bien" });
     }
 
     // Se comprueba aquí, en el servidor: que el sitio esconda el formulario
@@ -196,7 +231,7 @@ invitacionRouter.post(
     const { id: invitadoId, tipo, cupos } = inv.rows[0];
 
     const estadosValidos = ["pendiente", "confirmado", "no_asistira"];
-    if (respuestas.some((r) => !estadosValidos.includes(r.estado))) {
+    if (limpias.some((r) => !estadosValidos.includes(r.estado))) {
       return res.status(400).json({ error: "Estado de asistencia no válido" });
     }
 
@@ -204,15 +239,15 @@ invitacionRouter.post(
     // condición es que cada uno venga con nombre.
     let nuevosAcompanantes = null;
     if (acompanantes !== undefined) {
-      if (!Array.isArray(acompanantes)) {
+      if (!Array.isArray(acompanantes) || acompanantes.length > 50) {
         return res.status(400).json({ error: "Los acompañantes no llegaron bien" });
       }
       if (tipo !== "cupos") {
         return res.status(400).json({ error: "Esta invitación no admite acompañantes" });
       }
       nuevosAcompanantes = acompanantes.map((a) => ({
-        nombre: String(a?.nombre || "").trim(),
-        restriccion: String(a?.restriccion || "").trim(),
+        nombre: String(texto(a?.nombre, 120) ?? "").trim(),
+        restriccion: String(texto(a?.restriccion, 500) ?? "").trim(),
       }));
       if (nuevosAcompanantes.some((a) => !a.nombre)) {
         return res.status(400).json({ error: "Escribe el nombre de cada acompañante" });
@@ -230,7 +265,7 @@ invitacionRouter.post(
     const client = await pool.connect();
     try {
       await client.query("BEGIN");
-      for (const r of respuestas) {
+      for (const r of limpias) {
         // El WHERE con invitado_id impide que un código toque los miembros de otra invitación.
         await client.query(
           `UPDATE invitado_miembros
@@ -306,8 +341,8 @@ invitacionRouter.post(
 invitacionRouter.post(
   "/visto",
   capturar(async (req, res) => {
-    const { codigo } = req.body;
-    if (!codigo) return res.status(400).json({ error: "Falta el código" });
+    const codigo = req.body?.codigo;
+    if (!codigoValido(codigo)) return res.status(400).json({ error: "Falta el código" });
     // "ultima_apertura" solo se mueve cuando ha pasado un rato desde la última
     // apertura (nueva visita), no en cada refresco. Así se avisa una vez por
     // visita real y no una por cada recarga de la misma sesión.
@@ -327,17 +362,20 @@ invitacionRouter.post(
 );
 
 // Foto de la galería o audio de fondo. El id cambia al reemplazar el archivo,
-// así que se puede cachear para siempre sin quedar desactualizado. No hace
-// falta el slug: el id de un medio ya identifica un archivo sin ambigüedad,
-// y sirve tal cual desde antes de que existiera el multi-invitación.
+// así que se puede cachear para siempre sin quedar desactualizado. La URL
+// lleva una firma (?f=) que solo emite el servidor a quien ya puede ver el
+// archivo: sin ella, recorrer ids consecutivos no devuelve nada (antes servía
+// para bajar las fotos de cualquier evento). Firma mala, id mal formado o id
+// inexistente responden lo mismo: 404.
 publicRouter.get(
   "/medio/:id",
   capturar(async (req, res) => {
-    const { rows } = await pool.query("SELECT mime, datos FROM medios WHERE id = $1", [
-      req.params.id,
-    ]);
+    const { id } = req.params;
+    if (!esIdValido(id) || !firmaValida(id, req.query.f)) {
+      return res.status(404).json({ error: "Archivo no encontrado" });
+    }
+    const { rows } = await pool.query("SELECT mime, datos FROM medios WHERE id = $1", [id]);
     if (!rows.length) return res.status(404).json({ error: "Archivo no encontrado" });
-    res.set("Cache-Control", "public, max-age=31536000, immutable");
-    res.type(rows[0].mime).send(rows[0].datos);
+    enviarArchivo(res, rows[0].mime, rows[0].datos);
   })
 );

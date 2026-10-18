@@ -29,11 +29,41 @@ export function editandoPortada() {
   return new URLSearchParams(window.location.search).get("portada") === "1";
 }
 
+// Paneles que pueden incrustar el sitio en modo editor. Se pueden sumar más
+// (p. ej. un panel de pruebas) con VITE_PANEL_ORIGINS, separados por coma.
+const ORIGENES_PANEL = [
+  "https://panel.heysivu.com",
+  ...(import.meta.env.DEV ? ["http://localhost:5174"] : []),
+  ...String(import.meta.env.VITE_PANEL_ORIGINS || "")
+    .split(",")
+    .map((s) => s.trim().replace(/\/+$/, ""))
+    .filter(Boolean),
+];
+
+// Origen de la página que incrusta este iframe, si es un panel conocido.
+function origenDelPanel() {
+  if (window.parent === window) return null;
+  let origen = window.location.ancestorOrigins?.[0] || "";
+  if (!origen && document.referrer) {
+    try {
+      origen = new URL(document.referrer).origin;
+    } catch {
+      origen = "";
+    }
+  }
+  return ORIGENES_PANEL.includes(origen) ? origen : null;
+}
+
+// Solo se aceptan órdenes de la ventana que incrusta el sitio y solo si es el
+// panel: una página cualquiera que incruste la invitación no puede mover nada.
+export function mensajeDelPanel(e) {
+  return e.source === window.parent && window.parent !== window && ORIGENES_PANEL.includes(e.origin);
+}
+
 function avisarAlPanel(mensaje) {
-  if (window.parent === window) return;
-  // targetOrigin abierto a propósito: el panel puede estar en cualquier
-  // dominio y aquí solo viajan coordenadas, nada sensible.
-  window.parent.postMessage({ fuente: FUENTE, ...mensaje }, "*");
+  const origen = origenDelPanel();
+  if (!origen) return;
+  window.parent.postMessage({ fuente: FUENTE, ...mensaje }, origen);
 }
 
 export function EditorProvider({ activo, ubicaciones, onCambioLocal, onRecargar, children }) {
@@ -62,6 +92,7 @@ export function EditorProvider({ activo, ubicaciones, onCambioLocal, onRecargar,
   useEffect(() => {
     if (!activo) return;
     function alRecibir(e) {
+      if (!mensajeDelPanel(e)) return;
       const d = e.data;
       if (!d || d.fuente !== FUENTE) return;
       if (d.tipo === "aplicar" && d.id) onCambioLocal?.(d.id, d.cambios || {});
