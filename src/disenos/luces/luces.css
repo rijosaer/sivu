@@ -308,7 +308,7 @@
 .lu-vc-l { font: 400 16px/1.5 var(--f-guion); color: var(--suave); }
 .lu-cuenta-sec:not(.is-in) .lu-vc-cera { height: 124px; }
 
-.lu-cuando { display: grid; gap: 2px; margin-bottom: 14px; }
+.lu-cuando { display: grid; gap: 2px; margin: 4px 0 14px; }
 .lu-cuando-sem { font: 600 11px/1.4 var(--f-cuerpo); letter-spacing: .26em; text-transform: uppercase; color: var(--suave); }
 .lu-cuando-dia { font: 400 26px/1.2 var(--f-titulos); }
 .lu-cuando-hora { font: 400 22px/1.4 var(--f-guion); color: var(--ambar-oscuro); }
@@ -472,10 +472,11 @@
 
 /* Música y avisos */
 .lu-musica {
-  position: fixed; top: 0; right: 12px; z-index: 20; width: 48px; height: 84px; padding: 0;
+  position: fixed; top: 0; right: 10px; z-index: 20; width: 52px; height: 126px; padding: 40px 2px 0;
   border: 0; background: none; cursor: pointer;
   transform-origin: 50% 0; animation: lu-mece 4.2s ease-in-out infinite;
 }
+.lu-musica::before { content: ""; position: absolute; top: 0; left: calc(50% - .7px); width: 1.4px; height: 42px; background: #2a2d34; }
 .lu-bombilla-boton { display: block; width: 48px; height: 84px; overflow: visible; filter: drop-shadow(0 4px 4px rgb(0 0 0 / .18)); }
 .lu-bb-halo, .lu-bb-luz { opacity: 0; transition: opacity .5s ease; }
 .lu-bb-filamento { stroke: #8f887c; transition: stroke .4s ease; }
@@ -514,9 +515,8 @@
   box-shadow: 0 2px 4px rgb(0 0 0 / .12), 0 34px 60px -18px rgb(0 0 0 / .6);
 }
 .lu-modal-cabeza { text-align: center; padding: 0 40px; }
-.lu-modal-guion { font: 400 clamp(28px, 8vw, 34px)/1.3 var(--f-guion); color: var(--ambar-oscuro); }
-.lu-modal-cabeza .lu-filete-luces { width: 150px; margin: 0 auto 4px; }
-.lu-modal-nombre { font: 400 19px/1.35 var(--f-titulos); color: var(--tinta); overflow-wrap: anywhere; }
+.lu-modal-caja p.lu-modal-guion { font: 400 clamp(28px, 8vw, 34px)/1.3 var(--f-guion); color: var(--ambar-oscuro); }
+.lu-modal-cabeza .lu-filete-luces { width: 150px; margin: 0 auto; }
 .lu-cerrar {
   position: absolute; top: 12px; right: 12px; z-index: 2; width: 44px; height: 44px; display: grid; place-items: center;
   border: 1px solid rgb(var(--color-gold) / .6); border-radius: 50%; cursor: pointer;

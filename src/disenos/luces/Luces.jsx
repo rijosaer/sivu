@@ -511,7 +511,6 @@ export default function Luces({ site, contenidoDe, invitacion, onEnviarRSVP, enE
             <div className="lu-modal-cabeza is-in">
               <p className="lu-modal-guion">Guardamos tu lugar</p>
               <div className="lu-filete-luces" aria-hidden="true"><LuGuirnalda n={7} ancho={180} alto={6} r={2.8} /></div>
-              <p className="lu-modal-nombre">{invitacion.nombre}</p>
             </div>
             <RSVP
               invitacion={invitacion}
