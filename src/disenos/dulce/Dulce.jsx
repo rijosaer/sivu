@@ -467,7 +467,7 @@ export default function Dulce({ site, contenidoDe, invitacion, onEnviarRSVP, enE
               <span className="dl-modal-sello">{edad || "♥"}</span>
             </div>
             <button type="button" className="dl-cerrar" onClick={() => setRsvpAbierto(false)} aria-label="Cerrar">
-              <span aria-hidden="true">×</span>
+              <svg viewBox="0 0 24 24" {...trazo} strokeWidth="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
             </button>
             <span className="dl-modal-cordel" aria-hidden="true" />
             <RSVP

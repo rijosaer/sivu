@@ -755,9 +755,9 @@ export function LbConcha({ className = "", style }) {
         ))}
       </g>
       {/* agua que recibe la gota */}
-      <ellipse cx="110" cy="214" rx="56" ry="8" fill={`url(#${ids.charco})`} />
-      <ellipse className="lb-concha-onda" cx="110" cy="214" rx="20" ry="3.4" fill="none" stroke="#fff" strokeWidth="1.2" />
-      <ellipse className="lb-concha-onda lb-concha-onda-2" cx="110" cy="214" rx="20" ry="3.4" fill="none" stroke="#fff" strokeWidth=".8" />
+      <ellipse cx="110" cy="206" rx="56" ry="8" fill={`url(#${ids.charco})`} />
+      <ellipse className="lb-concha-onda" cx="110" cy="206" rx="20" ry="3.4" fill="none" stroke="#fff" strokeWidth="1.2" />
+      <ellipse className="lb-concha-onda lb-concha-onda-2" cx="110" cy="206" rx="20" ry="3.4" fill="none" stroke="#fff" strokeWidth=".8" />
       {/* concha bocabajo, vertiendo */}
       <g filter={`url(#${ids.sombra})`}>
         <g filter={`url(#${ids.grano})`}>

@@ -135,7 +135,7 @@
 
 /* Escena: vela alta sobre palmatoria y dos ramas de olivo en la mesa. */
 .lb-escena { position: relative; flex: 1 1 auto; display: flex; align-items: flex-end; padding-top: 3svh; justify-content: center; width: 100%; min-height: 0; }
-.lb-vela-caja { position: relative; height: min(52svh, 470px); aspect-ratio: 200 / 540; }
+.lb-vela-caja { position: relative; height: min(55svh, 480px); aspect-ratio: 200 / 540; }
 .lb-vela { display: block; width: 100%; height: 100%; overflow: visible; }
 .lb-escena-olivo { position: absolute; width: min(36vw, 150px); bottom: 6px; filter: drop-shadow(0 4px 6px rgb(60 50 30 / .12)); }
 .lb-escena-olivo-1 { right: calc(50% + 18px); transform: scaleX(-1) rotate(-8deg); }
@@ -341,15 +341,15 @@
 .lb-cruz {
   position: absolute; z-index: 2; top: -15px; left: 50%; width: 30px; height: 30px; transform: translateX(-50%);
   border-radius: 50%; pointer-events: none;
-  background: radial-gradient(circle, rgb(255 250 236) 0 18%, color-mix(in srgb, var(--oro-claro) 80%, transparent) 40%, transparent 70%);
+  background: radial-gradient(circle, rgb(255 252 240) 0 16%, color-mix(in srgb, var(--oro-claro) 90%, transparent) 38%, color-mix(in srgb, var(--oro) 22%, transparent) 55%, transparent 72%);
 }
 .lb-cruz::before, .lb-cruz::after, .lb-cruz i {
   content: ""; position: absolute; left: 50%; top: 50%; border-radius: 2px;
-  background: linear-gradient(180deg, #fff, color-mix(in srgb, var(--oro-claro) 60%, #fff));
-  box-shadow: 0 0 6px 1px rgb(255 236 190 / .95), 0 0 14px 3px color-mix(in srgb, var(--oro) 45%, transparent);
+  background: linear-gradient(180deg, #fff, color-mix(in srgb, var(--oro) 55%, #fff));
+  box-shadow: 0 0 2px .5px color-mix(in srgb, var(--oro) 70%, transparent), 0 0 8px 2px rgb(255 226 160 / .95), 0 0 16px 4px color-mix(in srgb, var(--oro) 40%, transparent);
 }
-.lb-cruz::before { width: 2.4px; height: 24px; transform: translate(-50%, -58%); }
-.lb-cruz::after { width: 15px; height: 2.4px; transform: translate(-50%, -190%); }
+.lb-cruz::before { width: 2.6px; height: 26px; transform: translate(-50%, -58%); }
+.lb-cruz::after { width: 16px; height: 2.6px; transform: translate(-50%, -190%); }
 .lb-cruz i { width: 1px; height: 1px; box-shadow: 0 0 20px 9px rgb(255 240 205 / .7); }
 .lb-ante { font: italic 400 15.5px/1.4 var(--f-titulos); color: var(--olivo-oscuro); }
 .lb-ante::first-letter { text-transform: uppercase; }
@@ -357,7 +357,7 @@
   position: relative; max-width: 100%;
   font: 500 clamp(22px, 6.4vw, 26px)/1.28 var(--f-titulos); color: var(--tinta); overflow-wrap: anywhere;
 }
-.lb-paloma-titulo { position: absolute; right: -22px; top: -6px; width: 52px; height: auto; filter: drop-shadow(0 3px 4px color-mix(in srgb, var(--oro-oscuro) 35%, transparent)); animation: lb-vuelo 4.8s ease-in-out infinite; }
+.lb-paloma-titulo { position: absolute; right: 18px; top: -14px; width: 48px; height: auto; filter: drop-shadow(0 3px 4px color-mix(in srgb, var(--oro-oscuro) 35%, transparent)); animation: lb-vuelo 4.8s ease-in-out infinite; }
 @keyframes lb-vuelo { 0%, 100% { transform: translate(0, 0) rotate(-4deg); } 50% { transform: translate(3px, -5px) rotate(2deg); } }
 
 .lb-texto { color: var(--suave); max-width: 32ch; }
@@ -372,12 +372,13 @@
 /* Cuenta regresiva: cuatro velas votivas con su número en el vaso. */
 .lb-cuenta { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; width: 100%; max-width: 300px; }
 .lb-cuenta-vela { display: flex; flex-direction: column; align-items: center; }
-.lb-cuenta-vaso { position: relative; width: 100%; max-width: 68px; }
+.lb-cuenta-vaso { position: relative; width: 100%; max-width: 72px; }
 .lb-cuenta-votiva { display: block; width: 100%; height: auto; overflow: visible; }
 .lb-cuenta-votiva .lb-votiva-llama { transform-box: fill-box; transform-origin: 50% 100%; animation: lb-titilar 2.6s ease-in-out calc(var(--i) * -.6s) infinite; }
 .lb-cuenta-votiva .lb-votiva-aura { transform-box: fill-box; transform-origin: center; animation: lb-aura 3.4s ease-in-out calc(var(--i) * -.8s) infinite; }
-.lb-cuenta .n { position: absolute; left: 0; right: 0; top: 63%; font: 600 clamp(19px, 5.6vw, 23px)/1 var(--f-titulos); color: var(--oro-oscuro);
+.lb-cuenta .n { position: absolute; left: 0; right: 0; top: 57%; font: 600 clamp(19px, 5.8vw, 23px)/1 var(--f-titulos); color: var(--oro-oscuro);
   font-variant-numeric: tabular-nums; text-align: center; text-shadow: 0 0 6px rgb(255 252 240 / .95); }
+.lb-cuenta .n-largo { font-size: clamp(16px, 4.8vw, 19px); top: 59%; letter-spacing: -.02em; }
 .lb-cuenta .l { margin-top: 2px; font: italic 400 14px/1 var(--f-titulos); color: var(--suave); }
 .lb-seccion:not(.is-in) .lb-cuenta-votiva .lb-votiva-llama { opacity: 0; }
 .lb-cuenta-votiva .lb-votiva-llama { transition: opacity .6s ease calc(1.4s + var(--i) * .25s); }
@@ -486,8 +487,8 @@
   0% { opacity: 0; transform: translateY(-8px) scale(.4, .3); }
   18% { opacity: 1; transform: translateY(0) scale(.9, .85); }
   32% { opacity: 1; transform: translateY(2px) scale(1, 1.08); }
-  66% { opacity: 1; transform: translateY(72px) scale(.92, 1.15); }
-  70%, 100% { opacity: 0; transform: translateY(74px) scale(1.3, .3); }
+  66% { opacity: 1; transform: translateY(60px) scale(.92, 1.15); }
+  70%, 100% { opacity: 0; transform: translateY(62px) scale(1.3, .3); }
 }
 @keyframes lb-onda {
   0%, 66% { opacity: 0; transform: scale(.3); }

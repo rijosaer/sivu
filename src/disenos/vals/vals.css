@@ -312,7 +312,7 @@
 .vr-limite { font-size: 14px; color: var(--suave); }
 
 .vr-fin { display: grid; justify-items: center; gap: 6px; text-align: center; padding-top: 8px; }
-.vr-fin-texto { font: 400 17px/1.4 var(--f-titulos); color: var(--suave); font-style: italic; margin-bottom: 26px !important; }
+.vr-fin-texto { font: 400 17px/1.4 var(--f-titulos); color: var(--suave); font-style: italic; margin-bottom: 48px !important; }
 .vr-fin-carnet { position: relative; width: 200px; height: 270px; margin-left: 30px; perspective: 1100px; }
 .vr-fin-interior {
   position: absolute; inset: 0; display: grid; align-content: start; gap: 0; padding: 26px 18px; border-radius: 3px;

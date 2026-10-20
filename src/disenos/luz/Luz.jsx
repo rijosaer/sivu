@@ -45,7 +45,7 @@ function CruzDeLuz({ className = "" }) {
 // Ventana de capilla: arco de medio punto con filete dorado y alféizar. El
 // título vive en un nicho con una cruz de luz en su clave; el texto de apoyo
 // va debajo, en cursiva. Al aparecer, la sombra (lb-velo) baja y la luz entra.
-function Arco({ id, ante, titulo, paloma, pieza, angosto, children }) {
+function Arco({ id, ante, anteArriba, titulo, paloma, pieza, angosto, children }) {
   return (
     <section className={`lb-seccion ${angosto ? "lb-angosto" : ""}`} aria-labelledby={id} data-reveal>
       <div className="lb-ventana">
@@ -56,8 +56,9 @@ function Arco({ id, ante, titulo, paloma, pieza, angosto, children }) {
           <header className="lb-nicho">
             <CruzDeLuz />
             {paloma && <LbPaloma className="lb-paloma-titulo" ramita />}
+            {ante && anteArriba && <p className="lb-ante">{ante}</p>}
             <h2 className="lb-h2" id={id}>{titulo}</h2>
-            {ante && <p className="lb-ante">{ante}</p>}
+            {ante && !anteArriba && <p className="lb-ante">{ante}</p>}
           </header>
           {children}
         </div>
@@ -259,7 +260,7 @@ export default function Luz({ site, contenidoDe, invitacion, onEnviarRSVP, enEdi
       {encendida && (
         <main className="lb-cuerpo">
           {hayBienvenida && (
-            <Arco id="lb-bienvenida" ante={welcome.padresTexto || "Hijo de"} titulo={padres.join(" y ") || nombres.join(" & ")} paloma>
+            <Arco id="lb-bienvenida" ante={welcome.padresTexto || "Hijo de"} anteArriba titulo={padres.join(" y ") || nombres.join(" & ")} paloma>
               {padresElla.length > 0 && <p className="lb-padres-2">y {padresElla.join(" y ")}</p>}
               {welcome.fraseIntro && <p className="lb-texto">{welcome.fraseIntro}</p>}
               {welcome.versiculo && (
@@ -279,7 +280,7 @@ export default function Luz({ site, contenidoDe, invitacion, onEnviarRSVP, enEdi
                     <div key={k} className="lb-cuenta-vela" style={{ "--i": i }}>
                       <span className="lb-cuenta-vaso">
                         <LbVotiva className="lb-cuenta-votiva" />
-                        <span className="n">{cuenta[k]}</span>
+                        <span className={`n ${String(cuenta[k]).length > 2 ? "n-largo" : ""}`}>{cuenta[k]}</span>
                       </span>
                       <span className="l">{l}</span>
                     </div>
