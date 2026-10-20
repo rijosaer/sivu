@@ -35,6 +35,10 @@ const ALIAS = {
   "audio/wave": "audio/wav",
   "audio/vnd.wave": "audio/wav",
   "audio/x-aac": "audio/aac",
+  "image/pjpeg": "image/jpeg",
+  "image/x-png": "image/png",
+  "audio/x-mpeg": "audio/mpeg",
+  "audio/mpeg3": "audio/mpeg",
 };
 
 export const IMAGENES = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/avif"];
@@ -54,18 +58,28 @@ export function leerDataUrl(dataUrl, permitidos) {
   return { mime, buffer, dataUrl: `data:${mime};base64,${buffer.toString("base64")}` };
 }
 
-// Envía un archivo guardado. Si el tipo guardado no es uno de los permitidos
-// (archivos viejos, de antes de este filtro), se manda como descarga binaria
-// en vez de dejar que el navegador lo interprete.
+// Envía un archivo de una invitación (foto, audio, fondo, decoración). Lo que
+// se guardó antes de este filtro puede venir con otro nombre para el mismo
+// formato (audio/mp3, audio/x-m4a, image/jpg...) o ser un SVG: se normaliza y
+// se sigue mostrando, para que ninguna invitación existente pierda su música
+// ni sus imágenes. El CSP sandbox de la respuesta impide que un SVG ejecute
+// código aunque se abra directo. Cualquier otro tipo (HTML, JS...) se entrega
+// como descarga binaria, nunca como página.
+const MOSTRABLES = new Set([
+  ...IMAGENES, "image/heic", "image/heif", "image/svg+xml",
+  ...AUDIOS, "video/mp4", "video/webm",
+]);
+
 export function enviarArchivo(res, mime, buffer) {
-  const seguro = IMAGENES.includes(mime) || AUDIOS.includes(mime);
+  const base = String(mime || "").toLowerCase().split(";")[0].trim();
+  const tipo = ALIAS[base] || base;
   res.set("Cache-Control", "public, max-age=31536000, immutable");
-  res.set("Content-Security-Policy", "default-src 'none'; sandbox");
-  if (!seguro) {
+  res.set("Content-Security-Policy", "default-src 'none'; style-src 'unsafe-inline'; sandbox");
+  if (!MOSTRABLES.has(tipo)) {
     res.set("Content-Disposition", "attachment");
     return res.type("application/octet-stream").send(buffer);
   }
-  res.type(mime).send(buffer);
+  res.type(tipo).send(buffer);
 }
 
 // Archivos que llegan de afuera (WhatsApp, comprobantes, el formulario del

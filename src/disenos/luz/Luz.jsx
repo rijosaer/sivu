@@ -302,7 +302,7 @@ export default function Luz({ site, contenidoDe, invitacion, onEnviarRSVP, enEdi
               {info.lugar && info.direccion && <p className="lb-texto">{info.direccion}</p>}
               {mapa && (
                 <div className="lb-mapa">
-                  <iframe src={mapa} title={`Mapa de ${info.lugar || "la ceremonia"}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+                  <iframe src={mapa} title={`Mapa de ${info.lugar || "la ceremonia"}`} loading="lazy" referrerPolicy="strict-origin-when-cross-origin" />
                 </div>
               )}
               {info.mapsUrl && (

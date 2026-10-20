@@ -233,7 +233,10 @@ export function cuerpoSeguro(req, res, next) {
 
 // ---------- Validadores de parámetros ----------
 
-export const SLUG_RE = /^[a-z0-9](?:[a-z0-9-]{0,58}[a-z0-9])?$/;
+// Holgado a propósito: tiene que aceptar todo slug que ya exista (el corte a
+// 60 caracteres puede dejarlo terminado en guion, y los repetidos llevan
+// "-2", "-3"...). Solo descarta lo que nunca podría ser un slug.
+export const SLUG_RE = /^[a-z0-9][a-z0-9-]{0,99}$/;
 export const CODIGO_RE = /^[A-Za-z0-9_-]{3,40}$/;
 export const CLAVE_RE = /^[a-z0-9_][a-z0-9_-]{0,59}$/;
 

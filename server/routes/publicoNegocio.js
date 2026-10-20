@@ -37,7 +37,9 @@ publicoNegocioRouter.use(["/cotizacion", "/datos"], limiteTokens);
 const jsonSubidas = express.json({ limit: "15mb", strict: true });
 export const subidasNegocio = Router();
 subidasNegocio.post(
-  ["/cotizacion/:token/pague", "/datos/:token/archivos"],
+  // "/datos/:token" también: el formulario del cliente admite textos largos
+  // (60 campos de hasta 4.000 caracteres) y puede pasar de 16 KB.
+  ["/cotizacion/:token/pague", "/datos/:token/archivos", "/datos/:token"],
   limiteTokens,
   capturar(async (req, res, next) => {
     const { token } = req.params;

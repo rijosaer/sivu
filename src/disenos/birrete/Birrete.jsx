@@ -176,7 +176,7 @@ export default function Birrete({ site, contenidoDe, invitacion, onEnviarRSVP, e
           <p className="bi-v">{info.lugar || info.direccion}</p>
           {info.lugar && info.direccion && <p className="bi-ayuda">{info.direccion}</p>}
           {info.mapaEmbed && /^https:\/\//.test(info.mapaEmbed) && (
-            <iframe className="bi-mapa" src={info.mapaEmbed} title={`Mapa de ${info.lugar || "el lugar"}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+            <iframe className="bi-mapa" src={info.mapaEmbed} title={`Mapa de ${info.lugar || "el lugar"}`} loading="lazy" referrerPolicy="strict-origin-when-cross-origin" />
           )}
           <div className="bi-botones">
             {info.mapsUrl && <a className="bi-btn bi-btn-linea" href={info.mapsUrl} target="_blank" rel="noopener noreferrer">{Icono.pin} Cómo llegar</a>}

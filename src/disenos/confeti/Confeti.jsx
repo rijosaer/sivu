@@ -366,7 +366,7 @@ export default function Confeti({ site, contenidoDe, invitacion, onEnviarRSVP, e
                 {info.overline && <p className="cf-k">{info.overline}</p>}
                 <p className="cf-v">{info.lugar || info.direccion}</p>
                 {info.lugar && info.direccion && <p className="cf-texto">{info.direccion}</p>}
-                {mapa && <iframe className="cf-mapa" src={mapa} title={`Mapa de ${info.lugar || "el lugar"}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />}
+                {mapa && <iframe className="cf-mapa" src={mapa} title={`Mapa de ${info.lugar || "el lugar"}`} loading="lazy" referrerPolicy="strict-origin-when-cross-origin" />}
                 <div className="cf-botones">
                   {info.mapsUrl && <a className="cf-btn" href={info.mapsUrl} target="_blank" rel="noopener noreferrer">{Icono.pin} Cómo llegar</a>}
                   <button className="cf-btn cf-btn-linea" type="button" onClick={() => copiar(lugar, "Dirección copiada")}>{Icono.copiar} Copiar</button>

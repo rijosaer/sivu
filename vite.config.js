@@ -2,18 +2,21 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { cspPlugin } from './csp.config.js'
 
-// Sitio público: sin scripts en línea ni eval. Solo se permiten la propia
-// web, la API, las letras de Google Fonts (el cliente puede elegir otras),
-// el mapa incrustado de Google y la analítica de Cloudflare.
+// Sitio público: sin scripts en línea ni eval; scripts solo de la propia web
+// y de la analítica de Cloudflare. Imágenes, audio y mapas sí pueden venir de
+// cualquier https: el contenido de cada evento admite «fotos por enlace
+// externo», música por URL y el mapa que pegue el cliente, y las invitaciones
+// que ya existen los usan. Eso no ejecuta código, así que no abre la puerta a
+// un XSS.
 const csp = cspPlugin(({ api }) => ({
   'default-src': ["'self'"],
   'script-src': ["'self'", 'https://static.cloudflareinsights.com'],
   'style-src': ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
   'font-src': ["'self'", 'data:', 'https://fonts.gstatic.com'],
-  'img-src': ["'self'", 'data:', 'blob:', api],
-  'media-src': ["'self'", 'blob:', api],
+  'img-src': ["'self'", 'data:', 'blob:', 'https:'],
+  'media-src': ["'self'", 'data:', 'blob:', 'https:'],
   'connect-src': ["'self'", api, 'https://cloudflareinsights.com'],
-  'frame-src': ["'self'", 'https://www.google.com', 'https://maps.google.com'],
+  'frame-src': ["'self'", 'https:'],
   'object-src': ["'none'"],
   'base-uri': ["'self'"],
   'form-action': ["'self'"],

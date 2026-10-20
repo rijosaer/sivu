@@ -174,6 +174,27 @@ cabeceras de API (`CSP sandbox`, `HSTS preload`, `COOP`, `Permissions-Policy`,
   romper nada. Un límite de 30/min en esa ruta rompería las galerías (una
   invitación pide 20–40 archivos al abrirse).
 
+### 3.8 · Compatibilidad con lo que ya existe
+
+Nada de lo anterior cambia eventos, enlaces ni códigos ya creados. En
+concreto, y con pruebas sobre datos "viejos" metidos directo en la base:
+
+- Enlaces de eventos existentes: iguales; «Solo con enlace personal» viene
+  apagado. Slugs largos o terminados en guion siguen abriendo.
+- Códigos de invitado ya enviados: iguales.
+- Archivos subidos antes del filtro de formatos: `audio/mp3`, `audio/x-m4a`,
+  `image/jpg` y SVG se siguen mostrando (se normaliza el tipo; el SVG va con
+  CSP sandbox). Solo lo que nunca fue imagen ni audio (HTML, JS) se entrega
+  como descarga.
+- Fotos, música y mapas "por enlace externo" en el contenido: la CSP del
+  sitio permite imágenes, audio e iframes de cualquier `https:`. Scripts no.
+- URLs de fotos del propio servidor pegadas en el contenido: se firman solas
+  al servir la invitación (solo si el archivo es de ese evento).
+- Formulario de datos del cliente: admite textos largos (límite propio).
+- Lo único que sí cambia para personas: todos vuelven a iniciar sesión una
+  vez en el panel, y `panel-pruebas` en `*.up.railway.app` deja de poder
+  usar la API de producción (ver 3.6).
+
 ### 3.6 · Sesión del panel en cookie HttpOnly (S-19, corregido)
 
 - La API pone la sesión en `__Host-sivu_sesion` (`HttpOnly; Secure;

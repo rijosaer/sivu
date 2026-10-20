@@ -20,6 +20,24 @@ function partirDataUrl(dataUrl) {
   return { mime: m[1].toLowerCase(), buffer: Buffer.from(m[2], "base64") };
 }
 
+// Antes de las URLs firmadas, alguien pudo pegar en el contenido de una
+// sección la dirección de una foto subida ("…/api/public/medio/12", por
+// ejemplo en «fotos por enlace externo»). Para que esas invitaciones sigan
+// viéndose igual, al servirlas se les pone la firma, pero solo a los archivos
+// que son de este mismo evento: así no sirve para abrir los de otro.
+async function firmarMediosDelContenido(secciones, invitacionId) {
+  const texto = JSON.stringify(secciones);
+  const ids = [...new Set([...texto.matchAll(/\/api\/public\/medio\/(\d{1,10})(?!\d|\?f=)/g)].map((m) => Number(m[1])))];
+  if (!ids.length) return secciones;
+  const { rows } = await pool.query("SELECT id FROM medios WHERE id = ANY($1) AND invitacion_id = $2", [ids, invitacionId]);
+  const propios = new Set(rows.map((r) => r.id));
+  return JSON.parse(
+    texto.replace(/\/api\/public\/medio\/(\d{1,10})(?!\d|\?f=)/g, (todo, id) =>
+      propios.has(Number(id)) ? urlMedio(id) : todo
+    )
+  );
+}
+
 const codigoValido = (c) => typeof c === "string" && CODIGO_RE.test(c);
 
 // Adivinar códigos de invitado: cada código que no existe cuenta. 20 fallos
@@ -104,7 +122,7 @@ invitacionRouter.get(
         ])
       ),
       ubicaciones: ubicaciones.rows,
-      secciones: secciones.rows,
+      secciones: await firmarMediosDelContenido(secciones.rows, id),
       // Aparte de las secciones a propósito: el plazo se aplica en el servidor
       // aunque "Información de la boda" esté oculta, así que el sitio también
       // tiene que conocerlo en ese caso. Si no, el invitado vería el formulario
@@ -216,8 +234,8 @@ invitacionRouter.post(
     const limpias = respuestas.map((r) => ({
       id: r?.id,
       estado: r?.estado,
-      restriccion: texto(r?.restriccion, 500),
-      comentario: texto(r?.comentario, 1000),
+      restriccion: texto(r?.restriccion, 2000),
+      comentario: texto(r?.comentario, 5000),
     }));
     if (limpias.some((r) => !esIdValido(r.id) || r.restriccion === null || r.comentario === null)) {
       return res.status(400).json({ error: "La respuesta no llegó bien" });

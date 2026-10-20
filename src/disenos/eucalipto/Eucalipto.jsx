@@ -232,7 +232,7 @@ export default function Eucalipto({ site, contenidoDe, invitacion, onEnviarRSVP,
           )}
           {info.lugar && <p className="eu-lugar">{info.lugar}</p>}
           {info.direccion && <p className="eu-texto">{info.direccion}</p>}
-          {mapa && <iframe className="eu-mapa" src={mapa} title={`Mapa de ${info.lugar || "el lugar"}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />}
+          {mapa && <iframe className="eu-mapa" src={mapa} title={`Mapa de ${info.lugar || "el lugar"}`} loading="lazy" referrerPolicy="strict-origin-when-cross-origin" />}
           {lugar && (
             <div className="eu-botones">
               {info.mapsUrl && <a className="eu-btn" href={info.mapsUrl} target="_blank" rel="noopener noreferrer">{Icono.pin} Cómo llegar</a>}

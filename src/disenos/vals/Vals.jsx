@@ -234,7 +234,7 @@ export default function Vals({ site, contenidoDe, invitacion, onEnviarRSVP, enEd
       <>
         {info.lugar && <p className="vr-destacado">{info.lugar}</p>}
         {info.direccion && <p className="vr-texto">{info.direccion}</p>}
-        {mapa && <iframe className="vr-mapa" src={mapa} title={`Mapa de ${info.lugar || "el lugar"}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />}
+        {mapa && <iframe className="vr-mapa" src={mapa} title={`Mapa de ${info.lugar || "el lugar"}`} loading="lazy" referrerPolicy="strict-origin-when-cross-origin" />}
         <div className="vr-botones">
           {info.mapsUrl && <a className="vr-btn" href={info.mapsUrl} target="_blank" rel="noopener noreferrer">{Icono.pin} Cómo llegar</a>}
           <button className="vr-btn vr-btn-linea" type="button" onClick={() => copiar(lugar, "Dirección copiada")}>{Icono.copiar} Copiar dirección</button>

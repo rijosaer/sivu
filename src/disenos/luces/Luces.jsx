@@ -262,7 +262,7 @@ export default function Luces({ site, contenidoDe, invitacion, onEnviarRSVP, enE
               {info.lugar && <p className="lu-lugar-titulo">{info.lugar}</p>}
               {info.direccion && <p className="lu-texto">{info.direccion}</p>}
               {info.mapaEmbed && /^https:\/\//.test(info.mapaEmbed) && (
-                <iframe className="lu-mapa" src={info.mapaEmbed} title={`Mapa de ${info.lugar || "el lugar"}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+                <iframe className="lu-mapa" src={info.mapaEmbed} title={`Mapa de ${info.lugar || "el lugar"}`} loading="lazy" referrerPolicy="strict-origin-when-cross-origin" />
               )}
               {(info.mapsUrl || info.direccion) && (
                 <div className="lu-botones">

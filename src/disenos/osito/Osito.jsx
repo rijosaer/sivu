@@ -273,7 +273,7 @@ export default function Osito({ site, contenidoDe, invitacion, onEnviarRSVP, enE
             <Bloque n={sig()} icono="casa" ante={info.overline || "Dónde"} titulo={info.lugar || "El lugar"} id="os-lugar">
               {info.direccion && <p className="os-texto">{info.direccion}</p>}
               {info.mapaEmbed && (
-                <div className="os-mapa"><iframe src={info.mapaEmbed} title={`Mapa de ${info.lugar || "el lugar"}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div>
+                <div className="os-mapa"><iframe src={info.mapaEmbed} title={`Mapa de ${info.lugar || "el lugar"}`} loading="lazy" referrerPolicy="strict-origin-when-cross-origin" /></div>
               )}
               <div className="os-botones">
                 {info.mapsUrl && <a className="os-btn" href={info.mapsUrl} target="_blank" rel="noopener noreferrer">{UI.pin} Cómo llegar</a>}
