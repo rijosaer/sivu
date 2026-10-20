@@ -57,7 +57,7 @@ cabeceras del sitio y del panel, y las reglas de límite en login).
 | S-16 | Contraseñas de cliente de 6 caracteres; bcrypt costo 10 | **3.1** Baja | A07 | Corregido (10 / 12, costo 12) |
 | S-17 | Banner del servidor y 404 de Express con HTML | Info | WSTG-INFO-02 | Corregido |
 | S-18 | API legacy `invitacion-api-production.up.railway.app` | Info | API9 Inventario | Ya cerrada (Railway responde `x-railway-fallback`) |
-| S-19 | Token del panel en `localStorage` | Info | WSTG-CLNT-12 | Aceptado con mitigaciones (ver 3.6) |
+| S-19 | Token del panel en `localStorage` (robable con cualquier XSS) | **5.4** Media | WSTG-CLNT-12 / WSTG-SESS-02 | Corregido: cookie HttpOnly + CSRF (ver 3.6) |
 
 Revisado y **sin hallazgo**: inyección SQL (todas las consultas son
 parametrizadas con `pg`; las pocas interpolaciones son fragmentos fijos del
@@ -144,13 +144,24 @@ validación de tamaños y rangos en RSVP, secciones, ubicaciones y tema,
 cabeceras de API (`CSP sandbox`, `HSTS preload`, `COOP`, `Permissions-Policy`,
 `Cache-Control: no-store`), opción `SOLO_CLOUDFLARE=1`.
 
-### 3.6 · Token en `localStorage` (aceptado)
+### 3.6 · Sesión del panel en cookie HttpOnly (S-19, corregido)
 
-Pasar a cookie `HttpOnly` exige que panel y API compartan sitio y cambiar
-todo el flujo de autenticación (+ protección CSRF). Con lo de arriba el
-riesgo residual es bajo: CSP del panel sin scripts en línea ni externos,
-token de 12 h revocable, y el único XSS encontrado (S-01) cerrado. Queda en
-el roadmap a 3 meses.
+- La API pone la sesión en `__Host-sivu_sesion` (`HttpOnly; Secure;
+  SameSite=Strict; Path=/`, 12 h). El JavaScript del panel nunca ve el token:
+  ni un XSS en el panel puede llevárselo. `Authorization: Bearer` ya no se
+  acepta.
+- CSRF: `SameSite=Strict` no protege entre subdominios del mismo sitio
+  (`heysivu.com` → `api.heysivu.com`), así que además: si llega `Origin`
+  tiene que ser el panel (también en GET); en lo que cambia datos `Origin` es
+  obligatorio y va la cabecera `X-CSRF-Token`, un HMAC ligado a esa sesión
+  que el panel recibe en el login o en `GET /api/auth/yo` y guarda solo en
+  memoria. El login también exige el origen del panel (login CSRF).
+- CORS con credenciales solo para `https://panel.heysivu.com` (+
+  `PANEL_ORIGINS`). El sitio público no recibe credenciales.
+- **Consecuencia:** un panel servido fuera de `heysivu.com` (por ejemplo
+  `panel-pruebas-production.up.railway.app`) ya no puede usar esta API: la
+  cookie no viaja entre sitios distintos. Ponle un subdominio
+  (`pruebas.heysivu.com`) y agrégalo en `PANEL_ORIGINS`.
 
 ---
 
@@ -306,7 +317,8 @@ y el `?v=` de las decoraciones forman parte del archivo).
 | Servicio | Variable | Valor |
 |---|---|---|
 | invitacion-api | `JWT_SECRET` | 48+ caracteres aleatorios (`openssl rand -base64 48`). Cambiarlo cierra todas las sesiones. |
-| invitacion-api | `CORS_ORIGINS` | Solo orígenes extra, p. ej. `https://panel-pruebas-production.up.railway.app` si ese panel usa esta API |
+| invitacion-api | `CORS_ORIGINS` | Solo orígenes extra que llaman a la API pública |
+| invitacion-api | `PANEL_ORIGINS` | Paneles extra (deben estar bajo `heysivu.com`), p. ej. `https://pruebas.heysivu.com` |
 | invitacion-api | `SOLO_CLOUDFLARE` | `1` cuando confirmes que `api.heysivu.com` está *Proxied* (si no, la API rechaza todo) |
 | sivú (sitio) | `VITE_PANEL_ORIGINS` | Solo si un panel distinto de `panel.heysivu.com` usa el editor visual |
 
@@ -322,10 +334,10 @@ sola en el `preDeployCommand`.
 |---|---|---|
 | **Esta semana** | Desplegar esta rama · Rocket Loader y Email Obfuscation Off · Transform Rules de cabeceras · regla de límite de login · SSL Full (strict) + TLS 1.2 · revisar que `JWT_SECRET` mida 32+ caracteres | 1–2 h |
 | **1 mes** | Custom rules 1–5 · Managed rules en Log → Block · `SOLO_CLOUDFLARE=1` · HSTS a 12 meses + preload · `security.txt` en `public/.well-known/` · rotar contraseñas de clientes con menos de 10 caracteres | ½ día |
-| **3 meses** | Sesión del panel en cookie `HttpOnly` + `SameSite=Strict` (panel y API bajo el mismo sitio) · 2FA para el dueño · limitador en Postgres/Redis si se pasa a más de una instancia · copia de seguridad cifrada y probada de la base · alertas de inicios de sesión fallidos | 2–4 días |
+| **3 meses** | 2FA para el dueño · limitador en Postgres/Redis si se pasa a más de una instancia · copia de seguridad cifrada y probada de la base · alertas de inicios de sesión fallidos | 2–4 días |
 
 ## 7. Cómo verificar
 - `curl -sI https://api.heysivu.com/api/public/medio/1` → **404** (sin firma).
 - `curl -sI https://heysivu.com/` → trae `content-security-policy: frame-ancestors …` (tras la Transform Rule).
-- Panel → cerrar sesión → el token anterior responde **401**.
+- Panel → cerrar sesión → la cookie anterior responde **401**. En DevTools → Application → Cookies, `__Host-sivu_sesion` aparece como HttpOnly y `localStorage` no tiene ningún token.
 - Observatorio: https://developer.mozilla.org/es/observatory con los tres dominios.

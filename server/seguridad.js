@@ -39,21 +39,19 @@ export function cabecerasSeguras(_req, res, next) {
   next();
 }
 
-// Orígenes permitidos para CORS. La autenticación va por token en la cabecera
-// (no por cookies), así que CORS no es la barrera principal; aun así se cierra
-// a lo conocido: los dominios de Sivú, los que se agreguen por variable de
-// entorno (CORS_ORIGINS, separados por coma) y localhost solo en desarrollo.
-// Ya no se acepta cualquier *.up.railway.app: ese comodín dejaba entrar a
-// cualquier proyecto de Railway de cualquier persona.
+// Orígenes permitidos para CORS: los dominios de Sivú, los que se agreguen
+// por variable de entorno (CORS_ORIGINS, separados por coma) y localhost solo
+// en desarrollo. Ya no se acepta cualquier *.up.railway.app: ese comodín
+// dejaba entrar a cualquier proyecto de Railway de cualquier persona.
 const ORIGENES_BASE = ["https://heysivu.com", "https://www.heysivu.com", "https://panel.heysivu.com"];
 
-export function origenPermitido(origin) {
-  if (!origin) return true; // curl, monitores, peticiones del propio servidor
-  const extra = (process.env.CORS_ORIGINS || "")
+const listaEnv = (nombre) =>
+  (process.env[nombre] || "")
     .split(",")
     .map((s) => s.trim().replace(/\/+$/, ""))
     .filter(Boolean);
-  if (ORIGENES_BASE.includes(origin) || extra.includes(origin)) return true;
+
+function esLocalhost(origin) {
   if (enProduccion) return false;
   try {
     const { hostname } = new URL(origin);
@@ -63,15 +61,33 @@ export function origenPermitido(origin) {
   }
 }
 
-export const corsOpciones = {
-  origin(origin, callback) {
-    callback(null, origenPermitido(origin));
-  },
+export function origenPermitido(origin) {
+  if (!origin) return true; // curl, monitores, peticiones del propio servidor
+  return ORIGENES_BASE.includes(origin) || listaEnv("CORS_ORIGINS").includes(origin) || esLocalhost(origin);
+}
+
+// Orígenes del PANEL: los únicos a los que el navegador les manda la cookie de
+// sesión con permiso para leer la respuesta (CORS con credenciales). El sitio
+// público (heysivu.com) muestra contenido que escriben clientes e invitados,
+// así que, aunque esté en el mismo dominio, no cuenta como panel.
+// PANEL_ORIGINS suma otros (separados por coma); deben estar bajo heysivu.com,
+// porque la cookie es SameSite=Strict y no viaja a otros sitios.
+export function origenPanel(origin) {
+  if (!origin) return false;
+  return origin === "https://panel.heysivu.com" || listaEnv("PANEL_ORIGINS").includes(origin) || esLocalhost(origin);
+}
+
+const corsBase = {
   methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: false,
+  allowedHeaders: ["Content-Type", "X-CSRF-Token"],
   maxAge: 600,
 };
+
+// Delegado de cors(): credenciales solo para el panel.
+export function corsOpciones(req, callback) {
+  const origin = req.headers.origin;
+  callback(null, { ...corsBase, origin: origenPermitido(origin), credentials: origenPanel(origin) });
+}
 
 // Rangos publicados por Cloudflare (https://www.cloudflare.com/ips/). Solo
 // cuando la conexión llega desde uno de ellos se le cree la cabecera

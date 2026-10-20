@@ -1,9 +1,12 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
 import { pool } from "../db.js";
-import { firmarToken, requiereAdmin } from "../auth.js";
+import jwt from "jsonwebtoken";
+import {
+  borrarCookieSesion, csrfDe, firmarToken, leerSesion, ponerCookieSesion, requiereAdmin, verificarOrigen,
+} from "../auth.js";
 import { capturar } from "../errores.js";
-import { clienteIp, limitador, texto } from "../seguridad.js";
+import { clienteIp, limitador, origenPanel, texto } from "../seguridad.js";
 
 export const authRouter = Router();
 
@@ -26,6 +29,11 @@ authRouter.post(
   "/login",
   limitePorUsuario,
   capturar(async (req, res) => {
+    // Iniciar sesión solo desde el panel: así una página ajena no puede
+    // meterte en una cuenta suya sin que te des cuenta (login CSRF).
+    if (req.headers.origin && !origenPanel(req.headers.origin)) {
+      return res.status(403).json({ error: "Solicitud rechazada" });
+    }
     const usuario = texto(req.body?.usuario, 60);
     const password = texto(req.body?.password, 200);
     if (!usuario || !password) {
@@ -50,24 +58,47 @@ authRouter.post(
     const invitacion = r.id
       ? { id: r.id, slug: r.slug, nombre: r.nombre, tipo_evento: r.tipo_evento }
       : null;
-    res.json({ token: firmarToken(r.usuario, r.sesion_version), invitacion });
+    // El token va en la cookie HttpOnly y nunca en el cuerpo: el JavaScript
+    // del panel no lo ve. Lo que sí recibe es el token CSRF de esta sesión.
+    const token = firmarToken(r.usuario, r.sesion_version);
+    ponerCookieSesion(res, token);
+    res.json({ usuario: r.usuario, invitacion, csrf: csrfDe(jwt.decode(token)) });
   })
 );
 
 // Cerrar sesión de verdad: sube la versión de sesión del usuario y con eso
 // todos sus tokens (en este y en cualquier otro dispositivo) dejan de valer.
+// La cookie se borra siempre, aunque la sesión ya no sirviera.
 authRouter.post(
   "/logout",
-  requiereAdmin,
   capturar(async (req, res) => {
-    await pool.query("UPDATE admin_usuarios SET sesion_version = sesion_version + 1 WHERE usuario = $1", [
-      req.admin.usuario,
-    ]);
+    const datos = leerSesion(req);
+    if (datos && verificarOrigen(req, datos)) {
+      await pool.query(
+        "UPDATE admin_usuarios SET sesion_version = sesion_version + 1 WHERE usuario = $1 AND sesion_version = $2",
+        [datos.usuario, datos.v]
+      );
+    }
+    borrarCookieSesion(res);
     res.json({ ok: true });
   })
 );
 
-// Quién soy: permite al panel comprobar la sesión sin pedir datos de más.
-authRouter.get("/yo", requiereAdmin, (req, res) => {
-  res.json({ usuario: req.admin.usuario, invitacionId: req.admin.invitacionId });
-});
+// Quién soy: el panel lo pregunta al abrir (ya no guarda ningún token) y
+// recibe el token CSRF de la sesión. Para un cliente, también su evento:
+// lo dice el servidor, no lo que haya quedado guardado en el navegador.
+authRouter.get(
+  "/yo",
+  requiereAdmin,
+  capturar(async (req, res) => {
+    let invitacion = null;
+    if (req.admin.invitacionId) {
+      const { rows } = await pool.query(
+        "SELECT id, slug, nombre, tipo_evento FROM invitaciones WHERE id = $1",
+        [req.admin.invitacionId]
+      );
+      invitacion = rows[0] || null;
+    }
+    res.json({ usuario: req.admin.usuario, invitacion, csrf: csrfDe(req.sesion) });
+  })
+);
