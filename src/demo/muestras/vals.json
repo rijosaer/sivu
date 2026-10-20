@@ -118,7 +118,7 @@
         "tipo": "vestimenta",
         "contenido": {
           "titulo": "Formal",
-          "nota": "Evita el rosa palo: es el color de la quinceañera.",
+          "nota": "Evita el lila: es el color de la quinceañera.",
           "permitidos": [
             {
               "nombre": "Tonos sugeridos",
@@ -133,8 +133,8 @@
           ],
           "evitar": [
             {
-              "nombre": "Rosa palo",
-              "color": "#D8A1AE"
+              "nombre": "Lila",
+              "color": "#A493C4"
             }
           ]
         }

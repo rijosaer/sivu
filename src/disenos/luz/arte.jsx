@@ -141,12 +141,12 @@ export function LbOlivo({ className = "", style }) {
   );
 }
 
-/* ---------- Vela bautismal con cinta y ramito de olivo ---------- */
+/* ---------- Vela bautismal con ramito de olivo (la cinta va aparte) ---------- */
 
 // SDXL: lb_vela
 export function LbVela({ className = "", style }) {
   const ids = useIds(
-    "cera", "cerasup", "luzcera", "borde", "oro", "orov", "cinta", "cintav", "pliegue", "plato", "platoin", "sombra", "difusa", "grano",
+    "cera", "cerasup", "luzcera", "borde", "oro", "orov", "plato", "platoin", "sombra", "difusa", "grano",
     ...IDS_OLIVO.map((n) => `o${n}`),
   );
   const olivo = Object.fromEntries(IDS_OLIVO.map((n) => [n, ids[`o${n}`]]));
@@ -189,21 +189,6 @@ export function LbVela({ className = "", style }) {
           <Stop o="0" c={mezcla(tema("gold-light"), 60, "#fff")} />
           <Stop o=".45" c={tema("gold")} />
           <Stop o="1" c={tema("gold-dark")} />
-        </linearGradient>
-        <linearGradient id={ids.cinta} x1="0" y1="0" x2="0" y2="1">
-          <Stop o="0" c="#FFFFFF" />
-          <Stop o=".45" c={mezcla(tema("gold-light"), 45, "#fff")} />
-          <Stop o="1" c={mezcla(tema("gold-light"), 85, tema("gold"))} />
-        </linearGradient>
-        <linearGradient id={ids.cintav} x1="0" y1="0" x2="1" y2="0">
-          <Stop o="0" c={mezcla(tema("gold-light"), 80, tema("gold"))} />
-          <Stop o=".35" c="#FFFFFF" />
-          <Stop o=".7" c={mezcla(tema("gold-light"), 50, "#fff")} />
-          <Stop o="1" c={mezcla(tema("gold-light"), 75, tema("gold"))} />
-        </linearGradient>
-        <linearGradient id={ids.pliegue} x1="0" y1="0" x2="0" y2="1">
-          <Stop o="0" c={tema("gold-dark")} a=".35" />
-          <Stop o="1" c={tema("gold-dark")} a="0" />
         </linearGradient>
         <linearGradient id={ids.plato} x1="0" y1="0" x2="1" y2="0">
           <Stop o="0" c={tema("gold-dark")} />
@@ -278,36 +263,10 @@ export function LbVela({ className = "", style }) {
         ))}
       </g>
 
-      {/* cinta: vuelta alrededor de la vela */}
-      <g filter={`url(#${ids.grano})`}>
-        <path d="M64 318 C 64 326 136 326 136 318 L136 334 C 136 342 64 342 64 334 Z" fill={`url(#${ids.cinta})`} />
-        <path d="M64 318 C 64 326 136 326 136 318" fill="none" stroke={tema("gold")} strokeWidth=".8" opacity=".9" />
-        <path d="M64 334 C 64 342 136 342 136 334" fill="none" stroke={tema("gold")} strokeWidth=".8" opacity=".9" />
-        <path d="M64 326 C 64 333 136 333 136 326" fill="none" stroke="#fff" strokeWidth="1.4" opacity=".7" />
-      </g>
-
-      {/* ramito de olivo metido en el lazo */}
+      {/* ramito de olivo que asoma bajo la cinta de raso (la cinta va encima, en LbCinta) */}
       <g transform="translate(96 330) rotate(-152) scale(.62)"><RamaOlivo ids={olivo} /></g>
       <g transform="translate(104 332) rotate(-24) scale(.7)"><RamaOlivo ids={olivo} /></g>
 
-      {/* lazo */}
-      <g filter={`url(#${ids.grano})`}>
-        {/* colas */}
-        <path d="M96 334 C 92 360 82 384 74 414 L 84 408 L 88 420 C 96 390 102 362 102 336 Z" fill={`url(#${ids.cintav})`} />
-        <path d="M104 334 C 110 362 120 386 132 410 L 121 407 L 119 420 C 108 392 100 364 99 336 Z" fill={`url(#${ids.cintav})`} />
-        <path d="M97 344 C 94 366 88 388 81 410" fill="none" stroke={tema("gold-dark")} strokeOpacity=".22" strokeWidth="1.2" />
-        <path d="M104 346 C 109 368 116 388 125 406" fill="none" stroke={tema("gold-dark")} strokeOpacity=".22" strokeWidth="1.2" />
-        {/* lazadas */}
-        <path d="M98 326 C 82 304 56 300 52 314 C 48 330 72 340 98 332 Z" fill={`url(#${ids.cinta})`} />
-        <path d="M102 326 C 118 304 144 300 148 314 C 152 330 128 340 102 332 Z" fill={`url(#${ids.cinta})`} />
-        <path d="M98 328 C 86 316 68 312 60 316 C 70 324 84 328 98 330 Z" fill={`url(#${ids.pliegue})`} />
-        <path d="M102 328 C 114 316 132 312 140 316 C 130 324 116 328 102 330 Z" fill={`url(#${ids.pliegue})`} />
-        <path d="M56 312 C 60 306 70 304 80 308 M144 312 C 140 306 130 304 120 308" fill="none" stroke="#fff" strokeWidth="1.3" strokeLinecap="round" opacity=".9" />
-        <path d="M98 326 C 82 304 56 300 52 314 C 48 330 72 340 98 332 Z M102 326 C 118 304 144 300 148 314 C 152 330 128 340 102 332 Z" fill="none" stroke={tema("gold")} strokeWidth=".7" opacity=".7" />
-        {/* nudo */}
-        <path d="M93 322 Q 100 318 107 322 L 108 336 Q 100 340 92 336 Z" fill={`url(#${ids.cintav})`} stroke={tema("gold")} strokeWidth=".6" />
-        <path d="M95 325 Q 100 323 104 325" fill="none" stroke="#fff" strokeWidth="1" />
-      </g>
     </svg>
   );
 }
@@ -413,34 +372,253 @@ export function LbPaloma({ className = "", style, ramita = false }) {
   );
 }
 
-/* ---------- Pila bautismal con agua ---------- */
+
+/* ---------- Cinta de raso con el nombre del invitado ---------- */
+
+// La cinta cruza la vela por delante (curva de cilindro) y sus dos puntas se
+// doblan hacia atrás en cola de golondrina, como un recordatorio de bautizo.
+// El nombre va escrito sobre la curva de la cinta.
+// SDXL: lb_cinta
+export function LbCinta({ texto = "", className = "", style }) {
+  const ids = useIds("raso", "rasoh", "atras", "sombra", "grano", "linea");
+  const largo = Math.max(texto.length, 6);
+  const tam = Math.min(27, Math.max(14, 250 / (largo * 0.46)));
+  const banda = "M30 27 Q170 57 310 27 L310 61 Q170 91 30 61 Z";
+  const espejo = (d) => d.replace(/(-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)/g, (_, x, y) => `${340 - +x} ${y}`);
+  const cola = "M48 46 L6 46 L19 63 L6 80 L48 80 Z";
+  const pliegue = "M30 61 L48 80 L48 62 Z";
+  return (
+    <svg className={className} style={style} viewBox="0 0 340 100" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id={ids.raso} x1="0" y1="0" x2="0" y2="1">
+          <Stop o="0" c="#FFFFFF" />
+          <Stop o=".32" c={mezcla(tema("gold-light"), 40, "#fff")} />
+          <Stop o=".55" c="#FFFFFF" />
+          <Stop o=".8" c={mezcla(tema("gold-light"), 60, "#fff")} />
+          <Stop o="1" c={mezcla(tema("gold-light"), 85, tema("gold"))} />
+        </linearGradient>
+        <linearGradient id={ids.rasoh} x1="0" y1="0" x2="1" y2="0">
+          <Stop o="0" c={tema("gold")} a=".35" />
+          <Stop o=".22" c={tema("gold")} a="0" />
+          <Stop o=".78" c={tema("gold")} a="0" />
+          <Stop o="1" c={tema("gold")} a=".35" />
+        </linearGradient>
+        <linearGradient id={ids.atras} x1="0" y1="0" x2="0" y2="1">
+          <Stop o="0" c={mezcla(tema("gold-light"), 70, tema("gold"))} />
+          <Stop o=".5" c={mezcla(tema("gold-light"), 55, "#fff")} />
+          <Stop o="1" c={mezcla(tema("gold-light"), 60, tema("gold"))} />
+        </linearGradient>
+        <filter id={ids.sombra} x="-10%" y="-30%" width="120%" height="170%">
+          <feDropShadow dx="0" dy="3" stdDeviation="2.6" floodColor="#5A4A2A" floodOpacity=".22" />
+        </filter>
+        <Grano id={ids.grano} fuerza={0.07} semilla={13} />
+        <path id={ids.linea} d="M30 47 Q170 77 310 47" />
+      </defs>
+      <g filter={`url(#${ids.sombra})`}>
+        <g filter={`url(#${ids.grano})`}>
+          {/* colas dobladas hacia atrás */}
+          <path d={cola} fill={`url(#${ids.atras})`} />
+          <path d={espejo(cola)} fill={`url(#${ids.atras})`} />
+          <path d={pliegue} fill={tema("gold-dark")} opacity=".45" />
+          <path d={espejo(pliegue)} fill={tema("gold-dark")} opacity=".45" />
+          {/* frente de la cinta */}
+          <path d={banda} fill={`url(#${ids.raso})`} />
+          <path d={banda} fill={`url(#${ids.rasoh})`} />
+          {/* brillo del raso */}
+          <path d="M40 44 Q170 74 300 44" fill="none" stroke="#fff" strokeWidth="2.2" opacity=".75" strokeLinecap="round" />
+          {/* pespunte dorado */}
+          <path d="M33 31.5 Q170 61.5 307 31.5 M33 56.5 Q170 86.5 307 56.5" fill="none" stroke={tema("gold")} strokeWidth=".8" strokeDasharray="2.4 2.6" opacity=".9" />
+        </g>
+      </g>
+      {texto && (
+        <text className="lb-cinta-texto" fontSize={tam} fill={tema("gold-dark")}>
+          <textPath href={`#${ids.linea}`} startOffset="50%" textAnchor="middle">{texto}</textPath>
+        </text>
+      )}
+    </svg>
+  );
+}
+
+/* ---------- Velita votiva en vaso de vidrio esmerilado ---------- */
+
+// SDXL: lb_votiva
+export function LbVotiva({ className = "", style }) {
+  const ids = useIds("aura", "vidrio", "vidriof", "dentro", "cera", "fuego", "nucleo", "sombra", "difusa");
+  const vaso = "M9 44 L55 44 L52.5 92 Q32 98 11.5 92 Z";
+  return (
+    <svg className={className} style={style} viewBox="0 0 64 100" aria-hidden="true" focusable="false" overflow="visible">
+      <defs>
+        <radialGradient id={ids.aura} cx=".5" cy=".5" r=".5">
+          <Stop o="0" c="#FFE7B4" a=".9" />
+          <Stop o=".45" c="#FFE2A6" a=".3" />
+          <Stop o="1" c="#FFE9BE" a="0" />
+        </radialGradient>
+        <linearGradient id={ids.vidrio} x1="0" y1="0" x2="1" y2="0">
+          <Stop o="0" c={mezcla(tema("gold-light"), 70, tema("gold"))} />
+          <Stop o=".25" c={mezcla(tema("gold-light"), 55, "#fff")} />
+          <Stop o=".55" c="#FFFBF1" />
+          <Stop o="1" c={mezcla(tema("gold-light"), 75, tema("gold"))} />
+        </linearGradient>
+        <linearGradient id={ids.vidriof} x1="0" y1="0" x2="0" y2="1">
+          <Stop o="0" c="#FFFFFF" a=".25" />
+          <Stop o=".6" c={mezcla(tema("gold-light"), 50, "#fff")} a=".55" />
+          <Stop o="1" c={mezcla(tema("gold-light"), 80, tema("gold"))} a=".7" />
+        </linearGradient>
+        <radialGradient id={ids.dentro} cx=".5" cy=".18" r=".7">
+          <Stop o="0" c="#FFE0A0" a=".95" />
+          <Stop o=".5" c="#FFEBC6" a=".4" />
+          <Stop o="1" c="#FFF4DE" a="0" />
+        </radialGradient>
+        <linearGradient id={ids.cera} x1="0" y1="0" x2="1" y2="0">
+          <Stop o="0" c="#E3D6BB" />
+          <Stop o=".4" c="#FFFBF2" />
+          <Stop o="1" c="#D9CAA9" />
+        </linearGradient>
+        <radialGradient id={ids.fuego} cx=".5" cy=".8" r=".65">
+          <Stop o="0" c="#FFFFFF" />
+          <Stop o=".3" c="#FFF5D6" />
+          <Stop o=".6" c="#FFD685" />
+          <Stop o="1" c="#EE9A3E" a=".9" />
+        </radialGradient>
+        <radialGradient id={ids.nucleo} cx=".5" cy=".7" r=".6">
+          <Stop o="0" c="#FFFFFF" />
+          <Stop o="1" c="#FFF3CF" a=".7" />
+        </radialGradient>
+        <radialGradient id={ids.sombra} cx=".5" cy=".5" r=".5">
+          <Stop o="0" c="#3B3A33" a=".3" />
+          <Stop o="1" c="#3B3A33" a="0" />
+        </radialGradient>
+        <filter id={ids.difusa} x="-50%" y="-30%" width="200%" height="160%"><feGaussianBlur stdDeviation=".7" /></filter>
+      </defs>
+      <ellipse cx="32" cy="96" rx="26" ry="4" fill={`url(#${ids.sombra})`} />
+      <circle className="lb-votiva-aura" cx="32" cy="40" r="32" fill={`url(#${ids.aura})`} />
+      {/* pared trasera del vaso con la luz de adentro */}
+      <path d={vaso} fill={`url(#${ids.vidrio})`} />
+      <path d={vaso} fill={`url(#${ids.dentro})`} />
+      {/* cera y mecha */}
+      <path d="M14.5 60 L49.5 60 L48.6 90 Q32 94 15.4 90 Z" fill={`url(#${ids.cera})`} opacity=".9" />
+      <ellipse cx="32" cy="60" rx="17.5" ry="3.4" fill="#FBF4E4" />
+      <path d="M32 60 L32 53.5" stroke="#3A3128" strokeWidth="1.4" strokeLinecap="round" />
+      {/* llama */}
+      <g className="lb-votiva-llama">
+        <path d="M32 24 C 35 33 39 41 38.5 47.5 C 38 52.5 35.5 55 32 55 C 28.5 55 26 52.5 25.5 47.5 C 25 41 29 33 32 24 Z" fill={`url(#${ids.fuego})`} filter={`url(#${ids.difusa})`} />
+        <path d="M32 37 C 33.6 43 35.4 47 35 50.5 C 34.7 53 33.4 54 32 54 C 30.6 54 29.3 53 29 50.5 C 28.6 47 30.4 43 32 37 Z" fill={`url(#${ids.nucleo})`} />
+      </g>
+      {/* frente esmerilado, brillos y filete dorado */}
+      <path d={vaso} fill={`url(#${ids.vidriof})`} />
+      <path d="M14.5 48 L17.6 48 L16.6 89 L14.4 88 Z" fill="#fff" opacity=".6" />
+      <path d="M47.5 48 L49 48 L48 88 L46.8 88.6 Z" fill="#fff" opacity=".35" />
+      <path d="M12.3 84 Q32 89.5 51.7 84" fill="none" stroke={tema("gold")} strokeWidth="1.3" />
+      <path d="M12.6 80.5 Q32 86 51.4 80.5" fill="none" stroke={tema("gold")} strokeWidth=".6" opacity=".8" />
+      <ellipse cx="32" cy="44" rx="23" ry="3.6" fill="none" stroke="#fff" strokeWidth="1.3" opacity=".9" />
+      <ellipse cx="32" cy="44.6" rx="23" ry="3.6" fill="none" stroke={tema("gold")} strokeWidth=".5" opacity=".6" />
+    </svg>
+  );
+}
+
+/* ---------- Chispa y cerilla (el llamado a tocar) ---------- */
+
+const estrella = (cx, cy, r) =>
+  `M${cx} ${cy - r} Q${cx} ${cy} ${cx + r} ${cy} Q${cx} ${cy} ${cx} ${cy + r} Q${cx} ${cy} ${cx - r} ${cy} Q${cx} ${cy} ${cx} ${cy - r} Z`;
+
+// SDXL: lb_chispa
+export function LbChispa({ className = "", style }) {
+  const ids = useIds("brillo");
+  return (
+    <svg className={className} style={style} viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+      <defs>
+        <radialGradient id={ids.brillo} cx=".5" cy=".5" r=".5">
+          <Stop o="0" c="#FFF6DC" a="1" />
+          <Stop o=".4" c="#FFE1A0" a=".5" />
+          <Stop o="1" c="#FFE1A0" a="0" />
+        </radialGradient>
+      </defs>
+      <circle cx="20" cy="20" r="18" fill={`url(#${ids.brillo})`} />
+      <path d={estrella(20, 20, 13)} fill="#FFF8E6" />
+      <path d={estrella(20, 20, 7)} fill="#fff" transform="rotate(45 20 20)" opacity=".9" />
+    </svg>
+  );
+}
+
+// SDXL: lb_cerilla
+export function LbCerilla({ className = "", style }) {
+  const ids = useIds("palo", "cabeza", "fuego", "aura", "difusa");
+  return (
+    <svg className={className} style={style} viewBox="0 0 132 48" aria-hidden="true" focusable="false" overflow="visible">
+      <defs>
+        <linearGradient id={ids.palo} x1="0" y1="0" x2="0" y2="1">
+          <Stop o="0" c="#F1DDB4" />
+          <Stop o=".5" c="#DDBB82" />
+          <Stop o="1" c="#B98E55" />
+        </linearGradient>
+        <radialGradient id={ids.cabeza} cx=".35" cy=".3" r=".8">
+          <Stop o="0" c="#C9765A" />
+          <Stop o=".5" c="#8E3A28" />
+          <Stop o="1" c="#4E1E18" />
+        </radialGradient>
+        <radialGradient id={ids.fuego} cx=".5" cy=".8" r=".65">
+          <Stop o="0" c="#FFFFFF" />
+          <Stop o=".3" c="#FFF2C8" />
+          <Stop o=".62" c="#FFC96E" />
+          <Stop o="1" c="#E7792C" a=".9" />
+        </radialGradient>
+        <radialGradient id={ids.aura} cx=".5" cy=".5" r=".5">
+          <Stop o="0" c="#FFE4A6" a=".9" />
+          <Stop o="1" c="#FFE4A6" a="0" />
+        </radialGradient>
+        <filter id={ids.difusa} x="-50%" y="-30%" width="200%" height="160%"><feGaussianBlur stdDeviation=".6" /></filter>
+      </defs>
+      <g className="lb-cerilla-aura"><circle cx="17" cy="20" r="22" fill={`url(#${ids.aura})`} /></g>
+      <path d="M22 25.4 L126 22.6 Q128.6 24.6 126.2 27.2 L22 31 Z" fill={`url(#${ids.palo})`} />
+      <path d="M30 27 L118 24.6" stroke="#fff" strokeOpacity=".55" strokeWidth=".8" />
+      <path d="M44 29 L96 27.6" stroke="#A47B45" strokeOpacity=".35" strokeWidth=".6" />
+      <ellipse cx="17" cy="28" rx="9.5" ry="7.2" fill={`url(#${ids.cabeza})`} transform="rotate(-6 17 28)" />
+      <ellipse cx="14" cy="25.4" rx="3" ry="1.8" fill="#fff" opacity=".35" />
+      <g className="lb-cerilla-llama">
+        <path d="M16 0 C 20.5 9 26 15 25.5 21.5 C 25 27.5 21 31 16.5 31 C 12 31 8.5 27.5 8 21.5 C 7.6 15 12 9 16 0 Z" fill={`url(#${ids.fuego})`} filter={`url(#${ids.difusa})`} />
+      </g>
+      <g className="lb-chispas" fill="#FFE7A8">
+        <path d={estrella(4, 12, 4)} />
+        <path d={estrella(30, 9, 3.2)} />
+        <path d={estrella(2, 34, 2.6)} />
+        <path d={estrella(33, 38, 2.2)} />
+      </g>
+    </svg>
+  );
+}
+
+/* ---------- Pila bautismal de mármol con agua ---------- */
 
 // SDXL: lb_pila
 export function LbPila({ className = "", style }) {
-  const ids = useIds("piedra", "piedrav", "agua", "brillo", "oro", "concha", "sombra", "grano");
+  const ids = useIds("marmol", "sombreado", "agua", "reflejo", "oro", "sombra", "grano", "blando", "luz");
+  const copa = "M18 58 C 22 88 62 106 110 106 C 158 106 198 88 202 58 Z";
+  const pie = "M93 104 C 97 112 99 118 97 124 C 94 132 87 138 82 142 L138 142 C 133 138 126 132 123 124 C 121 118 123 112 127 104 Z";
   return (
-    <svg className={className} style={style} viewBox="0 0 200 178" aria-hidden="true" focusable="false">
+    <svg className={className} style={style} viewBox="0 0 220 180" aria-hidden="true" focusable="false">
       <defs>
-        <linearGradient id={ids.piedra} x1="0" y1="0" x2="1" y2="0">
-          <Stop o="0" c="#CFC7B6" />
-          <Stop o=".25" c="#EEE9DE" />
-          <Stop o=".45" c="#FFFFFF" />
-          <Stop o=".7" c="#ECE6D9" />
-          <Stop o="1" c="#C2B9A6" />
+        <linearGradient id={ids.marmol} x1="0" y1="0" x2="1" y2="0">
+          <Stop o="0" c="#D3CBBC" />
+          <Stop o=".18" c="#ECE7DD" />
+          <Stop o=".4" c="#FFFFFF" />
+          <Stop o=".6" c="#F5F1EA" />
+          <Stop o=".84" c="#DCD4C6" />
+          <Stop o="1" c="#C8BEAC" />
         </linearGradient>
-        <linearGradient id={ids.piedrav} x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={ids.sombreado} x1="0" y1="0" x2="0" y2="1">
           <Stop o="0" c="#fff" a="0" />
-          <Stop o="1" c="#6E6553" a=".22" />
+          <Stop o=".55" c="#fff" a="0" />
+          <Stop o="1" c="#6E6553" a=".2" />
         </linearGradient>
-        <radialGradient id={ids.agua} cx=".42" cy=".38" r=".7">
-          <Stop o="0" c="#F3FAF9" />
-          <Stop o=".45" c="#CFE4E5" />
-          <Stop o=".85" c="#A7C9CE" />
-          <Stop o="1" c="#8FB4BA" />
+        <radialGradient id={ids.agua} cx=".42" cy=".4" r=".7">
+          <Stop o="0" c="#F6FCFB" />
+          <Stop o=".4" c="#D6EAEA" />
+          <Stop o=".8" c="#AFCFD3" />
+          <Stop o="1" c="#94B8BE" />
         </radialGradient>
-        <linearGradient id={ids.brillo} x1="0" y1="0" x2="1" y2="0">
+        <linearGradient id={ids.reflejo} x1="0" y1="0" x2="1" y2="0">
           <Stop o="0" c="#fff" a="0" />
-          <Stop o=".5" c="#fff" a=".9" />
+          <Stop o=".5" c="#fff" a=".95" />
           <Stop o="1" c="#fff" a="0" />
         </linearGradient>
         <linearGradient id={ids.oro} x1="0" y1="0" x2="1" y2="0">
@@ -450,58 +628,199 @@ export function LbPila({ className = "", style }) {
           <Stop o=".7" c={tema("gold")} />
           <Stop o="1" c={tema("gold-dark")} />
         </linearGradient>
-        <radialGradient id={ids.concha} cx=".5" cy=".9" r="1">
-          <Stop o="0" c={mezcla(tema("gold-light"), 50, "#fff")} />
-          <Stop o=".6" c={tema("gold")} />
-          <Stop o="1" c={tema("gold-dark")} />
-        </radialGradient>
         <radialGradient id={ids.sombra} cx=".5" cy=".5" r=".5">
-          <Stop o="0" c="#3B3A33" a=".25" />
+          <Stop o="0" c="#3B3A33" a=".24" />
           <Stop o="1" c="#3B3A33" a="0" />
         </radialGradient>
-        <Grano id={ids.grano} fuerza={0.18} semilla={5} />
+        <radialGradient id={ids.luz} cx=".5" cy=".5" r=".5">
+          <Stop o="0" c="#FFF6DE" a=".9" />
+          <Stop o="1" c="#FFF6DE" a="0" />
+        </radialGradient>
+        <filter id={ids.blando} x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="1.2" /></filter>
+        <Grano id={ids.grano} fuerza={0.05} semilla={5} />
       </defs>
-      <ellipse cx="100" cy="166" rx="84" ry="10" fill={`url(#${ids.sombra})`} />
+      <ellipse cx="110" cy="168" rx="86" ry="9" fill={`url(#${ids.sombra})`} />
       <g filter={`url(#${ids.grano})`}>
-        {/* base escalonada */}
-        <path d="M44 150 L 156 150 L 160 162 C 160 168 40 168 40 162 Z" fill={`url(#${ids.piedra})`} />
-        <path d="M44 150 L 156 150 L 160 162 C 160 168 40 168 40 162 Z" fill={`url(#${ids.piedrav})`} />
-        <ellipse cx="100" cy="150" rx="56" ry="6" fill="#F6F2EA" />
-        <path d="M58 142 L 142 142 L 146 150 C 146 155 54 155 54 150 Z" fill={`url(#${ids.piedra})`} />
-        <ellipse cx="100" cy="142" rx="42" ry="4.5" fill="#F7F3EC" />
-        {/* columna */}
-        <path d="M78 98 C 86 110 86 126 76 142 L 124 142 C 114 126 114 110 122 98 Z" fill={`url(#${ids.piedra})`} />
-        <path d="M78 98 C 86 110 86 126 76 142 L 124 142 C 114 126 114 110 122 98 Z" fill={`url(#${ids.piedrav})`} />
-        <path d="M92 104 C 94 116 94 128 90 140 M108 104 C 106 116 106 128 110 140" stroke="#D3CBBB" strokeWidth=".8" fill="none" />
-        <path d="M80 120 C 92 124 108 124 120 120" stroke={`url(#${ids.oro})`} strokeWidth="1.6" fill="none" />
+        {/* basa de dos escalones */}
+        <path d="M50 152 L170 152 L174 162 Q110 171 46 162 Z" fill={`url(#${ids.marmol})`} />
+        <path d="M50 152 L170 152 L174 162 Q110 171 46 162 Z" fill={`url(#${ids.sombreado})`} />
+        <ellipse cx="110" cy="152" rx="60" ry="5" fill="#F7F4EE" />
+        <path d="M64 142 L156 142 L160 151 Q110 157 60 151 Z" fill={`url(#${ids.marmol})`} />
+        <ellipse cx="110" cy="142" rx="46" ry="4" fill="#F8F5EF" />
+        {/* pie abalaustrado con nudo y anillo de oro */}
+        <path d={pie} fill={`url(#${ids.marmol})`} />
+        <path d={pie} fill={`url(#${ids.sombreado})`} />
+        <ellipse cx="110" cy="124" rx="14.5" ry="3.6" fill={`url(#${ids.marmol})`} stroke={`url(#${ids.oro})`} strokeWidth="1" />
+        <path d="M101 107 C 104 116 104 120 102 126 M119 107 C 116 116 116 120 118 126" stroke="#fff" strokeWidth=".9" opacity=".6" fill="none" />
+        <ellipse cx="110" cy="104.5" rx="21" ry="4.4" fill="#EDE8DE" />
         {/* copa */}
-        <path d="M14 54 C 18 88 58 104 100 104 C 142 104 182 88 186 54 Z" fill={`url(#${ids.piedra})`} />
-        <path d="M14 54 C 18 88 58 104 100 104 C 142 104 182 88 186 54 Z" fill={`url(#${ids.piedrav})`} />
-        {/* gallones tallados en la copa */}
-        {[-62, -42, -21, 0, 21, 42, 62].map((dx) => (
-          <path key={dx} d={`M${100 + dx} 70 C ${100 + dx * 0.98} 82 ${100 + dx * 0.9} 92 ${100 + dx * 0.78} 100`} stroke="#D6CEBE" strokeWidth=".9" fill="none" />
+        <path d={copa} fill={`url(#${ids.marmol})`} />
+        <path d={copa} fill={`url(#${ids.sombreado})`} />
+        {/* gallones muy suaves */}
+        {[-64, -43, -21.5, 0, 21.5, 43, 64].map((dx) => (
+          <path key={dx} d={`M${110 + dx} 74 C ${110 + dx * 0.97} 86 ${110 + dx * 0.88} 95 ${110 + dx * 0.74} 103`} stroke="#B9AF9C" strokeWidth=".7" opacity=".35" fill="none" />
         ))}
-        <path d="M18 70 C 50 80 150 80 182 70" stroke={`url(#${ids.oro})`} strokeWidth="1.4" fill="none" />
-        {/* borde de la copa */}
-        <ellipse cx="100" cy="54" rx="88" ry="17" fill="#F4EFE5" />
-        <ellipse cx="100" cy="54" rx="88" ry="17" fill="none" stroke={`url(#${ids.oro})`} strokeWidth="1.6" />
-        {/* agua */}
-        <ellipse cx="100" cy="55.5" rx="78" ry="12.5" fill={`url(#${ids.agua})`} />
-        <ellipse cx="100" cy="53" rx="78" ry="10" fill="none" stroke="#5E7C80" strokeOpacity=".18" strokeWidth="2" />
-        <g className="lb-ondas" fill="none" stroke="#fff" strokeLinecap="round">
-          <ellipse cx="86" cy="56" rx="22" ry="3.6" strokeWidth=".9" opacity=".8" />
-          <ellipse cx="86" cy="56" rx="36" ry="6" strokeWidth=".7" opacity=".5" />
-          <ellipse cx="86" cy="56" rx="50" ry="8.4" strokeWidth=".5" opacity=".3" />
-        </g>
-        <path d="M40 51 C 60 47 84 46 104 47" stroke={`url(#${ids.brillo})`} strokeWidth="2" fill="none" strokeLinecap="round" />
-        {/* concha bautismal apoyada en el borde */}
-        <g transform="translate(150 40) rotate(18)">
-          <path d="M0 18 C -16 14 -20 -2 -12 -12 C -6 -18 6 -18 12 -12 C 20 -2 16 14 0 18 Z" fill={`url(#${ids.concha})`} />
-          {[-10, -5, 0, 5, 10].map((a) => (
-            <path key={a} d={`M0 16 L ${a * 1.2} -14`} stroke={tema("gold-dark")} strokeOpacity=".5" strokeWidth=".7" />
+        {[-54, -32, -11, 11, 32, 54].map((dx) => (
+          <path key={dx} d={`M${110 + dx} 75 C ${110 + dx * 0.97} 87 ${110 + dx * 0.88} 96 ${110 + dx * 0.74} 103`} stroke="#fff" strokeWidth="1.1" opacity=".5" fill="none" />
+        ))}
+        {/* vetas del mármol */}
+        <path d="M34 72 C 46 78 50 86 66 92 C 74 95 78 99 86 100" stroke="#BDB4A3" strokeWidth=".55" opacity=".45" fill="none" />
+        <path d="M150 80 C 160 82 168 78 182 74" stroke="#BDB4A3" strokeWidth=".5" opacity=".4" fill="none" />
+        <path d="M70 158 C 84 160 96 156 110 160" stroke="#BDB4A3" strokeWidth=".45" opacity=".4" fill="none" />
+        <path d="M24 70 C 60 81 160 81 196 70" stroke={`url(#${ids.oro})`} strokeWidth="1.1" fill="none" />
+        {/* labio de la copa y agua */}
+        <ellipse cx="110" cy="58" rx="92" ry="17" fill="#F7F3EC" />
+        <ellipse cx="110" cy="58" rx="92" ry="17" fill="none" stroke={`url(#${ids.oro})`} strokeWidth=".9" />
+        <ellipse cx="110" cy="59" rx="83.5" ry="12.8" fill="#D9D1C3" />
+        <ellipse cx="110" cy="60.2" rx="82" ry="11.6" fill={`url(#${ids.agua})`} />
+        <path d="M30 58 C 60 50 160 50 190 58" stroke="#6E6553" strokeOpacity=".16" strokeWidth="2.2" fill="none" filter={`url(#${ids.blando})`} />
+      </g>
+      {/* luz del arco reflejada en el agua */}
+      <ellipse cx="104" cy="58" rx="28" ry="5" fill={`url(#${ids.luz})`} />
+      <g className="lb-ondas" fill="none" stroke="#fff" strokeLinecap="round">
+        <ellipse cx="104" cy="60" rx="14" ry="2.4" strokeWidth=".8" opacity=".85" />
+        <ellipse cx="104" cy="60" rx="27" ry="4.4" strokeWidth=".6" opacity=".55" />
+        <ellipse cx="104" cy="60" rx="41" ry="6.6" strokeWidth=".45" opacity=".3" />
+      </g>
+      <path d="M50 55.5 C 70 52.5 94 51.8 112 52.4" stroke={`url(#${ids.reflejo})`} strokeWidth="1.6" fill="none" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/* ---------- Concha bautismal con gota de agua y luz (cierre) ---------- */
+
+// SDXL: lb_concha
+export function LbConcha({ className = "", style }) {
+  const ids = useIds("luz", "rayo", "nacar", "sombreado", "oro", "gota", "charco", "grano", "sombra");
+  const H = { x: 110, y: 46 };
+  const N = 9;
+  const pt = (deg, r) => [H.x + Math.cos((deg * Math.PI) / 180) * r, H.y + Math.sin((deg * Math.PI) / 180) * r];
+  const borde = [];
+  for (let d = 28; d <= 152; d += 1) {
+    const r = 70 + 7 * Math.abs(Math.sin(((d - 28) / 124) * Math.PI * N));
+    borde.push(pt(d, r).map((v) => v.toFixed(1)).join(" "));
+  }
+  const concha = `M${H.x} ${H.y} L${borde.join(" L")} Z`;
+  const costillas = Array.from({ length: N + 1 }, (_, k) => 28 + (k * 124) / N);
+  const crestas = Array.from({ length: N }, (_, k) => 28 + ((k + 0.5) * 124) / N);
+  return (
+    <svg className={className} style={style} viewBox="0 0 220 236" aria-hidden="true" focusable="false">
+      <defs>
+        <radialGradient id={ids.luz} cx=".5" cy=".5" r=".5">
+          <Stop o="0" c="#FFF7E0" a="1" />
+          <Stop o=".45" c={tema("gold-light")} a=".55" />
+          <Stop o="1" c={tema("gold-light")} a="0" />
+        </radialGradient>
+        <linearGradient id={ids.rayo} x1="0" y1="0" x2="0" y2="1">
+          <Stop o="0" c="#fff" a=".85" />
+          <Stop o="1" c="#fff" a="0" />
+        </linearGradient>
+        <radialGradient id={ids.nacar} cx=".5" cy=".95" r="1">
+          <Stop o="0" c="#FFFFFF" />
+          <Stop o=".35" c="#FBF6EC" />
+          <Stop o=".7" c={mezcla(tema("gold-light"), 75, "#fff")} />
+          <Stop o="1" c={tema("gold")} />
+        </radialGradient>
+        <linearGradient id={ids.sombreado} x1="0" y1="0" x2="1" y2="0">
+          <Stop o="0" c={tema("gold-dark")} a=".22" />
+          <Stop o=".4" c={tema("gold-dark")} a="0" />
+          <Stop o=".7" c="#fff" a=".2" />
+          <Stop o="1" c={tema("gold-dark")} a=".2" />
+        </linearGradient>
+        <linearGradient id={ids.oro} x1="0" y1="0" x2="1" y2="0">
+          <Stop o="0" c={tema("gold-dark")} />
+          <Stop o=".45" c={mezcla(tema("gold-light"), 55, "#fff")} />
+          <Stop o="1" c={tema("gold-dark")} />
+        </linearGradient>
+        <radialGradient id={ids.gota} cx=".38" cy=".6" r=".7">
+          <Stop o="0" c="#FFFFFF" />
+          <Stop o=".5" c="#D7ECEE" />
+          <Stop o="1" c="#8DB6BE" />
+        </radialGradient>
+        <radialGradient id={ids.charco} cx=".5" cy=".5" r=".5">
+          <Stop o="0" c="#E3F1F1" a=".95" />
+          <Stop o=".7" c="#B7D4D8" a=".5" />
+          <Stop o="1" c="#B7D4D8" a="0" />
+        </radialGradient>
+        <filter id={ids.sombra} x="-20%" y="-20%" width="140%" height="150%">
+          <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#5A4A2A" floodOpacity=".2" />
+        </filter>
+        <Grano id={ids.grano} fuerza={0.06} semilla={17} />
+      </defs>
+      {/* luz que baja detrás de la concha */}
+      <g className="lb-concha-luz">
+        <circle cx="110" cy="92" r="96" fill={`url(#${ids.luz})`} />
+        {[-38, -20, 0, 20, 38].map((a, i) => (
+          <path key={a} d="M107 0 L113 0 L124 236 L96 236 Z" fill={`url(#${ids.rayo})`} opacity={i % 2 ? 0.35 : 0.55} transform={`rotate(${a} 110 0)`} />
+        ))}
+      </g>
+      {/* agua que recibe la gota */}
+      <ellipse cx="110" cy="214" rx="56" ry="8" fill={`url(#${ids.charco})`} />
+      <ellipse className="lb-concha-onda" cx="110" cy="214" rx="20" ry="3.4" fill="none" stroke="#fff" strokeWidth="1.2" />
+      <ellipse className="lb-concha-onda lb-concha-onda-2" cx="110" cy="214" rx="20" ry="3.4" fill="none" stroke="#fff" strokeWidth=".8" />
+      {/* concha bocabajo, vertiendo */}
+      <g filter={`url(#${ids.sombra})`}>
+        <g filter={`url(#${ids.grano})`}>
+          <path d={concha} fill={`url(#${ids.nacar})`} />
+          <path d={concha} fill={`url(#${ids.sombreado})`} />
+          {costillas.slice(1, -1).map((d) => {
+            const [x, y] = pt(d, 72);
+            return <path key={`c${d}`} d={`M${H.x} ${H.y + 4} L${x.toFixed(1)} ${y.toFixed(1)}`} stroke={tema("gold-dark")} strokeOpacity=".32" strokeWidth=".9" />;
+          })}
+          {crestas.map((d) => {
+            const [x, y] = pt(d, 74);
+            return <path key={`r${d}`} d={`M${H.x} ${H.y + 8} L${x.toFixed(1)} ${y.toFixed(1)}`} stroke="#fff" strokeOpacity=".7" strokeWidth="1.3" strokeLinecap="round" />;
+          })}
+          {[40, 56].map((r) => (
+            <path key={r} d={`M${pt(30, r).join(" ")} A ${r} ${r} 0 0 1 ${pt(150, r).join(" ")}`} fill="none" stroke={tema("gold-dark")} strokeOpacity=".14" strokeWidth=".7" />
           ))}
-          <path d="M-5 16 L 5 16 L 3 20 L -3 20 Z" fill={tema("gold-dark")} />
+          <path d={`M${H.x} ${H.y} L${borde.join(" L")}`} fill="none" stroke={tema("gold")} strokeWidth=".9" opacity=".8" />
+          {/* orejas de la charnela */}
+          <path d="M88 40 L132 40 L124 54 L96 54 Z" fill={`url(#${ids.oro})`} />
+          <path d="M90 41.5 L130 41.5" stroke="#fff" strokeOpacity=".7" strokeWidth=".8" />
         </g>
+      </g>
+      {/* gota que cae del borde */}
+      <g className="lb-concha-gota">
+        <path d="M110 126 C 113.2 132 115.4 136 115.4 139.4 C 115.4 143 113 145.6 110 145.6 C 107 145.6 104.6 143 104.6 139.4 C 104.6 136 106.8 132 110 126 Z" fill={`url(#${ids.gota})`} stroke="#8DB6BE" strokeOpacity=".5" strokeWidth=".5" />
+        <ellipse cx="108" cy="139" rx="1.4" ry="2.4" fill="#fff" opacity=".9" />
+      </g>
+    </svg>
+  );
+}
+
+/* ---------- Campanita (botón de música) ---------- */
+
+// SDXL: lb_campana
+export function LbCampana({ className = "", style }) {
+  const ids = useIds("oro", "boca");
+  return (
+    <svg className={className} style={style} viewBox="0 0 44 50" aria-hidden="true" focusable="false" overflow="visible">
+      <defs>
+        <linearGradient id={ids.oro} x1="0" y1="0" x2="1" y2="0">
+          <Stop o="0" c={tema("gold-dark")} />
+          <Stop o=".3" c={tema("gold")} />
+          <Stop o=".45" c={mezcla(tema("gold-light"), 55, "#fff")} />
+          <Stop o=".65" c={tema("gold")} />
+          <Stop o="1" c={tema("gold-dark")} />
+        </linearGradient>
+        <linearGradient id={ids.boca} x1="0" y1="0" x2="0" y2="1">
+          <Stop o="0" c={tema("gold")} />
+          <Stop o="1" c={tema("gold-dark")} />
+        </linearGradient>
+      </defs>
+      <g className="lb-campana-ondas" fill="none" stroke={tema("gold")} strokeWidth="1.4" strokeLinecap="round">
+        <path d="M38 14 Q42 19 38 25" />
+        <path d="M41.5 10 Q48 19 41.5 29" opacity=".6" />
+        <path d="M6 14 Q2 19 6 25" />
+        <path d="M2.5 10 Q-4 19 2.5 29" opacity=".6" />
+      </g>
+      <g className="lb-campana-cuerpo">
+        <path d="M18.5 8.5 Q22 1.5 25.5 8.5" fill="none" stroke={tema("gold-dark")} strokeWidth="2" strokeLinecap="round" />
+        <circle className="lb-campana-badajo" cx="22" cy="42.5" r="3.3" fill={`url(#${ids.boca})`} />
+        <path d="M22 7 C 13 7 10.5 15 10.5 23 C 10.5 31 8.5 35 5 38.5 L 39 38.5 C 35.5 35 33.5 31 33.5 23 C 33.5 15 31 7 22 7 Z" fill={`url(#${ids.oro})`} />
+        <path d="M4 37.5 Q22 41.5 40 37.5 L40 40 Q22 44.5 4 40 Z" fill={`url(#${ids.boca})`} />
+        <path d="M16.5 12 C 14 17 14 26 13.4 32" stroke="#fff" strokeOpacity=".65" strokeWidth="1.6" fill="none" strokeLinecap="round" />
       </g>
     </svg>
   );

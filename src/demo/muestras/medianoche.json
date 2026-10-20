@@ -2,7 +2,7 @@
   "site": {
     "invitacion": {
       "slug": "plantillas/medianoche",
-      "nombre": "Cena anual · Nortex Colombia",
+      "nombre": "Cena de fin de año · Grupo Altamira",
       "tipoEvento": "corporativo",
       "diseno": "medianoche"
     },
@@ -31,7 +31,7 @@
         "id": 46,
         "tipo": "welcome",
         "contenido": {
-          "novioEl": "Nortex Colombia",
+          "novioEl": "Grupo Altamira",
           "novioElla": "",
           "fraseIntro": "Cerramos el año como se merece: una noche de gala para celebrar lo logrado juntos y brindar por lo que viene.",
           "padresTexto": "",
@@ -173,6 +173,7 @@
         "comentario": "",
         "es_acompanante": false
       }
-    ]
+    ],
+    "mesa": 7
   }
 }

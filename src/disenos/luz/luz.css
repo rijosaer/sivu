@@ -1,6 +1,8 @@
 /* Diseño «Luz de bautizo»: marfil, oro suave y olivo bajo una luz cálida.
-   Entrada: la vela que se enciende (penumbra marfil → halo de luz). Cuerpo:
-   arcos de capilla con filete dorado y luz que entra desde arriba.
+   Entrada: la vela que se enciende (penumbra marfil → halo de luz); el
+   invitado va en la cinta de raso de la vela y sus pases son velitas
+   votivas. Cuerpo: arcos de capilla con nicho y cruz de luz; al aparecer, la
+   sombra baja y la luz entra por la clave del arco.
    Letras propias: Satisfy (guion, nombres), Lora (títulos y cifras) y
    Nunito (texto). El tema puede cambiarlas: fuente-guion, fuente-titulos,
    fuente-cuerpo. Todo el color sale del tema. */
@@ -107,23 +109,33 @@
 }
 .lb-encendida .lb-calidez { opacity: 1; }
 
-.lb-portada-arriba, .lb-portada-abajo { position: relative; z-index: 3; width: 100%; max-width: 420px; }
-.lb-invitado { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-.lb-invitado-ante { font: 700 11.5px/1.4 var(--f-cuerpo); letter-spacing: .3em; text-transform: uppercase; color: var(--tinta); opacity: .78; }
-.lb-invitado-nombre { font: 400 clamp(30px, 9vw, 40px)/1.2 var(--f-guion); color: var(--tinta); overflow-wrap: anywhere; transition: color 1.6s ease 1.4s; }
-.lb-encendida .lb-invitado-nombre { color: var(--oro-oscuro); }
-.lb-pases {
-  margin-top: 6px; padding: 5px 16px; border-radius: 999px;
-  font: 700 12.5px/1.3 var(--f-cuerpo); letter-spacing: .08em;
-  color: var(--tinta); background: color-mix(in srgb, var(--blanco) 55%, transparent);
-  border: 1px solid color-mix(in srgb, var(--oro) 70%, transparent);
-  transition: background-color 1.6s ease 1.4s;
+.lb-portada-abajo { position: relative; z-index: 3; width: 100%; max-width: 420px; }
+.lb-oculto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Cinta de raso con el nombre del invitado: va por encima de la penumbra
+   para leerse antes de encender, y se aviva cuando llega la luz. */
+.lb-cinta-sitio { position: absolute; z-index: 4; left: 50%; top: 46%; width: min(92vw, 360px); transform: translateX(-50%); pointer-events: none; }
+.lb-cinta { display: block; width: 100%; height: auto; overflow: visible; filter: brightness(.94) saturate(.85);
+  transition: filter 1.6s ease 1.2s; animation: lb-cinta-llega 1.4s var(--curva) .2s both; }
+.lb-encendida .lb-cinta { filter: none; }
+.lb-cinta-texto { font-family: var(--f-guion); letter-spacing: .01em; }
+@keyframes lb-cinta-llega {
+  from { opacity: 0; transform: scaleX(.55); clip-path: inset(0 50% 0 50%); }
+  to { opacity: 1; transform: none; clip-path: inset(0 0 0 0); }
 }
-.lb-encendida .lb-pases { background: var(--blanco); }
+
+/* Pases: velitas votivas encendidas, una por lugar. */
+.lb-votivas { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 6px; }
+.lb-votivas-fila { display: flex; justify-content: center; gap: 6px; }
+.lb-votivita { width: 30px; height: auto; overflow: visible; animation: lb-votiva-llega .8s var(--curva) calc(.5s + var(--i) * .22s) both; }
+.lb-votivita .lb-votiva-llama { transform-box: fill-box; transform-origin: 50% 100%; animation: lb-titilar 2.4s ease-in-out calc(var(--i) * -.7s) infinite; }
+.lb-votivas-texto { font: italic 500 16px/1.3 var(--f-titulos); color: color-mix(in srgb, var(--oro-claro) 30%, var(--tinta)); transition: color 1.6s ease 1.4s; }
+.lb-encendida .lb-votivas-texto { color: var(--oro-oscuro); }
+@keyframes lb-votiva-llega { from { opacity: 0; transform: translateY(6px) scale(.8); } to { opacity: 1; transform: none; } }
 
 /* Escena: vela alta sobre palmatoria y dos ramas de olivo en la mesa. */
-.lb-escena { position: relative; flex: 1 1 auto; display: flex; align-items: flex-end; padding-top: 6svh; justify-content: center; width: 100%; min-height: 0; }
-.lb-vela-caja { position: relative; height: min(50svh, 460px); aspect-ratio: 200 / 540; }
+.lb-escena { position: relative; flex: 1 1 auto; display: flex; align-items: flex-end; padding-top: 3svh; justify-content: center; width: 100%; min-height: 0; }
+.lb-vela-caja { position: relative; height: min(52svh, 470px); aspect-ratio: 200 / 540; }
 .lb-vela { display: block; width: 100%; height: 100%; overflow: visible; }
 .lb-escena-olivo { position: absolute; width: min(36vw, 150px); bottom: 6px; filter: drop-shadow(0 4px 6px rgb(60 50 30 / .12)); }
 .lb-escena-olivo-1 { right: calc(50% + 18px); transform: scaleX(-1) rotate(-8deg); }
@@ -140,7 +152,7 @@
   transform: translateX(-50%); pointer-events: none;
 }
 .lb-llama { display: block; width: 100%; height: auto; overflow: visible; opacity: 0; transform: scale(.15); transform-origin: 50% 80%; }
-.lb-encendida .lb-llama { animation: lb-prender 1s var(--curva) forwards; }
+.lb-encendida .lb-llama { animation: lb-prender 1s var(--curva) .25s both; }
 .lb-llama .lb-llama-fuego { transform-box: view-box; transform-origin: 30px 102px; }
 .lb-encendida .lb-llama .lb-llama-fuego { animation: lb-titilar 2.6s ease-in-out 1s infinite; }
 .lb-encendida .lb-llama .lb-llama-aura { animation: lb-aura 3.2s ease-in-out 1s infinite; transform-box: view-box; transform-origin: 30px 74px; }
@@ -154,31 +166,52 @@
 }
 .lb-encendida .lb-halo { animation: lb-halo 3.4s cubic-bezier(.3, .1, .2, 1) .35s forwards; }
 
-/* Mecha tocable con un pulso que invita. */
+/* Mecha tocable: una chispa titila en la punta y avisa dónde tocar. */
 .lb-mecha {
   position: absolute; z-index: 5; left: 49.7%; top: 11.3%; width: 72px; height: 72px;
   transform: translate(-50%, -62%); border: 0; border-radius: 50%; padding: 0;
   background: transparent; cursor: pointer;
 }
-.lb-mecha span { position: absolute; inset: 14px; border-radius: 50%; border: 1.5px solid color-mix(in srgb, var(--oro-claro) 80%, white);
-  box-shadow: 0 0 18px color-mix(in srgb, var(--oro-claro) 80%, transparent), inset 0 0 10px color-mix(in srgb, var(--oro-claro) 60%, transparent);
-  animation: lb-latido 2.2s ease-in-out infinite; }
-.lb-mecha span::after { content: ""; position: absolute; inset: 15px; border-radius: 50%; background: radial-gradient(circle, rgb(255 236 190 / .9), transparent 70%); }
+.lb-chispa { position: absolute; left: 50%; top: 50%; width: 38px; height: 38px; margin: -19px 0 0 -19px; animation: lb-centelleo 1.9s ease-in-out infinite; }
 .lb-mecha:disabled { cursor: default; }
-.lb-encendida .lb-mecha span { animation: none; opacity: 0; transition: opacity .3s; }
+.lb-encendida .lb-chispa { animation: lb-chispa-salta .5s ease-out forwards; }
+@keyframes lb-centelleo {
+  0%, 100% { transform: scale(.45) rotate(0deg); opacity: .55; }
+  40% { transform: scale(1.05) rotate(25deg); opacity: 1; }
+  55% { transform: scale(.8) rotate(35deg); opacity: .9; }
+}
+@keyframes lb-chispa-salta { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.2) rotate(60deg); opacity: 0; } }
 
 /* Pista y nombre revelado comparten lugar: uno se va, el otro llega. */
-.lb-portada-abajo { display: grid; align-items: start; justify-items: center; min-height: 150px; margin-top: 8px; }
+.lb-portada-abajo { display: grid; align-items: start; justify-items: center; min-height: 150px; margin-top: 4px; }
 .lb-portada-abajo > * { grid-area: 1 / 1; }
 .lb-pista {
-  display: inline-flex; flex-direction: column; align-items: center; gap: 6px; min-height: 48px; padding: 8px 18px;
+  display: inline-flex; flex-direction: column; align-items: center; gap: 4px; min-height: 48px; padding: 6px 18px;
   border: 0; background: none; cursor: pointer;
-  font: 400 clamp(25px, 7.4vw, 30px)/1.2 var(--f-guion); color: var(--tinta);
+  font: 400 clamp(26px, 7.6vw, 31px)/1.2 var(--f-guion); color: var(--tinta);
   align-self: center;
-  transition: opacity .5s ease, transform .5s ease;
+  transition: opacity .6s ease .9s, transform .6s ease .9s;
 }
-.lb-pista svg { width: 22px; height: 22px; color: var(--oro-oscuro); animation: lb-subir 1.8s ease-in-out infinite; }
+/* La cerilla: chispitas que invitan; al tocar, la cabeza se enciende. */
+.lb-cerilla { width: 104px; height: auto; overflow: visible; transform: rotate(-14deg); animation: lb-rasgar 3.2s ease-in-out infinite; }
+.lb-cerilla .lb-chispas path { transform-box: fill-box; transform-origin: center; animation: lb-centelleo 1.6s ease-in-out infinite; }
+.lb-cerilla .lb-chispas path:nth-child(2) { animation-delay: -.5s; }
+.lb-cerilla .lb-chispas path:nth-child(3) { animation-delay: -1s; }
+.lb-cerilla .lb-chispas path:nth-child(4) { animation-delay: -1.3s; }
+.lb-cerilla .lb-cerilla-llama { opacity: 0; transform-box: fill-box; transform-origin: 50% 100%; transform: scale(.2); }
+.lb-cerilla .lb-cerilla-aura { opacity: .35; transform-box: fill-box; transform-origin: center; transition: opacity .3s; }
+.lb-encendida .lb-cerilla { animation: none; }
+.lb-encendida .lb-cerilla .lb-cerilla-llama { animation: lb-cerilla-prende 1.2s var(--curva) forwards; }
+.lb-encendida .lb-cerilla .lb-cerilla-aura { opacity: 1; }
+.lb-encendida .lb-cerilla .lb-chispas { opacity: 0; transition: opacity .3s; }
 .lb-encendida .lb-pista { opacity: 0; transform: translateY(-8px); pointer-events: none; }
+@keyframes lb-rasgar { 0%, 70%, 100% { transform: rotate(-14deg) translateX(0); } 80% { transform: rotate(-14deg) translateX(-6px); } 88% { transform: rotate(-14deg) translateX(3px); } }
+@keyframes lb-cerilla-prende {
+  0% { opacity: 0; transform: scale(.2); }
+  25% { opacity: 1; transform: scale(1.25, 1.1); }
+  60% { transform: scale(.95, 1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
 
 .lb-revelado { display: flex; flex-direction: column; align-items: center; gap: 2px; opacity: 0; transform: translateY(14px); filter: blur(8px);
   transition: opacity 1.4s ease 1.9s, transform 1.6s var(--curva) 1.9s, filter 1.4s ease 1.9s; }
@@ -200,7 +233,7 @@
 
 /* En el panel: ya encendida, sin animación de entrada. */
 .lb-instantanea .lb-penumbra { display: none; }
-.lb-instantanea :is(.lb-calidez, .lb-revelado, .lb-desliza, .lb-invitado-nombre, .lb-pases, .lb-vela-luz) { transition: none !important; }
+.lb-instantanea :is(.lb-calidez, .lb-revelado, .lb-desliza, .lb-cinta, .lb-votivas-texto, .lb-vela-luz) { transition: none !important; animation: none !important; }
 .lb-instantanea .lb-llama { animation: none !important; opacity: 1; transform: none; }
 .lb-instantanea .lb-halo { animation: none !important; opacity: .75; transform: translate(-50%, -50%) scale(3.2); }
 
@@ -224,8 +257,6 @@
   25% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
   100% { opacity: .75; transform: translate(-50%, -50%) scale(3.2); }
 }
-@keyframes lb-latido { 0%, 100% { transform: scale(.85); opacity: .55; } 50% { transform: scale(1.12); opacity: 1; } }
-@keyframes lb-subir { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 @keyframes lb-bajar { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
 
 /* =================== Cuerpo: arcos de capilla =================== */
@@ -267,12 +298,25 @@
   mask-image: linear-gradient(180deg, #000 0%, transparent 58%);
   opacity: 0; transition: opacity 2.2s ease .7s;
 }
+/* Sombra de la ventana: cubre el arco hasta que la sección entra en
+   pantalla; entonces baja despacio y la luz entra desde la clave. */
+.lb-velo {
+  position: absolute; left: 0; right: 0; top: -30%; height: 132%; z-index: 5; pointer-events: none;
+  background: linear-gradient(180deg, transparent 0, color-mix(in srgb, var(--papel) 55%, var(--penumbra)) 23%, color-mix(in srgb, var(--papel) 40%, var(--penumbra)));
+  transition: transform 2s cubic-bezier(.55, 0, .25, 1) .15s;
+}
+.lb-seccion.is-in .lb-velo { transform: translateY(102%); }
 .lb-seccion.is-in .lb-luz { opacity: 1; transform: none; }
 .lb-seccion.is-in .lb-rayos { opacity: 1; animation: lb-rayos 9s ease-in-out 3s infinite; }
+.lb-seccion.is-in .lb-cruz { animation: lb-destello 1.6s ease-out .1s both; }
 @keyframes lb-rayos { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+@keyframes lb-destello {
+  0% { transform: translateX(-50%) scale(.2); filter: brightness(2.2); opacity: 0; }
+  35% { transform: translateX(-50%) scale(1.45); filter: brightness(1.6); opacity: 1; }
+  100% { transform: translateX(-50%) scale(1); filter: none; opacity: 1; }
+}
 
-.lb-clave { position: absolute; z-index: 3; top: 15px; left: 50%; width: 22px; height: 22px; transform: translateX(-50%); color: var(--oro); }
-.lb-dentro { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 64px 24px 36px; text-align: center; }
+.lb-dentro { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 46px 24px 36px; text-align: center; }
 .lb-alfeizar {
   display: block; height: 11px; margin: -1px -8px 0; border-radius: 2px 2px 4px 4px;
   background: linear-gradient(180deg, var(--blanco), color-mix(in srgb, var(--oro-claro) 80%, var(--oro)) 70%, color-mix(in srgb, var(--oro) 60%, var(--oro-claro)));
@@ -281,15 +325,40 @@
 }
 .lb-angosto { width: 88%; margin-inline: auto; }
 
-.lb-ante { font: 700 11.5px/1.4 var(--f-cuerpo); letter-spacing: .3em; text-transform: uppercase; color: var(--olivo-oscuro); }
+/* Título en su nicho: arco fino que se desvanece hacia abajo, con una cruz
+   de luz en la clave y el texto de apoyo en cursiva debajo del título. */
+.lb-nicho {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  width: min(100%, 270px); margin: 6px 0 6px; padding: 34px 16px 14px;
+}
+.lb-nicho::before {
+  content: ""; position: absolute; inset: 0; border-radius: 999px 999px 0 0; pointer-events: none;
+  border: 1px solid var(--filete); border-bottom: 0;
+  background: radial-gradient(70% 60% at 50% 0%, rgb(255 249 232 / .9), transparent 80%);
+  -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent);
+  mask-image: linear-gradient(180deg, #000 55%, transparent);
+}
+.lb-cruz {
+  position: absolute; z-index: 2; top: -15px; left: 50%; width: 30px; height: 30px; transform: translateX(-50%);
+  border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgb(255 250 236) 0 18%, color-mix(in srgb, var(--oro-claro) 80%, transparent) 40%, transparent 70%);
+}
+.lb-cruz::before, .lb-cruz::after, .lb-cruz i {
+  content: ""; position: absolute; left: 50%; top: 50%; border-radius: 2px;
+  background: linear-gradient(180deg, #fff, color-mix(in srgb, var(--oro-claro) 60%, #fff));
+  box-shadow: 0 0 6px 1px rgb(255 236 190 / .95), 0 0 14px 3px color-mix(in srgb, var(--oro) 45%, transparent);
+}
+.lb-cruz::before { width: 2.4px; height: 24px; transform: translate(-50%, -58%); }
+.lb-cruz::after { width: 15px; height: 2.4px; transform: translate(-50%, -190%); }
+.lb-cruz i { width: 1px; height: 1px; box-shadow: 0 0 20px 9px rgb(255 240 205 / .7); }
+.lb-ante { font: italic 400 15.5px/1.4 var(--f-titulos); color: var(--olivo-oscuro); }
 .lb-ante::first-letter { text-transform: uppercase; }
 .lb-h2 {
   position: relative; max-width: 100%;
-  font: 500 clamp(22px, 6.4vw, 26px)/1.3 var(--f-titulos); color: var(--tinta); overflow-wrap: anywhere;
+  font: 500 clamp(22px, 6.4vw, 26px)/1.28 var(--f-titulos); color: var(--tinta); overflow-wrap: anywhere;
 }
-.lb-paloma-titulo { width: 64px; height: auto; margin: -10px 0 -4px 22px; filter: drop-shadow(0 3px 4px color-mix(in srgb, var(--oro-oscuro) 35%, transparent)); animation: lb-vuelo 4.8s ease-in-out infinite; }
+.lb-paloma-titulo { position: absolute; right: -22px; top: -6px; width: 52px; height: auto; filter: drop-shadow(0 3px 4px color-mix(in srgb, var(--oro-oscuro) 35%, transparent)); animation: lb-vuelo 4.8s ease-in-out infinite; }
 @keyframes lb-vuelo { 0%, 100% { transform: translate(0, 0) rotate(-4deg); } 50% { transform: translate(3px, -5px) rotate(2deg); } }
-.lb-filete { width: 150px; height: 12px; color: var(--oro); margin: 2px 0 6px; }
 
 .lb-texto { color: var(--suave); max-width: 32ch; }
 .lb-texto b { color: var(--tinta); }
@@ -300,16 +369,21 @@
 .lb-versiculo p { font: italic 400 16.5px/1.55 var(--f-titulos); color: var(--tinta); }
 .lb-versiculo cite { display: block; margin-top: 8px; font: 700 11px/1.4 var(--f-cuerpo); font-style: normal; letter-spacing: .26em; text-transform: uppercase; color: var(--oro-oscuro); }
 
-/* Cuenta regresiva: cuatro arquitos */
-.lb-cuenta { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; width: 100%; max-width: 290px; }
-.lb-cuenta > div { display: flex; flex-direction: column; align-items: center; padding: 14px 2px 10px; border-radius: 999px 999px 4px 4px;
-  border: 1px solid color-mix(in srgb, var(--filete) 75%, transparent);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--oro-claro) 55%, var(--blanco)), var(--blanco)); }
-.lb-cuenta .n { font: 500 clamp(22px, 6.6vw, 27px)/1.1 var(--f-titulos); color: var(--oro-oscuro); font-variant-numeric: tabular-nums; }
-.lb-cuenta .l { margin-top: 4px; font: 700 10px/1 var(--f-cuerpo); letter-spacing: .14em; text-transform: uppercase; color: var(--suave); }
+/* Cuenta regresiva: cuatro velas votivas con su número en el vaso. */
+.lb-cuenta { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; width: 100%; max-width: 300px; }
+.lb-cuenta-vela { display: flex; flex-direction: column; align-items: center; }
+.lb-cuenta-vaso { position: relative; width: 100%; max-width: 68px; }
+.lb-cuenta-votiva { display: block; width: 100%; height: auto; overflow: visible; }
+.lb-cuenta-votiva .lb-votiva-llama { transform-box: fill-box; transform-origin: 50% 100%; animation: lb-titilar 2.6s ease-in-out calc(var(--i) * -.6s) infinite; }
+.lb-cuenta-votiva .lb-votiva-aura { transform-box: fill-box; transform-origin: center; animation: lb-aura 3.4s ease-in-out calc(var(--i) * -.8s) infinite; }
+.lb-cuenta .n { position: absolute; left: 0; right: 0; top: 63%; font: 600 clamp(19px, 5.6vw, 23px)/1 var(--f-titulos); color: var(--oro-oscuro);
+  font-variant-numeric: tabular-nums; text-align: center; text-shadow: 0 0 6px rgb(255 252 240 / .95); }
+.lb-cuenta .l { margin-top: 2px; font: italic 400 14px/1 var(--f-titulos); color: var(--suave); }
+.lb-seccion:not(.is-in) .lb-cuenta-votiva .lb-votiva-llama { opacity: 0; }
+.lb-cuenta-votiva .lb-votiva-llama { transition: opacity .6s ease calc(1.4s + var(--i) * .25s); }
 
 /* Ceremonia */
-.lb-pila { width: 156px; height: auto; margin: -8px 0 2px; }
+.lb-pila { width: 176px; height: auto; margin: -4px 0 0; }
 .lb-pila .lb-ondas { transform-box: fill-box; transform-origin: center; }
 .lb-seccion.is-in .lb-pila .lb-ondas { animation: lb-ondas 4.5s ease-in-out infinite; }
 @keyframes lb-ondas { 0%, 100% { transform: scale(.94); opacity: .7; } 50% { transform: scale(1.04); opacity: 1; } }
@@ -395,25 +469,49 @@
 .lb-limite { font-size: 14.5px; color: var(--suave); }
 .lb-limite b { color: var(--tinta); }
 
-/* Final */
-.lb-final { display: flex; flex-direction: column; align-items: center; gap: 6px; padding-top: 4px; text-align: center; }
-.lb-final-paloma { width: 92px; height: auto; animation: lb-vuelo 5.4s ease-in-out infinite; }
-.lb-final-gracias { font: 400 clamp(46px, 14vw, 60px)/1.15 var(--f-guion); color: var(--oro-oscuro); }
-.lb-final-olivo { width: 150px; margin-top: 6px; }
-
-/* Aparición: la ventana sube y la luz entra en ella */
-.lb [data-reveal] { opacity: 0; transform: translateY(26px); transition: opacity .9s var(--curva), transform 1s var(--curva); }
-.lb [data-reveal].is-in { opacity: 1; transform: none; }
+/* Cierre: concha bautismal que vierte una gota en la luz. */
+.lb-final { display: flex; flex-direction: column; align-items: center; gap: 4px; padding-top: 4px; text-align: center; }
+.lb-concha { width: 200px; height: auto; overflow: visible; }
+.lb-concha .lb-concha-luz { transform-box: fill-box; transform-origin: 50% 40%; opacity: 0; transform: scale(.4); transition: opacity 1.6s ease, transform 2.2s var(--curva); }
+.lb-concha .lb-concha-gota { transform-box: fill-box; transform-origin: 50% 0; opacity: 0; }
+.lb-concha .lb-concha-onda { transform-box: fill-box; transform-origin: center; opacity: 0; }
+.lb-final.is-in .lb-concha-luz { opacity: 1; transform: none; }
+.lb-final.is-in .lb-concha-gota { animation: lb-gota 3.6s cubic-bezier(.5, 0, .9, .6) 1.4s infinite; }
+.lb-final.is-in .lb-concha-onda { animation: lb-onda 3.6s ease-out 1.4s infinite; }
+.lb-final.is-in .lb-concha-onda-2 { animation-delay: 1.7s; }
+.lb-final-gracias, .lb-final-firma { opacity: 0; filter: blur(6px); transition: opacity 1.4s ease .9s, filter 1.4s ease .9s; }
+.lb-final.is-in :is(.lb-final-gracias, .lb-final-firma) { opacity: 1; filter: none; }
+.lb-final-gracias { font: 400 clamp(46px, 14vw, 60px)/1.15 var(--f-guion); color: var(--oro-oscuro); margin-top: -6px; }
+@keyframes lb-gota {
+  0% { opacity: 0; transform: translateY(-8px) scale(.4, .3); }
+  18% { opacity: 1; transform: translateY(0) scale(.9, .85); }
+  32% { opacity: 1; transform: translateY(2px) scale(1, 1.08); }
+  66% { opacity: 1; transform: translateY(72px) scale(.92, 1.15); }
+  70%, 100% { opacity: 0; transform: translateY(74px) scale(1.3, .3); }
+}
+@keyframes lb-onda {
+  0%, 66% { opacity: 0; transform: scale(.3); }
+  70% { opacity: .95; transform: scale(.6); }
+  100% { opacity: 0; transform: scale(2.4); }
+}
 
 /* Música */
+/* Música: una campanita que se mece mientras suena. */
 .lb-musica {
-  position: fixed; z-index: 40; top: max(12px, env(safe-area-inset-top)); right: 12px;
-  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px 0 13px; border-radius: 999px;
-  border: 1px solid var(--filete); background: color-mix(in srgb, var(--blanco) 86%, transparent); backdrop-filter: blur(6px);
-  color: var(--oro-oscuro); font: 700 13px/1 var(--f-cuerpo); letter-spacing: .04em; cursor: pointer;
-  box-shadow: 0 8px 18px -12px var(--oro-oscuro);
+  position: fixed; z-index: 40; top: max(10px, env(safe-area-inset-top)); right: 10px;
+  display: grid; place-items: center; width: 52px; height: 52px; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
+  background: radial-gradient(circle, color-mix(in srgb, var(--blanco) 92%, transparent) 0 52%, color-mix(in srgb, var(--oro-claro) 45%, transparent) 64%, transparent 72%);
 }
-.lb-musica svg { width: 18px; height: 18px; }
+.lb-campana { width: 30px; height: auto; overflow: visible; filter: drop-shadow(0 3px 4px color-mix(in srgb, var(--oro-oscuro) 45%, transparent)); }
+.lb-campana .lb-campana-cuerpo { transform-box: view-box; transform-origin: 22px 4px; }
+.lb-campana .lb-campana-badajo { transform-box: view-box; transform-origin: 22px 20px; }
+.lb-campana .lb-campana-ondas { opacity: 0; transition: opacity .3s; }
+.lb-sonando .lb-campana .lb-campana-cuerpo { animation: lb-mecer 1.6s ease-in-out infinite; }
+.lb-sonando .lb-campana .lb-campana-badajo { animation: lb-mecer 1.6s ease-in-out -.25s infinite reverse; }
+.lb-sonando .lb-campana .lb-campana-ondas { opacity: 1; animation: lb-ondas-campana 1.6s ease-in-out infinite; }
+.lb-musica:not(.lb-sonando) .lb-campana { opacity: .78; }
+@keyframes lb-mecer { 0%, 100% { transform: rotate(-12deg); } 50% { transform: rotate(12deg); } }
+@keyframes lb-ondas-campana { 0%, 100% { opacity: .2; } 25%, 75% { opacity: 1; } }
 
 .lb-aviso { position: fixed; z-index: 90; left: 16px; right: 16px; bottom: 76px; max-width: 420px; margin: 0 auto; padding: 12px 16px; border-radius: 999px;
   background: var(--tinta); color: #fff; font: 700 14px/1.4 var(--f-cuerpo); text-align: center; opacity: 0; transform: translateY(12px); pointer-events: none; transition: opacity .2s, transform .2s; }
@@ -423,13 +521,32 @@
    El RSVP es un componente común (Tailwind, letra mono pequeña). */
 .lb-modal { position: fixed; inset: 0; z-index: 80; display: flex; align-items: flex-end; justify-content: center;
   background: color-mix(in srgb, var(--tinta) 45%, transparent); animation: lb-fundido .25s ease; }
-.lb-modal-caja { position: relative; width: 100%; max-width: 520px; max-height: 92svh; overflow: auto; padding-top: 22px;
-  border-radius: 28px 28px 0 0; border-top: 1px solid var(--filete);
-  background: var(--grano), linear-gradient(180deg, color-mix(in srgb, var(--oro-claro) 50%, var(--blanco)), var(--papel) 180px); animation: lb-subir-caja .4s var(--curva); }
-@media (min-width: 600px) { .lb-modal { align-items: center; } .lb-modal-caja { border: 1px solid var(--filete); border-radius: 28px; } }
-.lb-cerrar { position: absolute; z-index: 2; top: 14px; right: 16px; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--filete);
-  background: var(--blanco); color: var(--oro-oscuro); font-size: 24px; line-height: 1; cursor: pointer; }
-.lb-modal-paloma { display: block; width: 70px; height: auto; margin: 4px auto -6px; }
+/* La caja es un arco de capilla: medio punto, doble filete y una cruz de
+   luz en la clave. El contenido corre por dentro del arco. */
+.lb-modal-caja { position: relative; width: 100%; max-width: 440px; animation: lb-subir-caja .5s var(--curva); }
+.lb-modal-caja::before {
+  content: ""; position: absolute; inset: 8px 8px 0; z-index: 1; pointer-events: none;
+  border-radius: 999px 999px 0 0; border: 1px solid color-mix(in srgb, var(--filete) 70%, transparent); border-bottom: 0;
+}
+.lb-modal-arco { position: relative; max-height: 92svh; overflow: auto; overscroll-behavior: contain; padding-top: 112px;
+  border-radius: 999px 999px 0 0; border: 1px solid var(--filete); border-bottom: 0;
+  background: var(--grano),
+    radial-gradient(60% 26% at 50% 0%, rgb(255 248 228), transparent 80%),
+    linear-gradient(180deg, color-mix(in srgb, var(--oro-claro) 55%, var(--blanco)), var(--papel) 260px);
+  box-shadow: 0 -10px 40px -10px color-mix(in srgb, var(--oro-oscuro) 50%, transparent); }
+@media (min-width: 600px) {
+  .lb-modal { align-items: center; padding: 24px; }
+  .lb-modal-arco { border-bottom: 1px solid var(--filete); border-radius: 999px 999px 10px 10px; max-height: 88svh; }
+  .lb-modal-caja::before { bottom: 8px; border-bottom: 1px solid color-mix(in srgb, var(--filete) 70%, transparent); border-radius: 999px 999px 6px 6px; }
+}
+.lb-modal-cruz { top: 26px; width: 40px; height: 40px; }
+.lb-modal-cruz::before { height: 30px; }
+.lb-modal-cruz::after { width: 19px; }
+.lb-cerrar { position: absolute; z-index: 3; top: 6px; right: 6px; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border-radius: 50%;
+  border: 1px solid var(--filete); background: var(--blanco); color: var(--oro-oscuro); cursor: pointer;
+  box-shadow: 0 6px 14px -8px var(--oro-oscuro); }
+.lb-cerrar svg { width: 20px; height: 20px; }
+.lb-modal-paloma { position: absolute; top: 46px; left: 50%; width: 58px; height: auto; margin-left: 14px; }
 .lb-modal #rsvp { padding: 6px 22px 36px; border-top: 0; font-family: var(--f-cuerpo); color: var(--tinta); }
 .lb-modal #rsvp img { display: none; }
 .lb-modal #rsvp .font-mono { font-family: var(--f-cuerpo); letter-spacing: .2em; }
@@ -460,13 +577,18 @@
 /* Movimiento reducido: la luz llega sin viaje y nada titila. */
 @media (prefers-reduced-motion: reduce) {
   .lb-penumbra { transition: opacity .4s ease; }
-  .lb-calidez, .lb-revelado, .lb-desliza, .lb-vela-luz, .lb-invitado-nombre, .lb-pases { transition-duration: .4s !important; transition-delay: 0s !important; }
+  .lb-calidez, .lb-revelado, .lb-desliza, .lb-vela-luz, .lb-cinta, .lb-votivas-texto, .lb-pista { transition-duration: .4s !important; transition-delay: 0s !important; }
   .lb-revelado { filter: none; transform: none; }
+  .lb-cinta, .lb-votivita, .lb-cerilla, .lb-chispa, .lb-cerilla .lb-chispas path { animation: none !important; }
+  .lb-encendida .lb-cerilla .lb-cerilla-llama { animation: none; opacity: 1; transform: none; }
+  .lb-encendida .lb-chispa { opacity: 0; }
   .lb-encendida .lb-llama { animation: none; opacity: 1; transform: none; }
-  .lb-encendida .lb-llama .lb-llama-fuego, .lb-encendida .lb-llama .lb-llama-aura { animation: none; }
+  .lb :is(.lb-llama-fuego, .lb-llama-aura, .lb-votiva-llama, .lb-votiva-aura) { animation: none !important; }
   .lb-encendida .lb-halo { animation: none; opacity: .75; transform: translate(-50%, -50%) scale(3.2); }
-  .lb-mecha span, .lb-pista svg, .lb-desliza svg, .lb-paloma-titulo, .lb-final-paloma { animation: none; }
-  .lb [data-reveal], .lb-luz { opacity: 1; transform: none; transition: none; }
-  .lb-rayos { opacity: 1; transition: none; }
-  .lb-seccion.is-in .lb-rayos, .lb-seccion.is-in .lb-pila .lb-ondas { animation: none; }
+  .lb-desliza svg, .lb-paloma-titulo, .lb-campana *, .lb-cruz { animation: none !important; }
+  .lb-velo { display: none; }
+  .lb-luz, .lb-rayos, .lb-concha-luz { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .lb-final-gracias, .lb-final-firma { opacity: 1; filter: none; transition: none; }
+  .lb-seccion.is-in .lb-rayos, .lb-seccion.is-in .lb-pila .lb-ondas, .lb-final.is-in :is(.lb-concha-gota, .lb-concha-onda) { animation: none; }
+  .lb-cuenta-votiva .lb-votiva-llama { opacity: 1 !important; transition: none; }
 }

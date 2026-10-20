@@ -4,20 +4,24 @@ import RSVP from "../../components/RSVP";
 import {
   partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer,
 } from "../comun";
-import { MdReloj, MdFuegos, MdCopas, MdPlato, MdAbanico, MdEsquina } from "./arte";
+import { MdReloj, MdFuegos, MdCopas, MdPlato, MdAbanico, MdEsquina, MdEsfera, MdCopa, MdAtril, MdRayos, MdDisco } from "./arte";
 
-// Diseño «Medianoche»: gala sofisticada en negro liso y oro fino, pensada
-// para cenas corporativas de fin de año. Oscuro a propósito pero sin recargo:
-// mucho aire, filetes de un píxel y el brillo reservado a la entrada.
-// - Entrada «Recibe el año»: un reloj de bolsillo antiguo de oro marca casi
-//   las 12. Al tocar suena la cuenta 3 · 2 · 1 en grande, las agujas llegan a
-//   la medianoche y estallan fuegos artificiales dorados que revelan el nombre
-//   de la empresa y del evento.
+// Diseño «Medianoche»: gala art-déco tipo Gatsby en esmeralda profundo y oro,
+// pensada para cenas corporativas de fin de año. Mucho aire, filetes de un
+// píxel, escamas de abanico muy tenues en el fondo y el brillo reservado a la
+// entrada.
+// - Entrada «Recibe el año»: el invitado tiene su tarjeta de mesa reservada
+//   sobre un atril de bronce (los pases son copas de champaña). Debajo, un
+//   reloj de bolsillo marca casi las 12: se presiona su corona, suena la cuenta
+//   3 · 2 · 1, las agujas llegan a la medianoche y estallan fuegos dorados que
+//   revelan el nombre de la empresa y del evento.
 // - Cuerpo: un programa de gala art-déco. Marco escalonado de filetes dorados;
 //   cada sección y cada momento de la noche llevan número romano y un abanico
-//   art-déco pequeño. Simétrico, sobrio y centrado.
+//   art-déco pequeño; cada bloque se despliega como un abanico desde su
+//   encabezado. La cuenta regresiva vive en una esfera de reloj con números
+//   romanos y la música es un disco de gramófono.
 // Colores del tema: principal = oro, claro = champaña, oscuro = bronce,
-// papel = negro, mármol = tarjetas, sello = acento champaña.
+// papel = esmeralda profundo, mármol = tarjetas, sello = acento champaña.
 
 const FUENTES =
   "https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Federo&display=swap";
@@ -32,7 +36,7 @@ const trazo = { fill: "none", stroke: "currentColor", strokeWidth: 1.4, strokeLi
 const Icono = {
   pin: <svg viewBox="0 0 24 24" {...trazo} aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z" /><circle cx="12" cy="9.5" r="2.5" /></svg>,
   copiar: <svg viewBox="0 0 24 24" {...trazo} aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="1" /><path d="M16 8V5H5v11h3" /></svg>,
-  musica: <svg viewBox="0 0 24 24" {...trazo} aria-hidden="true"><path d="M9 18V5l11-2v13" /><circle cx="6.5" cy="18" r="2.5" /><circle cx="17.5" cy="16" r="2.5" /></svg>,
+  play: <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" /></svg>,
   pausa: <svg viewBox="0 0 24 24" {...trazo} aria-hidden="true"><path d="M9 6v12M15 6v12" /></svg>,
   parqueadero: <svg viewBox="0 0 24 24" {...trazo} aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="1" /><path d="M9.5 17V7h3.5a3 3 0 0 1 0 6H9.5" /></svg>,
   persona: <svg viewBox="0 0 24 24" {...trazo} aria-hidden="true"><circle cx="12" cy="8" r="3.5" /><path d="M5 20c.8-4 3.6-6 7-6s6.2 2 7 6" /></svg>,
@@ -57,6 +61,49 @@ function Encabezado({ n, titulo, id, ante }) {
       {ante && <p className="md-ante">{ante}</p>}
       <h2 id={id}>{titulo}</h2>
     </div>
+  );
+}
+
+// Marco escalonado art-déco: dos filetes (CSS) y cuatro esquinas en SVG.
+function Esquinas({ fondo }) {
+  return (
+    <>
+      <MdEsquina className="md-esq md-esq-ai" fondo={fondo} />
+      <MdEsquina className="md-esq md-esq-ad" fondo={fondo} />
+      <MdEsquina className="md-esq md-esq-bi" fondo={fondo} />
+      <MdEsquina className="md-esq md-esq-bd" fondo={fondo} />
+    </>
+  );
+}
+
+// Tarjeta de mesa reservada sobre su atril de bronce: «Mesa 7 · Reservada
+// para…» y una copa de champaña por cada pase.
+function TarjetaMesa({ invitacion, pases, className = "" }) {
+  const mesa = String(invitacion.mesa || "").trim();
+  const copas = Math.min(pases, 6);
+  return (
+    <figure className={`md-mesa ${className}`}>
+      <div className="md-mesa-placa md-marco md-marco-recorte">
+        <Esquinas fondo="rgb(var(--color-marble))" />
+        <MdRayos className="md-mesa-rayos" />
+        <p className="md-mesa-num">
+          <i aria-hidden="true" />
+          {mesa ? <>Mesa <b>{mesa}</b></> : "Mesa reservada"}
+          <i aria-hidden="true" />
+        </p>
+        <p className="md-mesa-para">{mesa ? "Reservada para" : "para"}</p>
+        <p className="md-mesa-nombre">{invitacion.nombre}</p>
+        {pases > 0 && (
+          <div className="md-mesa-copas">
+            <span className="md-mesa-copas-fila" aria-hidden="true">
+              {Array.from({ length: copas }, (_, i) => <MdCopa key={i} style={{ "--i": i }} />)}
+            </span>
+            <span>{pases} {pases === 1 ? "copa" : "copas"} en tu mesa</span>
+          </div>
+        )}
+      </div>
+      <MdAtril className="md-mesa-atril" />
+    </figure>
   );
 }
 
@@ -97,20 +144,17 @@ function Entrada({ welcome, invitacion, onTocar, onAbrir }) {
     <section className={`md-entrada md-fase-${fase}`} aria-labelledby="md-entrada-titulo">
       <div className="md-entrada-arriba">
         {invitacion?.nombre ? (
-          <>
-            <p className="md-para">Invitación especial para</p>
-            <p className="md-para-nombre">{invitacion.nombre}</p>
-            {pases > 0 && <p className="md-pases">{pases} {pases === 1 ? "pase reservado" : "pases reservados"}</p>}
-          </>
+          <TarjetaMesa invitacion={invitacion} pases={pases} className="md-mesa-entrada" />
         ) : (
-          <p className="md-para">Invitación</p>
+          <p className="md-para">Una noche de gala te espera</p>
         )}
       </div>
 
       <div className="md-escena">
+        <p className="md-llamado" aria-hidden="true">Presiona la corona<i /></p>
         {!sinReloj && (
-          <button type="button" className="md-reloj-boton" onClick={tocar} disabled={enHora} aria-label="Recibir el año y abrir la invitación">
-            <MdReloj className="md-reloj-entrada" hora={enHora ? 0 : ANTES.hora} minuto={enHora ? 0 : ANTES.minuto} />
+          <button type="button" className="md-reloj-boton" onClick={tocar} disabled={enHora} aria-label="Presionar la corona del reloj para recibir el año y abrir la invitación">
+            <MdReloj className="md-reloj-entrada" hora={enHora ? 0 : ANTES.hora} minuto={enHora ? 0 : ANTES.minuto} llamado={!enHora} />
           </button>
         )}
         {fase === "cuenta" && (
@@ -129,12 +173,6 @@ function Entrada({ welcome, invitacion, onTocar, onAbrir }) {
             <button type="button" className="md-btn md-btn-linea md-revela-seguir" onClick={onAbrir}>Ver el programa</button>
           )}
         </div>
-      </div>
-
-      <div className="md-entrada-abajo">
-        <button type="button" className="md-btn md-btn-oro md-tocar" onClick={tocar} disabled={enHora}>
-          Toca para recibir el año
-        </button>
       </div>
     </section>
   );
@@ -237,9 +275,9 @@ export default function Medianoche({ site, contenidoDe, invitacion, onEnviarRSVP
     <div className="md" ref={raiz}>
       {audioSrc && <audio ref={audioRef} src={audioSrc} loop preload="none" />}
       {audioSrc && abierta && (
-        <button className="md-musica" type="button" aria-pressed={sonando} onClick={alternarMusica} aria-label={sonando ? "Pausar la música" : "Reproducir la música"}>
-          {sonando ? Icono.pausa : Icono.musica}
-          <span>{sonando ? "Pausar" : "Música"}</span>
+        <button className={`md-musica ${sonando ? "md-sonando" : ""}`} type="button" aria-pressed={sonando} onClick={alternarMusica} aria-label={sonando ? "Pausar la música" : "Reproducir la música"}>
+          <MdDisco sonando={sonando} />
+          <span className="md-musica-marca" aria-hidden="true">{sonando ? Icono.pausa : Icono.play}</span>
         </button>
       )}
 
@@ -263,19 +301,11 @@ export default function Medianoche({ site, contenidoDe, invitacion, onEnviarRSVP
                 <span className="md-fecha-mes">{partes.mes} · {partes.anio}</span>
               </div>
             )}
-            {invitacion?.nombre && (
-              <p className="md-hero-para">
-                Para <b>{invitacion.nombre}</b>
-                {pases > 0 && <span className="md-pases">{pases} {pases === 1 ? "pase" : "pases"}</span>}
-              </p>
-            )}
+            {invitacion?.nombre && <TarjetaMesa invitacion={invitacion} pases={pases} className="md-mesa-hero" />}
           </header>
 
-          <div className="md-programa">
-            <MdEsquina className="md-esq md-esq-ai" />
-            <MdEsquina className="md-esq md-esq-ad" />
-            <MdEsquina className="md-esq md-esq-bi" />
-            <MdEsquina className="md-esq md-esq-bd" />
+          <div className="md-programa md-marco">
+            <Esquinas />
             <div className="md-cresta" aria-hidden="true"><MdAbanico /></div>
             <p className="md-programa-titulo">Programa de gala</p>
 
@@ -284,9 +314,10 @@ export default function Medianoche({ site, contenidoDe, invitacion, onEnviarRSVP
                 <Encabezado n={num("cuenta")} titulo="Faltan" id="md-cuenta" ante="Para la medianoche" />
                 {cuenta ? (
                   <div className="md-cuenta" role="timer" aria-labelledby="md-cuenta">
-                    {[["dias", "días"], ["horas", "horas"], ["min", "min"], ["seg", "seg"]].map(([k, l]) => (
-                      <div key={k}><span className="n">{cuenta[k]}</span><span className="l">{l}</span></div>
-                    ))}
+                    <MdEsfera className="md-cuenta-esfera" dias={cuenta.dias} horas={+cuenta.horas} minutos={+cuenta.min} segundos={+cuenta.seg} />
+                    <p className="md-cuenta-leyenda">
+                      <b>{cuenta.dias}</b> {cuenta.dias === "1" ? "día" : "días"}, <b>{+cuenta.horas}</b> {+cuenta.horas === 1 ? "hora" : "horas"} y <b>{+cuenta.min}</b> {+cuenta.min === 1 ? "minuto" : "minutos"}
+                    </p>
                   </div>
                 ) : (
                   <p className="md-llego">¡Llegó la noche!</p>
@@ -476,8 +507,10 @@ export default function Medianoche({ site, contenidoDe, invitacion, onEnviarRSVP
 
       {rsvpAbierto && invitacion && (
         <div className="md-modal" role="dialog" aria-modal="true" aria-label="Confirmar asistencia" onClick={(e) => e.target === e.currentTarget && setRsvpAbierto(false)}>
-          <div className="md-modal-caja">
-            <button type="button" className="md-cerrar" onClick={() => setRsvpAbierto(false)} aria-label="Cerrar">×</button>
+          <div className="md-modal-caja md-marco md-marco-recorte">
+            <Esquinas />
+            <button type="button" className="md-cerrar" onClick={() => setRsvpAbierto(false)} aria-label="Cerrar"><span aria-hidden="true">×</span></button>
+            <div className="md-modal-scroll">
             <MdAbanico className="md-modal-abanico" />
             <RSVP
               invitacion={invitacion}
@@ -488,6 +521,7 @@ export default function Medianoche({ site, contenidoDe, invitacion, onEnviarRSVP
               }}
               onSubmit={onEnviarRSVP}
             />
+            </div>
           </div>
         </div>
       )}

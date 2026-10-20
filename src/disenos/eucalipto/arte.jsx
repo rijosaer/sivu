@@ -149,22 +149,22 @@ function Defs({ p }) {
         <stop offset="1" stopColor="#FBFAF6" />
       </radialGradient>
       <linearGradient id={`${p}-hoja0`} x1="0" y1="1" x2="1" y2="0">
-        <stop offset="0" stopColor="#6C887A" />
-        <stop offset=".55" stopColor="#9AB2A4" />
-        <stop offset="1" stopColor="#C4D3C9" />
+        <stop offset="0" stopColor="#64808A" />
+        <stop offset=".55" stopColor="#98AFB6" />
+        <stop offset="1" stopColor="#CAD8DC" />
       </linearGradient>
       <linearGradient id={`${p}-hoja1`} x1="0" y1="1" x2="1" y2="0">
-        <stop offset="0" stopColor="#5D796A" />
-        <stop offset=".55" stopColor="#86A091" />
-        <stop offset="1" stopColor="#AFC2B6" />
+        <stop offset="0" stopColor="#546E78" />
+        <stop offset=".55" stopColor="#839CA5" />
+        <stop offset="1" stopColor="#B3C5CB" />
       </linearGradient>
       <linearGradient id={`${p}-hoja2`} x1="0" y1="1" x2="1" y2="0">
-        <stop offset="0" stopColor="#7A948B" />
-        <stop offset=".55" stopColor="#A8BDB5" />
-        <stop offset="1" stopColor="#D3DFD9" />
+        <stop offset="0" stopColor="#7690A0" />
+        <stop offset=".55" stopColor="#A9BCC4" />
+        <stop offset="1" stopColor="#D8E3E7" />
       </linearGradient>
       <radialGradient id={`${p}-polvo`} cx=".38" cy=".34" r=".7">
-        <stop offset="0" stopColor="#FFFFFF" stopOpacity=".42" />
+        <stop offset="0" stopColor="#FFFFFF" stopOpacity=".5" />
         <stop offset="1" stopColor="#FFFFFF" stopOpacity="0" />
       </radialGradient>
       <radialGradient id={`${p}-flor`} cx=".38" cy=".34" r=".7">
@@ -178,7 +178,7 @@ function Defs({ p }) {
         <stop offset="1" stopColor="#7C7468" />
       </linearGradient>
       <filter id={`${p}-sombra`} x="-40%" y="-40%" width="180%" height="180%" colorInterpolationFilters="sRGB">
-        <feDropShadow dx="1" dy="3" stdDeviation="2.6" floodColor="#2F3A33" floodOpacity=".2" />
+        <feDropShadow dx="1" dy="3" stdDeviation="2.6" floodColor="#2C3A40" floodOpacity=".2" />
       </filter>
       <filter id={`${p}-grano`} x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
         <feTurbulence type="fractalNoise" baseFrequency=".75" numOctaves="2" seed="5" result="ruido" />
@@ -197,6 +197,16 @@ function Defs({ p }) {
         <stop offset=".82" style={{ stopColor: tema("--color-seal", "55%, white") }} />
         <stop offset="1" style={{ stopColor: tema("--color-seal", "80%, #2b2418") }} />
       </linearGradient>
+      {/* Lino champaña del tema (cintas) y su trama de hilos cruzados. */}
+      <linearGradient id={`${p}-lino`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" style={{ stopColor: tema("--color-seal", "20%, white") }} />
+        <stop offset=".45" style={{ stopColor: tema("--color-seal", "34%, white") }} />
+        <stop offset="1" style={{ stopColor: tema("--color-seal", "58%, white") }} />
+      </linearGradient>
+      <pattern id={`${p}-trama`} width="2.4" height="2.4" patternUnits="userSpaceOnUse">
+        <path d="M0 .6H2.4" stroke="#FFFFFF" strokeOpacity=".45" strokeWidth=".5" />
+        <path d="M1.8 0V2.4" style={{ stroke: tema("--color-seal", "70%, #3a3020") }} strokeOpacity=".16" strokeWidth=".45" />
+      </pattern>
     </defs>
   );
 }
@@ -261,9 +271,9 @@ function Hoja({ x, y, a, s, tipo, tono, p }) {
   const larga = tipo === "larga";
   return (
     <g transform={`translate(${n1(x)} ${n1(y)}) rotate(${n1(a)}) scale(${n1(s * 100) / 100})`}>
-      <path d={larga ? HOJA_LARGA : HOJA_REDONDA} fill={`url(#${p}-hoja${tono})`} stroke="#4F6857" strokeOpacity=".35" strokeWidth=".6" />
+      <path d={larga ? HOJA_LARGA : HOJA_REDONDA} fill={`url(#${p}-hoja${tono})`} stroke="#4C626C" strokeOpacity=".35" strokeWidth=".6" />
       <path d={larga ? HOJA_LARGA : HOJA_REDONDA} fill={`url(#${p}-polvo)`} />
-      <path d={larga ? NERVIO_LARGA : NERVIO_REDONDA} fill="none" stroke="#EAF1EB" strokeOpacity=".5" strokeWidth=".7" strokeLinecap="round" />
+      <path d={larga ? NERVIO_LARGA : NERVIO_REDONDA} fill="none" stroke="#F0F5F7" strokeOpacity=".5" strokeWidth=".7" strokeLinecap="round" />
     </g>
   );
 }
@@ -296,7 +306,7 @@ function Ramita({ c, n = 7, s0 = 1, s1 = 0.6, tipo = "redonda", opuestas = false
   hojas.push({ x: px, y: py, a: rumbo(1), s: s1 * 0.85, tono: 2 });
   return (
     <g filter={sombra ? `url(#${p}-sombra)` : undefined}>
-      <path d={`M${x0} ${y0}Q${cx} ${cy} ${x1} ${y1}`} fill="none" stroke="#8B8275" strokeWidth={tipo === "larga" ? 1.2 : 1.6} strokeLinecap="round" />
+      <path d={`M${x0} ${y0}Q${cx} ${cy} ${x1} ${y1}`} fill="none" stroke="#8D8983" strokeWidth={tipo === "larga" ? 1.2 : 1.6} strokeLinecap="round" />
       {hojas.map((h, i) => <Hoja key={i} {...h} tipo={tipo} p={p} />)}
     </g>
   );
@@ -327,7 +337,7 @@ function Gipsofila({ x, y, a = 0, s = 1, semilla = 3, sombra = true, p }) {
   }
   return (
     <g filter={sombra ? `url(#${p}-sombra)` : undefined}>
-      <path d={tallos.join("")} fill="none" stroke="#98A68C" strokeWidth=".7" strokeLinecap="round" />
+      <path d={tallos.join("")} fill="none" stroke="#A2AEB1" strokeWidth=".7" strokeLinecap="round" />
       {flores.map(([fx, fy, fr], i) => (
         <g key={i}>
           <circle cx={fx} cy={fy} r={fr} fill={`url(#${p}-flor)`} stroke="#D3CDBD" strokeWidth=".35" />
@@ -453,7 +463,7 @@ export function EuRamito({ className = "" }) {
       <Defs p={p} />
       <g filter={`url(#${p}-grano)`}>
         <g filter={`url(#${p}-sombra)`}>
-          <path d="M112 168L104 246M118 168L116 248M124 168L128 247M130 168L138 244" stroke="#8E9A82" strokeWidth="2.4" strokeLinecap="round" fill="none" />
+          <path d="M112 168L104 246M118 168L116 248M124 168L128 247M130 168L138 244" stroke="#8C9A9F" strokeWidth="2.4" strokeLinecap="round" fill="none" />
         </g>
         <Ramita p={p} c={[118, 150, 70, 120, 24, 70]} n={6} s0={0.9} s1={0.55} opuestas semilla={61} />
         <Ramita p={p} c={[122, 150, 170, 116, 216, 66]} n={6} s0={0.9} s1={0.55} opuestas semilla={62} />
@@ -467,15 +477,20 @@ export function EuRamito({ className = "" }) {
         <Rosa p={p} x={166} y={124} s={0.5} a={25} />
         <Peonia p={p} x={120} y={108} s={0.72} a={8} />
         <Rosa p={p} x={146} y={62} s={0.3} a={0} />
-        {/* Cinta: lazada de satín con borde de hilo */}
+        {/* Cinta de lino: tres vueltas alrededor de los tallos, un nudo y dos
+            puntas deshilachadas que caen. */}
         <g filter={`url(#${p}-sombra)`}>
-          <path d="M120 176C100 160 82 162 84 174C86 186 106 184 120 178Z" fill="#FBF8F0" stroke="#D8CFBC" strokeWidth=".8" />
-          <path d="M120 176C140 160 158 162 156 174C154 186 134 184 120 178Z" fill="#F6F1E6" stroke="#D8CFBC" strokeWidth=".8" />
-          <path d="M117 180C110 196 100 210 92 222L100 220L102 228C110 214 118 198 121 182Z" fill="#F3EEE2" stroke="#D8CFBC" strokeWidth=".8" />
-          <path d="M123 180C130 196 140 210 148 222L140 220L138 228C130 214 122 198 119 182Z" fill="#FBF8F0" stroke="#D8CFBC" strokeWidth=".8" />
-          <rect x="108" y="168" width="24" height="16" rx="6" fill="#FFFDF8" stroke="#D8CFBC" strokeWidth=".8" />
-          <path d="M110 176H130" style={{ stroke: tema("--color-seal") }} strokeWidth="1" />
-          <path d="M90 172C98 168 106 170 112 174M150 172C142 168 134 170 128 174" fill="none" stroke="#FFFFFF" strokeWidth="1.2" opacity=".9" strokeLinecap="round" />
+          <path d="M120 186C112 200 104 216 96 236L101 233L103 241C110 222 117 204 122 189Z" fill={`url(#${p}-lino)`} style={{ stroke: tema("--color-seal", "60%, #8a7a5c") }} strokeOpacity=".5" strokeWidth=".6" />
+          <path d="M122 186C129 202 136 214 146 230L141 228L140 236C131 220 124 204 119 189Z" fill={`url(#${p}-lino)`} style={{ stroke: tema("--color-seal", "60%, #8a7a5c") }} strokeOpacity=".5" strokeWidth=".6" />
+          {[166, 175, 184].map((y, i) => (
+            <g key={i}>
+              <path d={`M104 ${y}Q120 ${y + 4} 136 ${y}L136 ${y + 8}Q120 ${y + 12} 104 ${y + 8}Z`} fill={`url(#${p}-lino)`} style={{ stroke: tema("--color-seal", "60%, #8a7a5c") }} strokeOpacity=".45" strokeWidth=".6" />
+              <path d={`M104 ${y}Q120 ${y + 4} 136 ${y}L136 ${y + 8}Q120 ${y + 12} 104 ${y + 8}Z`} fill={`url(#${p}-trama)`} />
+            </g>
+          ))}
+          <ellipse cx="120" cy="184" rx="7" ry="5.4" fill={`url(#${p}-lino)`} style={{ stroke: tema("--color-seal", "60%, #8a7a5c") }} strokeOpacity=".6" strokeWidth=".6" />
+          <path d="M115 182Q120 186 125 182" fill="none" style={{ stroke: tema("--color-seal", "60%, #6a5c44") }} strokeOpacity=".5" strokeWidth=".7" />
+          <path d="M96 236l-1 4M99 236l0 5M102 238l1 4M141 230l-1 5M144 231l1 4" style={{ stroke: tema("--color-seal", "50%, white") }} strokeWidth=".6" strokeLinecap="round" />
         </g>
       </g>
     </svg>
@@ -504,7 +519,7 @@ export function EuAnillos({ className = "" }) {
         <Ramita p={p} c={[20, 100, 70, 112, 160, 96]} n={6} s0={0.7} s1={0.45} opuestas semilla={71} />
         <Gipsofila p={p} x={140} y={98} a={50} s={0.8} semilla={72} />
         <Gipsofila p={p} x={34} y={96} a={-50} s={0.8} semilla={73} />
-        <ellipse cx="92" cy="96" rx="52" ry="7" fill="#2F3A33" opacity=".1" />
+        <ellipse cx="92" cy="96" rx="52" ry="7" fill="#2C3A40" opacity=".1" />
         <g filter={`url(#${p}-sombra)`} fill="none">
           <ellipse cx="74" cy="66" rx="30" ry="25" stroke={`url(#${p}-oro)`} strokeWidth="7.5" />
           <ellipse cx="74" cy="66" rx="30" ry="25" stroke="#FFFFFF" strokeOpacity=".45" strokeWidth="1.2" transform="translate(-1.6 -2)" />
@@ -533,14 +548,14 @@ export function EuCopas({ className = "" }) {
   const p = usePrefijo();
   const copa = (
     <>
-      <path d="M-14 0C-15 22 -9 46 -2 58V96H-14C-16 96 -16 100 -14 100H14C16 100 16 96 14 96H2V58C9 46 15 22 14 0Z" fill={`url(#${p}-vidrio)`} stroke="#8FA096" strokeOpacity=".7" strokeWidth=".9" />
+      <path d="M-14 0C-15 22 -9 46 -2 58V96H-14C-16 96 -16 100 -14 100H14C16 100 16 96 14 96H2V58C9 46 15 22 14 0Z" fill={`url(#${p}-vidrio)`} stroke="#8FA0A8" strokeOpacity=".7" strokeWidth=".9" />
       <path d="M-12.6 16C-12.6 30 -8 46 -1.6 55H1.6C8 46 12.6 30 12.6 16Z" fill={`url(#${p}-champana)`} />
       <path d="M-12.6 16H12.6" style={{ stroke: tema("--color-seal", "40%, white") }} strokeWidth="1.2" />
       {[[-5, 44, 1.1], [3, 36, 0.9], [-2, 28, 1.2], [5, 24, 0.8], [-6, 22, 0.7], [1, 48, 0.8]].map(([bx, by, br], i) => (
         <circle key={i} cx={bx} cy={by} r={br} fill="#FFFFFF" opacity=".75" />
       ))}
       <path d="M-10 4C-11 20 -7 38 -2 50" fill="none" stroke="#FFFFFF" strokeWidth="1.6" strokeLinecap="round" opacity=".8" />
-      <ellipse cx="0" cy="0" rx="14" ry="2.2" fill="none" stroke="#8FA096" strokeOpacity=".6" strokeWidth=".8" />
+      <ellipse cx="0" cy="0" rx="14" ry="2.2" fill="none" stroke="#8FA0A8" strokeOpacity=".6" strokeWidth=".8" />
     </>
   );
   return (
@@ -549,8 +564,8 @@ export function EuCopas({ className = "" }) {
       <defs>
         <linearGradient id={`${p}-vidrio`} x1="0" y1="0" x2="1" y2="0">
           <stop offset="0" stopColor="#FFFFFF" stopOpacity=".55" />
-          <stop offset=".5" stopColor="#EEF3EF" stopOpacity=".25" />
-          <stop offset="1" stopColor="#C9D4CC" stopOpacity=".6" />
+          <stop offset=".5" stopColor="#EEF2F4" stopOpacity=".25" />
+          <stop offset="1" stopColor="#C9D3D8" stopOpacity=".6" />
         </linearGradient>
         <linearGradient id={`${p}-champana`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" style={{ stopColor: tema("--color-seal", "30%, white") }} />
@@ -558,7 +573,7 @@ export function EuCopas({ className = "" }) {
         </linearGradient>
       </defs>
       <g filter={`url(#${p}-grano)`}>
-        <ellipse cx="90" cy="140" rx="56" ry="6" fill="#2F3A33" opacity=".1" />
+        <ellipse cx="90" cy="140" rx="56" ry="6" fill="#2C3A40" opacity=".1" />
         <Ramita p={p} c={[30, 138, 80, 146, 150, 134]} n={6} s0={0.62} s1={0.4} opuestas semilla={81} />
         <g filter={`url(#${p}-sombra)`}>
           <g transform="translate(70 38) rotate(-14)">{copa}</g>
@@ -574,55 +589,8 @@ export function EuCopas({ className = "" }) {
   );
 }
 
-// SDXL: eu_sello
-// Sello de lacre en el verde del tema con las iniciales y una corona de
-// hojitas en relieve.
-export function EuSello({ iniciales = "", className = "" }) {
-  const p = usePrefijo();
-  const r = azar(91);
-  const borde = Array.from({ length: 28 }, (_, i) => {
-    const a = (i / 28) * Math.PI * 2;
-    const rad = 52 + (r() - 0.5) * 6 + (i % 3 === 0 ? 2.5 : 0);
-    return `${n1(60 + Math.cos(a) * rad)} ${n1(60 + Math.sin(a) * rad)}`;
-  });
-  const hojitas = Array.from({ length: 16 }, (_, i) => {
-    const a = (i / 16) * 360;
-    return giro(60, 60, a)(34, 0);
-  });
-  return (
-    <svg className={className} viewBox="0 0 120 120" aria-hidden="true">
-      <defs>
-        <radialGradient id={`${p}-lacre`} cx=".38" cy=".32" r=".75">
-          <stop offset="0" style={{ stopColor: tema("--color-gold", "70%, white") }} />
-          <stop offset=".55" style={{ stopColor: tema("--color-gold-dark") }} />
-          <stop offset="1" style={{ stopColor: tema("--color-gold-dark", "70%, #1d2620") }} />
-        </radialGradient>
-        <radialGradient id={`${p}-hundido`} cx=".5" cy=".5" r=".5">
-          <stop offset=".8" style={{ stopColor: tema("--color-gold-dark", "85%, #1d2620") }} />
-          <stop offset="1" style={{ stopColor: tema("--color-gold", "60%, white") }} />
-        </radialGradient>
-        <filter id={`${p}-sombra`} x="-30%" y="-30%" width="160%" height="160%">
-          <feDropShadow dx="1" dy="3" stdDeviation="2.4" floodColor="#2F3A33" floodOpacity=".3" />
-        </filter>
-      </defs>
-      <g filter={`url(#${p}-sombra)`}>
-        <path d={`M${borde.join("L")}Z`} fill={`url(#${p}-lacre)`} strokeLinejoin="round" />
-        <circle cx="60" cy="60" r="41" fill={`url(#${p}-hundido)`} opacity=".9" />
-        <circle cx="60" cy="60" r="41" fill="none" stroke="#FFFFFF" strokeOpacity=".25" strokeWidth="1" />
-        {hojitas.map((pt, i) => {
-          const [hx, hy] = pt.split(" ").map(Number);
-          return <ellipse key={i} cx={hx} cy={hy} rx="2.2" ry="4.4" transform={`rotate(${(i / 16) * 360 + 30} ${hx} ${hy})`} fill="#FFFFFF" opacity=".22" />;
-        })}
-        <text x="60.8" y="71.2" textAnchor="middle" fontSize="36" style={{ fontFamily: "var(--fuente-guion, 'Allura'), cursive", fill: tema("--color-gold-dark", "55%, #141b16") }}>{iniciales}</text>
-        <text x="60" y="70" textAnchor="middle" fontSize="36" style={{ fontFamily: "var(--fuente-guion, 'Allura'), cursive", fill: tema("--color-gold-light", "85%, white") }}>{iniciales}</text>
-        <path d="M30 34C38 24 50 19 62 19" fill="none" stroke="#FFFFFF" strokeOpacity=".4" strokeWidth="2.2" strokeLinecap="round" />
-      </g>
-    </svg>
-  );
-}
-
 // SDXL: eu_sobre
-// Sobre de papel de algodón con solapa, sellito verde y ramita metida.
+// Sobre de papel de algodón con solapa y una ramita de eucalipto metida.
 export function EuSobre({ className = "" }) {
   const p = usePrefijo();
   return (
@@ -640,8 +608,6 @@ export function EuSobre({ className = "" }) {
           <path d="M10 94L58 54Q70 46 82 54L130 94" fill="none" stroke="#D3CCBB" strokeWidth=".8" />
           <Ramita p={p} c={[40, 30, 54, 10, 74, 0]} n={4} s0={0.55} s1={0.4} opuestas semilla={93} sombra={false} />
           <path d="M10 24L62 60Q70 66 78 60L130 24Q130 22 127 22H13Q10 22 10 24Z" fill="#FBF9F4" stroke="#D3CCBB" strokeWidth=".8" />
-          <circle cx="70" cy="58" r="8" style={{ fill: tema("--color-gold-dark") }} />
-          <circle cx="70" cy="58" r="5" fill="none" stroke="#FFFFFF" strokeOpacity=".35" strokeWidth=".8" />
         </g>
       </g>
     </svg>
@@ -658,10 +624,10 @@ export function EuOjal({ className = "" }) {
       <defs>
         <radialGradient id={`${p}-hueco`} cx=".5" cy=".42" r=".55">
           <stop offset=".55" style={{ stopColor: tema("--color-paper") }} />
-          <stop offset="1" style={{ stopColor: tema("--color-paper", "80%, #2F3A33") }} />
+          <stop offset="1" style={{ stopColor: tema("--color-paper", "80%, #2C3A40") }} />
         </radialGradient>
       </defs>
-      <circle cx="20" cy="20" r="11" fill="#2F3A33" opacity=".12" transform="translate(.6 1.4)" />
+      <circle cx="20" cy="20" r="11" fill="#2C3A40" opacity=".12" transform="translate(.6 1.4)" />
       <circle cx="20" cy="20" r="6.6" fill={`url(#${p}-hueco)`} />
       {/* Hilo que entra por el ojal */}
       <path d="M17.4 0V17.6M22.6 0V17.6" style={{ stroke: tema("--color-seal", "85%, #3a3020") }} strokeWidth="1.1" strokeLinecap="round" />
@@ -681,6 +647,172 @@ export function EuHilo({ className = "" }) {
         <path d="M29 10C26 16 22 22 19 27M31 10C34 15 38 20 42 24" />
       </g>
       <ellipse cx="30" cy="9.5" rx="3.2" ry="2.6" style={{ fill: tema("--color-seal") }} />
+    </svg>
+  );
+}
+
+/* ---------------- Piezas de lino, etiquetas y hojitas ---------------- */
+
+const HILO = () => tema("--color-seal", "85%, #3a3020");
+const BORDE_LINO = () => tema("--color-seal", "60%, #8a7a5c");
+
+// SDXL: eu_vara
+// Vara horizontal de eucalipto plateado con gipsofila y una rosita: de su
+// centro (160, 34) cuelga la etiqueta de la entrada.
+export function EuVara({ className = "" }) {
+  const p = usePrefijo();
+  return (
+    <svg className={className} viewBox="0 0 320 90" overflow="visible" aria-hidden="true">
+      <Defs p={p} />
+      <g filter={`url(#${p}-grano)`}>
+        <g filter={`url(#${p}-sombra)`}>
+          <Ramita sombra={false} p={p} c={[160, 34, 110, 18, 30, 26]} n={5} s0={0.8} s1={0.55} tipo="larga" semilla={101} />
+          <Ramita sombra={false} p={p} c={[160, 34, 216, 18, 296, 30]} n={5} s0={0.8} s1={0.55} tipo="larga" semilla={102} />
+          <Ramita sombra={false} p={p} c={[164, 34, 96, 38, 8, 48]} n={7} s0={0.85} s1={0.55} opuestas semilla={103} />
+          <Ramita sombra={false} p={p} c={[156, 34, 226, 38, 314, 46]} n={7} s0={0.85} s1={0.55} opuestas semilla={104} />
+          <Gipsofila sombra={false} p={p} x={96} y={36} a={-30} s={0.95} semilla={105} />
+          <Gipsofila sombra={false} p={p} x={232} y={36} a={30} s={0.95} semilla={106} />
+        </g>
+        <Rosa p={p} x={232} y={30} s={0.3} a={20} />
+        <Rosa p={p} x={84} y={34} s={0.24} a={-10} />
+      </g>
+    </svg>
+  );
+}
+
+// SDXL: eu_hojita
+// Una sola hoja redonda de eucalipto plateado con su pecíolo (para contar
+// lugares y acompañar los títulos).
+export function EuHojita({ className = "", style }) {
+  const p = usePrefijo();
+  return (
+    <svg className={className} style={style} viewBox="-14 -30 28 36" aria-hidden="true">
+      <Defs p={p} />
+      <path d="M0 0Q1 3 -1 6" fill="none" stroke="#8D8983" strokeWidth="1.2" strokeLinecap="round" />
+      <Hoja x={0} y={0} a={0} s={1} tono={1} p={p} />
+    </svg>
+  );
+}
+
+// SDXL: eu_cinta
+// Medio tramo de cinta de lino champaña con su trama. Se estira a lo ancho
+// (preserveAspectRatio none); `espejo` la voltea para el lado derecho.
+export function EuCinta({ className = "", espejo = false }) {
+  const p = usePrefijo();
+  return (
+    <svg className={className} viewBox="0 0 200 30" preserveAspectRatio="none" aria-hidden="true">
+      <Defs p={p} />
+      <g transform={espejo ? "translate(200 0) scale(-1 1)" : undefined}>
+        <path d="M0 5C60 2 130 9 200 4L200 26C130 29 60 23 0 25Z" fill={`url(#${p}-lino)`} style={{ stroke: BORDE_LINO() }} strokeOpacity=".45" strokeWidth=".6" />
+        <path d="M0 5C60 2 130 9 200 4L200 26C130 29 60 23 0 25Z" fill={`url(#${p}-trama)`} />
+        <path d="M0 7.5C60 4.5 130 11.5 200 6.5" fill="none" stroke="#FFFFFF" strokeOpacity=".55" strokeWidth=".8" />
+        <path d="M0 22C60 20 130 26 200 23" fill="none" style={{ stroke: BORDE_LINO() }} strokeOpacity=".25" strokeWidth=".6" />
+      </g>
+    </svg>
+  );
+}
+
+// SDXL: eu_nudo
+// Nudo de la cinta de lino con dos puntas deshilachadas que caen. Las puntas
+// van en grupos aparte (.eu-punta-izq, .eu-punta-der) para animar el desate.
+export function EuNudo({ className = "" }) {
+  const p = usePrefijo();
+  const borde = { stroke: BORDE_LINO() };
+  return (
+    <svg className={className} viewBox="0 0 120 110" overflow="visible" aria-hidden="true">
+      <Defs p={p} />
+      <g filter={`url(#${p}-sombra)`}>
+        <g className="eu-punta-izq">
+          <path d="M54 30C47 50 36 72 22 96L31 93L34 102C46 78 57 55 64 34Z" fill={`url(#${p}-lino)`} style={borde} strokeOpacity=".5" strokeWidth=".6" />
+          <path d="M54 30C47 50 36 72 22 96L31 93L34 102C46 78 57 55 64 34Z" fill={`url(#${p}-trama)`} />
+          <path d="M22 96l-2 4M26 95l-1 5M33 101l0 4" style={borde} strokeWidth=".6" strokeLinecap="round" />
+        </g>
+        <g className="eu-punta-der">
+          <path d="M64 30C72 52 83 74 100 92L91 91L89 100C77 80 66 57 56 34Z" fill={`url(#${p}-lino)`} style={borde} strokeOpacity=".5" strokeWidth=".6" />
+          <path d="M64 30C72 52 83 74 100 92L91 91L89 100C77 80 66 57 56 34Z" fill={`url(#${p}-trama)`} />
+          <path d="M100 92l3 3M96 92l1 5M89 100l-1 4" style={borde} strokeWidth=".6" strokeLinecap="round" />
+        </g>
+        <g className="eu-nudo-bulto">
+          <path d="M45 22C49 11 71 11 75 22C79 33 71 41 60 41C49 41 41 33 45 22Z" fill={`url(#${p}-lino)`} style={borde} strokeOpacity=".6" strokeWidth=".7" />
+          <path d="M45 22C49 11 71 11 75 22C79 33 71 41 60 41C49 41 41 33 45 22Z" fill={`url(#${p}-trama)`} />
+          <path d="M51 19Q60 28 69 19M49 33Q60 26 71 34" fill="none" style={borde} strokeOpacity=".55" strokeWidth=".8" strokeLinecap="round" />
+          <path d="M50 18Q56 13 64 14" fill="none" stroke="#FFFFFF" strokeOpacity=".7" strokeWidth="1.2" strokeLinecap="round" />
+        </g>
+      </g>
+    </svg>
+  );
+}
+
+// SDXL: eu_cinta_iniciales
+// Cinta de lino anudada con las iniciales de los novios bordadas a punto
+// de hilo del tema y un pespunte ovalado alrededor.
+export function EuCintaIniciales({ iniciales = "", className = "" }) {
+  const p = usePrefijo();
+  const borde = { stroke: BORDE_LINO() };
+  const banda = "M2 40C80 33 170 46 258 37L248 51L258 64C170 73 80 60 2 67L12 53Z";
+  return (
+    <svg className={className} viewBox="0 0 260 112" overflow="visible" aria-hidden="true">
+      <Defs p={p} />
+      <g filter={`url(#${p}-sombra)`}>
+        <path d={banda} fill={`url(#${p}-lino)`} style={borde} strokeOpacity=".5" strokeWidth=".7" />
+        <path d={banda} fill={`url(#${p}-trama)`} />
+        <path d="M14 43C80 37 170 49 246 41" fill="none" stroke="#FFFFFF" strokeOpacity=".55" strokeWidth=".9" />
+        <ellipse cx="100" cy="52" rx="52" ry="11.5" fill="none" style={{ stroke: HILO() }} strokeWidth=".9" strokeDasharray="3 2.6" strokeLinecap="round" opacity=".75" />
+        <text x="100" y="62" textAnchor="middle" fontSize="34" style={{ fontFamily: "var(--fuente-guion, 'Allura'), cursive", fill: HILO() }}>{iniciales}</text>
+        <text x="100" y="62" textAnchor="middle" fontSize="34" fill="none" stroke="#FFFFFF" strokeOpacity=".55" strokeWidth=".45" strokeDasharray=".8 1.5" style={{ fontFamily: "var(--fuente-guion, 'Allura'), cursive" }}>{iniciales}</text>
+        <g transform="translate(130 18)">
+          <path d="M54 30C47 50 38 70 28 92L36 89L39 97C48 74 57 54 64 34Z" fill={`url(#${p}-lino)`} style={borde} strokeOpacity=".5" strokeWidth=".6" />
+          <path d="M64 30C72 50 82 68 96 86L88 85L86 93C76 74 66 55 56 34Z" fill={`url(#${p}-lino)`} style={borde} strokeOpacity=".5" strokeWidth=".6" />
+          <path d="M45 22C49 11 71 11 75 22C79 33 71 41 60 41C49 41 41 33 45 22Z" fill={`url(#${p}-lino)`} style={borde} strokeOpacity=".6" strokeWidth=".7" />
+          <path d="M45 22C49 11 71 11 75 22C79 33 71 41 60 41C49 41 41 33 45 22Z" fill={`url(#${p}-trama)`} />
+          <path d="M51 19Q60 28 69 19M49 33Q60 26 71 34" fill="none" style={borde} strokeOpacity=".55" strokeWidth=".8" strokeLinecap="round" />
+        </g>
+      </g>
+    </svg>
+  );
+}
+
+// SDXL: eu_hoja_boton
+// Hoja grande de eucalipto dólar de plata: es el botón de la música.
+export function EuHojaBoton({ className = "" }) {
+  const p = usePrefijo();
+  return (
+    <svg className={className} viewBox="0 0 52 62" aria-hidden="true">
+      <Defs p={p} />
+      <g filter={`url(#${p}-sombra)`}>
+        <path d="M26 56Q27 59 25 62" fill="none" stroke="#8D8983" strokeWidth="2" strokeLinecap="round" />
+        <path d="M26 56C10 54 3 41 4 28C5 13 15 4 26 4C37 4 47 13 48 28C49 41 42 54 26 56Z" fill={`url(#${p}-hoja1)`} stroke="#4C626C" strokeOpacity=".4" strokeWidth=".8" />
+        <path d="M26 56C10 54 3 41 4 28C5 13 15 4 26 4C37 4 47 13 48 28C49 41 42 54 26 56Z" fill={`url(#${p}-polvo)`} />
+        <path d="M26 54Q27.5 32 26 7M26.5 40Q18 36 12 28M26.5 40Q35 36 40 28" fill="none" stroke="#F0F5F7" strokeOpacity=".45" strokeWidth=".9" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+}
+
+// Puntos (en unidades del viewBox 360×64) donde el hilo de la cuenta regresiva
+// lleva un nudito y cuelga una etiqueta.
+export const GUIRNALDA_NUDOS = [[54, 24.7], [138, 38.3], [222, 38.3], [306, 24.7]];
+
+// SDXL: eu_guirnalda
+// Hilo horizontal que cuelga entre dos ramitas de eucalipto, con cuatro
+// nuditos de donde cuelgan las etiquetas de la cuenta regresiva.
+export function EuGuirnalda({ className = "" }) {
+  const p = usePrefijo();
+  return (
+    <svg className={className} viewBox="0 0 360 64" overflow="visible" aria-hidden="true">
+      <Defs p={p} />
+      <path d="M22 16Q180 64 338 16" fill="none" style={{ stroke: HILO() }} strokeWidth="1.1" strokeLinecap="round" />
+      {GUIRNALDA_NUDOS.map(([x, y]) => (
+        <ellipse key={x} cx={x} cy={y} rx="2.6" ry="2.1" style={{ fill: HILO() }} />
+      ))}
+      <g filter={`url(#${p}-grano)`}>
+        <Ramita p={p} c={[30, 16, 12, 4, -14, 22]} n={4} s0={0.62} s1={0.45} opuestas semilla={111} />
+        <Ramita p={p} c={[330, 16, 348, 4, 374, 22]} n={4} s0={0.62} s1={0.45} opuestas semilla={112} />
+        <Gipsofila p={p} x={22} y={18} a={-130} s={0.7} semilla={113} />
+        <Gipsofila p={p} x={338} y={18} a={130} s={0.7} semilla={114} />
+      </g>
+      <ellipse cx="22" cy="16" rx="3.4" ry="2.8" style={{ fill: HILO() }} />
+      <ellipse cx="338" cy="16" rx="3.4" ry="2.8" style={{ fill: HILO() }} />
     </svg>
   );
 }

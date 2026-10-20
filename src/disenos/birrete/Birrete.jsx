@@ -4,20 +4,21 @@ import RSVP from "../../components/RSVP";
 import {
   partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer,
 } from "../comun";
-import { BiDiploma, BiRizo, BiSello, BiBirrete, BiLaurel, BiLibros, BiCopas } from "./arte";
+import { BiDiploma, BiRizo, BiSello, BiSelloPases, BiFirma, BiCirculo, BiBirrete, BiLaurel, BiLibros } from "./arte";
 
-// Diseño «Birrete»: graduación académica y elegante en claro. Marfil, tinta
-// y oro con detalles en azul tinta; todo el arte en SVG semi-realista.
-// - Entrada: un diploma enrollado con cinta azul y oro al centro. Al tocar,
-//   la cinta se suelta y el pergamino se desenrolla de arriba abajo (el rollo
-//   baja, adelgaza y arrastra su sombra) mostrando el nombre, la frase con el
-//   título y un sello dorado. El pergamino abierto queda como portada.
-// - Cuerpo: un portafolio con pestañas. Cada sección es una hoja de papel
-//   marfil con una pestaña lateral de color (alterna oro, azul tinta, oro
-//   claro y oro oscuro) que lleva el título; las hojas se apilan con la
-//   sombra de la hoja de debajo. Birrete y laureles acompañan.
-// Colores del tema: principal = oro, claro = oro pálido, oscuro = oro viejo,
-// papel = marfil, mármol = blanco de tarjeta, sello = azul tinta.
+// Diseño «Birrete»: graduación académica en vino y oro sobre una mesa de
+// estudio forrada en cuero vino suave; hojas y diploma en marfil. Todo el
+// arte en SVG semi-realista.
+// - Entrada: el invitado recibe un certificado («Se otorga la presente
+//   invitación a…», firma que se traza sola, folio y un sello de pases en
+//   relieve dorado). Debajo, el diploma enrollado con su cinta vino y oro; la
+//   cola del lazo es el llamado a tocar («Tira para desenrollar»). Al tirar,
+//   la cinta se desata y el pergamino se desenrolla de arriba abajo.
+// - Cuerpo: un portafolio con pestañas verticales (vino, oro, vino claro y
+//   burdeos). La cuenta regresiva es un calendario académico con el día
+//   marcado a tinta y un boletín de lo que falta. Cierre: birretes lanzados.
+// Colores del tema: principal = vino, claro = vino pálido, oscuro = burdeos,
+// papel = marfil, mármol = blanco de tarjeta, sello = oro.
 
 const FUENTES =
   "https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Imperial+Script&display=swap";
@@ -30,6 +31,31 @@ const aRomano = (n) => {
   for (const [v, l] of t) while (r >= v) { s += l; r -= v; }
   return s;
 };
+
+// Número de folio estable para cada invitado (sale de su código o su nombre).
+const folioDe = (inv) => {
+  const base = `${inv?.codigo || ""}${inv?.nombre || ""}`;
+  let h = 7;
+  for (const ch of base) h = (h * 31 + ch.charCodeAt(0)) % 100000;
+  return String(1000 + (h % 9000));
+};
+
+const SEMANA = ["L", "M", "M", "J", "V", "S", "D"];
+// Celdas del mes del evento, con la semana empezando en lunes.
+function celdasMes(anio, mes) {
+  const primero = (new Date(anio, mes - 1, 1).getDay() + 6) % 7;
+  const total = new Date(anio, mes, 0).getDate();
+  return [...Array(primero).fill(null), ...Array.from({ length: total }, (_, i) => i + 1)];
+}
+
+// Birretes lanzados del cierre: posición, giro, tamaño y demora.
+const LANZADOS = [
+  { x: -118, y: 34, r: -24, s: 0.62, d: 0 },
+  { x: -54, y: -4, r: 14, s: 0.86, d: 0.12 },
+  { x: 8, y: 22, r: -8, s: 1, d: 0.04 },
+  { x: 70, y: -10, r: 22, s: 0.74, d: 0.2 },
+  { x: 122, y: 30, r: -16, s: 0.58, d: 0.3 },
+];
 
 const trazo = { fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinecap: "round", strokeLinejoin: "round" };
 const Icono = {
@@ -146,20 +172,34 @@ export default function Birrete({ site, contenidoDe, invitacion, onEnviarRSVP, e
   const hojas = [];
   if (partes) {
     hojas.push({
-      clave: "cuenta", titulo: "Faltan",
+      clave: "cuenta", titulo: "Calendario",
       cuerpo: (
         <>
-          <p className="bi-k">{info.overline || "La cita"}</p>
-          <p className="bi-fecha-larga">
-            <span>{partes.semana}</span> {partes.dia} de {partes.mes} de {partes.anio}
-          </p>
-          <p className="bi-ayuda">a las {partes.hora}</p>
-          {cuenta ? (
-            <div className="bi-cuenta" role="timer" aria-label="Cuenta regresiva">
-              {[["dias", "días"], ["horas", "horas"], ["min", "min"], ["seg", "seg"]].map(([k, l]) => (
-                <div key={k}><span className="n">{cuenta[k]}</span><span className="l">{l}</span></div>
+          <p className="bi-k">{info.overline || "Calendario académico"}</p>
+          <div className="bi-calendario">
+            <p className="bi-cal-mes"><span>{partes.mes}</span> · {aRomano(partes.anio)}</p>
+            <div className="bi-cal-rejilla" aria-hidden="true">
+              {SEMANA.map((d, i) => <span key={`s${i}`} className="bi-cal-sem">{d}</span>)}
+              {celdasMes(Number(partes.anio), Number(partes.mesNum)).map((d, i) => (
+                <span key={i} className={`bi-cal-dia ${d === Number(partes.dia) ? "is-hoy" : ""}`}>
+                  {d}
+                  {d === Number(partes.dia) && <BiCirculo className="bi-cal-marca" />}
+                </span>
               ))}
             </div>
+            <p className="bi-fecha-larga">
+              <span>{partes.semana}</span> {partes.dia} de {partes.mes}, {partes.hora}
+            </p>
+          </div>
+          {cuenta ? (
+            <table className="bi-boletin" role="timer" aria-label="Cuenta regresiva">
+              <caption>Registro de lo que falta</caption>
+              <tbody>
+                {[["dias", "Días"], ["horas", "Horas"], ["min", "Minutos"], ["seg", "Segundos"]].map(([k, l]) => (
+                  <tr key={k}><th scope="row"><span>{l}</span></th><td>{cuenta[k]}</td></tr>
+                ))}
+              </tbody>
+            </table>
           ) : (
             <p className="bi-llego">¡Llegó el gran día!</p>
           )}
@@ -357,19 +397,31 @@ export default function Birrete({ site, contenidoDe, invitacion, onEnviarRSVP, e
     <div className={`bi bi-fase-${fase}`} ref={raiz}>
       {audioSrc && <audio ref={audioRef} src={audioSrc} loop />}
       {audioSrc && fase !== "enrollado" && (
-        <button className="bi-musica" type="button" aria-pressed={sonando} onClick={alternarMusica} aria-label={sonando ? "Pausar música" : "Reproducir música"}>
-          {sonando ? Icono.pausa : Icono.musica}
-          <span>{sonando ? "Pausar" : "Música"}</span>
+        <button className={`bi-musica ${sonando ? "is-sonando" : ""}`} type="button" aria-pressed={sonando} onClick={alternarMusica} aria-label={sonando ? "Pausar música" : "Reproducir música"}>
+          <BiBirrete className="bi-musica-birrete" />
+          <span className="bi-musica-icono">{sonando ? Icono.pausa : Icono.musica}</span>
         </button>
       )}
 
       {/* Entrada y portada: el diploma enrollado que se desenrolla. */}
       <header className="bi-portada" aria-labelledby="bi-nombre">
         {invitacion?.nombre && (
-          <div className="bi-invitado">
-            <span className="bi-k">Invitación especial para</span>
+          <div className="bi-certificado">
+            <p className="bi-otorga">Se otorga la presente invitación a</p>
             <p className="bi-invitado-nombre">{invitacion.nombre}</p>
-            {pases > 0 && <span className="bi-pases">{pases} {pases === 1 ? "pase reservado" : "pases reservados"}</span>}
+            <div className="bi-cert-pie">
+              <div className="bi-cert-firma">
+                <BiFirma className="bi-firma-svg" />
+                <p className="bi-cert-quien">{nombres[0] || "La anfitriona"}</p>
+                <p className="bi-cert-folio">Folio N.º {folioDe(invitacion)}</p>
+              </div>
+              {pases > 0 && (
+                <div className="bi-cert-pases">
+                  <BiSelloPases className="bi-relieve" numero={pases} />
+                  <p>Válida para {pases} {pases === 1 ? "persona" : "personas"}</p>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
@@ -413,8 +465,9 @@ export default function Birrete({ site, contenidoDe, invitacion, onEnviarRSVP, e
         </div>
 
         <div className="bi-pie-entrada">
-          <button type="button" className="bi-desenrollar" onClick={desenrollar} tabIndex={fase === "enrollado" ? 0 : -1} aria-hidden={fase !== "enrollado"}>
-            Toca para desenrollar
+          <button type="button" className="bi-tirar" onClick={desenrollar} tabIndex={fase === "enrollado" ? 0 : -1} aria-hidden={fase !== "enrollado"}>
+            <span className="bi-tirar-cola" aria-hidden="true" />
+            <span className="bi-tirar-cinta">Tira para desenrollar</span>
           </button>
           <p className="bi-desliza" aria-hidden="true">{Icono.abajo}<span>Desliza</span></p>
         </div>
@@ -439,10 +492,12 @@ export default function Birrete({ site, contenidoDe, invitacion, onEnviarRSVP, e
           </div>
 
           <footer className="bi-final" data-reveal>
-            <div className="bi-final-arte" aria-hidden="true">
-              <BiLaurel className="bi-final-laurel" />
-              <BiCopas className="bi-final-copas" />
-              <BiLaurel className="bi-final-laurel" espejo />
+            <div className="bi-lanzados" aria-hidden="true">
+              {LANZADOS.map((b, i) => (
+                <span key={i} className="bi-lanzado" style={{ "--x": `${b.x}px`, "--y": `${b.y}px`, "--r": `${b.r}deg`, "--s": b.s, "--d": `${b.d}s` }}>
+                  <BiBirrete className="bi-lanzado-birrete" />
+                </span>
+              ))}
             </div>
             <p className="bi-te-espero">¡Te espero para celebrar!</p>
             {nombres.length > 0 && <p className="bi-ayuda">Con gratitud, {nombres.join(" & ")}</p>}
@@ -455,11 +510,22 @@ export default function Birrete({ site, contenidoDe, invitacion, onEnviarRSVP, e
 
       {rsvpAbierto && invitacion && (
         <div className="bi-modal" role="dialog" aria-modal="true" aria-label="Confirmar asistencia" onClick={(e) => e.target === e.currentTarget && setRsvpAbierto(false)}>
+          <div className="bi-modal-hoja">
+            <button type="button" className="bi-cerrar" onClick={() => setRsvpAbierto(false)} aria-label="Cerrar">
+              <span aria-hidden="true">Cerrar</span><b aria-hidden="true">×</b>
+            </button>
           <div className="bi-modal-caja">
-            <button type="button" className="bi-cerrar" onClick={() => setRsvpAbierto(false)} aria-label="Cerrar">×</button>
-            <div className="bi-modal-cabeza" aria-hidden="true">
-              <BiBirrete className="bi-modal-birrete" />
-              <p>R.S.V.P.</p>
+            <div className="bi-membrete" aria-hidden="true">
+              <div className="bi-membrete-escudo">
+                <BiLaurel className="bi-membrete-laurel" />
+                <BiBirrete className="bi-membrete-birrete" />
+                <BiLaurel className="bi-membrete-laurel" espejo />
+              </div>
+              <div className="bi-membrete-texto">
+                <p className="bi-membrete-titulo">Constancia de asistencia</p>
+                <p className="bi-membrete-sub">{[nombres[0], partes && `${partes.dia} de ${partes.mes} de ${partes.anio}`].filter(Boolean).join(" · ")}</p>
+              </div>
+              <p className="bi-membrete-folio">Folio N.º {folioDe(invitacion)}</p>
             </div>
             <RSVP
               invitacion={invitacion}
@@ -470,6 +536,7 @@ export default function Birrete({ site, contenidoDe, invitacion, onEnviarRSVP, e
               }}
               onSubmit={onEnviarRSVP}
             />
+          </div>
           </div>
         </div>
       )}

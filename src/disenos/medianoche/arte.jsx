@@ -49,7 +49,7 @@ function Metal({ id, x1 = 0, y1 = 0, x2 = 1, y2 = 1 }) {
 // argolla, esfera de esmalte marfil con guilloché fino, índices de bastón y
 // un pequeño segundero a las 6. `minuto` y `hora` son ángulos en grados
 // (0 = las 12); el componente que lo usa los anima con una transición CSS.
-export function MdReloj({ className = "", minuto = 0, hora = 0, segundero = true }) {
+export function MdReloj({ className = "", minuto = 0, hora = 0, segundero = true, llamado = false }) {
   const id = useIds("caja", "bisel", "esfera", "brillo", "sombra", "grano", "aguja", "argolla", "vidrio");
   const marcas = Array.from({ length: 60 }, (_, i) => i);
   const anillos = [56, 52, 48, 44, 40, 36, 32];
@@ -97,11 +97,13 @@ export function MdReloj({ className = "", minuto = 0, hora = 0, segundero = true
         {/* Argolla y corona */}
         <ellipse cx="120" cy="32" rx="24" ry="22" fill="none" stroke={`url(#${id.argolla})`} strokeWidth="7" />
         <ellipse cx="120" cy="32" rx="24" ry="22" fill="none" stroke={CLARO} strokeOpacity=".5" strokeWidth="1" transform="translate(-1.5 -1.5)" />
-        <rect x="111" y="50" width="18" height="12" rx="3" fill={`url(#${id.caja})`} />
-        <g fill={`url(#${id.caja})`}>
-          <rect x="107" y="60" width="26" height="16" rx="4" />
+        {/* La corona es la que se presiona: baja y sube con CSS. */}
+        <g className="md-reloj-corona">
+          <rect x="111" y="50" width="18" height="12" rx="3" fill={`url(#${id.caja})`} />
+          <rect x="107" y="60" width="26" height="16" rx="4" fill={`url(#${id.caja})`} />
+          <path d="M110 62v12M114 62v12M118 62v12M122 62v12M126 62v12M130 62v12" stroke={OSCURO} strokeOpacity=".55" strokeWidth="1" />
+          <rect x="108" y="61" width="24" height="3" rx="1.5" fill={CLARO} opacity=".55" />
         </g>
-        <path d="M110 62v12M114 62v12M118 62v12M122 62v12M126 62v12M130 62v12" stroke={OSCURO} strokeOpacity=".55" strokeWidth="1" />
         <rect x="114" y="74" width="12" height="10" rx="2" fill={`url(#${id.caja})`} />
 
         {/* Caja */}
@@ -164,6 +166,14 @@ export function MdReloj({ className = "", minuto = 0, hora = 0, segundero = true
       <circle cx="120" cy="178" r="88" fill={`url(#${id.vidrio})`} />
       <path d="M58 140 C 72 104 104 88 140 92" fill="none" stroke="#fff" strokeOpacity=".35" strokeWidth="3" strokeLinecap="round" />
       <circle cx="120" cy="178" r="104" fill={`url(#${id.brillo})`} />
+
+      {/* Ondas doradas alrededor de la corona: «presióname» */}
+      {llamado && (
+        <g className="md-corona-ondas" fill="none" stroke={CLARO} strokeWidth="1.4">
+          <ellipse cx="120" cy="66" rx="22" ry="16" />
+          <ellipse cx="120" cy="66" rx="22" ry="16" />
+        </g>
+      )}
     </svg>
   );
 }
@@ -378,7 +388,8 @@ export function MdPlato({ className = "" }) {
 }
 
 // Abanico art-déco: semicírculo de rayos y arcos con base escalonada. Trazo
-// fino de oro; se usa pequeño en cada sección.
+// fino de oro; se usa pequeño en cada sección. Los rayos giran con CSS
+// (`--g`), así el abanico se despliega cuando su sección aparece.
 export function MdAbanico({ className = "" }) {
   const id = useIds("oro");
   const rayos = [-75, -60, -45, -30, -15, 0, 15, 30, 45, 60, 75];
@@ -390,7 +401,7 @@ export function MdAbanico({ className = "" }) {
         <path d="M11 30 A 21 21 0 0 1 53 30" strokeOpacity=".75" />
         <path d="M20 30 A 12 12 0 0 1 44 30" />
         {rayos.map((a) => (
-          <line key={a} x1="32" y1="30" x2="32" y2="3.5" transform={`rotate(${a} 32 30)`} strokeOpacity={a % 30 === 0 ? 1 : 0.6} />
+          <line key={a} className="md-rayo" x1="32" y1="30" x2="32" y2="3.5" style={{ "--g": `${a}deg` }} strokeOpacity={a % 30 === 0 ? 1 : 0.6} />
         ))}
         <path d="M14 30 H 50 M 18 33 H 46" />
       </g>
@@ -402,13 +413,235 @@ export function MdAbanico({ className = "" }) {
 // Esquina escalonada del marco art-déco (arriba a la izquierda; las demás se
 // voltean con CSS). Tapa el filete recto con el color de fondo y lo redibuja
 // con escalones; las medidas coinciden con los filetes del CSS (0,5 y 7,5 px).
-export function MdEsquina({ className = "" }) {
+export function MdEsquina({ className = "", fondo = "rgb(var(--color-paper))" }) {
   return (
     <svg className={`md-esquina ${className}`} viewBox="0 0 28 28" width="28" height="28" aria-hidden="true">
-      <rect width="27.5" height="27.5" fill="rgb(var(--color-paper))" />
+      <rect width="27.5" height="27.5" fill={fondo} />
       <path d="M0.5 28 V18.5 H6.5 V6.5 H18.5 V0.5 H28" fill="none" stroke={ORO} strokeOpacity=".7" />
       <path d="M7.5 28 V25.5 H13.5 V13.5 H25.5 V7.5 H28" fill="none" stroke={ORO} strokeOpacity=".38" />
       <path d="M20 17.5 L 22.5 20 L 20 22.5 L 17.5 20 Z" fill={ORO} />
+    </svg>
+  );
+}
+
+// SDXL: md_esfera
+// Esfera art-déco de la cuenta regresiva: bisel de oro escalonado, esfera
+// esmeralda con rayos de sol finos, números romanos y una ventanilla de fecha
+// a las 6 con los días que faltan. Las agujas marcan las horas, minutos y
+// segundos que restan (el componente las gira con CSS).
+export function MdEsfera({ className = "", dias = "", horas = 0, minutos = 0, segundos = 0 }) {
+  const id = useIds("bisel", "anillo", "cara", "aguja", "vidrio", "grano", "sombra");
+  const C = 140;
+  const romanos = ["XII", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI"];
+  const angH = ((horas % 12) + minutos / 60) * 30;
+  const angM = (minutos + segundos / 60) * 6;
+  const angS = segundos * 6;
+  const gira = (a) => ({ transform: `rotate(${a}deg)`, transformOrigin: `${C}px ${C}px` });
+  return (
+    <svg className={`md-esfera ${className}`} viewBox="0 0 280 292" aria-hidden="true">
+      <defs>
+        <Metal id={id.bisel} x1="0" y1="0" x2="1" y2="1" />
+        <linearGradient id={id.anillo} x1="1" y1="1" x2="0" y2="0">
+          <stop offset="0" stopColor={CLARO} />
+          <stop offset=".5" stopColor={OSCURO} />
+          <stop offset="1" stopColor={CLARO} />
+        </linearGradient>
+        <radialGradient id={id.cara} cx=".45" cy=".36" r=".72">
+          <stop offset="0" stopColor="rgb(var(--color-marble))" />
+          <stop offset="1" stopColor="rgb(var(--color-paper))" />
+        </radialGradient>
+        <linearGradient id={id.aguja} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor={OSCURO} />
+          <stop offset=".5" stopColor={CLARO} />
+          <stop offset="1" stopColor={ORO} />
+        </linearGradient>
+        <linearGradient id={id.vidrio} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#fff" stopOpacity=".16" />
+          <stop offset=".45" stopColor="#fff" stopOpacity="0" />
+        </linearGradient>
+        <radialGradient id={id.sombra}>
+          <stop offset="0" stopColor="#000" stopOpacity=".5" />
+          <stop offset="1" stopColor="#000" stopOpacity="0" />
+        </radialGradient>
+        <Grano id={id.grano} opacidad={0.2} />
+      </defs>
+      <ellipse cx={C} cy="282" rx="96" ry="8" fill={`url(#${id.sombra})`} />
+      <g filter={`url(#${id.grano})`}>
+        {/* Bisel escalonado: tres anillos */}
+        <circle cx={C} cy={C} r="136" fill={`url(#${id.bisel})`} />
+        <circle cx={C} cy={C} r="135" fill="none" stroke={CLARO} strokeOpacity=".55" />
+        <circle cx={C} cy={C} r="128" fill={`url(#${id.anillo})`} />
+        <circle cx={C} cy={C} r="131" fill="none" stroke={CLARO} strokeOpacity=".5" strokeWidth="2" strokeDasharray="1 3.4" />
+        <circle cx={C} cy={C} r="122" fill={`url(#${id.cara})`} />
+        <circle cx={C} cy={C} r="122" fill="none" stroke={OSCURO} strokeWidth="1.2" />
+      </g>
+      {/* Rayos de sol art-déco sobre la esfera */}
+      <g stroke={ORO}>
+        {Array.from({ length: 48 }, (_, i) => (
+          <line key={i} x1={C} y1={C - 24} x2={C} y2={C - 84} strokeWidth={i % 2 ? 0.5 : 0.9} strokeOpacity={i % 2 ? 0.1 : 0.2} transform={`rotate(${i * 7.5} ${C} ${C})`} />
+        ))}
+      </g>
+      <circle cx={C} cy={C} r="86" fill="none" stroke={ORO} strokeOpacity=".45" strokeWidth=".8" />
+      <circle cx={C} cy={C} r="82" fill="none" stroke={ORO} strokeOpacity=".25" strokeWidth=".6" />
+      {/* Pista de minutos */}
+      <g stroke={CLARO}>
+        {Array.from({ length: 60 }, (_, i) => (
+          <line key={i} x1={C} y1={C - 118} x2={C} y2={C - (i % 5 ? 114 : 110)} strokeWidth={i % 5 ? 0.7 : 1.6} strokeOpacity={i % 5 ? 0.5 : 0.95} transform={`rotate(${i * 6} ${C} ${C})`} />
+        ))}
+      </g>
+      {/* Números romanos */}
+      <g fill={CLARO} style={{ fontFamily: "var(--f-titulos)" }} textAnchor="middle" dominantBaseline="central">
+        {romanos.map((r, i) => {
+          const a = (i * 30 * Math.PI) / 180;
+          const rr = 97;
+          return (
+            <text key={r} x={(C + Math.sin(a) * rr).toFixed(1)} y={(C - Math.cos(a) * rr).toFixed(1)} fontSize={i % 3 ? 14 : 18} opacity={i === 6 ? 0 : 1}>{r}</text>
+          );
+        })}
+      </g>
+      {/* Ventanilla de fecha a las 6 con los días */}
+      <g>
+        <path d={`M${C - 40} 186 h80 l6 6 v24 l-6 6 h-80 l-6 -6 v-24 z`} fill="rgb(var(--color-paper))" stroke={`url(#${id.bisel})`} strokeWidth="2" />
+        <path d={`M${C - 37} 190 h74 l4 4 v20 l-4 4 h-74 l-4 -4 v-20 z`} fill="none" stroke={ORO} strokeOpacity=".4" strokeWidth=".7" />
+        <text x={C} y="205" textAnchor="middle" dominantBaseline="central" fill="rgb(var(--color-ink))" fontSize="22" style={{ fontFamily: "var(--f-titulos)", letterSpacing: "1px" }}>{dias}</text>
+        <text x={C} y="238" textAnchor="middle" fill={ORO} fontSize="10" style={{ fontFamily: "var(--f-titulos)", letterSpacing: "2px" }}>DÍAS</text>
+      </g>
+      {/* Agujas art-déco: lanza escalonada */}
+      <g className="md-esf-hora" style={gira(angH)}>
+        <path d={`M${C} ${C + 14} L${C - 4.5} ${C + 6} L${C - 4.5} ${C - 30} L${C - 2} ${C - 34} L${C - 5} ${C - 44} L${C} ${C - 66} L${C + 5} ${C - 44} L${C + 2} ${C - 34} L${C + 4.5} ${C - 30} L${C + 4.5} ${C + 6} Z`} fill={`url(#${id.aguja})`} stroke={OSCURO} strokeWidth=".6" />
+      </g>
+      <g className="md-esf-min" style={gira(angM)}>
+        <path d={`M${C} ${C + 18} L${C - 3} ${C + 8} L${C - 3} ${C - 70} L${C - 1.4} ${C - 74} L${C - 3.4} ${C - 82} L${C} ${C - 104} L${C + 3.4} ${C - 82} L${C + 1.4} ${C - 74} L${C + 3} ${C - 70} L${C + 3} ${C + 8} Z`} fill={`url(#${id.aguja})`} stroke={OSCURO} strokeWidth=".6" />
+      </g>
+      <g className="md-esf-seg" style={gira(angS)}>
+        <line x1={C} y1={C + 26} x2={C} y2={C - 112} stroke={ACENTO} strokeWidth="1" strokeLinecap="round" />
+        <path d={`M${C} ${C + 20} l4 6 -4 6 -4 -6 z`} fill={ACENTO} />
+      </g>
+      <circle cx={C} cy={C} r="6.5" fill={`url(#${id.bisel})`} stroke={OSCURO} strokeWidth=".8" />
+      <circle cx={C} cy={C} r="2" fill={ACENTO} />
+      {/* Reflejo del cristal */}
+      <circle cx={C} cy={C} r="122" fill={`url(#${id.vidrio})`} />
+      <path d="M44 104 C 58 66 92 40 132 34" fill="none" stroke="#fff" strokeOpacity=".22" strokeWidth="3" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+// SDXL: md_copa
+// Una copa flauta de champaña, de frente, para contar los pases en la
+// tarjeta de mesa. La champaña sube con CSS (.md-copa-liquido).
+export function MdCopa({ className = "", style }) {
+  const id = useIds("vidrio", "liquido");
+  return (
+    <svg className={`md-copa ${className}`} style={style} viewBox="0 0 24 64" aria-hidden="true">
+      <defs>
+        <linearGradient id={id.vidrio} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor="#fff" stopOpacity=".38" />
+          <stop offset=".4" stopColor="#fff" stopOpacity=".06" />
+          <stop offset="1" stopColor="#fff" stopOpacity=".3" />
+        </linearGradient>
+        <linearGradient id={id.liquido} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor={CLARO} />
+          <stop offset="1" stopColor={ORO} />
+        </linearGradient>
+      </defs>
+      <g className="md-copa-liquido">
+        <path d="M5.4 10 C 5.4 24 6.6 33 12 37 C 17.4 33 18.6 24 18.6 10 Z" fill={`url(#${id.liquido})`} />
+        <ellipse cx="12" cy="10" rx="6.6" ry="1.2" fill={CLARO} />
+        <circle cx="10.5" cy="28" r=".8" fill="#FFF8E6" opacity=".8" />
+        <circle cx="13" cy="21" r=".6" fill="#FFF8E6" opacity=".8" />
+      </g>
+      <path d="M4.4 3 C 4.2 22 5.8 34 12 38.5 C 18.2 34 19.8 22 19.6 3 Z" fill={`url(#${id.vidrio})`} stroke="#F7EFDC" strokeOpacity=".7" strokeWidth=".7" />
+      <path d="M7 6 C 7 20 7.8 28 10 33" fill="none" stroke="#fff" strokeOpacity=".6" strokeWidth=".9" strokeLinecap="round" />
+      <path d="M11.4 38.5 L 11.5 58 H 12.5 L 12.6 38.5 Z" fill="#fff" fillOpacity=".55" />
+      <ellipse cx="12" cy="59" rx="7" ry="1.8" fill="#fff" fillOpacity=".35" stroke="#F7EFDC" strokeOpacity=".6" strokeWidth=".5" />
+    </svg>
+  );
+}
+
+// SDXL: md_atril
+// Atril de bronce escalonado (zigurat art-déco) que sostiene la tarjeta de
+// mesa reservada, con su sombra sobre el mantel.
+export function MdAtril({ className = "" }) {
+  const id = useIds("metal", "sombra", "grano");
+  return (
+    <svg className={`md-atril ${className}`} viewBox="0 0 240 34" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <Metal id={id.metal} x1="0" y1="0" x2="1" y2=".2" />
+        <radialGradient id={id.sombra}>
+          <stop offset="0" stopColor="#000" stopOpacity=".5" />
+          <stop offset="1" stopColor="#000" stopOpacity="0" />
+        </radialGradient>
+        <Grano id={id.grano} opacidad={0.2} />
+      </defs>
+      <ellipse cx="120" cy="29" rx="118" ry="5" fill={`url(#${id.sombra})`} />
+      <g filter={`url(#${id.grano})`} fill={`url(#${id.metal})`}>
+        <rect x="30" y="0" width="180" height="7" />
+        <rect x="16" y="7" width="208" height="7" />
+        <rect x="4" y="14" width="232" height="10" />
+      </g>
+      <g stroke={CLARO} strokeOpacity=".65" strokeWidth=".8">
+        <path d="M30 .5 H210 M16 7.5 H224 M4 14.5 H236" />
+      </g>
+      <path d="M120 16 l3.5 3.5 -3.5 3.5 -3.5 -3.5 z" fill={OSCURO} />
+    </svg>
+  );
+}
+
+// Rayos de sol art-déco que nacen del pie de la tarjeta de mesa (fondo).
+export function MdRayos({ className = "" }) {
+  return (
+    <svg className={`md-rayos ${className}`} viewBox="0 0 200 100" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <g stroke={ORO} strokeWidth=".6">
+        {Array.from({ length: 19 }, (_, i) => (
+          <line key={i} x1="100" y1="100" x2="100" y2="-60" strokeOpacity={i % 2 ? 0.08 : 0.16} transform={`rotate(${-90 + i * 10} 100 100)`} />
+        ))}
+      </g>
+      <g fill="none" stroke={ORO} strokeOpacity=".18" strokeWidth=".6">
+        <path d="M70 100 A 30 30 0 0 1 130 100" />
+        <path d="M80 100 A 20 20 0 0 1 120 100" />
+      </g>
+    </svg>
+  );
+}
+
+// SDXL: md_disco
+// Disco de vinilo esmeralda con etiqueta de oro y brazo del gramófono: el
+// botón de la música. Gira mientras suena; el brazo se apoya al sonar.
+export function MdDisco({ className = "", sonando = false }) {
+  const id = useIds("vinilo", "etiqueta", "brazo", "brillo");
+  return (
+    <svg className={`md-disco ${className}`} viewBox="0 0 60 60" aria-hidden="true">
+      <defs>
+        <radialGradient id={id.vinilo} cx=".5" cy=".5" r=".5">
+          <stop offset="0" stopColor="rgb(var(--color-marble))" />
+          <stop offset=".9" stopColor="rgb(var(--color-paper))" />
+          <stop offset="1" stopColor={OSCURO} />
+        </radialGradient>
+        <Metal id={id.etiqueta} x1="0" y1="0" x2="1" y2="1" />
+        <Metal id={id.brazo} x1="0" y1="0" x2="1" y2="0" />
+        <linearGradient id={id.brillo} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#fff" stopOpacity="0" />
+          <stop offset=".45" stopColor="#fff" stopOpacity=".18" />
+          <stop offset=".55" stopColor="#fff" stopOpacity=".18" />
+          <stop offset="1" stopColor="#fff" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <g className="md-disco-gira">
+        <circle cx="28" cy="32" r="26" fill={`url(#${id.vinilo})`} stroke={ORO} strokeOpacity=".6" strokeWidth=".8" />
+        <g fill="none" stroke={CLARO} strokeOpacity=".16" strokeWidth=".5">
+          {[23, 20.5, 18, 15.5, 13].map((r) => <circle key={r} cx="28" cy="32" r={r} />)}
+        </g>
+        <circle cx="28" cy="32" r="9" fill={`url(#${id.etiqueta})`} />
+        <path d="M28 25 l2 3.4 -2 3.4 -2 -3.4 z M28 32 l2 3.4 -2 3.4 -2 -3.4 z" fill={OSCURO} opacity=".7" />
+        <circle cx="28" cy="32" r="1.4" fill="rgb(var(--color-paper))" />
+      </g>
+      <circle cx="28" cy="32" r="26" fill={`url(#${id.brillo})`} />
+      {/* Brazo del gramófono */}
+      <g className={`md-disco-brazo ${sonando ? "md-disco-brazo-on" : ""}`}>
+        <circle cx="53" cy="7" r="3.6" fill={`url(#${id.brazo})`} />
+        <path d="M53 7 L 50 26 L 42 34" fill="none" stroke={`url(#${id.brazo})`} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <rect x="38.5" y="32" width="6" height="4" rx="1" fill={CLARO} transform="rotate(-45 41.5 34)" />
+      </g>
     </svg>
   );
 }

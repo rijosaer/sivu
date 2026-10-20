@@ -5,23 +5,27 @@ import {
   partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer,
 } from "../comun";
 import {
-  DlPastel, DlHumo, DlMacarons, DlCopas, DlTarta, DlCajita,
-  DlToldo, DlEtiqueta, DlCordon, DlFilete, DlMacaronSuelto,
+  DlPastel, DlHumo, DlSoplido, DlTemporizador, DlMacarons, DlCopas, DlTarta, DlCajita,
+  DlCajaCierre, DlBatidor, DlToldo, DlEtiqueta, DlCordon, DlMacaronSuelto, SURTIDO,
 } from "./arte";
 
-// Diseño «Dulce 30»: cumpleaños de adultos con aire de pastelería parisina:
-// pastel de pisos rosa, macarons pastel, rosas, mármol blanco y oro.
-// - Entrada «Sopla las velas»: un pastel de tres pisos sobre un pedestal de
-//   mármol, con las velas encendidas y la edad como topper dorado (texto).
-//   Al tocar «Sopla las velas» las llamas se inclinan y se apagan, sube un
-//   hilo de humo de cada mecha y la invitación se abre.
-// - Cuerpo «vitrina de pastelería»: bajo un toldo a rayas, cada sección es
-//   una repisa de vitrina (cristal y borde dorado) con su postre pintado
-//   (macarons, copas de champaña rosada, porción de torta, cajita) y una
-//   etiqueta escrita a mano, colgada de un cordón, con el título.
-// Colores del tema: principal = rosa pastel, claro = rosa muy claro, oscuro =
-// rosa antiguo, papel = fondo rosado, mármol = blanco de tarjetas, sello =
-// lila. El oro y el mármol son colores del material y van fijos en el arte.
+// Diseño «Dulce 30»: cumpleaños de adultos con aire de pastelería de
+// caramelo y vainilla: pastel de crema con caramelo chorreado, frutos rojos,
+// hojillas de oro, macarons surtidos y mármol.
+// - Entrada «Sopla las velas»: el pastel de tres pisos sobre su pedestal,
+//   con las velas encendidas, la edad como topper dorado y, si hay invitado,
+//   su nombre escrito con manga en una placa de chocolate blanco con las
+//   porciones reservadas. El llamado es un soplido dibujado (remolinos de
+//   aire): al tocarlo la ráfaga vuela al pastel, las llamas se apagan, sube
+//   el humo y la invitación se abre.
+// - Cuerpo «vitrina de pastelería»: bajo un toldo caramelo y crema, cada
+//   sección es una repisa de vitrina con su postre y una etiqueta de precio
+//   escrita a mano que se columpia al aparecer. La cuenta regresiva es un
+//   temporizador de horno; el cierre, una caja de pastelería que se tapa y
+//   se ata con cordel; la música, un batidor; el RSVP, una caja de pastelería.
+// Colores del tema: principal = caramelo, claro = vainilla, oscuro = caramelo
+// tostado, papel = fondo vainilla, mármol = crema de tarjetas, sello = frutos.
+// El oro, el mármol y los frutos rojos son color del material y van fijos.
 
 const FUENTES =
   "https://fonts.googleapis.com/css2?family=Italiana&family=Montserrat:wght@400;500;600&family=Yesteryear&display=swap";
@@ -88,13 +92,6 @@ function Entrada({ nombre, edad, antetitulo, invitacion, alSoplar, onAbrir }) {
   return (
     <section className={`dl-entrada ${soplando ? "dl-sopladas" : ""} ${saliendo ? "dl-saliendo" : ""}`} aria-labelledby="dl-entrada-nombre">
       <div className="dl-entrada-arriba">
-        {invitacion?.nombre && (
-          <div className="dl-invitado">
-            <span>Invitación especial para</span>
-            <p>{invitacion.nombre}</p>
-            {pases > 0 && <span className="dl-pases">{pases} {pases === 1 ? "pase reservado" : "pases reservados"}</span>}
-          </div>
-        )}
         {antetitulo && <p className="dl-antetitulo">{antetitulo}</p>}
         <h1 className="dl-entrada-nombre" id="dl-entrada-nombre">{nombre}</h1>
       </div>
@@ -104,11 +101,20 @@ function Entrada({ nombre, edad, antetitulo, invitacion, alSoplar, onAbrir }) {
         <DlPastel className="dl-pastel" topper={Boolean(edad)} />
         <DlHumo className="dl-humo" />
         {edad && <span className="dl-topper" aria-label={`${edad} años`}>{edad}</span>}
+        {invitacion?.nombre && (
+          <div className={`dl-placa ${invitacion.nombre.length > 18 ? "dl-placa-larga" : ""}`}>
+            <p className="dl-placa-nombre">{invitacion.nombre}</p>
+            {pases > 0 && (
+              <p className="dl-placa-pases">{pases === 1 ? "1 porción para ti" : `${pases} porciones para ti`}</p>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="dl-mostrador">
         <button type="button" className="dl-soplar" onClick={soplar} disabled={soplando}>
-          <span>{soplando ? "¡Pide un deseo!" : "Sopla las velas"}</span>
+          <DlSoplido className="dl-soplido" />
+          <span className="dl-soplar-texto">{soplando ? "¡Pide un deseo!" : "Sopla las velas"}</span>
         </button>
         <p className="dl-pista" aria-live="polite">{soplando ? "Abriendo tu invitación…" : "y abre tu invitación"}</p>
       </div>
@@ -141,6 +147,9 @@ export default function Dulce({ site, contenidoDe, invitacion, onEnviarRSVP, enE
 
   const partes = useMemo(() => partesFecha(info.fecha), [info.fecha]);
   const cuenta = useCuentaRegresiva(partes?.fecha);
+  const totalSeg = cuenta
+    ? ((Number(cuenta.dias) * 24 + Number(cuenta.horas)) * 60 + Number(cuenta.min)) * 60 + Number(cuenta.seg)
+    : 0;
   const limite = limiteLegible(info.fechaLimiteConfirmacion || site.fechaLimiteConfirmacion);
 
   const festejados = (welcome.festejados || []).filter((f) => f && f.nombre);
@@ -211,9 +220,9 @@ export default function Dulce({ site, contenidoDe, invitacion, onEnviarRSVP, enE
     <div className="dl" ref={raiz}>
       {audioSrc && <audio ref={audioRef} src={audioSrc} loop preload="auto" />}
       {audioSrc && abierta && (
-        <button className="dl-musica" type="button" aria-pressed={sonando} onClick={alternarMusica} aria-label={sonando ? "Pausar música" : "Reproducir música"}>
-          {sonando ? Icono.pausa : Icono.musica}
-          <span>{sonando ? "Pausar" : "Música"}</span>
+        <button className={`dl-musica ${sonando ? "dl-batiendo" : ""}`} type="button" aria-pressed={sonando} onClick={alternarMusica} aria-label={sonando ? "Pausar música" : "Reproducir música"}>
+          <DlBatidor className="dl-batidor" />
+          <span className="dl-musica-marca" aria-hidden="true">{sonando ? Icono.pausa : Icono.musica}</span>
         </button>
       )}
 
@@ -240,7 +249,7 @@ export default function Dulce({ site, contenidoDe, invitacion, onEnviarRSVP, enE
               )}
               {welcome.fraseIntro && <p className="dl-frase">{welcome.fraseIntro}</p>}
               {invitacion?.nombre && (
-                <p className="dl-para">Para <b>{invitacion.nombre}</b></p>
+                <p className="dl-para">Tu porción ya está apartada, <b>{invitacion.nombre.split(" ")[0]}</b></p>
               )}
             </div>
           </header>
@@ -248,10 +257,22 @@ export default function Dulce({ site, contenidoDe, invitacion, onEnviarRSVP, enE
           {partes && (
             <Repisa n={sig()} id="dl-cuenta" titulo="Faltan" postre={<DlMacarons className="dl-arte" />}>
               {cuenta ? (
-                <div className="dl-cuenta" role="timer" aria-labelledby="dl-cuenta">
-                  {[["dias", "días"], ["horas", "horas"], ["min", "min"], ["seg", "seg"]].map(([k, l]) => (
-                    <div key={k}><span className="n">{cuenta[k]}</span><span className="l">{l}</span></div>
-                  ))}
+                <div className="dl-horno" role="timer" aria-labelledby="dl-cuenta"
+                  aria-label={`${cuenta.dias} días, ${Number(cuenta.horas)} horas, ${Number(cuenta.min)} minutos`}>
+                  <div className="dl-reloj">
+                    <DlTemporizador className="dl-reloj-arte" giro={-totalSeg * 6} />
+                    <div className="dl-reloj-centro" aria-hidden="true">
+                      <span className="n">{cuenta.dias}</span>
+                      <span className="l">{cuenta.dias === "1" ? "día" : "días"}</span>
+                    </div>
+                  </div>
+                  <p className="dl-pantalla" aria-hidden="true">
+                    <span><b>{cuenta.horas}</b><small>horas</small></span>
+                    <i>:</i>
+                    <span><b>{cuenta.min}</b><small>min</small></span>
+                    <i>:</i>
+                    <span><b>{cuenta.seg}</b><small>seg</small></span>
+                  </p>
                 </div>
               ) : (
                 <p className="dl-llego">¡Llegó el gran día!</p>
@@ -291,7 +312,7 @@ export default function Dulce({ site, contenidoDe, invitacion, onEnviarRSVP, enE
                 <ol className="dl-programa">
                   {cronograma.map((c, i) => (
                     <li key={i}>
-                      <DlMacaronSuelto className="dl-vineta" color={i % 2 ? "rgb(var(--color-seal))" : "rgb(var(--color-gold))"} />
+                      <DlMacaronSuelto className="dl-vineta" color={SURTIDO[i % SURTIDO.length]} />
                       <span className="dl-hora">{c.hora}</span>
                       <span className="dl-que">{c.titulo}</span>
                     </li>
@@ -430,7 +451,7 @@ export default function Dulce({ site, contenidoDe, invitacion, onEnviarRSVP, enE
           )}
 
           <footer className="dl-final" data-reveal>
-            <DlFilete className="dl-filete" />
+            <DlCajaCierre className="dl-caja-cierre" sello={edad} />
             <p className="dl-te-espero">{varios ? "¡Los esperamos!" : "¡Te espero!"}</p>
             {nombre && <p className="dl-texto">Con cariño, {nombre}</p>}
           </footer>
@@ -442,8 +463,13 @@ export default function Dulce({ site, contenidoDe, invitacion, onEnviarRSVP, enE
       {rsvpAbierto && invitacion && (
         <div className="dl-modal" role="dialog" aria-modal="true" aria-label="Confirmar asistencia" onClick={(e) => e.target === e.currentTarget && setRsvpAbierto(false)}>
           <div className="dl-modal-caja">
-            <button type="button" className="dl-cerrar" onClick={() => setRsvpAbierto(false)} aria-label="Cerrar">×</button>
-            <DlFilete className="dl-modal-filete" />
+            <div className="dl-modal-tapa" aria-hidden="true">
+              <span className="dl-modal-sello">{edad || "♥"}</span>
+            </div>
+            <button type="button" className="dl-cerrar" onClick={() => setRsvpAbierto(false)} aria-label="Cerrar">
+              <span aria-hidden="true">×</span>
+            </button>
+            <span className="dl-modal-cordel" aria-hidden="true" />
             <RSVP
               invitacion={invitacion}
               fechaLimite={info.fechaLimiteConfirmacion || site.fechaLimiteConfirmacion}

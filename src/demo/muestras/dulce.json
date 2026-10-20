@@ -90,17 +90,17 @@
         "id": 49,
         "tipo": "vestimenta",
         "contenido": {
-          "titulo": "Cóctel en tonos pastel",
-          "nota": "Rosa, lila, durazno, menta o vainilla: elige tu favorito.",
+          "titulo": "Cóctel en tonos de pastelería",
+          "nota": "Vainilla, caramelo, café con leche, frutos rojos o pistacho: elige tu favorito.",
           "permitidos": [
             {
-              "nombre": "Tonos pastel",
+              "nombre": "Tonos dulces",
               "colores": [
-                "#F4C7D3",
-                "#D9C6EA",
-                "#F8D8C0",
-                "#CFE8DC",
-                "#F3EAD3"
+                "#F3E6CC",
+                "#C68B59",
+                "#A8795A",
+                "#B5344A",
+                "#BFD39A"
               ]
             }
           ],

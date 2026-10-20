@@ -322,6 +322,9 @@ export function OsCubo({ tono = "beige", letra, children, className = "" }) {
   const fr = `${u}a`, lado = `${u}b`, tapa = `${u}c`, madera = `${u}d`, f = `${u}e`, s = `${u}f`, panel = `${u}g`;
   const t = TONOS[tono] || TONOS.beige;
   const tintaIcono = tono === "claro" || tono === "blanco" ? C.oscuro : "#FFFDF8";
+  // Letras o números: uno, dos o tres caracteres caben en la cara frontal.
+  const largo = String(letra ?? "").length;
+  const tam = largo >= 3 ? 30 : largo === 2 ? 40 : 48;
   const FRENTE = "M14 46 L 86 58 L 86 128 L 14 116 Z";
   const LADO = "M86 58 L 126 40 L 126 110 L 86 128 Z";
   const TAPA = "M14 46 L 86 58 L 126 40 L 54 28 Z";
@@ -372,10 +375,10 @@ export function OsCubo({ tono = "beige", letra, children, className = "" }) {
         <g transform="matrix(1 .1667 0 1 14 46)">
           <rect x="7" y="7" width="58" height="56" rx="7" fill={`url(#${panel})`} />
           <rect x="7" y="7" width="58" height="56" rx="7" fill="none" stroke="white" strokeOpacity=".5" strokeWidth="1.2" />
-          {letra ? (
+          {letra != null && letra !== "" ? (
             <>
-              <text x="36.8" y="54.8" textAnchor="middle" fontSize="48" fontWeight="700" style={{ fill: C.tinta, fontFamily: "var(--f-titulos, Georgia, serif)" }} opacity=".18">{letra}</text>
-              <text x="36" y="54" textAnchor="middle" fontSize="48" fontWeight="700" style={{ fill: tintaIcono, fontFamily: "var(--f-titulos, Georgia, serif)" }}>{letra}</text>
+              <text x="36.8" y={54.8 - (48 - tam) * 0.38} textAnchor="middle" fontSize={tam} fontWeight="700" style={{ fill: C.tinta, fontFamily: "var(--f-titulos, Georgia, serif)", fontVariantNumeric: "lining-nums" }} opacity=".18">{letra}</text>
+              <text x="36" y={54 - (48 - tam) * 0.38} textAnchor="middle" fontSize={tam} fontWeight="700" style={{ fill: tintaIcono, fontFamily: "var(--f-titulos, Georgia, serif)", fontVariantNumeric: "lining-nums" }}>{letra}</text>
             </>
           ) : (
             <g transform="translate(17 16) scale(1.6)" style={{ color: tintaIcono }}>
@@ -614,6 +617,215 @@ export function OsSobre({ className = "", style }) {
       <rect x="1" y="1" width="38" height="26" rx="3" style={{ fill: C.blanco, stroke: C.beige }} strokeWidth="1.2" />
       <path d="M2 3 L 20 16 L 38 3" fill="none" style={{ stroke: C.beige }} strokeWidth="1.2" strokeLinejoin="round" />
       <circle cx="20" cy="16" r="3.2" style={{ fill: C.salvia }} />
+    </svg>
+  );
+}
+
+// Contorno de la mantita: algodón suave con bordes apenas ondulados.
+const MANTA = "M20 12 C 84 6 214 8 282 11 C 293 12 296 21 295 32 C 292 82 295 128 292 158 C 291 169 284 172 272 171 C 200 175 100 174 24 170 C 12 169 6 163 7 151 C 10 110 6 62 8 27 C 9 18 12 13 20 12 Z";
+
+// SDXL: os_mantita
+// Mantita de algodón para bebé: acolchado en rombos, ribete satinado salvia
+// y punto de festón. Se estira detrás del nombre bordado (HTML encima).
+export function OsMantita({ className = "" }) {
+  const u = useUid();
+  const tela = `${u}a`, f = `${u}b`, s = `${u}c`, k = `${u}d`, ribete = `${u}e`;
+  const rombos = [];
+  for (let i = -6; i < 16; i++) {
+    rombos.push(`M${i * 34} 0 L ${i * 34 + 180} 180`, `M${i * 34 + 180} 0 L ${i * 34} 180`);
+  }
+  return (
+    <svg className={className} viewBox="0 0 300 180" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <radialGradient id={tela} cx=".42" cy=".3" r=".95">
+          <P o="0" c={C.blanco} />
+          <P o=".65" c={mezcla(C.blanco, C.claro, 72)} />
+          <P o="1" c={mezcla(C.claro, C.blanco, 70)} />
+        </radialGradient>
+        <linearGradient id={ribete} x1="0" y1="0" x2="1" y2="1">
+          <P o="0" c={mezcla(C.salvia, "white", 62)} />
+          <P o=".5" c={C.salvia} />
+          <P o="1" c={mezcla(C.salvia, C.tinta, 78)} />
+        </linearGradient>
+        <Grano id={f} fuerza={0.55} freq={1.25} semilla={11} />
+        <Difuso id={s} d={6} />
+        <clipPath id={k}><path d={MANTA} /></clipPath>
+      </defs>
+      <path d={MANTA} transform="translate(3 7)" style={{ fill: C.oscuro }} opacity=".16" filter={`url(#${s})`} />
+      <g filter={`url(#${f})`}>
+        <path d={MANTA} fill={`url(#${tela})`} />
+        <g clipPath={`url(#${k})`}>
+          {/* Acolchado: costuras en rombo con relieve */}
+          <path d={rombos.join(" ")} fill="none" style={{ stroke: C.claro }} strokeWidth="1.6" vectorEffect="non-scaling-stroke" />
+          <path d={rombos.join(" ")} transform="translate(0 1.2)" fill="none" stroke="white" strokeOpacity=".7" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+          {/* Pliegues suaves */}
+          <ellipse cx="230" cy="168" rx="90" ry="26" style={{ fill: C.claro }} opacity=".55" filter={`url(#${s})`} />
+          <ellipse cx="80" cy="30" rx="80" ry="22" fill="white" opacity=".6" filter={`url(#${s})`} />
+          <path d="M210 182 C 240 150 270 140 300 132" fill="none" style={{ stroke: C.claro }} strokeWidth="10" opacity=".5" filter={`url(#${s})`} />
+        </g>
+        {/* Ribete satinado y su brillo */}
+        <path d={MANTA} fill="none" stroke={`url(#${ribete})`} strokeWidth="7" vectorEffect="non-scaling-stroke" />
+        <path d={MANTA} fill="none" stroke="white" strokeOpacity=".35" strokeWidth="1.4" transform="translate(0 -1.2)" vectorEffect="non-scaling-stroke" />
+        {/* Esquina doblada: asoma el revés salvia de la tela */}
+        <path d="M232 172 C 252 160 276 140 293 116 C 292 140 292 158 291 164 C 288 171 280 172 270 172 Z" style={{ fill: C.oscuro }} opacity=".18" filter={`url(#${s})`} />
+        <path d="M240 171 C 256 160 278 142 293 122 C 296 148 290 170 240 171 Z" fill={`url(#${ribete})`} />
+        <path d="M244 168 C 258 158 276 144 290 128" fill="none" stroke="white" strokeOpacity=".4" strokeWidth="1.2" vectorEffect="non-scaling-stroke" />
+        {/* Punto de festón */}
+        <path d={MANTA} transform="translate(150 91) scale(.94 .9) translate(-150 -91)" fill="none" style={{ stroke: C.oscuro }} strokeOpacity=".5" strokeWidth="1.5" strokeDasharray="5 4" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+      </g>
+    </svg>
+  );
+}
+
+const PATA = "M12 22.5 C 7.5 22.5 5 20 5 17.2 C 5 13.6 8.6 11 12 11 C 15.4 11 19 13.6 19 17.2 C 19 20 16.5 22.5 12 22.5 Z";
+const DEDOS = [[4.4, 10.2, 2.5, 3.1, -22], [9, 6.6, 2.6, 3.3, -8], [15, 6.6, 2.6, 3.3, 8], [19.6, 10.2, 2.5, 3.1, 22]];
+
+// SDXL: os_patita
+// Huella de patita de osito, bordada en hilo beige sobre la tela.
+export function OsPatita({ className = "", style }) {
+  const u = useUid();
+  return (
+    <svg className={className} style={style} viewBox="0 0 24 24" aria-hidden="true">
+      <defs>
+        <radialGradient id={u} cx=".38" cy=".3" r=".85">
+          <P o="0" c={mezcla(C.beige, "white", 55)} />
+          <P o=".55" c={C.beige} />
+          <P o="1" c={mezcla(C.oscuro, C.beige, 70)} />
+        </radialGradient>
+      </defs>
+      <path d={PATA} fill={`url(#${u})`} />
+      {DEDOS.map(([x, y, rx, ry, g], i) => <ellipse key={i} cx={x} cy={y} rx={rx} ry={ry} transform={`rotate(${g} ${x} ${y})`} fill={`url(#${u})`} />)}
+      <path d="M8.5 14.5 C 10 13 14 13 15.5 14.5" fill="none" stroke="white" strokeOpacity=".45" strokeWidth=".9" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+// SDXL: os_tirador
+// Tirador del cordón del móvil: cuenta de madera, estrellita de fieltro y
+// aro de madera para jalar.
+export function OsTirador({ className = "" }) {
+  const u = useUid();
+  const madera = `${u}a`, s = `${u}b`;
+  return (
+    <svg className={className} viewBox="0 0 48 92" aria-hidden="true">
+      <defs>
+        <linearGradient id={madera} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#F1DDBF" />
+          <stop offset=".5" stopColor="#C9A170" />
+          <stop offset="1" stopColor="#8E6A43" />
+        </linearGradient>
+        <Difuso id={s} d={2.4} />
+      </defs>
+      <path d="M24 0 L 24 52" style={{ stroke: C.tinta }} strokeOpacity=".5" strokeWidth="1.2" />
+      <g transform="translate(13.4 8) scale(.33)">
+        <path d={ESTRELLA} style={{ fill: C.salvia }} stroke="rgb(var(--color-seal))" strokeWidth="5" strokeLinejoin="round" />
+        <path d={ESTRELLA} transform="translate(32 34) scale(.74) translate(-32 -34)" fill="none" stroke="white" strokeOpacity=".7" strokeWidth="2.4" strokeDasharray="4 4" />
+      </g>
+      <circle cx="24" cy="38" r="5.5" fill={`url(#${madera})`} />
+      <circle cx="22.4" cy="36.4" r="1.6" fill="white" opacity=".55" />
+      <ellipse cx="25" cy="74" rx="15" ry="5" style={{ fill: C.oscuro }} opacity=".18" filter={`url(#${s})`} />
+      <circle cx="24" cy="66" r="14" fill="none" stroke={`url(#${madera})`} strokeWidth="6.5" />
+      <path d="M13.5 60 A 12 12 0 0 1 24 54" fill="none" stroke="white" strokeOpacity=".55" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+// SDXL: os_sonajero
+// Sonajero de madera: bola pintada con lunares, mango y aro para agarrar.
+export function OsSonajero({ className = "" }) {
+  const u = useUid();
+  const bola = `${u}a`, madera = `${u}b`, s = `${u}c`, f = `${u}d`;
+  return (
+    <svg className={className} viewBox="0 0 56 56" aria-hidden="true">
+      <defs>
+        <radialGradient id={bola} cx=".36" cy=".3" r=".85">
+          <P o="0" c={mezcla(C.claro, "white", 45)} />
+          <P o=".55" c={C.beige} />
+          <P o="1" c={mezcla(C.oscuro, C.beige, 70)} />
+        </radialGradient>
+        <linearGradient id={madera} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#F1DDBF" />
+          <stop offset=".5" stopColor="#C9A170" />
+          <stop offset="1" stopColor="#8E6A43" />
+        </linearGradient>
+        <Difuso id={s} d={2} />
+        <Grano id={f} fuerza={0.45} freq={1.3} />
+      </defs>
+      <ellipse cx="30" cy="51" rx="18" ry="3.2" style={{ fill: C.oscuro }} opacity=".22" filter={`url(#${s})`} />
+      <g filter={`url(#${f})`}>
+        <path d="M27 27 L 40 40" stroke={`url(#${madera})`} strokeWidth="5.5" strokeLinecap="round" />
+        <circle cx="43" cy="43" r="7" fill="none" stroke={`url(#${madera})`} strokeWidth="3.6" />
+        <circle cx="25.5" cy="25.5" r="4.2" style={{ fill: C.salvia }} />
+        <circle cx="19" cy="19" r="14" fill={`url(#${bola})`} />
+        {[[13, 15], [22, 12], [25, 21], [15, 24], [19.5, 18.5]].map(([x, y], i) => <circle key={i} cx={x} cy={y} r={i === 4 ? 1.9 : 2.3} style={{ fill: C.salvia }} opacity=".9" />)}
+        <ellipse cx="13.5" cy="12" rx="4.5" ry="2.6" transform="rotate(-35 13.5 12)" fill="white" opacity=".55" />
+      </g>
+    </svg>
+  );
+}
+
+// SDXL: os_boton_costura
+// Botón de madera cosido con hilo salvia en cruz (cierra la mantita).
+export function OsBotonCostura({ className = "" }) {
+  const u = useUid();
+  const madera = `${u}a`, s = `${u}b`;
+  return (
+    <svg className={className} viewBox="0 0 44 44" aria-hidden="true">
+      <defs>
+        <radialGradient id={madera} cx=".36" cy=".3" r=".85">
+          <stop offset="0" stopColor="#F4E3C6" />
+          <stop offset=".6" stopColor="#D2AE7E" />
+          <stop offset="1" stopColor="#9A7349" />
+        </radialGradient>
+        <Difuso id={s} d={2} />
+      </defs>
+      <circle cx="23" cy="25" r="17" style={{ fill: C.oscuro }} opacity=".22" filter={`url(#${s})`} />
+      <circle cx="22" cy="22" r="17" fill={`url(#${madera})`} />
+      <circle cx="22" cy="22" r="12.5" fill="none" stroke="#9A7349" strokeOpacity=".45" strokeWidth="1.2" />
+      {[[17.5, 17.5], [26.5, 17.5], [17.5, 26.5], [26.5, 26.5]].map(([x, y], i) => <circle key={i} cx={x} cy={y} r="2.1" fill="#7A5A38" />)}
+      <path d="M17.5 17.5 L 26.5 26.5 M26.5 17.5 L 17.5 26.5" style={{ stroke: C.salvia }} strokeWidth="2.6" strokeLinecap="round" />
+      <path d="M17.5 17.5 L 26.5 26.5 M26.5 17.5 L 17.5 26.5" stroke="white" strokeOpacity=".35" strokeWidth=".8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+// SDXL: os_parche
+// Parche bordado con la carita del osito, cosido a la mantita.
+export function OsParche({ className = "" }) {
+  const u = useUid();
+  const tela = `${u}a`, piel = `${u}b`, f = `${u}c`, s = `${u}d`;
+  return (
+    <svg className={className} viewBox="0 0 96 96" aria-hidden="true">
+      <defs>
+        <radialGradient id={tela} cx=".38" cy=".3" r=".9">
+          <P o="0" c={mezcla(C.salvia, "white", 55)} />
+          <P o="1" c={mezcla(C.salvia, C.tinta, 85)} />
+        </radialGradient>
+        <radialGradient id={piel} cx=".38" cy=".3" r=".85">
+          <P o="0" c={mezcla(C.claro, "white", 30)} />
+          <P o=".6" c={C.beige} />
+          <P o="1" c={mezcla(C.oscuro, C.beige, 60)} />
+        </radialGradient>
+        <Grano id={f} fuerza={0.75} freq={1.4} semilla={2} />
+        <Difuso id={s} d={3} />
+      </defs>
+      <circle cx="49" cy="51" r="42" style={{ fill: C.oscuro }} opacity=".2" filter={`url(#${s})`} />
+      <g filter={`url(#${f})`}>
+        <circle cx="48" cy="48" r="42" fill={`url(#${tela})`} />
+        <circle cx="48" cy="48" r="36" fill="none" stroke="white" strokeOpacity=".85" strokeWidth="1.8" strokeDasharray="4 3.4" strokeLinecap="round" />
+        <circle cx="30" cy="32" r="9" fill={`url(#${piel})`} />
+        <circle cx="66" cy="32" r="9" fill={`url(#${piel})`} />
+        <circle cx="30" cy="32" r="4.6" style={{ fill: C.claro }} />
+        <circle cx="66" cy="32" r="4.6" style={{ fill: C.claro }} />
+        <ellipse cx="48" cy="52" rx="23" ry="21" fill={`url(#${piel})`} />
+        <ellipse cx="48" cy="61" rx="11" ry="8" style={{ fill: C.claro }} />
+      </g>
+      <circle cx="40" cy="48" r="2.6" style={{ fill: C.tinta }} />
+      <circle cx="56" cy="48" r="2.6" style={{ fill: C.tinta }} />
+      <path d="M44.5 57.5 C 44.5 55 51.5 55 51.5 57.5 C 51.5 59.6 49.5 61 48 61 C 46.5 61 44.5 59.6 44.5 57.5 Z" style={{ fill: C.tinta }} />
+      <path d="M48 61 L 48 63.5 M44.5 64 C 46 66 48 65.5 48 63.5 C 48 65.5 50 66 51.5 64" fill="none" style={{ stroke: C.tinta }} strokeWidth="1.1" strokeLinecap="round" />
+      <ellipse cx="36" cy="55" rx="3.4" ry="2" fill="#E3A99A" opacity=".5" />
+      <ellipse cx="60" cy="55" rx="3.4" ry="2" fill="#E3A99A" opacity=".5" />
     </svg>
   );
 }

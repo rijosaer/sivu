@@ -1,11 +1,11 @@
 import { useId } from "react";
 
-// Arte de «Vals rosa», todo en SVG semi-realista: capas de degradados, sombras
+// Arte de «Vals lila», todo en SVG semi-realista: capas de degradados, sombras
 // difusas, pétalos y pliegues con curvas Bézier y un grano sutil para que no
 // se vea plano. Los colores de marca salen del tema (canales R G B):
-//   gold = rosa palo · gold-light = rosa claro · gold-dark = rosa antiguo ·
-//   seal = oro suave · paper = fondo · marble = tarjetas · ink = texto.
-// Los colores naturales (hojas, piel, cabello, cristal) son fijos.
+//   gold = lila · gold-light = lila claro · gold-dark = lila profundo ·
+//   seal = plata · paper = fondo · marble = tarjetas · ink = texto.
+// Los colores naturales (hojas, piel, cabello, cristal, llama, grafito) son fijos.
 // Cada pieza lleva encima su nombre SDXL por si luego se pinta como .webp.
 
 const col = (v, a) => (a == null ? `rgb(var(--color-${v}))` : `rgb(var(--color-${v}) / ${a})`);
@@ -26,15 +26,15 @@ function Grano({ id, fuerza = 0.08, frec = 0.9 }) {
   return (
     <filter id={id} x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
       <feTurbulence type="fractalNoise" baseFrequency={frec} numOctaves="2" stitchTiles="stitch" result="r" />
-      <feColorMatrix in="r" type="matrix" values={`0 0 0 0 .27  0 0 0 0 .16  0 0 0 0 .19  ${fuerza * 2.2} 0 0 0 ${-fuerza * 0.6}`} result="m" />
+      <feColorMatrix in="r" type="matrix" values={`0 0 0 0 .2  0 0 0 0 .18  0 0 0 0 .28  ${fuerza * 2.2} 0 0 0 ${-fuerza * 0.6}`} result="m" />
       <feComposite in="m" in2="SourceGraphic" operator="in" result="g" />
       <feMerge><feMergeNode in="SourceGraphic" /><feMergeNode in="g" /></feMerge>
     </filter>
   );
 }
 
-// Oro suave con brillo y sombra (lee --color-seal).
-function Oro({ id, x2 = "0", y2 = "1" }) {
+// Plata suave con brillo y sombra (lee --color-seal).
+function Plata({ id, x2 = "0", y2 = "1" }) {
   return (
     <linearGradient id={id} x1="0" y1="0" x2={x2} y2={y2}>
       <Stop o="0" c={mezcla("seal", 42, "white")} />
@@ -46,12 +46,12 @@ function Oro({ id, x2 = "0", y2 = "1" }) {
   );
 }
 
-function OroRadial({ id }) {
+function PlataRadial({ id }) {
   return (
     <radialGradient id={id} cx="38%" cy="32%" r="70%">
-      <Stop o="0" c={mezcla("seal", 25, "white")} />
+      <Stop o="0" c={mezcla("seal", 18, "white")} />
       <Stop o=".45" c={col("seal")} />
-      <Stop o="1" c={mezcla("seal", 62, col("ink"))} />
+      <Stop o="1" c={mezcla("seal", 58, col("ink"))} />
     </radialGradient>
   );
 }
@@ -73,11 +73,15 @@ const ANILLOS = [
 const petalo = (r, w) =>
   `M0 0 C ${-w} ${-r * 0.3} ${-w * 1.12} ${-r * 0.86} ${-w * 0.42} ${-r * 1.0} Q 0 ${-r * 1.08} ${w * 0.42} ${-r * 1.0} C ${w * 1.12} ${-r * 0.86} ${w} ${-r * 0.3} 0 0 Z`;
 
+// Rosa lavanda (tono del tema) o blanca (blanca: sombras en plata y lila claro).
+const BLANCA = "#fdfcff";
 function Rosa({ x, y, r, rot = 0, tono = col("gold"), sinSombra = false }) {
   const id = useUid();
+  const esBlanca = tono === BLANCA;
+  const fondo = esBlanca ? `color-mix(in srgb, rgb(var(--color-seal)) 70%, rgb(var(--color-gold)))` : "rgb(var(--color-gold-dark))";
   const claro = `color-mix(in srgb, ${tono} 40%, white)`;
-  const hondo = `color-mix(in srgb, ${tono} 62%, rgb(var(--color-gold-dark)))`;
-  const muyHondo = `color-mix(in srgb, ${tono} 30%, rgb(var(--color-gold-dark)))`;
+  const hondo = `color-mix(in srgb, ${tono} ${esBlanca ? 74 : 62}%, ${fondo})`;
+  const muyHondo = `color-mix(in srgb, ${tono} ${esBlanca ? 42 : 30}%, ${fondo})`;
   return (
     <g transform={`translate(${x} ${y}) rotate(${rot}) scale(${r / 40})`}>
       <defs>
@@ -122,8 +126,8 @@ function Capullo({ x, y, ang = 0, s = 1, idVerde }) {
   return (
     <g transform={`translate(${x} ${y}) rotate(${ang}) scale(${s})`}>
       <path fill="none" stroke="#6d8a64" strokeWidth="1.6" strokeLinecap="round" d="M0 2 C 1 10 3 18 2 26" />
-      <path fill={col("gold")} d="M0 0 C -8 -6 -8 -19 0 -27 C 8 -19 8 -6 0 0 Z" />
-      <path fill={mezcla("gold", 55, "white")} d="M0 -27 C 3 -20 4 -10 0 0 C 6 -6 7 -17 0 -27 Z" />
+      <path fill={mezcla("gold", 85, "white")} d="M0 0 C -8 -6 -8 -19 0 -27 C 8 -19 8 -6 0 0 Z" />
+      <path fill={mezcla("gold", 40, "white")} d="M0 -27 C 3 -20 4 -10 0 0 C 6 -6 7 -17 0 -27 Z" />
       <path fill={`url(#${idVerde})`} d="M0 1 C -7 -2 -9 -9 -6 -14 C -4 -8 -2 -4 0 -2 C 2 -4 4 -8 6 -14 C 9 -9 7 -2 0 1 Z" />
     </g>
   );
@@ -168,9 +172,9 @@ export function VrRosas({ className = "", variante = "ramo" }) {
             <Hoja id={verde} x={170} y={72} ang={-40} largo={34} />
             <Capullo idVerde={verde} x={42} y={98} ang={-58} s={0.9} />
             <Capullo idVerde={verde} x={198} y={98} ang={58} s={0.9} />
-            <Rosa x={78} y={92} r={25} rot={-14} tono={mezcla("gold", 62, "white")} />
-            <Rosa x={164} y={92} r={24} rot={12} tono={col("gold-light")} />
-            <Rosa x={121} y={78} r={34} rot={4} tono={col("gold")} />
+            <Rosa x={78} y={92} r={25} rot={-14} tono={BLANCA} />
+            <Rosa x={164} y={92} r={24} rot={12} tono={BLANCA} />
+            <Rosa x={121} y={78} r={34} rot={4} tono={mezcla("gold", 82, "white")} />
             <Florecita x={52} y={74} s={1.1} />
             <Florecita x={190} y={70} s={1} />
             <Florecita x={100} y={118} s={0.9} />
@@ -185,8 +189,8 @@ export function VrRosas({ className = "", variante = "ramo" }) {
             <Hoja id={verde} x={150} y={100} ang={-140} largo={32} />
             <Hoja id={verde} x={196} y={88} ang={10} largo={32} />
             <Capullo idVerde={verde} x={226} y={74} ang={64} s={0.8} />
-            <Rosa x={118} y={102} r={26} rot={-6} tono={col("gold")} />
-            <Rosa x={66} y={118} r={18} rot={10} tono={col("gold-light")} />
+            <Rosa x={118} y={102} r={26} rot={-6} tono={mezcla("gold", 82, "white")} />
+            <Rosa x={66} y={118} r={18} rot={10} tono={BLANCA} />
             <Florecita x={176} y={92} />
             <Florecita x={30} y={134} s={0.9} />
           </>
@@ -262,7 +266,7 @@ function Mitad({ id, espejo }) {
       <rect x="186" y="0" width="14" height="784" fill={`url(#${id("oroH")})`} />
       <rect x="186" y="0" width="14" height="784" fill={`url(#${id("bordado")})`} />
       <path d="M185.5 0 V784" stroke={mezcla("seal", 55, col("ink"))} strokeOpacity=".6" strokeWidth="1" />
-      {/* flecos dorados del dobladillo */}
+      {/* flecos de plata del dobladillo */}
       <path d={DOBLADILLO} transform="translate(0 6)" fill="none" stroke={`url(#${id("oroH")})`} strokeWidth="11" strokeDasharray="1 1.7" />
       <path d={DOBLADILLO} fill="none" stroke={`url(#${id("oroH")})`} strokeWidth="2.6" />
     </g>
@@ -306,7 +310,7 @@ function Cenefa({ id }) {
 }
 
 // SDXL: vr_telon
-// Telón de terciopelo rosa palo con pliegues, galón y flecos dorados.
+// Telón de terciopelo lila con pliegues, galón y flecos de plata.
 // lado: "izq" | "der" (cada mitad), "cenefa" (bambalina de arriba con
 // borlas) o "amarre" (cordón con borla que recoge cada mitad).
 export function VrTelon({ lado = "izq", className = "" }) {
@@ -343,9 +347,9 @@ export function VrTelon({ lado = "izq", className = "" }) {
         <Stop o=".7" c={mezcla("gold", 70, "white")} />
         <Stop o="1" c={col("gold")} />
       </linearGradient>
-      <Oro id={id("oro")} x2="1" y2="0" />
-      <Oro id={id("oroH")} x2="1" y2="0" />
-      <OroRadial id={id("oroR")} />
+      <Plata id={id("oro")} x2="1" y2="0" />
+      <Plata id={id("oroH")} x2="1" y2="0" />
+      <PlataRadial id={id("oroR")} />
       <pattern id={id("bordado")} x="186" y="0" width="14" height="22" patternUnits="userSpaceOnUse">
         <path d="M7 2 L 11 11 L 7 20 L 3 11 Z" fill="none" stroke={mezcla("seal", 55, col("ink"))} strokeOpacity=".55" strokeWidth=".8" />
         <circle cx="7" cy="11" r="1.4" fill="white" fillOpacity=".6" />
@@ -473,9 +477,9 @@ export function VrSalon({ className = "" }) {
           <Stop o=".5" c={mezcla("gold-light", 40, "white")} />
           <Stop o="1" c={mezcla("seal", 30, "white")} />
         </linearGradient>
-        <Oro id={id("oro")} />
-        <Oro id={id("oroH")} x2="1" y2="0" />
-        <OroRadial id={id("oroR")} />
+        <Plata id={id("oro")} />
+        <Plata id={id("oroH")} x2="1" y2="0" />
+        <PlataRadial id={id("oroR")} />
         <filter id={id("difuso")} x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="8" /></filter>
         <filter id={id("suave")} x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.4" /></filter>
         <Grano id={id("grano")} fuerza={0.06} />
@@ -599,7 +603,7 @@ export function VrSalon({ className = "" }) {
 
 // SDXL: vr_quince
 // Quinceañera de espaldas, sin rostro: moño alto con tiara, hombros
-// descubiertos, corsé con lazo dorado y falda de baile de tul con rosas.
+// descubiertos, vestido lila: corsé con lazo de plata y falda de tul con rosas.
 export function VrQuince({ className = "" }) {
   const id = useUid();
   const pliegues = [
@@ -638,8 +642,8 @@ export function VrQuince({ className = "" }) {
           <Stop o=".6" c="#4f3126" />
           <Stop o="1" c="#33201a" />
         </radialGradient>
-        <Oro id={id("oro")} x2="1" y2="0" />
-        <OroRadial id={id("oroR")} />
+        <Plata id={id("oro")} x2="1" y2="0" />
+        <PlataRadial id={id("oroR")} />
         <filter id={id("difuso")} x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3" /></filter>
         <filter id={id("sombra")} x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="7" /></filter>
         <Grano id={id("grano")} fuerza={0.07} />
@@ -697,14 +701,14 @@ export function VrQuince({ className = "" }) {
         <circle cx="162" cy="13" r="1.5" fill="white" />
       </g>
       {/* rosas aplicadas en la falda */}
-      <Rosa x={150} y={196} r={6} tono={col("gold-light")} sinSombra />
+      <Rosa x={150} y={196} r={6} tono={BLANCA} sinSombra />
       <Rosa x={96} y={318} r={8} rot={-20} tono={mezcla("gold", 60, "white")} sinSombra />
       <Rosa x={204} y={330} r={7} rot={14} tono={mezcla("gold", 60, "white")} sinSombra />
-      <Rosa x={150} y={376} r={9} tono={col("gold-light")} sinSombra />
-      <Rosa x={58} y={404} r={8} rot={-10} tono={col("gold-light")} sinSombra />
-      <Rosa x={244} y={404} r={8} rot={10} tono={col("gold-light")} sinSombra />
-      <Rosa x={124} y={270} r={6} tono={col("gold-light")} sinSombra />
-      <Rosa x={178} y={262} r={6} tono={col("gold-light")} sinSombra />
+      <Rosa x={150} y={376} r={9} tono={BLANCA} sinSombra />
+      <Rosa x={58} y={404} r={8} rot={-10} tono={BLANCA} sinSombra />
+      <Rosa x={244} y={404} r={8} rot={10} tono={BLANCA} sinSombra />
+      <Rosa x={124} y={270} r={6} tono={BLANCA} sinSombra />
+      <Rosa x={178} y={262} r={6} tono={BLANCA} sinSombra />
     </svg>
   );
 }
@@ -714,15 +718,15 @@ export function VrQuince({ className = "" }) {
 /* ------------------------------------------------------------------ */
 
 // SDXL: vr_tiara
-// Tiara de oro suave con filigrana, perlas y una piedra rosa al centro.
+// Tiara de plata con filigrana, perlas y una piedra lila al centro.
 export function VrTiara({ className = "" }) {
   const id = useUid();
   const piedras = [[40, 72, 2.4], [62, 68, 2.8], [138, 68, 2.8], [160, 72, 2.4], [80, 62, 2.2], [120, 62, 2.2]];
   return (
     <svg className={className} viewBox="0 0 200 100" aria-hidden="true">
       <defs>
-        <Oro id={id("oro")} />
-        <OroRadial id={id("oroR")} />
+        <Plata id={id("oro")} />
+        <PlataRadial id={id("oroR")} />
         <radialGradient id={id("gema")} cx="40%" cy="35%" r="70%">
           <Stop o="0" c="white" />
           <Stop o=".35" c={col("gold-light")} />
@@ -731,10 +735,10 @@ export function VrTiara({ className = "" }) {
         </radialGradient>
         <radialGradient id={id("perla")} cx="35%" cy="30%" r="70%">
           <Stop o="0" c="white" />
-          <Stop o=".6" c="#f6eee9" />
+          <Stop o=".6" c="#f3f2f7" />
           <Stop o="1" c={mezcla("gold-light", 60, col("seal"))} />
         </radialGradient>
-        <filter id={id("sombra")} x="-10%" y="-10%" width="120%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="1.6" floodColor="#4a2e36" floodOpacity=".25" /></filter>
+        <filter id={id("sombra")} x="-10%" y="-10%" width="120%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="1.6" floodColor={col("ink")} floodOpacity=".25" /></filter>
       </defs>
       <g filter={`url(#${id("sombra")})`} fill="none" strokeLinecap="round" strokeLinejoin="round">
         <path d="M14 86 Q 100 64 186 86" stroke={`url(#${id("oro")})`} strokeWidth="5" />
@@ -761,7 +765,7 @@ export function VrTiara({ className = "" }) {
 }
 
 // SDXL: vr_zapatillas
-// Par de zapatillas de satén rosa palo con tacón dorado y lazo.
+// Par de zapatillas de satén lila con tacón de plata y lazo.
 export function VrZapatillas({ className = "" }) {
   const id = useUid();
   const zapato = "M34 52 C 29 62 28 78 34 90 L 40 93 L 46 124 L 51 124 L 54 97 C 72 101 94 112 128 116 C 160 120 194 118 202 108 C 206 98 196 92 180 90 C 152 86 130 84 116 86 C 92 90 62 76 34 52 Z";
@@ -790,8 +794,8 @@ export function VrZapatillas({ className = "" }) {
           <Stop o=".5" c={mezcla("gold", 80, col("gold-dark"))} />
           <Stop o="1" c={mezcla("gold", 50, col("gold-dark"))} />
         </linearGradient>
-        <Oro id={id("oro")} x2="1" y2="0" />
-        <OroRadial id={id("oroR")} />
+        <Plata id={id("oro")} x2="1" y2="0" />
+        <PlataRadial id={id("oroR")} />
         <filter id={id("difuso")} x="-10%" y="-50%" width="120%" height="200%"><feGaussianBlur stdDeviation="2" /></filter>
         <filter id={id("sombra")} x="-20%" y="-100%" width="140%" height="300%"><feGaussianBlur stdDeviation="4" /></filter>
         <Grano id={id("grano")} fuerza={0.06} />
@@ -809,32 +813,39 @@ export function VrZapatillas({ className = "" }) {
 /* Ornamentos del libro                                                */
 /* ------------------------------------------------------------------ */
 
-// Letra capital dorada e iluminada (primera letra del título de cada página).
+// Letra capital ornamentada en plata (primera letra del título de cada página):
+// campo de plata clara grabada, enredadera y la letra en plata pulida.
 export function VrCapital({ letra = "A", className = "" }) {
   const id = useUid();
   return (
     <svg className={className} viewBox="0 0 100 100" aria-hidden="true">
       <defs>
         <radialGradient id={id("campo")} cx="50%" cy="45%" r="70%">
-          <Stop o="0" c={mezcla("gold-light", 35, "white")} />
-          <Stop o="1" c={col("gold-light")} />
+          <Stop o="0" c="white" />
+          <Stop o=".7" c={mezcla("seal", 16, "white")} />
+          <Stop o="1" c={mezcla("seal", 34, "white")} />
         </radialGradient>
         <linearGradient id={id("letra")} x1="0" y1="0" x2="0" y2="1">
-          <Stop o="0" c={mezcla("seal", 55, "white")} />
-          <Stop o=".45" c={col("seal")} />
-          <Stop o=".6" c={mezcla("seal", 65, col("ink"))} />
-          <Stop o="1" c={mezcla("seal", 80, "white")} />
+          <Stop o="0" c={mezcla("seal", 40, "white")} />
+          <Stop o=".42" c={mezcla("seal", 85, col("ink"))} />
+          <Stop o=".58" c={mezcla("seal", 55, col("ink"))} />
+          <Stop o="1" c={mezcla("seal", 70, "white")} />
         </linearGradient>
-        <Oro id={id("oro")} x2="1" y2="1" />
+        <Plata id={id("oro")} x2="1" y2="1" />
         <filter id={id("relieve")} x="-10%" y="-10%" width="120%" height="120%">
-          <feDropShadow dx=".8" dy="1.4" stdDeviation=".6" floodColor="#4a2e36" floodOpacity=".45" />
+          <feDropShadow dx=".8" dy="1.4" stdDeviation=".6" floodColor={col("ink")} floodOpacity=".45" />
         </filter>
       </defs>
       <rect x="2" y="2" width="96" height="96" rx="3" fill={`url(#${id("campo")})`} />
       <rect x="2" y="2" width="96" height="96" rx="3" fill="none" stroke={`url(#${id("oro")})`} strokeWidth="3" />
       <rect x="8" y="8" width="84" height="84" rx="1" fill="none" stroke={col("seal", 0.7)} strokeWidth="1" />
       {/* filigrana de enredadera */}
-      <g fill="none" stroke={col("seal", 0.6)} strokeWidth="1.1" strokeLinecap="round">
+      {/* grabado fino de la plata */}
+      <clipPath id={id("dentro")}><rect x="8" y="8" width="84" height="84" /></clipPath>
+      <g stroke={col("seal", 0.22)} strokeWidth=".6" clipPath={`url(#${id("dentro")})`}>
+        {Array.from({ length: 18 }, (_, i) => <path key={i} d={`M${-12 + i * 6} 92 L${8 + i * 6} 8`} />)}
+      </g>
+      <g fill="none" stroke={mezcla("seal", 75, col("ink"))} strokeOpacity=".7" strokeWidth="1.1" strokeLinecap="round">
         <path d="M12 88 C 18 70 14 56 22 44 C 28 36 20 28 14 32 C 10 36 16 40 18 36" />
         <path d="M88 12 C 82 30 86 44 78 56 C 72 64 80 72 86 68 C 90 64 84 60 82 64" />
         <path d="M12 88 C 26 84 34 90 46 86 M88 12 C 74 16 66 10 54 14" />
@@ -844,10 +855,10 @@ export function VrCapital({ letra = "A", className = "" }) {
         <path d="M78 56 C 84 58 86 54 82 50 C 78 52 78 54 78 56 Z" />
         <circle cx="46" cy="86" r="1.8" /><circle cx="54" cy="14" r="1.8" />
       </g>
-      <circle cx="16" cy="84" r="5" fill={col("gold")} />
-      <circle cx="16" cy="84" r="2.6" fill={col("gold-dark")} />
-      <circle cx="84" cy="16" r="5" fill={col("gold")} />
-      <circle cx="84" cy="16" r="2.6" fill={col("gold-dark")} />
+      <circle cx="16" cy="84" r="4.6" fill={`url(#${id("oro")})`} />
+      <circle cx="16" cy="84" r="2" fill={col("gold")} />
+      <circle cx="84" cy="16" r="4.6" fill={`url(#${id("oro")})`} />
+      <circle cx="84" cy="16" r="2" fill={col("gold")} />
       <text x="51" y="73" textAnchor="middle" fontSize="66" filter={`url(#${id("relieve")})`}
         style={{ fontFamily: 'var(--fuente-titulos, "Prata"), Georgia, serif' }} fill={`url(#${id("letra")})`}
         stroke={mezcla("seal", 60, col("ink"))} strokeWidth=".8">{letra}</text>
@@ -855,7 +866,7 @@ export function VrCapital({ letra = "A", className = "" }) {
   );
 }
 
-// Esquinero de filigrana dorada para las páginas.
+// Esquinero de filigrana de plata para las páginas.
 export function VrEsquina({ className = "" }) {
   return (
     <svg className={className} viewBox="0 0 60 60" aria-hidden="true">
@@ -870,7 +881,7 @@ export function VrEsquina({ className = "" }) {
   );
 }
 
-// Filete con un rombo y dos hojitas, en oro.
+// Filete con un rombo y dos hojitas, en plata.
 export function VrFilete({ className = "" }) {
   return (
     <svg className={className} viewBox="0 0 220 20" aria-hidden="true">
@@ -881,6 +892,188 @@ export function VrFilete({ className = "" }) {
       <path d="M110 3 L 117 10 L 110 17 L 103 10 Z" fill="currentColor" />
       <circle cx="6" cy="10" r="1.6" fill="currentColor" />
       <circle cx="214" cy="10" r="1.6" fill="currentColor" />
+    </svg>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Borla para jalar, carnet de baile, reloj de pie y cajita de música  */
+/* ------------------------------------------------------------------ */
+
+// SDXL: vr_borla_jalar
+// Borla grande de plata, con nudo y flecos, que cuelga del cordón del telón.
+export function VrBorla({ className = "" }) {
+  const id = useUid();
+  return (
+    <svg className={className} viewBox="-22 0 44 110" aria-hidden="true" overflow="visible">
+      <defs>
+        <Plata id={id("oro")} x2="1" y2="0" />
+        <PlataRadial id={id("oroR")} />
+      </defs>
+      <Borla x={0} y={0} s={1} oro={id("oro")} oroR={id("oroR")} />
+    </svg>
+  );
+}
+
+// SDXL: vr_carnet_cordon
+// Cordón de seda plateado que sale del ojal del carnet de baile y sostiene
+// el lapicito: mina de grafito, madera natural y cuerpo lacado en lila.
+export function VrCordonLapiz({ className = "" }) {
+  const id = useUid();
+  return (
+    <svg className={className} viewBox="0 0 64 220" aria-hidden="true" overflow="visible">
+      <defs>
+        <Plata id={id("plata")} x2="1" y2="0" />
+        <PlataRadial id={id("plataR")} />
+        <linearGradient id={id("laca")} x1="0" y1="0" x2="1" y2="0">
+          <Stop o="0" c={mezcla("gold-dark", 80, col("ink"))} />
+          <Stop o=".35" c={mezcla("gold", 70, "white")} />
+          <Stop o=".55" c={col("gold")} />
+          <Stop o="1" c={col("gold-dark")} />
+        </linearGradient>
+        <linearGradient id={id("madera")} x1="0" y1="0" x2="1" y2="0">
+          <Stop o="0" c="#c9a37a" />
+          <Stop o=".5" c="#ecd3b0" />
+          <Stop o="1" c="#b98e63" />
+        </linearGradient>
+      </defs>
+      {/* lazada que sube y lo cuelga */}
+      <path d="M37 46 C 35 30 37 14 40 0 M43 46 C 45 30 43 14 40 0" fill="none" stroke={`url(#${id("plata")})`} strokeWidth="2.2" strokeLinecap="round" />
+      {/* ojal de plata */}
+      <circle cx="40" cy="48" r="5.4" fill="none" stroke={`url(#${id("plata")})`} strokeWidth="3" />
+      <circle cx="40" cy="48" r="2.4" fill={col("ink", 0.35)} />
+      {/* cordón que baja hasta el lápiz */}
+      <path d="M38 52 C 30 64 14 66 10 84 C 8 94 9 104 9 112" fill="none" stroke={`url(#${id("plata")})`} strokeWidth="2" strokeLinecap="round" />
+      <path d="M38 52 C 30 64 14 66 10 84 C 8 94 9 104 9 112" fill="none" stroke={col("ink", 0.25)} strokeWidth="2" strokeDasharray="1.2 1.6" />
+      <g className="vr-lapiz">
+        <circle cx="9" cy="115" r="3.4" fill="none" stroke={`url(#${id("plata")})`} strokeWidth="1.6" />
+        <rect x="4" y="118" width="10" height="12" rx="1.2" fill={`url(#${id("plata")})`} />
+        <path d="M4 121 H14 M4 127 H14" stroke={col("ink", 0.3)} strokeWidth=".7" />
+        <rect x="4" y="130" width="10" height="62" fill={`url(#${id("laca")})`} />
+        <path d="M7.2 130 V192" stroke="white" strokeOpacity=".45" strokeWidth="1.1" />
+        <path d="M4 192 L 14 192 L 10.4 206 L 7.6 206 Z" fill={`url(#${id("madera")})`} />
+        <path d="M7.6 206 L 10.4 206 L 9 211 Z" fill="#45434c" />
+      </g>
+    </svg>
+  );
+}
+
+// SDXL: vr_reloj_pie
+// Reloj de pie de salón, lacado en lila claro con molduras de plata; esfera
+// de marfil con números romanos y péndulo que oscila tras el cristal.
+// Las agujas marcan lo que falta (horas y minutos de la cuenta regresiva).
+export function VrRelojPie({ className = "", horas = 0, min = 0, seg = 0 }) {
+  const id = useUid();
+  const romanos = ["XII", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI"];
+  const aHora = (horas % 12) * 30 + min * 0.5;
+  return (
+    <svg className={className} viewBox="0 0 100 262" aria-hidden="true" overflow="visible">
+      <defs>
+        <linearGradient id={id("laca")} x1="0" y1="0" x2="1" y2="0">
+          <Stop o="0" c={mezcla("gold", 60, col("gold-dark"))} />
+          <Stop o=".22" c={mezcla("gold-light", 70, col("gold"))} />
+          <Stop o=".5" c={mezcla("gold-light", 60, "white")} />
+          <Stop o=".8" c={mezcla("gold-light", 60, col("gold"))} />
+          <Stop o="1" c={mezcla("gold", 55, col("gold-dark"))} />
+        </linearGradient>
+        <radialGradient id={id("esfera")} cx="45%" cy="40%" r="65%">
+          <Stop o="0" c="white" />
+          <Stop o=".8" c={mezcla("marble", 88, col("seal"))} />
+          <Stop o="1" c={mezcla("seal", 40, "white")} />
+        </radialGradient>
+        <linearGradient id={id("vidrio")} x1="0" y1="0" x2="1" y2="1">
+          <Stop o="0" c={mezcla("gold-dark", 55, col("ink"))} />
+          <Stop o="1" c={mezcla("gold-dark", 80, col("ink"))} />
+        </linearGradient>
+        <Plata id={id("plata")} x2="1" y2="0" />
+        <PlataRadial id={id("plataR")} />
+        <filter id={id("sombra")} x="-40%" y="-10%" width="180%" height="130%"><feGaussianBlur stdDeviation="4" /></filter>
+        <Grano id={id("grano")} fuerza={0.06} />
+      </defs>
+      <ellipse cx="52" cy="256" rx="40" ry="5" fill={col("ink", 0.22)} filter={`url(#${id("sombra")})`} />
+      <g filter={`url(#${id("grano")})`}>
+        {/* copete con volutas */}
+        <path d="M18 40 C 18 22 30 10 50 8 C 70 10 82 22 82 40 Z" fill={`url(#${id("laca")})`} />
+        <path d="M24 30 C 30 18 40 14 46 20 C 42 22 40 26 44 28 M76 30 C 70 18 60 14 54 20 C 58 22 60 26 56 28" fill="none" stroke={`url(#${id("plata")})`} strokeWidth="1.6" strokeLinecap="round" />
+        <circle cx="50" cy="5" r="4" fill={`url(#${id("plataR")})`} />
+        <rect x="14" y="38" width="72" height="5" rx="1" fill={`url(#${id("plata")})`} />
+        {/* capucha con la esfera */}
+        <rect x="18" y="43" width="64" height="60" fill={`url(#${id("laca")})`} />
+        <rect x="14" y="101" width="72" height="5" rx="1" fill={`url(#${id("plata")})`} />
+        <circle cx="50" cy="72" r="26" fill={`url(#${id("plataR")})`} />
+        <circle cx="50" cy="72" r="23" fill={`url(#${id("esfera")})`} />
+        {romanos.map((r, i) => {
+          const a = (i * 30 * Math.PI) / 180;
+          return (
+            <text key={r} x={50 + Math.sin(a) * 17.5} y={72 - Math.cos(a) * 17.5 + 2} textAnchor="middle" fontSize="5.6"
+              style={{ fontFamily: 'var(--fuente-titulos, "Prata"), Georgia, serif' }} fill={col("ink", 0.8)}>{r}</text>
+          );
+        })}
+        <circle cx="50" cy="72" r="11" fill="none" stroke={col("seal", 0.5)} strokeWidth=".5" />
+        <g className="vr-aguja" style={{ transform: `rotate(${aHora}deg)` }}>
+          <path d="M50 74 L 48.6 72 L 50 60 L 51.4 72 Z" fill={col("ink")} />
+        </g>
+        <g className="vr-aguja" style={{ transform: `rotate(${min * 6}deg)` }}>
+          <path d="M50 75 L 49.2 72 L 50 53 L 50.8 72 Z" fill={col("ink")} />
+        </g>
+        <g className="vr-aguja" style={{ transform: `rotate(${seg * 6}deg)` }}>
+          <path d="M50 77 V54" stroke={col("gold-dark")} strokeWidth=".6" />
+        </g>
+        <circle cx="50" cy="72" r="1.8" fill={`url(#${id("plataR")})`} />
+        {/* caja con puerta de cristal y péndulo */}
+        <rect x="26" y="106" width="48" height="104" fill={`url(#${id("laca")})`} />
+        <path d="M34 200 V126 C 34 116 42 112 50 112 C 58 112 66 116 66 126 V200 Z" fill={`url(#${id("vidrio")})`} />
+        <g className="vr-pendulo">
+          <path d="M50 108 V178" stroke={`url(#${id("plata")})`} strokeWidth="1.6" />
+          <circle cx="50" cy="184" r="9" fill={`url(#${id("plataR")})`} />
+          <circle cx="47" cy="181" r="2.4" fill="white" fillOpacity=".7" />
+        </g>
+        <path d="M34 200 V126 C 34 116 42 112 50 112 C 58 112 66 116 66 126 V200 Z" fill="none" stroke={`url(#${id("plata")})`} strokeWidth="2" />
+        <path d="M38 196 L 46 120" stroke="white" strokeOpacity=".22" strokeWidth="3" strokeLinecap="round" />
+        {/* base y patas */}
+        <rect x="20" y="208" width="60" height="5" rx="1" fill={`url(#${id("plata")})`} />
+        <rect x="22" y="213" width="56" height="34" fill={`url(#${id("laca")})`} />
+        <rect x="30" y="219" width="40" height="22" rx="2" fill="none" stroke={col("seal", 0.8)} strokeWidth="1" />
+        <rect x="18" y="246" width="64" height="5" rx="1" fill={`url(#${id("plata")})`} />
+        <path d="M22 251 h8 l-2 6 h-4 Z M70 251 h8 l-2 6 h-4 Z" fill={`url(#${id("plata")})`} />
+      </g>
+    </svg>
+  );
+}
+
+// SDXL: vr_cajita_musica
+// Cajita de música lacada en lila con la tapa abierta, filo de plata y la
+// manivela al costado (gira mientras suena).
+export function VrCajita({ className = "" }) {
+  const id = useUid();
+  return (
+    <svg className={className} viewBox="0 0 48 48" aria-hidden="true" overflow="visible">
+      <defs>
+        <linearGradient id={id("laca")} x1="0" y1="0" x2="0" y2="1">
+          <Stop o="0" c={mezcla("gold", 75, "white")} />
+          <Stop o=".6" c={col("gold")} />
+          <Stop o="1" c={col("gold-dark")} />
+        </linearGradient>
+        <linearGradient id={id("tapa")} x1="0" y1="0" x2="0" y2="1">
+          <Stop o="0" c={mezcla("gold-light", 70, "white")} />
+          <Stop o="1" c={mezcla("gold", 60, "white")} />
+        </linearGradient>
+        <Plata id={id("plata")} x2="1" y2="0" />
+        <PlataRadial id={id("plataR")} />
+      </defs>
+      <path className="vr-notita" d="M30 12 V4 L 35 3 V10" fill="none" stroke={`url(#${id("plata")})`} strokeWidth="1.4" strokeLinecap="round" />
+      <circle className="vr-notita" cx="28.6" cy="12.4" r="1.9" fill={`url(#${id("plataR")})`} />
+      <path d="M8 24 L 12 9 L 34 9 L 38 24 Z" fill={`url(#${id("tapa")})`} stroke={`url(#${id("plata")})`} strokeWidth="1.2" strokeLinejoin="round" />
+      <path d="M13 21 L 15.5 12 L 30.5 12 L 33 21 Z" fill="none" stroke={col("seal", 0.8)} strokeWidth=".7" />
+      <rect x="6" y="24" width="34" height="16" rx="1.6" fill={`url(#${id("laca")})`} />
+      <rect x="6" y="24" width="34" height="2.4" fill={`url(#${id("plata")})`} />
+      <rect x="6" y="37.6" width="34" height="2.4" fill={`url(#${id("plata")})`} />
+      <circle cx="23" cy="32" r="2.4" fill={`url(#${id("plataR")})`} />
+      <g className="vr-manivela">
+        <path d="M40 32 H44 V27" fill="none" stroke={`url(#${id("plata")})`} strokeWidth="1.6" strokeLinecap="round" />
+        <circle cx="44" cy="26" r="1.8" fill={`url(#${id("plataR")})`} />
+      </g>
+      <circle cx="40.6" cy="32" r="1.4" fill={`url(#${id("plataR")})`} />
     </svg>
   );
 }
