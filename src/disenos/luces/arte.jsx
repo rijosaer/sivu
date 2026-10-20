@@ -340,12 +340,16 @@ function BombillaCenital({ x, y, i, ids }) {
   return (
     <g className="lu-bombilla" style={{ "--i": i }} transform={`translate(${x.toFixed(1)} ${y.toFixed(1)})`}>
       <ellipse className="lu-sombra-bombilla" cx="9" cy="13" rx="9" ry="8" fill="#1d1a14" opacity=".3" filter={`url(#${ids.difuso})`} />
-      <circle className="lu-halo" r="44" fill={`url(#${ids.halo})`} />
-      <circle r="9" fill={`url(#${ids.vidrio})`} stroke="rgb(60 64 80 / .35)" strokeWidth=".6" />
-      <circle className="lu-vidrio-luz" r="9" fill={`url(#${ids.luz})`} />
-      <circle r="3.6" fill={`url(#${ids.casquillo})`} />
-      <circle r="1.6" fill="#0f1116" opacity=".6" />
-      <ellipse cx="-4" cy="-4.4" rx="2.4" ry="1.4" fill="#fff" opacity=".85" transform="rotate(-38 -4 -4.4)" />
+      <circle className="lu-halo" r="58" fill={`url(#${ids.halo})`} />
+      <circle r="9.5" fill={`url(#${ids.vidrio})`} stroke="rgb(60 64 80 / .4)" strokeWidth=".7" />
+      <circle className="lu-vidrio-luz" r="9.5" fill={`url(#${ids.luz})`} />
+      <path d="M-5.8 3.6 A 7 7 0 0 0 5.4 4.2" fill="none" stroke="#fff" strokeWidth=".9" strokeLinecap="round" opacity=".55" />
+      {/* Casquillo de metal visto desde arriba, con sus roscas */}
+      <circle r="4.4" fill={`url(#${ids.casquillo})`} />
+      <circle r="3.3" fill="none" stroke="#d9dbe0" strokeWidth=".45" opacity=".7" />
+      <circle r="2.2" fill="none" stroke="#2a2d34" strokeWidth=".5" opacity=".6" />
+      <circle cx="-1.2" cy="-1.3" r="1" fill="#f4f5f7" opacity=".8" />
+      <ellipse cx="-5" cy="-5" rx="2.2" ry="1.2" fill="#fff" opacity=".8" transform="rotate(-45 -5 -5)" />
     </g>
   );
 }
@@ -518,14 +522,15 @@ export function LuMesaCenital({ className = "" }) {
           <stop offset="1" style={{ stopColor: tema("gold"), stopOpacity: 0 }} />
         </radialGradient>
         <radialGradient id={ids.charco} cx="50%" cy="50%" r="50%">
-          <stop offset="0" style={{ stopColor: tema("gold-light"), stopOpacity: 0.55 }} />
-          <stop offset=".55" style={{ stopColor: tema("gold-light"), stopOpacity: 0.2 }} />
+          <stop offset="0" style={{ stopColor: tema("gold-light"), stopOpacity: 0.8 }} />
+          <stop offset=".55" style={{ stopColor: tema("gold-light"), stopOpacity: 0.3 }} />
           <stop offset="1" style={{ stopColor: tema("gold-light"), stopOpacity: 0 }} />
         </radialGradient>
-        <radialGradient id={ids.vidrio} cx="38%" cy="34%" r="72%">
-          <stop offset="0" stopColor="#FFFFFF" stopOpacity=".95" />
-          <stop offset=".55" stopColor="#E4E0D8" stopOpacity=".75" />
-          <stop offset="1" stopColor="#9E998F" stopOpacity=".8" />
+        <radialGradient id={ids.vidrio} cx="40%" cy="38%" r="70%">
+          <stop offset="0" stopColor="#F4F2EE" stopOpacity=".9" />
+          <stop offset=".6" stopColor="#CFCBC3" stopOpacity=".7" />
+          <stop offset=".9" stopColor="#8F8A80" stopOpacity=".85" />
+          <stop offset="1" stopColor="#6f6a62" stopOpacity=".9" />
         </radialGradient>
         <radialGradient id={ids.luz} cx="45%" cy="42%" r="62%">
           <stop offset="0" stopColor="#FFFDF4" />
@@ -533,9 +538,10 @@ export function LuMesaCenital({ className = "" }) {
           <stop offset=".85" style={{ stopColor: tema("gold-light") }} />
           <stop offset="1" style={{ stopColor: tema("gold") }} />
         </radialGradient>
-        <radialGradient id={ids.casquillo} cx="40%" cy="40%" r="65%">
-          <stop offset="0" stopColor="#6a6d75" />
-          <stop offset="1" stopColor="#1c1e24" />
+        <radialGradient id={ids.casquillo} cx="38%" cy="36%" r="70%">
+          <stop offset="0" stopColor="#c9ccd2" />
+          <stop offset=".55" stopColor="#8a8e96" />
+          <stop offset="1" stopColor="#4a4d55" />
         </radialGradient>
         <radialGradient id={ids.petalo} cx="50%" cy="10%" r="95%">
           <stop offset="0" stopColor="#F1E8DA" />

@@ -262,7 +262,7 @@ function Goteo({ cx, arriba, rx, ry, largos, g }) {
 // pedestal de mármol con aros dorados. Las velas encendidas llevan la clase
 // dl-llama (el CSS las hace titilar y las apaga al soplar). Con `topper`
 // dibuja los palillos dorados donde va la edad (texto en el HTML).
-export const VELAS = [
+const VELAS = [
   { x: 110, base: 116 }, { x: 124, base: 113 }, { x: 196, base: 113 }, { x: 210, base: 116 },
 ];
 const ALTO_VELA = 34;
@@ -981,8 +981,10 @@ export function DlFilete({ className = "" }) {
 }
 
 // Macaron suelto y pequeño (viñetas del programa).
-export function DlMacaronSuelto({ className = "", color = T.caramelo }) {
+// `tono` elige un sabor del surtido (caramelo, pistacho, vainilla, frutos…).
+export function DlMacaronSuelto({ className = "", tono = 0 }) {
   const g = useIds("m");
+  const color = SURTIDO[tono % SURTIDO.length];
   return (
     <svg className={className} viewBox="0 0 40 30" aria-hidden="true">
       <Macaron x={20} y={17} r={14} color={color} id={g.m} />
@@ -990,4 +992,3 @@ export function DlMacaronSuelto({ className = "", color = T.caramelo }) {
   );
 }
 
-export { SURTIDO };

@@ -107,9 +107,9 @@
 
 /* Etiquetas colgadas de una vara entre las ramas */
 .eu .eu-entrada { position: absolute; inset: 0; z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 12px 0 78px; }
+  padding: 0 0 70px; }
 .eu .eu-colgador { position: relative; width: min(300px, 78vw); transition: opacity .8s ease .45s, transform 1.3s var(--curva) .35s; }
-.eu .eu-colgador:has(.eu-tag-invitado) { padding-bottom: 150px; }
+.eu .eu-colgador:has(.eu-tag-invitado) { padding-bottom: 178px; }
 .eu.eu-abriendo .eu-colgador { opacity: 0; transform: translateY(-36px); }
 .eu .eu-colgador::before { content: ""; position: absolute; z-index: 0; inset: 40px -60px -30px; pointer-events: none;
   background: radial-gradient(closest-side, color-mix(in srgb, var(--papel) 78%, transparent), transparent); }
@@ -344,6 +344,7 @@
 .eu .eu-modal #rsvp img { display: none; }
 .eu .eu-modal #rsvp .font-mono { font-family: var(--f-texto); letter-spacing: .2em; }
 .eu .eu-modal #rsvp p.font-mono, .eu .eu-modal #rsvp span.font-mono { font-size: 11.5px; font-weight: 700; color: var(--profundo); }
+.eu .eu-modal #rsvp > div > p.font-mono:first-child, .eu .eu-modal #rsvp p.font-mono:first-of-type { font: italic 400 15px/1.4 var(--f-texto); letter-spacing: .01em; text-transform: none; color: var(--suave); }
 .eu .eu-modal #rsvp h2 { font-family: var(--f-guion); font-weight: 400; font-size: clamp(40px, 11vw, 48px); line-height: 1.15; color: var(--profundo); margin: 4px 0; }
 .eu .eu-modal #rsvp .font-body { font-family: var(--f-texto); font-size: 16.5px; color: var(--tinta); }
 .eu .eu-modal #rsvp p.text-xs, .eu .eu-modal #rsvp p.text-sm { font-size: 15px; line-height: 1.55; color: var(--suave); }

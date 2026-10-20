@@ -6,7 +6,7 @@ import {
 } from "../comun";
 import {
   EuRama, EuTallo, EuRamito, EuAnillos, EuCopas, EuSobre, EuOjal, EuHilo,
-  EuVara, EuHojita, EuCinta, EuNudo, EuCintaIniciales, EuHojaBoton, EuGuirnalda, GUIRNALDA_NUDOS,
+  EuVara, EuHojita, EuCinta, EuNudo, EuCintaIniciales, EuHojaBoton, EuGuirnalda,
 } from "./arte";
 
 // Diseño «Eucalipto»: boda de jardín romántica y fresca. Rosas blancas,
@@ -457,8 +457,8 @@ export default function Eucalipto({ site, contenidoDe, invitacion, onEnviarRSVP,
                       key={k}
                       className="eu-mini"
                       style={{
-                        "--x": `${(GUIRNALDA_NUDOS[j][0] / 360) * 100}%`,
-                        "--y": GUIRNALDA_NUDOS[j][1],
+                        "--x": `${(EuGuirnalda.nudos[j][0] / 360) * 100}%`,
+                        "--y": EuGuirnalda.nudos[j][1],
                         "--largo": `${[14, 6, 20, 10][j]}px`,
                         "--d": `${-j * 0.9}s`,
                       }}

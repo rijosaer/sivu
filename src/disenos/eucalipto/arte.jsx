@@ -796,7 +796,7 @@ export function EuHojaBoton({ className = "" }) {
 
 // Puntos (en unidades del viewBox 360×64) donde el hilo de la cuenta regresiva
 // lleva un nudito y cuelga una etiqueta.
-export const GUIRNALDA_NUDOS = [[54, 24.7], [138, 38.3], [222, 38.3], [306, 24.7]];
+const GUIRNALDA_NUDOS = [[54, 24.7], [138, 38.3], [222, 38.3], [306, 24.7]];
 
 // SDXL: eu_guirnalda
 // Hilo horizontal que cuelga entre dos ramitas de eucalipto, con cuatro
@@ -821,3 +821,4 @@ export function EuGuirnalda({ className = "" }) {
     </svg>
   );
 }
+EuGuirnalda.nudos = GUIRNALDA_NUDOS;

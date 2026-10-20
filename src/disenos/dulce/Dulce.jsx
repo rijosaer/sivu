@@ -6,7 +6,7 @@ import {
 } from "../comun";
 import {
   DlPastel, DlHumo, DlSoplido, DlTemporizador, DlMacarons, DlCopas, DlTarta, DlCajita,
-  DlCajaCierre, DlBatidor, DlToldo, DlEtiqueta, DlCordon, DlMacaronSuelto, SURTIDO,
+  DlCajaCierre, DlBatidor, DlToldo, DlEtiqueta, DlCordon, DlMacaronSuelto,
 } from "./arte";
 
 // Diseño «Dulce 30»: cumpleaños de adultos con aire de pastelería de
@@ -312,7 +312,7 @@ export default function Dulce({ site, contenidoDe, invitacion, onEnviarRSVP, enE
                 <ol className="dl-programa">
                   {cronograma.map((c, i) => (
                     <li key={i}>
-                      <DlMacaronSuelto className="dl-vineta" color={SURTIDO[i % SURTIDO.length]} />
+                      <DlMacaronSuelto className="dl-vineta" tono={i} />
                       <span className="dl-hora">{c.hora}</span>
                       <span className="dl-que">{c.titulo}</span>
                     </li>
