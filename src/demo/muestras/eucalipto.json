@@ -7,13 +7,13 @@
       "diseno": "eucalipto"
     },
     "tema": {
-      "color-paper": "#F6F4EC",
-      "color-ink": "#2F3A33",
-      "color-gold": "#8FA58F",
-      "color-gold-light": "#D6E0D2",
-      "color-gold-dark": "#5C7262",
+      "color-paper": "#F1F4F4",
+      "color-ink": "#2C3A40",
+      "color-gold": "#6F8F98",
+      "color-gold-light": "#CFDDE0",
+      "color-gold-dark": "#46626B",
       "color-marble": "#FFFFFF",
-      "color-seal": "#B89A5E",
+      "color-seal": "#B7A07A",
       "fuente-guion": "Allura",
       "fuente-titulos": "Gilda Display",
       "fuente-cuerpo": "Mulish"

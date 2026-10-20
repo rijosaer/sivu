@@ -2,7 +2,7 @@
  "site": {
   "invitacion": {
    "slug": "plantillas/gala",
-   "nombre": "Gala · Cena de fin de año",
+   "nombre": "Gala · Lanzamiento Nova Tech",
    "tipoEvento": "corporativo",
    "diseno": "gala"
   },
@@ -28,52 +28,47 @@
     "id": 56,
     "tipo": "welcome",
     "contenido": {
-     "novioEl": "Fin de año",
-     "novioElla": "Nortex Colombia",
-     "fraseIntro": "Cerramos el año juntos: una noche para celebrar lo logrado y brindar por lo que viene.",
+     "novioEl": "Lanzamiento",
+     "novioElla": "Nova Tech",
+     "fraseIntro": "Te invitamos a conocer primero lo que construimos este año: una noche de demostraciones, conversación y cóctel.",
      "padresTexto": "",
      "padreElMadre": "",
      "padreElPadre": "",
      "padreEllaMadre": "",
      "padreEllaPadre": "",
-     "bienvenidaTexto": "Cena anual"
+     "bienvenidaTexto": "Evento de producto"
     }
    },
    {
     "id": 57,
     "tipo": "informacion_boda",
     "contenido": {
-     "fecha": "2026-12-12T20:00:00-05:00",
-     "lugar": "Salón Gran Nogal",
-     "mapsUrl": "https://maps.google.com/?q=Calle+93+12-40+Bogota",
-     "overline": "Cena y fiesta",
-     "direccion": "Calle 93 # 12-40, Bogotá",
+     "fecha": "2027-03-18T19:00:00-05:00",
+     "lugar": "Ágora Bogotá",
+     "mapsUrl": "https://maps.google.com/?q=Agora+Bogota",
+     "overline": "Lanzamiento y cóctel",
+     "direccion": "Carrera 40 # 22C-67, Bogotá",
      "mapaEmbed": "",
      "cronograma": [
       {
-       "hora": "8:00 pm",
-       "titulo": "Recepción y cóctel",
-       "detalle": "Bienvenida de los invitados en el salón."
+       "hora": "7:00 pm",
+       "titulo": "Registro",
+       "detalle": "Recoge tu credencial en la entrada."
+      },
+      {
+       "hora": "7:30 pm",
+       "titulo": "Keynote de lanzamiento",
+       "detalle": "Presentamos el producto nuevo."
+      },
+      {
+       "hora": "8:15 pm",
+       "titulo": "Demos en vivo",
+       "detalle": "Pruébalo con el equipo que lo hizo."
       },
       {
        "hora": "9:00 pm",
-       "titulo": "Palabras de bienvenida",
-       "detalle": "Un repaso breve del año junto a la dirección."
-      },
-      {
-       "hora": "9:30 pm",
-       "titulo": "Cena",
-       "detalle": "Menú de tres tiempos con opciones para cada preferencia."
-      },
-      {
-       "hora": "11:00 pm",
-       "titulo": "Brindis de fin de año",
-       "detalle": "Celebramos juntos lo logrado."
-      },
-      {
-       "hora": "11:30 pm",
-       "titulo": "Música y baile",
-       "detalle": "La noche sigue en la pista."
+       "titulo": "Cóctel y networking",
+       "detalle": "Música, conversación y brindis."
       }
      ],
      "tituloSeccion": "Información del evento",
@@ -82,7 +77,7 @@
      "cronogramaMensaje": "",
      "mostrarRestriccion": true,
      "mostrarObservaciones": true,
-     "fechaLimiteConfirmacion": "2026-12-05"
+     "fechaLimiteConfirmacion": "2027-03-11"
     }
    },
    {

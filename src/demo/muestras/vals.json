@@ -7,13 +7,13 @@
       "diseno": "vals"
     },
     "tema": {
-      "color-paper": "#FBF1F1",
-      "color-ink": "#4A2E36",
-      "color-gold": "#D8A1AE",
-      "color-gold-light": "#F3D9DE",
-      "color-gold-dark": "#9C5C6C",
+      "color-paper": "#F6F2FA",
+      "color-ink": "#3D3350",
+      "color-gold": "#A493C4",
+      "color-gold-light": "#E3DAF0",
+      "color-gold-dark": "#6B5B8E",
       "color-marble": "#FFFFFF",
-      "color-seal": "#C2A15E",
+      "color-seal": "#A9A9B8",
       "fuente-guion": "Norican",
       "fuente-titulos": "Prata",
       "fuente-cuerpo": "Karla"

@@ -54,7 +54,7 @@ const MUESTRAS = {
   osito: () => import("./muestras/osito.json"),
 };
 
-const NOMBRES = { jardin: "Jardín encantado", ensueno: "Ensueño", gala: "Gala", lazos: "Moños y perlas", coquette: "Coquette", paris: "París rosé", valle: "Valle de luna", "valle-claro": "Valle claro", eucalipto: "Eucalipto", luces: "Luces de verano", vals: "Vals rosa", luz: "Luz de bautizo", confeti: "Confeti", dulce: "Dulce 30", birrete: "Birrete", medianoche: "Medianoche", osito: "Osito" };
+const NOMBRES = { jardin: "Jardín encantado", ensueno: "Ensueño", gala: "Gala", lazos: "Moños y perlas", coquette: "Coquette", paris: "París rosé", valle: "Valle de luna", "valle-claro": "Valle claro", eucalipto: "Eucalipto", luces: "Luces de verano", vals: "Vals lila", luz: "Luz de bautizo", confeti: "Confeti", dulce: "Dulce 30", birrete: "Birrete", medianoche: "Medianoche", osito: "Osito" };
 
 function temaDeUrl() {
   try {
