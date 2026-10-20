@@ -41,6 +41,7 @@ cabeceras del sitio y del panel, y las reglas de límite en login).
 |---|---|---|---|---|
 | S-01 | XSS almacenado en el panel vía archivos de WhatsApp (blob: con tipo `text/html`) → robo de sesión del dueño | **9.0** Crítica `AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:L` | A03 Inyección / API8 | Corregido |
 | S-02 | IDOR/BOLA en `GET /api/public/medio/{id}` (ids consecutivos, sin control) | **7.5** Alta `AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N` | API1 BOLA | Corregido |
+| S-20 | Datos personales de eventos reales por slug adivinable en `/api/public/invitaciones/{slug}/site` (nombres de padres, lugar, fecha) | **7.5** Alta `AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N` | API1 BOLA / API3 | Corregido (ver 3.7); requiere decisión por evento |
 | S-03 | XSS almacenado en `api.heysivu.com`: subida de `data:text/html` / SVG servida con su tipo | **7.3** Alta `AV:N/AC:L/PR:L/UI:R/S:C/C:H/I:L/A:N` | A03 / API8 | Corregido |
 | S-04 | Límites de intentos evadibles con `X-Forwarded-For` falso (login, códigos, RSVP) | **7.5** Alta `AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N` | API2 / API4 | Corregido |
 | S-05 | CORS acepta cualquier `*.up.railway.app` (de cualquier persona) | **5.3** Media | A05 Configuración | Corregido |
@@ -144,6 +145,35 @@ validación de tamaños y rangos en RSVP, secciones, ubicaciones y tema,
 cabeceras de API (`CSP sandbox`, `HSTS preload`, `COOP`, `Permissions-Policy`,
 `Cache-Control: no-store`), opción `SOLO_CLOUDFLARE=1`.
 
+### 3.7 · Slugs adivinables y datos personales en `/site` (S-20)
+
+- **Antes:** `maria-y-juan`, `carlos-y-laura`… se probaban uno a uno y cada
+  acierto devolvía el contenido completo del evento: nombres de los padres,
+  lugar, dirección, fecha y hora, fotos.
+- **Por qué no se exige un token a todos:** el enlace general del evento se
+  usa de verdad (se comparte en grupos, y las páginas de participación
+  `?anuncio=1` y de servidores no llevan código). Cerrarlo para todos rompería
+  invitaciones en curso. Por eso son tres capas:
+  1. **Slugs nuevos con sufijo al azar** (`maria-y-juan-k7m2qx`, ~2.000
+     millones de opciones). Si el dueño escribe el enlace a mano, se respeta.
+  2. **Freno a la enumeración:** 15 slugs o códigos inexistentes por IP cada
+     10 minutos (abrir una invitación real nunca cuenta).
+  3. **«Solo con enlace personal»** (Ajustes del evento → Privacidad del
+     enlace): `/site` exige el código de un invitado de ese evento (`?i=`) o el
+     token de vista previa del panel (`?vista=`, HMAC por evento). Sin eso
+     responde 404, igual que un enlace inexistente. Con un clic también se
+     puede **cambiar el enlace por uno difícil de adivinar** (los enlaces ya
+     enviados dejan de abrir: el panel lo advierte).
+- **Pendiente de decisión (tuya, por evento):** los eventos que ya existen
+  conservan su enlace y el modo normal, para no romper enlaces repartidos. En
+  los que cada invitado recibe su enlace personal, activa «Solo con enlace
+  personal»; en los que tengan un slug fácil y aún no se hayan enviado,
+  cambia el enlace.
+- **Sobre usar UUID en `/medio/{id}`:** la URL firmada (`?f=` = HMAC-SHA256 de
+  132 bits) logra lo mismo que un UUID v4 (122 bits) sin migrar la tabla ni
+  romper nada. Un límite de 30/min en esa ruta rompería las galerías (una
+  invitación pide 20–40 archivos al abrirse).
+
 ### 3.6 · Sesión del panel en cookie HttpOnly (S-19, corregido)
 
 - La API pone la sesión en `__Host-sivu_sesion` (`HttpOnly; Secure;
@@ -219,6 +249,11 @@ landing incrusta sus propias plantillas.)
 | `Cache-Control` | `no-store` |
 
 La API (`api.heysivu.com`) ya manda todas sus cabeceras desde Express.
+
+**Regla "Quitar huellas del origen"** · si: `(http.host in {"heysivu.com" "www.heysivu.com" "panel.heysivu.com" "api.heysivu.com"})` →
+*Remove*: `x-railway-request-id`, `x-railway-edge`, `x-railway-fallback`,
+`x-hikari-trace`. (Dicen que el origen es Railway y qué nodo respondió; no
+son críticas, pero no hace falta regalarlas.)
 
 ### 4.4 WAF → Managed rules
 - Activa **Cloudflare Managed Ruleset** (todos los planes tienen el
@@ -332,6 +367,8 @@ sola en el `preDeployCommand`.
 
 | Plazo | Qué | Esfuerzo |
 |---|---|---|
+| **Hoy** | **Desplegar.** El IDOR de medios (S-02) y los slugs (S-20) siguen abiertos en producción hasta que esta rama esté publicada. API y panel juntos (el panel nuevo usa cookie; el viejo deja de funcionar con la API nueva y al revés). No bloquees `/api/public/invitaciones/*` en Cloudflare como medida temporal: tumbaría todas las invitaciones de eventos en curso. Si quieres algo mientras despliegas, la regla de límite de 4.6 sobre `/api/public/medio/` a 30/min por IP frena el barrido a cambio de que alguna galería cargue lento. |
+| **Al desplegar** | En Ajustes de cada evento real: activar «Solo con enlace personal» donde todos reciban enlace propio; cambiar el enlace de los eventos con slug fácil que aún no se hayan enviado. |
 | **Esta semana** | Desplegar esta rama · Rocket Loader y Email Obfuscation Off · Transform Rules de cabeceras · regla de límite de login · SSL Full (strict) + TLS 1.2 · revisar que `JWT_SECRET` mida 32+ caracteres | 1–2 h |
 | **1 mes** | Custom rules 1–5 · Managed rules en Log → Block · `SOLO_CLOUDFLARE=1` · HSTS a 12 meses + preload · `security.txt` en `public/.well-known/` · rotar contraseñas de clientes con menos de 10 caracteres | ½ día |
 | **3 meses** | 2FA para el dueño · limitador en Postgres/Redis si se pasa a más de una instancia · copia de seguridad cifrada y probada de la base · alertas de inicios de sesión fallidos | 2–4 días |

@@ -9,6 +9,7 @@ import { RITMO } from "../envioMasivo.js";
 import { estadoWhatsapp } from "../whatsappWeb.js";
 import { AUDIOS, IMAGENES, leerDataUrl, urlMedio } from "../archivos.js";
 import { CLAVE_RE, esIdValido, validarParam } from "../seguridad.js";
+import { tokenVista } from "../middlewareInvitacion.js";
 
 // Todo lo de aquí cuelga de una invitación concreta: se monta en admin.js
 // bajo /invitaciones/:invitacionId, con resolverInvitacionAdmin puesto antes
@@ -76,6 +77,10 @@ function ordenValido(orden) {
     orden.every((o) => esIdValido(o?.id) && Number.isInteger(o?.orden) && o.orden >= 0 && o.orden < 100000)
   );
 }
+
+// Token para que la vista previa del panel abra la invitación aunque sea
+// «solo con enlace personal» (ver exigirAccesoPublico).
+recursosRouter.get("/vista", (req, res) => res.json({ token: tokenVista(req.invitacionId) }));
 
 // ---------- Secciones (contenido, orden, activo/inactivo) ----------
 

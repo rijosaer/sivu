@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, urlMedia, SITIO_BASE, ORIGEN_SITIO, mensajeDelSitio } from "../api";
 import { comprimirDecoracion } from "../archivos";
+import { conVista, useTokenVista } from "../vistaPrevia";
 import GestorFondo from "./GestorFondo";
 
 const FUENTE = "invitacion-editor";
@@ -110,7 +111,8 @@ export default function Decoraciones() {
   // previa tiene que recargarse al pasar de una a otra. Como el src solo
   // cambia al cruzar esa frontera, moverse entre secciones del cuerpo no
   // recarga nada.
-  const srcPrevia = `${SITIO_BASE}?editor=1${seccionActiva === PORTADA ? "&portada=1" : ""}`;
+  const tokenVista = useTokenVista();
+  const srcPrevia = conVista(`${SITIO_BASE}?editor=1${seccionActiva === PORTADA ? "&portada=1" : ""}`, tokenVista);
 
   // Los deslizadores se mueven muy seguido: se refleja al instante en la
   // previa y se guarda una sola vez cuando el usuario se detiene.
@@ -384,7 +386,7 @@ export default function Decoraciones() {
             <iframe
               ref={iframeRef}
               title="Vista previa de la invitación"
-              src={srcPrevia}
+              src={tokenVista === null ? "about:blank" : srcPrevia}
               className="w-[390px] h-[720px] bg-white border border-borde rounded-lg"
             />
           </div>

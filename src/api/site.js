@@ -13,8 +13,14 @@ function base(slug) {
   return `${API_URL}/api/public/invitaciones/${encodeURIComponent(slug)}`;
 }
 
-export async function getSite(slug) {
-  const res = await fetch(`${base(slug)}/site`);
+// Un evento «solo con enlace personal» únicamente se abre con el código del
+// invitado (?i=) o, en la vista previa del panel, con su token (?vista=).
+export async function getSite(slug, { codigo = "", vista = "" } = {}) {
+  const params = new URLSearchParams();
+  if (codigo) params.set("i", codigo);
+  if (vista) params.set("vista", vista);
+  const qs = params.toString();
+  const res = await fetch(`${base(slug)}/site${qs ? `?${qs}` : ""}`);
   if (res.status === 404) throw new Error("Invitación no encontrada");
   if (!res.ok) throw new Error("No se pudo cargar el sitio");
   const site = await res.json();

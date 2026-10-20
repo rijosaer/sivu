@@ -1,5 +1,6 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
+import { randomInt } from "node:crypto";
 import { pool } from "../db.js";
 import { capturar } from "../errores.js";
 import { resolverInvitacionAdmin } from "../middlewareInvitacion.js";
@@ -23,6 +24,18 @@ function slugificar(texto) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 60);
+}
+
+// Un enlace hecho solo con los nombres ("maria-y-juan") se adivina probando:
+// quien lo encuentra ve la fecha, el lugar y los nombres de la familia. Los
+// enlaces que arma el sistema llevan un final al azar (6 caracteres, ~2.000
+// millones de opciones): "maria-y-juan-k7m2qx". Si el dueño escribe el enlace
+// a mano, se respeta tal cual.
+const ALFABETO_SLUG = "abcdefghjkmnpqrstuvwxyz23456789";
+function conSufijo(base) {
+  let sufijo = "";
+  for (let i = 0; i < 6; i++) sufijo += ALFABETO_SLUG[randomInt(ALFABETO_SLUG.length)];
+  return `${String(base || "invitacion").slice(0, 50).replace(/-+$/, "")}-${sufijo}`;
 }
 
 async function slugUnico(base) {
@@ -63,7 +76,7 @@ invitacionesRouter.get(
     // El dueño ve todos los eventos; un cliente, solo el suyo.
     const soloUno = req.admin.invitacionId || null;
     const { rows } = await pool.query(
-      `SELECT id, slug, nombre, tipo_evento, diseno, diseno_variante, fecha_evento, activo, es_plantilla, avisos_whatsapp, creado_en
+      `SELECT id, slug, nombre, tipo_evento, diseno, diseno_variante, fecha_evento, activo, es_plantilla, solo_codigo, avisos_whatsapp, creado_en
        FROM invitaciones WHERE ($1::int IS NULL OR id = $1) ORDER BY creado_en DESC`,
       [soloUno]
     );
@@ -133,7 +146,7 @@ invitacionesRouter.post(
     const elegido = await resolverDiseno(diseno || plantilla?.diseno || "clasico");
     if (!elegido) return res.status(400).json({ error: "Diseño no válido" });
     const disenoFinal = elegido.base;
-    const base = slugificar(slugPedido || nombre) || "invitacion";
+    const base = slugPedido ? slugificar(slugPedido) || "invitacion" : conSufijo(slugificar(nombre));
     const slug = await slugUnico(base);
 
     const client = await pool.connect();
@@ -349,7 +362,11 @@ invitacionesRouter.put(
   capturar(async (req, res) => {
     const {
       nombre, slug: slugPedido, tipo_evento, fecha_evento, activo, es_plantilla, diseno,
+      solo_codigo, regenerar_enlace,
     } = req.body;
+    if (solo_codigo !== undefined && typeof solo_codigo !== "boolean") {
+      return res.status(400).json({ error: "El valor de «solo con enlace personal» no es válido" });
+    }
     if (tipo_evento && !TIPOS_EVENTO.includes(tipo_evento)) {
       return res.status(400).json({ error: "Tipo de evento no válido" });
     }
@@ -365,6 +382,11 @@ invitacionesRouter.put(
       );
       if (rowCount) return res.status(400).json({ error: "Ese enlace ya lo usa otra invitación" });
       slug = candidato;
+    }
+    // Cambiar el enlace por uno difícil de adivinar. Los enlaces que ya se
+    // mandaron con el anterior dejan de abrir: el panel lo advierte antes.
+    if (regenerar_enlace === true) {
+      slug = await slugUnico(conSufijo(slugificar(req.invitacion.nombre)));
     }
     // Cambiar de diseño aplica su paquete de colores y letras; el resto del
     // tema (mensajes de WhatsApp, etc.) se conserva.
@@ -388,6 +410,7 @@ invitacionesRouter.put(
          es_plantilla = COALESCE($8, es_plantilla),
          diseno = COALESCE($9, diseno),
          diseno_variante = CASE WHEN $9::text IS NULL THEN diseno_variante ELSE $10::text END,
+         solo_codigo = COALESCE($11, solo_codigo),
          actualizado_en = now()
        WHERE id = $1 RETURNING *`,
       [
@@ -401,6 +424,7 @@ invitacionesRouter.put(
         es_plantilla,
         elegido?.base || null,
         elegido?.variante || null,
+        solo_codigo ?? null,
       ]
     );
     res.json(rows[0]);
@@ -418,7 +442,7 @@ invitacionesRouter.post(
   capturar(async (req, res) => {
     const { nombre, slug: slugPedido } = req.body;
     if (!nombre?.trim()) return res.status(400).json({ error: "Ponle un nombre a la copia" });
-    const base = slugificar(slugPedido || nombre) || "invitacion";
+    const base = slugPedido ? slugificar(slugPedido) || "invitacion" : conSufijo(slugificar(nombre));
     const slug = await slugUnico(base);
     const origen = req.invitacionId;
 
@@ -494,7 +518,7 @@ export async function crearEventoBasico(client, { nombre, tipo_evento = "otro", 
   const tipo = TIPOS_EVENTO.includes(tipo_evento) ? tipo_evento : "otro";
   const elegido = (await resolverDiseno(diseno, client)) || (await resolverDiseno("clasico", client));
   const disenoFinal = elegido.base;
-  const slug = await slugUnico(slugificar(nombre) || "invitacion");
+  const slug = await slugUnico(conSufijo(slugificar(nombre)));
   const { rows: [invitacion] } = await client.query(
     `INSERT INTO invitaciones (slug, nombre, tipo_evento, fecha_evento, diseno, diseno_variante)
      VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,

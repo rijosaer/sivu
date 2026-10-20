@@ -1,6 +1,22 @@
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { pool } from "./db.js";
 import { capturar } from "./errores.js";
+import { secretoFirma } from "./auth.js";
 import { esIdValido, SLUG_RE } from "./seguridad.js";
+
+// Token de vista previa: deja al panel mostrar en su iframe una invitación
+// que es «solo con enlace personal» sin tener que inventar un invitado. Lo
+// emite GET /api/admin/invitaciones/:id/vista a quien ya administra el evento.
+export function tokenVista(invitacionId) {
+  return createHmac("sha256", secretoFirma("vista")).update(String(invitacionId)).digest("base64url").slice(0, 24);
+}
+
+function vistaValida(invitacionId, token) {
+  if (typeof token !== "string" || token.length !== 24) return false;
+  const a = Buffer.from(tokenVista(invitacionId));
+  const b = Buffer.from(token);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
 
 // Admin: la invitación se identifica por su id numérico en la URL
 // (/api/admin/invitaciones/:invitacionId/...). El panel puede operar sobre
@@ -17,7 +33,7 @@ export const resolverInvitacionAdmin = capturar(async (req, res, next) => {
     return res.status(404).json({ error: "Invitación no encontrada" });
   }
   const { rows } = await pool.query(
-    "SELECT id, slug, nombre, tipo_evento, diseno, activo, es_plantilla FROM invitaciones WHERE id = $1",
+    "SELECT id, slug, nombre, tipo_evento, diseno, activo, es_plantilla, solo_codigo FROM invitaciones WHERE id = $1",
     [id]
   );
   if (!rows.length) return res.status(404).json({ error: "Invitación no encontrada" });
@@ -36,11 +52,29 @@ export const resolverInvitacionPublica = capturar(async (req, res, next) => {
     return res.status(404).json({ error: "Invitación no encontrada" });
   }
   const { rows } = await pool.query(
-    "SELECT id, slug, nombre, tipo_evento, diseno FROM invitaciones WHERE slug = $1 AND activo = true",
+    "SELECT id, slug, nombre, tipo_evento, diseno, solo_codigo FROM invitaciones WHERE slug = $1 AND activo = true",
     [req.params.slug]
   );
   if (!rows.length) return res.status(404).json({ error: "Invitación no encontrada" });
   req.invitacionId = rows[0].id;
   req.invitacion = rows[0];
   next();
+});
+
+// ¿Quien pide puede ver el contenido de esta invitación? Siempre, salvo que
+// el evento sea «solo con enlace personal»: ahí hace falta el código de un
+// invitado de ESTE evento (?i=) o el token de vista previa del panel (?vista=).
+// Lo que no cumple responde 404, igual que un slug que no existe.
+export const exigirAccesoPublico = capturar(async (req, res, next) => {
+  if (!req.invitacion.solo_codigo) return next();
+  if (vistaValida(req.invitacionId, req.query.vista)) return next();
+  const codigo = req.query.i;
+  if (typeof codigo === "string" && /^[A-Za-z0-9_-]{3,40}$/.test(codigo)) {
+    const { rowCount } = await pool.query(
+      "SELECT 1 FROM invitados WHERE codigo = $1 AND invitacion_id = $2",
+      [codigo, req.invitacionId]
+    );
+    if (rowCount) return next();
+  }
+  return res.status(404).json({ error: "Invitación no encontrada" });
 });

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { pool } from "../db.js";
 import { capturar } from "../errores.js";
-import { resolverInvitacionPublica } from "../middlewareInvitacion.js";
+import { exigirAccesoPublico, resolverInvitacionPublica } from "../middlewareInvitacion.js";
 import { avisarRespuesta, fotoRespuestas } from "../avisosWhatsapp.js";
 import { publicoNegocioRouter } from "./publicoNegocio.js";
 import { enviarArchivo, firmaValida, urlMedio } from "../archivos.js";
@@ -42,12 +42,22 @@ const limiteRsvp = limitador({
 // /api/public/invitaciones/:slug/... . resolverInvitacionPublica ya validó
 // que el slug existe y que la invitación está activa antes de llegar aquí.
 const invitacionRouter = Router({ mergeParams: true });
-publicRouter.use("/invitaciones/:slug", resolverInvitacionPublica, invitacionRouter);
+// Quien recorre nombres de eventos ("maria-y-juan", "carlos-y-laura"...)
+// buscando invitaciones choca con este freno: solo cuentan los que no
+// existen, así que abrir una invitación real nunca lo activa.
+const limiteSlugs = limitador({
+  ventanaMs: 10 * 60 * 1000,
+  maximo: 15,
+  soloFallos: true,
+  mensaje: "Demasiadas invitaciones no encontradas. Espera unos minutos.",
+});
+publicRouter.use("/invitaciones/:slug", limiteSlugs, resolverInvitacionPublica, invitacionRouter);
 
 // Todo el sitio: tema, decoraciones, dónde va cada una y las secciones activas.
 // Ojo: aquí NO viajan imágenes ni audio, solo las URLs para pedirlos aparte.
 invitacionRouter.get(
   "/site",
+  exigirAccesoPublico,
   capturar(async (req, res) => {
     const id = req.invitacionId;
     const [tema, decoraciones, ubicaciones, secciones, fotos, audio, fondo, limite] = await Promise.all([

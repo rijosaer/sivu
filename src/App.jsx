@@ -95,7 +95,7 @@ export default function App() {
   const cargar = useCallback(async () => {
     try {
       const [siteData, invitadoData] = await Promise.all([
-        getSite(slug),
+        getSite(slug, { codigo, vista: new URLSearchParams(window.location.search).get("vista") || "" }),
         codigo ? getInvitado(slug, codigo) : Promise.resolve(null),
       ]);
       setSite(siteData);
@@ -104,8 +104,9 @@ export default function App() {
       // Registrar la apertura solo cuando es un invitado real abriendo su
       // enlace: con código válido y fuera del editor del panel.
       if (invitadoData && codigo && !enEditor) registrarApertura(slug, codigo);
-    } catch {
-      setError(true);
+    } catch (e) {
+      // 404: el enlace no existe, o el evento solo abre con enlace personal.
+      setError(e?.message === "Invitación no encontrada" ? "no-encontrada" : "red");
     }
   }, [codigo, slug, enEditor]);
 
@@ -151,7 +152,9 @@ export default function App() {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center text-center px-6 font-body text-ink/70">
-        No pudimos conectar con el servidor de la invitación. Vuelve a intentarlo en un momento.
+        {error === "no-encontrada"
+          ? "No encontramos esta invitación. Ábrela desde el enlace que te enviaron, completo tal como llegó."
+          : "No pudimos conectar con el servidor de la invitación. Vuelve a intentarlo en un momento."}
       </div>
     );
   }

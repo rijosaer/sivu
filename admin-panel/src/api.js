@@ -271,6 +271,7 @@ export const api = {
   borrarMedio: (id) => request(scoped(`/medios/${id}`), { method: "DELETE" }),
 
   decoraciones: () => request(scoped("/decoraciones")),
+  tokenVista: () => request(scoped("/vista")),
   crearDecoracion: (etiqueta, datos) =>
     request(scoped("/decoraciones"), { method: "POST", body: JSON.stringify({ etiqueta, datos }) }),
   actualizarDecoracion: (clave, datos) =>
