@@ -440,7 +440,7 @@
 .bi .bi-modal #rsvp label > span.font-mono { display: block; margin-bottom: 4px; }
 .bi .bi-modal #rsvp button[type="submit"] { position: relative; min-height: 56px; border-radius: 2px; border: 0; font: 600 18px/1.2 var(--f-texto); font-variant: small-caps; letter-spacing: .08em; color: var(--papel);
   background: var(--poro), linear-gradient(170deg, color-mix(in srgb, var(--vino) 80%, white), var(--vino) 45%, var(--vino-osc));
-  box-shadow: inset 0 0 0 5px transparent, inset 0 0 0 6px color-mix(in srgb, var(--oro) 85%, transparent), 0 14px 24px -14px var(--vino-osc); }
+  box-shadow: inset 0 0 0 5px var(--vino), inset 0 0 0 6px color-mix(in srgb, var(--oro) 85%, transparent), 0 14px 24px -14px var(--vino-osc); }
 .bi .bi-modal #rsvp button[type="submit"]:disabled { opacity: .4; }
 .bi .bi-modal #rsvp .border-gold\/40 { border-color: var(--filete); background: var(--tarjeta); }
 @keyframes bi-fundido { from { opacity: 0; } to { opacity: 1; } }

@@ -514,29 +514,29 @@ export default function Birrete({ site, contenidoDe, invitacion, onEnviarRSVP, e
             <button type="button" className="bi-cerrar" onClick={() => setRsvpAbierto(false)} aria-label="Cerrar">
               <span aria-hidden="true">Cerrar</span><b aria-hidden="true">×</b>
             </button>
-          <div className="bi-modal-caja">
-            <div className="bi-membrete" aria-hidden="true">
-              <div className="bi-membrete-escudo">
-                <BiLaurel className="bi-membrete-laurel" />
-                <BiBirrete className="bi-membrete-birrete" />
-                <BiLaurel className="bi-membrete-laurel" espejo />
+            <div className="bi-modal-caja">
+              <div className="bi-membrete" aria-hidden="true">
+                <div className="bi-membrete-escudo">
+                  <BiLaurel className="bi-membrete-laurel" />
+                  <BiBirrete className="bi-membrete-birrete" />
+                  <BiLaurel className="bi-membrete-laurel" espejo />
+                </div>
+                <div className="bi-membrete-texto">
+                  <p className="bi-membrete-titulo">Constancia de asistencia</p>
+                  <p className="bi-membrete-sub">{[nombres[0], partes && `${partes.dia} de ${partes.mes} de ${partes.anio}`].filter(Boolean).join(" · ")}</p>
+                </div>
+                <p className="bi-membrete-folio">Folio N.º {folioDe(invitacion)}</p>
               </div>
-              <div className="bi-membrete-texto">
-                <p className="bi-membrete-titulo">Constancia de asistencia</p>
-                <p className="bi-membrete-sub">{[nombres[0], partes && `${partes.dia} de ${partes.mes} de ${partes.anio}`].filter(Boolean).join(" · ")}</p>
-              </div>
-              <p className="bi-membrete-folio">Folio N.º {folioDe(invitacion)}</p>
+              <RSVP
+                invitacion={invitacion}
+                fechaLimite={info.fechaLimiteConfirmacion || site.fechaLimiteConfirmacion}
+                opciones={{
+                  mostrarRestriccion: info.mostrarRestriccion !== false,
+                  mostrarObservaciones: info.mostrarObservaciones !== false,
+                }}
+                onSubmit={onEnviarRSVP}
+              />
             </div>
-            <RSVP
-              invitacion={invitacion}
-              fechaLimite={info.fechaLimiteConfirmacion || site.fechaLimiteConfirmacion}
-              opciones={{
-                mostrarRestriccion: info.mostrarRestriccion !== false,
-                mostrarObservaciones: info.mostrarObservaciones !== false,
-              }}
-              onSubmit={onEnviarRSVP}
-            />
-          </div>
           </div>
         </div>
       )}

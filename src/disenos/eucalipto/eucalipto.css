@@ -162,11 +162,11 @@
 .eu .eu-portada-texto::before { content: ""; position: absolute; inset: 0 -40px; z-index: -1;
   background: radial-gradient(closest-side, color-mix(in srgb, var(--papel) 92%, transparent), transparent); }
 .eu .eu-portada-texto > * { opacity: 0; transform: translateY(14px); animation: eu-sube 1.1s var(--curva) forwards; }
-.eu .eu-portada-texto > :nth-child(1) { animation-delay: .7s; }
-.eu .eu-portada-texto > :nth-child(2) { animation-delay: .85s; }
-.eu .eu-portada-texto > :nth-child(3) { animation-delay: 1.05s; }
-.eu .eu-portada-texto > :nth-child(4) { animation-delay: 1.2s; }
-.eu .eu-portada-texto > :nth-child(5) { animation-delay: 1.6s; }
+.eu .eu-portada-texto > :nth-child(1) { animation-delay: 1.2s; }
+.eu .eu-portada-texto > :nth-child(2) { animation-delay: 1.35s; }
+.eu .eu-portada-texto > :nth-child(3) { animation-delay: 1.55s; }
+.eu .eu-portada-texto > :nth-child(4) { animation-delay: 1.7s; }
+.eu .eu-portada-texto > :nth-child(5) { animation-delay: 2.1s; }
 .eu.eu-abierta .eu-portada-texto > * { animation-delay: 0s; }
 @keyframes eu-sube { to { opacity: 1; transform: none; } }
 .eu .eu-ante { font: 700 12px/1.4 var(--f-texto); letter-spacing: .34em; text-transform: uppercase; color: var(--profundo); }

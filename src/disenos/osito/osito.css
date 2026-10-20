@@ -319,7 +319,7 @@
 
 /* Música */
 /* Música: un sonajero que se agita mientras suena */
-.os-musica { position: fixed; z-index: 25; top: 8px; right: 8px; width: 60px; height: 60px; padding: 4px; border: 0; cursor: pointer;
+.os-musica { position: fixed; z-index: 25; top: 6px; right: 6px; width: 64px; height: 64px; padding: 4px; border: 0; cursor: pointer;
   background: radial-gradient(closest-side, color-mix(in srgb, var(--blanco) 88%, transparent) 55%, transparent); }
 .os-sonajero { display: block; width: 100%; height: 100%; transform-origin: 78% 78%; rotate: -8deg; transition: rotate .4s var(--curva); }
 .os-musica.is-sonando .os-sonajero { animation: os-agita 1.8s ease-in-out infinite; }

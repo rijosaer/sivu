@@ -490,9 +490,9 @@ export function DlSoplido({ className = "" }) {
     <svg className={className} viewBox="0 0 280 110" aria-hidden="true">
       <defs>
         <linearGradient id={g.aire} x1="0" y1="0" x2="1" y2="0">
-          <Parada o="0" c={T.caramelo} a=".25" />
-          <Parada o=".5" c={T.tostado} a=".9" />
-          <Parada o="1" c={T.caramelo} a=".4" />
+          <Parada o="0" c={T.caramelo} a=".45" />
+          <Parada o=".5" c={T.tostado} a=".95" />
+          <Parada o="1" c={T.caramelo} a=".6" />
         </linearGradient>
       </defs>
       {trazos.map((t, i) => (
@@ -832,8 +832,8 @@ export function DlCajaCierre({ className = "", sello = "" }) {
       <g filter={url(g.grano)}>
         {/* Boca abierta de la caja con un pedacito de torta adentro. */}
         <path d="M50 92 L94 74 L214 74 L170 92 Z" fill={url(g.interior)} />
-        <path d="M100 86 L148 86 L148 80 Q 124 70 100 80 Z" style={{ fill: T.caramelo }} />
-        <Fresa x={124} y={76} s={0.9} giro={10} g={g} />
+        <path d="M100 88 L148 88 L148 83 Q 124 75 100 83 Z" style={{ fill: T.caramelo }} />
+        <Fresa x={124} y={83} s={0.6} giro={10} g={g} />
         <path d="M50 92 L170 92 L170 186 L50 186 Z" fill={url(g.frente)} />
         <path d="M170 92 L214 74 L214 168 L170 186 Z" fill={url(g.lado)} />
         <path d="M50 92 L170 92" stroke="#fff" strokeOpacity=".8" strokeWidth="1" />
@@ -863,11 +863,11 @@ export function DlCajaCierre({ className = "", sello = "" }) {
           </g>
         ))}
       </g>
-      <g className="dl-nudo" transform="translate(132 80.5)" fill="none" strokeLinecap="round">
+      <g transform="translate(132 80.5)"><g className="dl-nudo" fill="none" strokeLinecap="round">
         <path d="M0 0 C -9 -14 -24 -9 -14 0 C -9 3 -4 2 0 0 C 9 -14 24 -9 14 0 C 9 3 4 2 0 0 M0 0 C -4 8 -9 14 -14 18 M0 0 C 3 8 9 14 15 17"
           style={{ stroke: T.tostado }} strokeWidth="2.2" />
         <circle r="2.6" style={{ fill: T.tostado }} />
-      </g>
+      </g></g>
     </svg>
   );
 }
