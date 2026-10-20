@@ -100,7 +100,7 @@ function Lugares({ n, className = "" }) {
     <p className={`eu-lugares ${className}`}>
       <span className="eu-lugares-hojas" aria-hidden="true">
         {Array.from({ length: Math.min(n, 10) }, (_, k) => (
-          <EuHojita key={k} className="eu-hojita" style={{ "--k": k, "--g": `${(k % 2 ? 1 : -1) * (8 + (k % 3) * 5)}deg` }} />
+          <EuHojita key={k} className="eu-hojita" style={{ "--k": k, "--g": `${(k % 2 ? 1 : -1) * (14 + (k % 3) * 6)}deg` }} />
         ))}
       </span>
       <span>{n} {n === 1 ? "lugar" : "lugares"} para ti</span>

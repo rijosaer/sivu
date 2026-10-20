@@ -74,7 +74,7 @@
 /* Lugares: una hojita por cada uno, que brotan contadas */
 .eu .eu-lugares { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 8px; font: 400 14px/1.3 var(--f-texto); color: var(--suave); }
 .eu .eu-lugares-hojas { display: flex; align-items: flex-end; gap: 1px; }
-.eu .eu-hojita { width: 17px; height: 22px; transform-origin: 50% 85%; transform: rotate(var(--g, 0deg));
+.eu .eu-hojita { width: 18px; height: 24px; transform-origin: 50% 85%; transform: rotate(var(--g, 0deg));
   animation: eu-brota .7s var(--curva) both calc(1.3s + var(--k, 0) * .35s); }
 .eu .eu-lugares-rsvp { margin: 0 0 16px; font-size: 15px; }
 .eu .eu-colgante:not(.is-in) .eu-hojita { animation-play-state: paused; }
@@ -109,8 +109,10 @@
 .eu .eu-entrada { position: absolute; inset: 0; z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: center;
   padding: 12px 0 78px; }
 .eu .eu-colgador { position: relative; width: min(300px, 78vw); transition: opacity .8s ease .45s, transform 1.3s var(--curva) .35s; }
-.eu .eu-colgador:has(.eu-tag-invitado) { padding-bottom: 112px; }
+.eu .eu-colgador:has(.eu-tag-invitado) { padding-bottom: 150px; }
 .eu.eu-abriendo .eu-colgador { opacity: 0; transform: translateY(-36px); }
+.eu .eu-colgador::before { content: ""; position: absolute; z-index: 0; inset: 40px -60px -30px; pointer-events: none;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--papel) 78%, transparent), transparent); }
 .eu .eu-vara { position: relative; z-index: 3; display: block; width: calc(100% + 40px); height: auto; margin: 0 -20px; animation: eu-asoma 1.1s var(--curva) both .1s; }
 .eu .eu-tag { position: relative; transform-origin: 50% 9.5px; }
 .eu .eu-tag-novios { z-index: 2; width: 236px; margin: -71px auto 0; padding-top: 78px; animation: eu-mecer 4.8s ease-in-out infinite; }
@@ -119,11 +121,11 @@
 .eu .eu-tag-nombres { margin-top: 4px; font: 400 clamp(46px, 13vw, 54px)/1 var(--f-guion); color: var(--profundo); overflow-wrap: anywhere; }
 .eu .eu-tag-fecha { margin-top: 12px; font: 400 15px/1 var(--f-titulo); letter-spacing: .24em; color: var(--tinta); }
 /* La etiquetita del invitado: atada con su propio hilo a la punta de la vara */
-.eu .eu-tag-invitado { position: absolute; z-index: 1; top: 30px; right: -22px; width: 152px; padding-top: 270px; transform-origin: 50% 0;
+.eu .eu-tag-invitado { position: absolute; z-index: 1; top: 30px; right: -22px; width: 152px; padding-top: 312px; transform-origin: 50% 0;
   animation: eu-mecer 3.7s ease-in-out infinite -1.3s; }
-.eu .eu-tag-hilo { position: absolute; top: 0; left: 50%; width: 1.2px; height: 290px; margin-left: -.6px; background: var(--hilo); }
+.eu .eu-tag-hilo { position: absolute; top: 0; left: 50%; width: 1.2px; height: 330px; margin-left: -.6px; background: var(--hilo); }
 .eu .eu-tag-hilo::before { content: ""; position: absolute; top: -3px; left: -3px; width: 7px; height: 6px; border-radius: 50%; background: var(--hilo); }
-.eu .eu-tag-invitado .eu-ojal { top: calc(270px + 4px); width: 32px; height: 32px; margin-left: -16px; }
+.eu .eu-tag-invitado .eu-ojal { top: calc(312px + 4px); width: 32px; height: 32px; margin-left: -16px; }
 .eu .eu-tag-invitado .eu-papel { padding: 40px 12px 16px; }
 .eu .eu-tag-invitado .eu-sombra { transform: rotate(-3deg); }
 .eu .eu-para { font: 400 22px/1 var(--f-guion); color: var(--suave); }
@@ -132,19 +134,19 @@
 @keyframes eu-asoma { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
 
 /* «Tira de la cinta»: la cinta de lino ata las dos ramas con un nudo */
-.eu .eu-cinta { position: relative; z-index: 4; display: block; width: 100%; height: 142px; margin-top: 10px; padding: 0; border: 0; background: none; cursor: pointer; color: inherit; }
+.eu .eu-cinta { position: relative; z-index: 4; display: block; width: 100%; height: 148px; margin-top: 0; padding: 0; border: 0; background: none; cursor: pointer; color: inherit; }
 .eu .eu-cinta-banda { position: absolute; top: 20px; width: 53%; height: 30px; filter: drop-shadow(0 4px 4px rgb(44 58 64 / .18));
   transition: transform 1.1s var(--suelta) .15s, opacity .5s ease .7s; }
 .eu .eu-cinta-banda svg { display: block; width: 100%; height: 100%; }
 .eu .eu-cinta-izq { left: 0; }
 .eu .eu-cinta-der { right: 0; }
-.eu .eu-nudo { position: absolute; z-index: 1; left: 50%; top: 13px; width: 100px; height: auto; margin-left: -50px; transform-origin: 50% 20%;
+.eu .eu-nudo { position: absolute; z-index: 1; left: 50%; top: 9px; width: 124px; height: auto; margin-left: -62px; transform-origin: 50% 20%;
   animation: eu-tiron 2.8s ease-in-out infinite 1.4s; }
 .eu .eu-nudo g { transform-box: fill-box; transition: transform .8s var(--suelta), opacity .5s ease .2s; }
 .eu .eu-punta-izq { transform-origin: 90% 0; }
 .eu .eu-punta-der { transform-origin: 10% 0; }
 .eu .eu-nudo-bulto { transform-origin: 50% 50%; }
-.eu .eu-cinta-texto { position: absolute; left: 0; right: 0; top: 100px; font: 400 32px/1.1 var(--f-guion); color: var(--profundo);
+.eu .eu-cinta-texto { position: absolute; left: 0; right: 0; top: 108px; font: 400 32px/1.1 var(--f-guion); color: var(--profundo);
   text-shadow: 0 0 6px var(--papel), 0 0 14px var(--papel), 0 0 2px var(--papel); transition: opacity .4s ease; }
 @keyframes eu-tiron { 0%, 70%, 100% { transform: none; } 78% { transform: translateY(3px) rotate(-3deg); } 88% { transform: translateY(-1px) rotate(2deg); } }
 /* Al tirar: el nudo se afloja, las puntas caen y la cinta se corre a los lados */
@@ -198,10 +200,9 @@
   background: var(--fibras), var(--grano), linear-gradient(180deg, var(--algodon), color-mix(in srgb, var(--algodon) 94%, var(--papel)));
   box-shadow: inset 0 0 10px color-mix(in srgb, var(--papel) 80%, #b9ae92); }
 /* Títulos escritos a mano sobre la etiqueta, con una hojita a la izquierda */
-.eu .eu-h2 { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0 0 14px; font: 400 clamp(36px, 10.4vw, 42px)/1.1 var(--f-guion);
+.eu .eu-h2 { display: block; margin: 0 0 14px; text-align: center; font: 400 clamp(36px, 10.4vw, 42px)/1.1 var(--f-guion);
   color: var(--profundo); overflow-wrap: anywhere; }
-.eu .eu-h2 span { min-width: 0; }
-.eu .eu-h2-hoja { flex: none; width: 22px; height: 29px; margin-top: -6px; transform: rotate(-34deg); }
+.eu .eu-h2-hoja { display: inline-block; width: 20px; height: 26px; margin: 0 6px 0 -4px; vertical-align: -2px; transform: rotate(-34deg); }
 .eu .eu-arte { display: block; height: auto; margin: -14px auto 4px; }
 .eu .eu-arte-anillos { width: 150px; }
 .eu .eu-arte-copas { width: 130px; }

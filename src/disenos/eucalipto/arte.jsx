@@ -680,6 +680,9 @@ export function EuVara({ className = "" }) {
   );
 }
 
+// Hoja ovada con punta (eucalipto joven), para la hojita suelta.
+const HOJITA = "M0 0C-7.5 -3 -10 -12 -8.4 -19C-6.8 -25 -2.4 -28.6 0 -30C2.4 -28.6 6.8 -25 8.4 -19C10 -12 7.5 -3 0 0Z";
+
 // SDXL: eu_hojita
 // Una sola hoja redonda de eucalipto plateado con su pecíolo (para contar
 // lugares y acompañar los títulos).
@@ -689,7 +692,9 @@ export function EuHojita({ className = "", style }) {
     <svg className={className} style={style} viewBox="-14 -30 28 36" aria-hidden="true">
       <Defs p={p} />
       <path d="M0 0Q1 3 -1 6" fill="none" stroke="#8D8983" strokeWidth="1.2" strokeLinecap="round" />
-      <Hoja x={0} y={0} a={0} s={1} tono={1} p={p} />
+      <path d={HOJITA} fill={`url(#${p}-hoja1)`} stroke="#4C626C" strokeOpacity=".4" strokeWidth=".6" />
+      <path d={HOJITA} fill={`url(#${p}-polvo)`} />
+      <path d="M0 -1Q.8 -14 0 -27M0 -9Q-3 -12 -5 -16M.3 -16Q3 -19 4.6 -22" fill="none" stroke="#F0F5F7" strokeOpacity=".55" strokeWidth=".7" strokeLinecap="round" />
     </svg>
   );
 }
@@ -745,7 +750,7 @@ export function EuNudo({ className = "" }) {
 
 // SDXL: eu_cinta_iniciales
 // Cinta de lino anudada con las iniciales de los novios bordadas a punto
-// de hilo del tema y un pespunte ovalado alrededor.
+// de hilo azul del tema y un pespunte champaña ovalado alrededor.
 export function EuCintaIniciales({ iniciales = "", className = "" }) {
   const p = usePrefijo();
   const borde = { stroke: BORDE_LINO() };
@@ -758,8 +763,8 @@ export function EuCintaIniciales({ iniciales = "", className = "" }) {
         <path d={banda} fill={`url(#${p}-trama)`} />
         <path d="M14 43C80 37 170 49 246 41" fill="none" stroke="#FFFFFF" strokeOpacity=".55" strokeWidth=".9" />
         <ellipse cx="100" cy="52" rx="52" ry="11.5" fill="none" style={{ stroke: HILO() }} strokeWidth=".9" strokeDasharray="3 2.6" strokeLinecap="round" opacity=".75" />
-        <text x="100" y="62" textAnchor="middle" fontSize="34" style={{ fontFamily: "var(--fuente-guion, 'Allura'), cursive", fill: HILO() }}>{iniciales}</text>
-        <text x="100" y="62" textAnchor="middle" fontSize="34" fill="none" stroke="#FFFFFF" strokeOpacity=".55" strokeWidth=".45" strokeDasharray=".8 1.5" style={{ fontFamily: "var(--fuente-guion, 'Allura'), cursive" }}>{iniciales}</text>
+        <text x="100" y="63" textAnchor="middle" fontSize="38" strokeWidth=".9" style={{ fontFamily: "var(--fuente-guion, 'Allura'), cursive", fill: tema("--color-gold-dark"), stroke: tema("--color-gold-dark") }}>{iniciales}</text>
+        <text x="100" y="63" textAnchor="middle" fontSize="38" fill="none" stroke="#FFFFFF" strokeOpacity=".55" strokeWidth=".45" strokeDasharray=".8 1.5" style={{ fontFamily: "var(--fuente-guion, 'Allura'), cursive" }}>{iniciales}</text>
         <g transform="translate(130 18)">
           <path d="M54 30C47 50 38 70 28 92L36 89L39 97C48 74 57 54 64 34Z" fill={`url(#${p}-lino)`} style={borde} strokeOpacity=".5" strokeWidth=".6" />
           <path d="M64 30C72 50 82 68 96 86L88 85L86 93C76 74 66 55 56 34Z" fill={`url(#${p}-lino)`} style={borde} strokeOpacity=".5" strokeWidth=".6" />
