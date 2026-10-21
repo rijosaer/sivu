@@ -1,0 +1,224 @@
+{
+  "site": {
+    "invitacion": {
+      "slug": "plantillas/capillita",
+      "nombre": "Primera comunión · Valentina",
+      "tipoEvento": "bautizo",
+      "diseno": "capillita"
+    },
+    "tema": {
+      "color-paper": "#F7F1E6",
+      "color-ink": "#3F3229",
+      "color-gold": "#2F5D9E",
+      "color-gold-light": "#F2D4C9",
+      "color-gold-dark": "#234574",
+      "color-marble": "#FFFDF8",
+      "color-seal": "#C8507A",
+      "fuente-guion": "Courgette",
+      "fuente-titulos": "Gelasio",
+      "fuente-cuerpo": "Source Sans 3"
+    },
+    "decoraciones": {
+      "scrollwork": null,
+      "bouquet": null,
+      "frame": null,
+      "column": null,
+      "divider": null
+    },
+    "ubicaciones": [],
+    "secciones": [
+      {
+        "id": 46,
+        "tipo": "welcome",
+        "contenido": {
+          "bienvenidaTexto": "Mi primera comunión",
+          "novioEl": "Valentina",
+          "novioElla": "",
+          "fraseIntro": "Llegó el día que tanto he esperado: voy a recibir a Jesús por primera vez y quiero que estés conmigo.",
+          "padresTexto": "hija de",
+          "padreElPadre": "Julián Arango",
+          "padreElMadre": "Paula Henao",
+          "padreEllaPadre": "",
+          "padreEllaMadre": "",
+          "versiculo": "Yo soy el pan de vida; el que viene a mí no tendrá hambre.",
+          "versiculoCita": "Juan 6, 35"
+        }
+      },
+      {
+        "id": 47,
+        "tipo": "informacion_boda",
+        "contenido": {
+          "fecha": "2027-05-23T09:00:00-05:00",
+          "lugar": "Capilla de Santa Bárbara",
+          "direccion": "Calle del Comercio, Santa Fe de Antioquia",
+          "mapsUrl": "https://maps.google.com/?q=Santa+Fe+de+Antioquia",
+          "mapaEmbed": "",
+          "overline": "La misa",
+          "tituloSeccion": "La ceremonia",
+          "tituloItinerario": "El programa",
+          "cronogramaModo": "detallado",
+          "cronograma": [
+            {
+              "hora": "9:00 a. m.",
+              "titulo": "Misa de primera comunión"
+            },
+            {
+              "hora": "10:30 a. m.",
+              "titulo": "Fotos en la plaza"
+            },
+            {
+              "hora": "11:00 a. m.",
+              "titulo": "Desayuno en casa de los abuelos"
+            }
+          ],
+          "cronogramaMensaje": "Les compartiremos el programa más cerca de la fecha.",
+          "mostrarRestriccion": true,
+          "mostrarObservaciones": true,
+          "fechaLimiteConfirmacion": "2027-05-10",
+          "telefonoConfirmar": "300 555 0144"
+        }
+      },
+      {
+        "id": 48,
+        "tipo": "padrinos",
+        "contenido": {
+          "titulo": "Mis padrinos",
+          "grupos": [
+            {
+              "etiqueta": "Mis padrinos",
+              "personas": [
+                "Luisa Henao",
+                "Mateo Arango"
+              ]
+            }
+          ]
+        },
+        "activo": true
+      },
+      {
+        "id": 49,
+        "tipo": "vestimenta",
+        "contenido": {
+          "titulo": "Blanco y flores",
+          "nota": "Te sugerimos colores suaves de mañana de domingo.",
+          "permitidos": [
+            {
+              "nombre": "Rosa",
+              "colores": [
+                "#F1C6CF"
+              ]
+            },
+            {
+              "nombre": "Celeste",
+              "colores": [
+                "#C9DCEF"
+              ]
+            },
+            {
+              "nombre": "Crema",
+              "colores": [
+                "#F2E8D5"
+              ]
+            },
+            {
+              "nombre": "Verde suave",
+              "colores": [
+                "#CBD8BE"
+              ]
+            }
+          ],
+          "evitar": [
+            {
+              "nombre": "Blanco",
+              "color": "#FFFFFF"
+            }
+          ]
+        }
+      },
+      {
+        "id": 53,
+        "tipo": "historia",
+        "contenido": {
+          "titulo": "Mi camino",
+          "texto": "Este año aprendí en la catequesis que Jesús siempre está cerca. Cada sábado iba con mi abuela, repasábamos las oraciones en el camino y al volver compartíamos un pandebono. Ahora estoy lista para este día tan especial."
+        }
+      },
+      {
+        "id": 50,
+        "tipo": "regalos",
+        "contenido": {
+          "titulo": "Un detalle",
+          "texto": "Tu compañía es mi mejor regalo. Si quieres tener un detalle conmigo, puedes hacerlo aquí.",
+          "enlaces": [],
+          "datosTransferencia": "Nequi 300 555 0144 · Paula Henao"
+        }
+      },
+      {
+        "id": 54,
+        "tipo": "sobres",
+        "activo": false,
+        "contenido": {
+          "texto": ""
+        }
+      },
+      {
+        "id": 51,
+        "tipo": "info_importante",
+        "contenido": {
+          "nota": "",
+          "items": [
+            "Te pedimos llegar 15 minutos antes para acomodarnos con calma en la parroquia.",
+            "La invitación es personal y válida solo para los pases indicados.",
+            "Si vienes con niños, avísanos al confirmar para reservarles un lugar en el almuerzo."
+          ]
+        }
+      },
+      {
+        "id": 52,
+        "tipo": "faq",
+        "contenido": {
+          "items": [
+            {
+              "p": "¿Dónde es el desayuno?",
+              "r": "En la casa de los abuelos, a dos cuadras de la capilla."
+            },
+            {
+              "p": "¿Pueden ir niños?",
+              "r": "¡Claro! Los niños son bienvenidos."
+            }
+          ]
+        }
+      },
+      {
+        "id": 55,
+        "tipo": "musica",
+        "contenido": {
+          "src": "",
+          "titulo": ""
+        }
+      }
+    ],
+    "fechaLimiteConfirmacion": "2027-05-10",
+    "fotosSubidas": [],
+    "audioUrl": null,
+    "fondoUrl": null
+  },
+  "invitado": {
+    "codigo": "DEMO",
+    "tipo": "cupos",
+    "nombre": "Familia Restrepo",
+    "familia": "",
+    "mensaje": "",
+    "cupos": 2,
+    "miembros": [
+      {
+        "id": -1,
+        "nombre": "Familia Restrepo",
+        "estado": "pendiente",
+        "restriccion": "",
+        "comentario": "",
+        "es_acompanante": false
+      }
+    ]
+  }
+}

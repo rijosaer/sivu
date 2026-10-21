@@ -32,6 +32,10 @@ const DISENOS = {
   birrete: lazy(() => import("../disenos/birrete/Birrete")),
   medianoche: lazy(() => import("../disenos/medianoche/Medianoche")),
   osito: lazy(() => import("../disenos/osito/Osito")),
+  cielito: lazy(() => import("../disenos/cuento/cielito/Cielito")),
+  capillita: lazy(() => import("../disenos/cuento/capillita/Capillita")),
+  cometas: lazy(() => import("../disenos/cuento/cometas/Cometas")),
+  bosquecito: lazy(() => import("../disenos/cuento/bosquecito/Bosquecito")),
 };
 
 const MUESTRAS = {
@@ -52,9 +56,13 @@ const MUESTRAS = {
   birrete: () => import("./muestras/birrete.json"),
   medianoche: () => import("./muestras/medianoche.json"),
   osito: () => import("./muestras/osito.json"),
+  cielito: () => import("./muestras/cielito.json"),
+  capillita: () => import("./muestras/capillita.json"),
+  cometas: () => import("./muestras/cometas.json"),
+  bosquecito: () => import("./muestras/bosquecito.json"),
 };
 
-const NOMBRES = { jardin: "Jardín encantado", ensueno: "Ensueño", gala: "Gala", lazos: "Moños y perlas", coquette: "Coquette", paris: "París rosé", valle: "Valle de luna", "valle-claro": "Valle claro", eucalipto: "Eucalipto", luces: "Luces de verano", vals: "Vals lila", luz: "Luz de bautizo", confeti: "Confeti", dulce: "Dulce 30", birrete: "Birrete", medianoche: "Medianoche", osito: "Osito" };
+const NOMBRES = { jardin: "Jardín encantado", ensueno: "Ensueño", gala: "Gala", lazos: "Moños y perlas", coquette: "Coquette", paris: "París rosé", valle: "Valle de luna", "valle-claro": "Valle claro", eucalipto: "Eucalipto", luces: "Luces de verano", vals: "Vals lila", luz: "Luz de bautizo", confeti: "Confeti", dulce: "Dulce 30", birrete: "Birrete", medianoche: "Medianoche", osito: "Osito", cielito: "Cielito", capillita: "Capillita", cometas: "Cometas", bosquecito: "Bosquecito" };
 
 function temaDeUrl() {
   try {

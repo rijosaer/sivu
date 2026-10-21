@@ -35,6 +35,10 @@ const DISENOS_ALTERNATIVOS = {
   birrete: lazy(() => import("./disenos/birrete/Birrete")),
   medianoche: lazy(() => import("./disenos/medianoche/Medianoche")),
   osito: lazy(() => import("./disenos/osito/Osito")),
+  cielito: lazy(() => import("./disenos/cuento/cielito/Cielito")),
+  capillita: lazy(() => import("./disenos/cuento/capillita/Capillita")),
+  cometas: lazy(() => import("./disenos/cuento/cometas/Cometas")),
+  bosquecito: lazy(() => import("./disenos/cuento/bosquecito/Bosquecito")),
 };
 
 function useInvitationCode() {

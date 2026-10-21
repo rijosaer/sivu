@@ -22,7 +22,7 @@ export const TIPOS_EVENTO = [
 
 // Diseños con los que el sitio puede dibujar una invitación (columna
 // invitaciones.diseno). Tiene que coincidir con src/disenos del sitio.
-export const DISENOS = ["clasico", "jardin", "ensueno", "gala", "lazos", "coquette", "paris", "valle", "valle-claro", "celebracion", "celebracion-azul", "eucalipto", "luces", "vals", "luz", "confeti", "dulce", "birrete", "medianoche", "osito"];
+export const DISENOS = ["clasico", "jardin", "ensueno", "gala", "lazos", "coquette", "paris", "valle", "valle-claro", "celebracion", "celebracion-azul", "eucalipto", "luces", "vals", "luz", "confeti", "dulce", "birrete", "medianoche", "osito", "cielito", "capillita", "cometas", "bosquecito"];
 
 export const NOMBRE_TIPO_EVENTO = {
   boda: "Boda",
@@ -299,7 +299,61 @@ const TEMA_OSITO = [
   ["fuente-cuerpo", "Figtree"],
 ];
 
-const TEMAS_DISENO = { celebracion: TEMA_CELEBRACION, "celebracion-azul": TEMA_CELEBRACION_AZUL, valle: TEMA_VALLE, "valle-claro": TEMA_VALLE_CLARO, jardin: TEMA_JARDIN, ensueno: TEMA_ENSUENO, gala: TEMA_GALA, lazos: TEMA_LAZOS, coquette: TEMA_COQUETTE, paris: TEMA_PARIS, eucalipto: TEMA_EUCALIPTO, luces: TEMA_LUCES, vals: TEMA_VALS, luz: TEMA_LUZ, confeti: TEMA_CONFETI, dulce: TEMA_DULCE, birrete: TEMA_BIRRETE, medianoche: TEMA_MEDIANOCHE, osito: TEMA_OSITO };
+// Cielito (bautizo, cuento ilustrado): papel = cielo claro, principal = azul pajarito, claro = durazno de las nubes, oscuro = azul profundo, mármol = nube crema, sello = melocotón.
+const TEMA_CIELITO = [
+  ["color-paper", "#EAF2FA"],
+  ["color-ink", "#45382F"],
+  ["color-gold", "#6E95C2"],
+  ["color-gold-light", "#F6DCC4"],
+  ["color-gold-dark", "#3D5F86"],
+  ["color-marble", "#FFFBF3"],
+  ["color-seal", "#E0A27E"],
+  ["fuente-guion", "Playball"],
+  ["fuente-titulos", "Corben"],
+  ["fuente-cuerpo", "Atkinson Hyperlegible"],
+];
+
+// Capillita, Cometas y Bosquecito: cuentos ilustrados (comunión, confirmación, cumpleaños infantil).
+const TEMA_CAPILLITA = [
+  ["color-paper", "#F7F1E6"],
+  ["color-ink", "#3F3229"],
+  ["color-gold", "#2F5D9E"],
+  ["color-gold-light", "#F2D4C9"],
+  ["color-gold-dark", "#234574"],
+  ["color-marble", "#FFFDF8"],
+  ["color-seal", "#C8507A"],
+  ["fuente-guion", "Courgette"],
+  ["fuente-titulos", "Gelasio"],
+  ["fuente-cuerpo", "Source Sans 3"],
+];
+
+const TEMA_COMETAS = [
+  ["color-paper", "#FBE7D3"],
+  ["color-ink", "#3A2B2E"],
+  ["color-gold", "#D9603F"],
+  ["color-gold-light", "#F6C76A"],
+  ["color-gold-dark", "#7A3B4A"],
+  ["color-marble", "#FFF6EC"],
+  ["color-seal", "#8E7CC3"],
+  ["fuente-guion", "Caveat"],
+  ["fuente-titulos", "Bree Serif"],
+  ["fuente-cuerpo", "Hanken Grotesk"],
+];
+
+const TEMA_BOSQUECITO = [
+  ["color-paper", "#EEF3DF"],
+  ["color-ink", "#3B3426"],
+  ["color-gold", "#C8443A"],
+  ["color-gold-light", "#F2D27A"],
+  ["color-gold-dark", "#4E6B2F"],
+  ["color-marble", "#FFFBEE"],
+  ["color-seal", "#6FA3D6"],
+  ["fuente-guion", "Sniglet"],
+  ["fuente-titulos", "Baloo 2"],
+  ["fuente-cuerpo", "Lexend"],
+];
+
+const TEMAS_DISENO = { cielito: TEMA_CIELITO, capillita: TEMA_CAPILLITA, cometas: TEMA_COMETAS, bosquecito: TEMA_BOSQUECITO,  celebracion: TEMA_CELEBRACION, "celebracion-azul": TEMA_CELEBRACION_AZUL, valle: TEMA_VALLE, "valle-claro": TEMA_VALLE_CLARO, jardin: TEMA_JARDIN, ensueno: TEMA_ENSUENO, gala: TEMA_GALA, lazos: TEMA_LAZOS, coquette: TEMA_COQUETTE, paris: TEMA_PARIS, eucalipto: TEMA_EUCALIPTO, luces: TEMA_LUCES, vals: TEMA_VALS, luz: TEMA_LUZ, confeti: TEMA_CONFETI, dulce: TEMA_DULCE, birrete: TEMA_BIRRETE, medianoche: TEMA_MEDIANOCHE, osito: TEMA_OSITO };
 
 export function temaDeDiseno(diseno) {
   const tema = TEMAS_DISENO[diseno];

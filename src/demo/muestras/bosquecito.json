@@ -1,0 +1,199 @@
+{
+  "site": {
+    "invitacion": {
+      "slug": "plantillas/bosquecito",
+      "nombre": "Cumpleaños · Tomás 5 años",
+      "tipoEvento": "cumpleanos",
+      "diseno": "bosquecito"
+    },
+    "tema": {
+      "color-paper": "#EEF3DF",
+      "color-ink": "#3B3426",
+      "color-gold": "#C8443A",
+      "color-gold-light": "#F2D27A",
+      "color-gold-dark": "#4E6B2F",
+      "color-marble": "#FFFBEE",
+      "color-seal": "#6FA3D6",
+      "fuente-guion": "Sniglet",
+      "fuente-titulos": "Baloo 2",
+      "fuente-cuerpo": "Lexend"
+    },
+    "decoraciones": {
+      "scrollwork": null,
+      "bouquet": null,
+      "frame": null,
+      "column": null,
+      "divider": null
+    },
+    "ubicaciones": [],
+    "secciones": [
+      {
+        "id": 46,
+        "tipo": "welcome",
+        "contenido": {
+          "bienvenidaTexto": "¡Ven a mi fiesta!",
+          "novioEl": "Tomás",
+          "novioElla": "",
+          "fraseIntro": "¡Cumplo 5 años y los animalitos del bosque ya están preparando la fiesta! Ven a jugar conmigo.",
+          "padresTexto": "hijo de",
+          "padreElPadre": "Daniel Castro",
+          "padreElMadre": "Laura Peña",
+          "padreEllaPadre": "",
+          "padreEllaMadre": "",
+          "versiculo": "",
+          "versiculoCita": ""
+        }
+      },
+      {
+        "id": 47,
+        "tipo": "informacion_boda",
+        "contenido": {
+          "fecha": "2027-10-09T15:00:00-05:00",
+          "lugar": "Parque El Salitre · Kiosco 4",
+          "direccion": "Avenida 68 # 63-45, Bogotá",
+          "mapsUrl": "https://maps.google.com/?q=Parque+El+Salitre+Bogota",
+          "mapaEmbed": "",
+          "overline": "La fiesta",
+          "tituloSeccion": "La ceremonia",
+          "tituloItinerario": "El programa",
+          "cronogramaModo": "detallado",
+          "cronograma": [
+            {
+              "hora": "3:00 p. m.",
+              "titulo": "Llegada y juegos en el bosque"
+            },
+            {
+              "hora": "4:00 p. m.",
+              "titulo": "Show de títeres"
+            },
+            {
+              "hora": "4:45 p. m.",
+              "titulo": "Torta y canción"
+            },
+            {
+              "hora": "5:30 p. m.",
+              "titulo": "Piñata y sorpresas"
+            }
+          ],
+          "cronogramaMensaje": "Les compartiremos el programa más cerca de la fecha.",
+          "mostrarRestriccion": true,
+          "mostrarObservaciones": true,
+          "fechaLimiteConfirmacion": "2027-10-01",
+          "telefonoConfirmar": "300 555 0199"
+        }
+      },
+      {
+        "id": 48,
+        "tipo": "padrinos",
+        "contenido": {
+          "titulo": "Mis padrinos",
+          "grupos": []
+        },
+        "activo": false
+      },
+      {
+        "id": 49,
+        "tipo": "vestimenta",
+        "contenido": {
+          "titulo": "Ropa para jugar",
+          "nota": "Vamos a estar al aire libre: ropa cómoda, tenis y una chaqueta por si hace frío.",
+          "permitidos": [
+            {
+              "nombre": "Lo que quieras",
+              "colores": [
+                "#C8443A",
+                "#F2D27A",
+                "#6FA3D6"
+              ]
+            }
+          ],
+          "evitar": []
+        }
+      },
+      {
+        "id": 53,
+        "tipo": "historia",
+        "contenido": {
+          "titulo": "Cinco años",
+          "texto": "En estos cinco años aprendí a montar en bicicleta, a contar hasta cien y a cuidar mi huerta de fresas. Mi animal favorito es el zorro y por eso quise una fiesta en el bosque."
+        }
+      },
+      {
+        "id": 50,
+        "tipo": "regalos",
+        "contenido": {
+          "titulo": "Un detalle",
+          "texto": "Lo más importante es que vengas a jugar. Si quieres traer un detalle, ¡me encantan los libros de animales!",
+          "enlaces": [],
+          "datosTransferencia": ""
+        }
+      },
+      {
+        "id": 54,
+        "tipo": "sobres",
+        "activo": false,
+        "contenido": {
+          "texto": ""
+        }
+      },
+      {
+        "id": 51,
+        "tipo": "info_importante",
+        "contenido": {
+          "nota": "",
+          "items": [
+            "Te pedimos llegar 15 minutos antes para acomodarnos con calma en la parroquia.",
+            "La invitación es personal y válida solo para los pases indicados.",
+            "Si vienes con niños, avísanos al confirmar para reservarles un lugar en el almuerzo."
+          ]
+        }
+      },
+      {
+        "id": 52,
+        "tipo": "faq",
+        "contenido": {
+          "items": [
+            {
+              "p": "¿Los papás se quedan?",
+              "r": "Sí, hay café y onces para los grandes."
+            },
+            {
+              "p": "¿Y si llueve?",
+              "r": "El kiosco tiene techo; la fiesta sigue igual."
+            }
+          ]
+        }
+      },
+      {
+        "id": 55,
+        "tipo": "musica",
+        "contenido": {
+          "src": "",
+          "titulo": ""
+        }
+      }
+    ],
+    "fechaLimiteConfirmacion": "2027-10-01",
+    "fotosSubidas": [],
+    "audioUrl": null,
+    "fondoUrl": null
+  },
+  "invitado": {
+    "codigo": "DEMO",
+    "tipo": "cupos",
+    "nombre": "Familia Rojas",
+    "familia": "",
+    "mensaje": "",
+    "cupos": 2,
+    "miembros": [
+      {
+        "id": -1,
+        "nombre": "Familia Rojas",
+        "estado": "pendiente",
+        "restriccion": "",
+        "comentario": "",
+        "es_acompanante": false
+      }
+    ]
+  }
+}

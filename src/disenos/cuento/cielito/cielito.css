@@ -1,0 +1,32 @@
+/* Cielito: cielo pintado que atardece, cinta con pajaritos y nubecitas.
+   Letras propias: Playball (guion), Corben (títulos), Atkinson Hyperlegible
+   (texto). El tema puede cambiarlas. */
+.cu-cielito {
+  --f-guion: var(--fuente-guion, "Playball"), "Dancing Script", cursive;
+  --f-titulos: var(--fuente-titulos, "Corben"), Georgia, serif;
+  --f-cuerpo: var(--fuente-cuerpo, "Atkinson Hyperlegible"), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --sop-ancho: min(100%, 420px);
+  --sop-izq: 22%;
+  --sop-der: 22%;
+  --sop-arriba: 37%;
+  --sop-alto: 30%;
+  --sop-giro: -1deg;
+  --cu-invitado-dur: 3.6s;
+  --cu-texto-retraso: 5.4s;
+  --cuenta-n-arriba: 30%;
+  --cu-luz: linear-gradient(to bottom, transparent 0%, color-mix(in srgb, var(--nube) 30%, transparent) 30%, color-mix(in srgb, var(--claro) 45%, transparent) 70%, color-mix(in srgb, var(--sello) 55%, transparent) 100%);
+}
+.cu-cielito .cu-escenario { background: var(--papel); }
+.cu-cielito .cu-cuerpo { background: url("./arte/cielo-continuo.webp") center top / 100% auto repeat-y, var(--papel); }
+.cu-cielito .cu-viajando .cu-escenario { filter: drop-shadow(0 18px 26px var(--sombra)); }
+.cu-cielito .cu-union img { transform: scaleX(-1); }
+
+.cu-cielito .cu-escena-bienvenida { width: min(92%, 380px); margin-bottom: -6px; }
+.cu-cielito .cu-escena-ceremonia { width: min(62%, 240px); margin-bottom: 4px; }
+.cu-cielito .cu-escena-programa { width: min(100%, 380px); margin-top: 18px; }
+.cu-cielito .cu-escena-vestimenta { width: min(100%, 400px); margin-bottom: 4px; }
+.cu-cielito .cu-escena-regalos { width: min(46%, 180px); margin-bottom: 2px; }
+.cu-cielito .cu-escena-confirmar { width: min(56%, 220px); margin-bottom: -4px; }
+.cu-cielito [data-reveal] .cu-escena-confirmar { transform: translate(-70px, 24px) rotate(-8deg); }
+.cu-cielito .cu-cuenta-pieza img { margin-bottom: 4px; }
+.cu-cielito .cu-padrinos p { font-size: clamp(28px, 8.6vw, 34px); }

@@ -1,0 +1,41 @@
+/* Bosquecito: claro del bosque, letreros de madera, globos y hongos.
+   Letras propias: Sniglet (guion), Baloo 2 (títulos), Lexend (texto). */
+.cu-bosquecito {
+  --f-guion: var(--fuente-guion, "Sniglet"), "Baloo 2", system-ui, sans-serif;
+  --f-titulos: var(--fuente-titulos, "Baloo 2"), "Trebuchet MS", sans-serif;
+  --f-cuerpo: var(--fuente-cuerpo, "Lexend"), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --sop-ancho: min(100%, 400px);
+  --sop-izq: 15%;
+  --sop-der: 15%;
+  --sop-arriba: 33%;
+  --sop-alto: 40%;
+  --cu-invitado-dur: 3.2s;
+  --cu-texto-retraso: 4.4s;
+  --cuenta-n-arriba: 22%;
+  --cuenta-n-color: var(--nube);
+  --flor-petalo: var(--nube);
+  --flor-centro: var(--claro);
+  --cu-luz: linear-gradient(to bottom, transparent 0%, color-mix(in srgb, var(--claro) 18%, transparent) 50%, color-mix(in srgb, var(--claro) 40%, transparent) 100%);
+  font-size: 16.5px;
+}
+.cu-bosquecito .cu-cuerpo { background: url("./arte/fondo-continuo.webp") center top / 100% auto repeat-y, var(--papel); }
+.cu-bosquecito .cu-portada-nombre, .cu-bosquecito .cu-invitado-nombre, .cu-bosquecito .cu-final-gracias { font-weight: 800; letter-spacing: -.01em; }
+.cu-bosquecito .cu-ante { font-size: 21px; }
+.cu-bosquecito .cu-h2-soporte, .cu-bosquecito .cu-h2-libre { font-weight: 700; }
+.cu-bosquecito .cu-h2-soporte { color: color-mix(in srgb, var(--tinta) 85%, #5b3a1a); }
+.cu-bosquecito .cu-h2-libre::after { background: var(--principal); }
+.cu-bosquecito .cu-padrinos p, .cu-bosquecito .cu-firma { font-size: clamp(24px, 7vw, 28px); font-weight: 400; }
+.cu-bosquecito .cu-cuenta .n { text-shadow: 0 1px 3px rgba(40, 20, 10, .45); }
+.cu-bosquecito .cu-cuenta-pieza img { transform-origin: 50% 90%; animation: cu-globo 3.4s ease-in-out calc(var(--i) * -.8s) infinite alternate; }
+@keyframes cu-globo { from { rotate: -3deg; } to { rotate: 3deg; } }
+
+.cu-bosquecito .cu-escena-ceremonia { width: min(62%, 240px); margin-bottom: 4px; }
+.cu-bosquecito .cu-escena-programa { width: min(58%, 220px); margin-top: 16px; }
+.cu-bosquecito .cu-escena-vestimenta { width: min(56%, 220px); margin-bottom: 4px; }
+.cu-bosquecito .cu-escena-regalos { width: min(54%, 210px); margin-bottom: 4px; }
+.cu-bosquecito .cu-escena-confirmar { width: min(40%, 150px); margin-bottom: 2px; }
+.cu-bosquecito [data-reveal] .cu-escena-confirmar { transform: translate(-60px, 10px); }
+.cu-bosquecito .cu-adorno-hongo { width: 78px; animation: none; }
+.cu-bosquecito .cu-final-escena { aspect-ratio: 2.1 / 1; width: min(100%, 420px); }
+.cu-bosquecito .cu-final-figura { width: 100%; bottom: 0; animation: none; }
+.cu-bosquecito .cu-modal-figura { width: 70px; top: -14px; }

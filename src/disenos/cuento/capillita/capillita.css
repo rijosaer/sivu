@@ -1,0 +1,36 @@
+/* Capillita: pared encalada con buganvilias, placas de azulejo y materas.
+   Letras propias: Courgette (guion), Gelasio (títulos), Source Sans 3 (texto). */
+.cu-capillita {
+  --f-guion: var(--fuente-guion, "Courgette"), "Dancing Script", cursive;
+  --f-titulos: var(--fuente-titulos, "Gelasio"), Georgia, serif;
+  --f-cuerpo: var(--fuente-cuerpo, "Source Sans 3"), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --sop-ancho: min(100%, 400px);
+  --sop-izq: 17%;
+  --sop-der: 13%;
+  --sop-arriba: 33%;
+  --sop-alto: 38%;
+  --cu-invitado-dur: 3.4s;
+  --cu-texto-retraso: 4.2s;
+  --cuenta-n-arriba: 64%;
+  --cuenta-n-color: var(--nube);
+  --flor-petalo: color-mix(in srgb, var(--sello) 55%, white);
+  --flor-centro: var(--claro);
+  --cu-luz: linear-gradient(to bottom, transparent 0%, color-mix(in srgb, var(--claro) 25%, transparent) 50%, color-mix(in srgb, var(--claro) 55%, transparent) 100%);
+}
+.cu-capillita .cu-cuerpo { background: url("./arte/fondo-continuo.webp") center top / 100% auto repeat-y, var(--papel); }
+.cu-capillita .cu-h2-soporte { color: var(--hondo); font-weight: 600; }
+.cu-capillita .cu-h2-libre::after { background: var(--sello); }
+.cu-capillita .cu-capa-quieta { animation: none !important; }
+.cu-capillita .cu-cuenta .n { text-shadow: 0 1px 2px rgba(60, 30, 20, .55); }
+
+.cu-capillita .cu-escena-ceremonia { width: min(60%, 230px); margin-bottom: 6px; }
+.cu-capillita .cu-escena-programa { width: min(96%, 370px); margin-top: 16px; }
+.cu-capillita .cu-escena-vestimenta { width: min(44%, 170px); margin-bottom: 6px; }
+.cu-capillita .cu-escena-regalos { width: min(46%, 180px); margin-bottom: 4px; }
+.cu-capillita .cu-escena-confirmar { width: min(44%, 170px); margin-bottom: 2px; }
+.cu-capillita .cu-adorno-rama { width: 112px; }
+.cu-capillita .cu-adorno-der.cu-adorno-rama { right: -26px; }
+.cu-capillita .cu-adorno-izq.cu-adorno-rama { left: -26px; }
+.cu-capillita .cu-final-escena { aspect-ratio: 1 / 1.05; width: min(70%, 280px); }
+.cu-capillita .cu-final-figura { width: 70%; bottom: 0; animation: none; }
+.cu-capillita .cu-modal-figura { width: 92px; }

@@ -43,4 +43,8 @@ export const DISENOS = [
   { key: "birrete", nombre: "Birrete (vino y oro, graduación)" },
   { key: "medianoche", nombre: "Medianoche (esmeralda y oro art-déco, corporativo)" },
   { key: "osito", nombre: "Osito (osito, nubes y salvia, baby shower)" },
+  { key: "cielito", nombre: "Cielito (cuento ilustrado: bebé en canasta entre nubes, bautizo)" },
+  { key: "capillita", nombre: "Capillita (cuento ilustrado: pueblo y capilla, primera comunión)" },
+  { key: "cometas", nombre: "Cometas (cuento ilustrado: loma al atardecer, confirmación)" },
+  { key: "bosquecito", nombre: "Bosquecito (cuento ilustrado: picnic en el bosque, cumpleaños infantil)" },
 ];

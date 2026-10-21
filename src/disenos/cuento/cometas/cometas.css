@@ -1,0 +1,39 @@
+/* Cometas: cielo del atardecer al anochecer, banderines y cometas.
+   Letras propias: Caveat (guion), Bree Serif (títulos), Hanken Grotesk (texto). */
+.cu-cometas {
+  --f-guion: var(--fuente-guion, "Caveat"), "Kalam", cursive;
+  --f-titulos: var(--fuente-titulos, "Bree Serif"), Georgia, serif;
+  --f-cuerpo: var(--fuente-cuerpo, "Hanken Grotesk"), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --sop-ancho: min(100%, 420px);
+  --sop-izq: 30%;
+  --sop-der: 14%;
+  --sop-arriba: 30%;
+  --sop-alto: 30%;
+  --sop-giro: -2deg;
+  --cu-invitado-dur: 3.2s;
+  --cu-texto-retraso: 4.6s;
+  --cuenta-n-arriba: 18%;
+  --cuenta-n-color: var(--nube);
+  --flor-petalo: var(--nube);
+  --flor-centro: var(--principal);
+  --cu-luz: linear-gradient(to bottom, transparent 0%, color-mix(in srgb, var(--claro) 20%, transparent) 30%, color-mix(in srgb, var(--sello) 30%, transparent) 75%, color-mix(in srgb, var(--sello) 50%, transparent) 100%);
+}
+.cu-cometas .cu-cuerpo { background: url("./arte/fondo-continuo.webp") center top / 100% auto repeat-y, var(--papel); }
+.cu-cometas .cu-ante { font-weight: 700; font-size: 28px; }
+.cu-cometas .cu-portada-nombre, .cu-cometas .cu-final-gracias, .cu-cometas .cu-invitado-nombre, .cu-cometas .cu-padrinos p, .cu-cometas .cu-firma { font-weight: 700; }
+.cu-cometas .cu-h2-libre::after { background: var(--principal); }
+.cu-cometas .cu-cuenta .n { text-shadow: 0 1px 3px rgba(60, 20, 20, .5); }
+.cu-cometas .cu-cuenta-pieza:nth-child(odd) { animation-duration: 3.2s; }
+.cu-cometas .cu-cuenta-pieza img { transform-origin: 50% 20%; animation: cu-cometa 3.6s ease-in-out calc(var(--i) * -.7s) infinite alternate; }
+@keyframes cu-cometa { from { rotate: -4deg; } to { rotate: 5deg; } }
+
+.cu-cometas .cu-escena-ceremonia { width: min(76%, 300px); margin-bottom: 4px; }
+.cu-cometas .cu-escena-programa { width: min(80%, 310px); margin-top: 16px; }
+.cu-cometas .cu-escena-vestimenta { width: min(40%, 150px); margin-bottom: 6px; }
+.cu-cometas .cu-escena-regalos { width: min(52%, 200px); margin-bottom: 4px; }
+.cu-cometas .cu-escena-confirmar { width: min(70%, 270px); margin-bottom: -6px; }
+.cu-cometas [data-reveal] .cu-escena-confirmar { transform: translate(60px, -30px) rotate(8deg); }
+.cu-cometas .cu-adorno-diente { width: 62px; opacity: .95; }
+.cu-cometas .cu-final-escena { aspect-ratio: .62 / 1; width: min(62%, 260px); }
+.cu-cometas .cu-final-figura { width: 100%; bottom: 0; }
+.cu-cometas .cu-modal-figura { width: 150px; }

@@ -1,0 +1,231 @@
+{
+  "site": {
+    "invitacion": {
+      "slug": "plantillas/cielito",
+      "nombre": "Bautizo · Emilia",
+      "tipoEvento": "bautizo",
+      "diseno": "cielito"
+    },
+    "tema": {
+      "color-paper": "#EAF2FA",
+      "color-ink": "#45382F",
+      "color-gold": "#6E95C2",
+      "color-gold-light": "#F6DCC4",
+      "color-gold-dark": "#3D5F86",
+      "color-marble": "#FFFBF3",
+      "color-seal": "#E0A27E",
+      "fuente-guion": "Playball",
+      "fuente-titulos": "Corben",
+      "fuente-cuerpo": "Atkinson Hyperlegible"
+    },
+    "decoraciones": {
+      "scrollwork": null,
+      "bouquet": null,
+      "frame": null,
+      "column": null,
+      "divider": null
+    },
+    "ubicaciones": [],
+    "secciones": [
+      {
+        "id": 46,
+        "tipo": "welcome",
+        "contenido": {
+          "bienvenidaTexto": "Mi bautizo",
+          "novioEl": "Emilia",
+          "novioElla": "",
+          "fraseIntro": "Con el corazón lleno de gratitud queremos compartir contigo el día en que Emilia recibe el agua del bautismo y comienza su camino en la fe.",
+          "padresTexto": "hija de",
+          "padreElPadre": "Andrés Felipe Cárdenas",
+          "padreElMadre": "Mariana Ríos",
+          "padreEllaPadre": "",
+          "padreEllaMadre": "",
+          "versiculo": "Dejen que los niños vengan a mí, porque de los que son como ellos es el reino de los cielos.",
+          "versiculoCita": "Marcos 10, 14"
+        }
+      },
+      {
+        "id": 47,
+        "tipo": "informacion_boda",
+        "contenido": {
+          "fecha": "2027-06-12T10:30:00-05:00",
+          "lugar": "Parroquia San José de Calasanz",
+          "direccion": "Carrera 46 # 48-52, El Poblado, Medellín",
+          "mapsUrl": "https://maps.google.com/?q=Parroquia+San+Jos%C3%A9+de+Calasanz+Medell%C3%ADn",
+          "mapaEmbed": "",
+          "overline": "La ceremonia",
+          "tituloSeccion": "La ceremonia",
+          "tituloItinerario": "El programa",
+          "cronogramaModo": "detallado",
+          "cronograma": [
+            {
+              "hora": "10:30 a. m.",
+              "titulo": "Bautizo en la parroquia"
+            },
+            {
+              "hora": "11:45 a. m.",
+              "titulo": "Fotos en el atrio con los padrinos"
+            },
+            {
+              "hora": "1:00 p. m.",
+              "titulo": "Almuerzo en familia · Casa de los abuelos"
+            },
+            {
+              "hora": "3:30 p. m.",
+              "titulo": "Torta y sobremesa"
+            }
+          ],
+          "cronogramaMensaje": "Les compartiremos el programa más cerca de la fecha.",
+          "mostrarRestriccion": true,
+          "mostrarObservaciones": true,
+          "fechaLimiteConfirmacion": "2027-05-29",
+          "telefonoConfirmar": "300 555 0187"
+        }
+      },
+      {
+        "id": 48,
+        "tipo": "padrinos",
+        "contenido": {
+          "titulo": "Mis padrinos",
+          "grupos": [
+            {
+              "etiqueta": "Padrinos de bautismo",
+              "personas": [
+                "Carolina Cárdenas",
+                "Tomás Ríos"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": 49,
+        "tipo": "vestimenta",
+        "contenido": {
+          "titulo": "Fresco y luminoso",
+          "nota": "Te sugerimos tonos suaves, como el cielo de una mañana tranquila.",
+          "permitidos": [
+            {
+              "nombre": "Celeste",
+              "colores": [
+                "#CFE0F0"
+              ]
+            },
+            {
+              "nombre": "Durazno",
+              "colores": [
+                "#F4D2B8"
+              ]
+            },
+            {
+              "nombre": "Crema",
+              "colores": [
+                "#F3EAD8"
+              ]
+            },
+            {
+              "nombre": "Salvia",
+              "colores": [
+                "#C5D3BC"
+              ]
+            }
+          ],
+          "evitar": [
+            {
+              "nombre": "Blanco total",
+              "color": "#FFFFFF"
+            }
+          ]
+        }
+      },
+      {
+        "id": 53,
+        "tipo": "historia",
+        "contenido": {
+          "titulo": "Mi llegada",
+          "texto": "Llegué una madrugada de marzo y la casa se llenó de una calma nueva. Desde entonces mis papás me bañan con canciones, me leen cuentos junto a la ventana y guardan cada risa como un tesoro. Hoy quieren presentarme ante Dios rodeada de las personas que me han acompañado desde el principio."
+        }
+      },
+      {
+        "id": 50,
+        "tipo": "regalos",
+        "contenido": {
+          "titulo": "Un detalle para Emilia",
+          "texto": "Tu compañía y tus oraciones son el mejor regalo. Si quieres tener un detalle conmigo, puedes hacerlo aquí.",
+          "enlaces": [],
+          "datosTransferencia": "Nequi 300 555 0187 · Mariana Ríos"
+        }
+      },
+      {
+        "id": 54,
+        "tipo": "sobres",
+        "activo": false,
+        "contenido": {
+          "texto": ""
+        }
+      },
+      {
+        "id": 51,
+        "tipo": "info_importante",
+        "contenido": {
+          "nota": "",
+          "items": [
+            "Te pedimos llegar 15 minutos antes para acomodarnos con calma en la parroquia.",
+            "La invitación es personal y válida solo para los pases indicados.",
+            "Si vienes con niños, avísanos al confirmar para reservarles un lugar en el almuerzo."
+          ]
+        }
+      },
+      {
+        "id": 52,
+        "tipo": "faq",
+        "contenido": {
+          "items": [
+            {
+              "p": "¿Dónde será el almuerzo?",
+              "r": "En la casa de los abuelos de Emilia, a diez minutos de la parroquia. Al confirmar te enviamos la ubicación."
+            },
+            {
+              "p": "¿Puedo llevar acompañante?",
+              "r": "La invitación es para los pases indicados. Si tienes una duda, escríbenos."
+            },
+            {
+              "p": "¿Hay parqueadero?",
+              "r": "La parroquia tiene parqueadero propio y también hay cupos en la calle."
+            }
+          ]
+        }
+      },
+      {
+        "id": 55,
+        "tipo": "musica",
+        "contenido": {
+          "src": "",
+          "titulo": ""
+        }
+      }
+    ],
+    "fechaLimiteConfirmacion": "2027-04-03",
+    "fotosSubidas": [],
+    "audioUrl": null,
+    "fondoUrl": null
+  },
+  "invitado": {
+    "codigo": "DEMO",
+    "tipo": "cupos",
+    "nombre": "Lucía Herrera",
+    "familia": "",
+    "mensaje": "",
+    "cupos": 2,
+    "miembros": [
+      {
+        "id": -1,
+        "nombre": "Lucía Herrera",
+        "estado": "pendiente",
+        "restriccion": "",
+        "comentario": "",
+        "es_acompanante": false
+      }
+    ]
+  }
+}

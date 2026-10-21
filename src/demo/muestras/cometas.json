@@ -1,0 +1,223 @@
+{
+  "site": {
+    "invitacion": {
+      "slug": "plantillas/cometas",
+      "nombre": "Confirmación · Samuel",
+      "tipoEvento": "otro",
+      "diseno": "cometas"
+    },
+    "tema": {
+      "color-paper": "#FBE7D3",
+      "color-ink": "#3A2B2E",
+      "color-gold": "#D9603F",
+      "color-gold-light": "#F6C76A",
+      "color-gold-dark": "#7A3B4A",
+      "color-marble": "#FFF6EC",
+      "color-seal": "#8E7CC3",
+      "fuente-guion": "Caveat",
+      "fuente-titulos": "Bree Serif",
+      "fuente-cuerpo": "Hanken Grotesk"
+    },
+    "decoraciones": {
+      "scrollwork": null,
+      "bouquet": null,
+      "frame": null,
+      "column": null,
+      "divider": null
+    },
+    "ubicaciones": [],
+    "secciones": [
+      {
+        "id": 46,
+        "tipo": "welcome",
+        "contenido": {
+          "bienvenidaTexto": "Mi confirmación",
+          "novioEl": "Samuel",
+          "novioElla": "",
+          "fraseIntro": "Este año doy un paso que venía esperando. Me haría muy feliz que me acompañaras a celebrarlo.",
+          "padresTexto": "hijo de",
+          "padreElPadre": "Óscar Gómez",
+          "padreElMadre": "Natalia Suárez",
+          "padreEllaPadre": "",
+          "padreEllaMadre": "",
+          "versiculo": "Recibirán la fuerza del Espíritu Santo, que vendrá sobre ustedes.",
+          "versiculoCita": "Hechos 1, 8"
+        }
+      },
+      {
+        "id": 47,
+        "tipo": "informacion_boda",
+        "contenido": {
+          "fecha": "2027-08-14T16:00:00-05:00",
+          "lugar": "Parroquia Nuestra Señora del Carmen",
+          "direccion": "Calle 10 # 4-21, Barichara, Santander",
+          "mapsUrl": "https://maps.google.com/?q=Barichara",
+          "mapaEmbed": "",
+          "overline": "La ceremonia",
+          "tituloSeccion": "La ceremonia",
+          "tituloItinerario": "El programa",
+          "cronogramaModo": "detallado",
+          "cronograma": [
+            {
+              "hora": "4:00 p. m.",
+              "titulo": "Misa de confirmación"
+            },
+            {
+              "hora": "5:30 p. m.",
+              "titulo": "Elevada de cometas en el mirador"
+            },
+            {
+              "hora": "7:00 p. m.",
+              "titulo": "Cena en el mirador"
+            }
+          ],
+          "cronogramaMensaje": "Les compartiremos el programa más cerca de la fecha.",
+          "mostrarRestriccion": true,
+          "mostrarObservaciones": true,
+          "fechaLimiteConfirmacion": "2027-08-01",
+          "telefonoConfirmar": "300 555 0122"
+        }
+      },
+      {
+        "id": 48,
+        "tipo": "padrinos",
+        "contenido": {
+          "titulo": "Mis padrinos",
+          "grupos": [
+            {
+              "etiqueta": "Mi padrino de confirmación",
+              "personas": [
+                "Andrés Suárez"
+              ]
+            }
+          ]
+        },
+        "activo": true
+      },
+      {
+        "id": 49,
+        "tipo": "vestimenta",
+        "contenido": {
+          "titulo": "Casual y fresco",
+          "nota": "Ven cómodo: después de la misa subimos al mirador a elevar cometas.",
+          "permitidos": [
+            {
+              "nombre": "Blanco",
+              "colores": [
+                "#FBF7F0"
+              ]
+            },
+            {
+              "nombre": "Beige",
+              "colores": [
+                "#E6D3B3"
+              ]
+            },
+            {
+              "nombre": "Coral",
+              "colores": [
+                "#E9967A"
+              ]
+            },
+            {
+              "nombre": "Lila",
+              "colores": [
+                "#C7B8E0"
+              ]
+            }
+          ],
+          "evitar": [
+            {
+              "nombre": "Tacones altos",
+              "color": ""
+            }
+          ]
+        }
+      },
+      {
+        "id": 53,
+        "tipo": "historia",
+        "contenido": {
+          "titulo": "Mi decisión",
+          "texto": "Durante el último año me preparé con mi grupo de la parroquia. Entre retiros, conversaciones largas y muchas tardes de cometas en el mirador entendí que quería decir «sí» por mí mismo. Esta vez el paso lo doy yo."
+        }
+      },
+      {
+        "id": 50,
+        "tipo": "regalos",
+        "contenido": {
+          "titulo": "Un detalle",
+          "texto": "Tu compañía es lo más importante. Si quieres darme un detalle, puedes hacerlo aquí.",
+          "enlaces": [],
+          "datosTransferencia": "Nequi 300 555 0122 · Natalia Suárez"
+        }
+      },
+      {
+        "id": 54,
+        "tipo": "sobres",
+        "activo": false,
+        "contenido": {
+          "texto": ""
+        }
+      },
+      {
+        "id": 51,
+        "tipo": "info_importante",
+        "contenido": {
+          "nota": "",
+          "items": [
+            "Te pedimos llegar 15 minutos antes para acomodarnos con calma en la parroquia.",
+            "La invitación es personal y válida solo para los pases indicados.",
+            "Si vienes con niños, avísanos al confirmar para reservarles un lugar en el almuerzo."
+          ]
+        }
+      },
+      {
+        "id": 52,
+        "tipo": "faq",
+        "contenido": {
+          "items": [
+            {
+              "p": "¿Habrá cometas para todos?",
+              "r": "Sí, llevaremos cometas; si quieres traer la tuya, ¡mejor!"
+            },
+            {
+              "p": "¿Hay parqueadero?",
+              "r": "Hay parqueadero en la plaza principal, a una cuadra de la parroquia."
+            }
+          ]
+        }
+      },
+      {
+        "id": 55,
+        "tipo": "musica",
+        "contenido": {
+          "src": "",
+          "titulo": ""
+        }
+      }
+    ],
+    "fechaLimiteConfirmacion": "2027-08-01",
+    "fotosSubidas": [],
+    "audioUrl": null,
+    "fondoUrl": null
+  },
+  "invitado": {
+    "codigo": "DEMO",
+    "tipo": "cupos",
+    "nombre": "Valeria Ortiz",
+    "familia": "",
+    "mensaje": "",
+    "cupos": 2,
+    "miembros": [
+      {
+        "id": -1,
+        "nombre": "Valeria Ortiz",
+        "estado": "pendiente",
+        "restriccion": "",
+        "comentario": "",
+        "es_acompanante": false
+      }
+    ]
+  }
+}
