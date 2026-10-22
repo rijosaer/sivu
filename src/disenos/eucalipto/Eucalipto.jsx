@@ -4,21 +4,25 @@ import RSVP from "../../components/RSVP";
 import {
   partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer,
 } from "../comun";
-import { EuRama, EuTallo, EuHojas, EuRamito, EuAnillos, EuCopas, EuSello, EuSobre, EuOjal, EuHilo } from "./arte";
+import {
+  EuRama, EuTallo, EuRamito, EuAnillos, EuCopas, EuSobre, EuOjal, EuHilo,
+  EuVara, EuHojita, EuCinta, EuNudo, EuCintaIniciales, EuHojaBoton, EuGuirnalda,
+} from "./arte";
 
 // Diseño «Eucalipto»: boda de jardín romántica y fresca. Rosas blancas,
-// peonías, gipsofila y eucalipto plateado sobre papel crema.
-// - Entrada «cortina de flores»: dos grandes ramas cubren la pantalla, una
-//   desde cada lado; entre ellas, un medallón con los nombres y «Invitación
-//   especial para…». Al tocar, las ramas se abren hacia los lados con
-//   suavidad y se quedan asomando en los bordes de la portada.
+// peonías, gipsofila y eucalipto azul plata sobre papel gris perla.
+// - Entrada «cortina de flores»: dos grandes ramas cubren la pantalla, atadas
+//   por una cinta de lino con nudo. De una vara de eucalipto cuelga, meciéndose,
+//   la etiqueta con los nombres; a su lado, la etiquetita del invitado con su
+//   nombre a mano y una hoja por cada lugar. «Tira de la cinta»: el nudo se
+//   desata, la cinta se corre y las ramas se abren a los lados.
 // - Cuerpo: un tallo de eucalipto baja por el centro de la página y cada
 //   sección cuelga de él como una etiqueta de papel de algodón con borde
 //   rasgado, ojal de metal e hilo fino anudado al tallo. Las etiquetas se
 //   inclinan un poco, alternando, y se mecen al entrar en pantalla.
-// Colores del tema: principal = verde eucalipto, claro = salvia pálido,
-// oscuro = eucalipto profundo, papel = crema, mármol = blanco algodón,
-// sello = oro viejo. Todo el color de marca sale del tema.
+// Colores del tema: principal = azul eucalipto, claro = plata pálida,
+// oscuro = azul pizarra, papel = gris perla, mármol = blanco algodón,
+// sello = champaña (lino, hilo y metal). Todo el color de marca sale del tema.
 
 const FUENTES =
   "https://fonts.googleapis.com/css2?family=Allura&family=Gilda+Display&family=Mulish:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap";
@@ -67,7 +71,7 @@ const Icono = {
 };
 
 // Etiqueta colgada del tallo: hilo anudado, ojal y papel de algodón rasgado.
-function Etiqueta({ i, id, guion, titulo, arte, className = "", children }) {
+function Etiqueta({ i, id, titulo, arte, className = "", children }) {
   return (
     <section
       className={`eu-colgante ${className}`}
@@ -80,13 +84,27 @@ function Etiqueta({ i, id, guion, titulo, arte, className = "", children }) {
       <div className="eu-sombra">
         <div className="eu-papel" style={{ clipPath: BORDES[i % BORDES.length] }}>
           {arte}
-          {guion && <p className="eu-guion">{guion}</p>}
-          <h2 className="eu-h2" id={id}>{titulo}</h2>
-          <EuHojas className="eu-filete" />
+          <h2 className="eu-h2" id={id}><EuHojita className="eu-h2-hoja" /><span>{titulo}</span></h2>
           {children}
         </div>
       </div>
     </section>
+  );
+}
+
+// Lugares reservados: una hojita de eucalipto por cada uno, que brotan
+// contadas, y el número escrito.
+function Lugares({ n, className = "" }) {
+  if (!n) return null;
+  return (
+    <p className={`eu-lugares ${className}`}>
+      <span className="eu-lugares-hojas" aria-hidden="true">
+        {Array.from({ length: Math.min(n, 10) }, (_, k) => (
+          <EuHojita key={k} className="eu-hojita" style={{ "--k": k, "--g": `${(k % 2 ? 1 : -1) * (14 + (k % 3) * 6)}deg` }} />
+        ))}
+      </span>
+      <span>{n} {n === 1 ? "lugar" : "lugares"} para ti</span>
+    </p>
   );
 }
 
@@ -164,7 +182,7 @@ export default function Eucalipto({ site, contenidoDe, invitacion, onEnviarRSVP,
     if (fase !== "cerrada") return;
     setFase("abriendo");
     const reducido = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    setTimeout(() => setFase("abierta"), reducido ? 0 : 1900);
+    setTimeout(() => setFase("abierta"), reducido ? 0 : 2500);
     audioRef.current?.play().then(() => setSonando(true)).catch(() => {});
   }
   function alternarMusica() {
@@ -194,18 +212,8 @@ export default function Eucalipto({ site, contenidoDe, invitacion, onEnviarRSVP,
   // Etiquetas en orden; solo las que tienen contenido. El índice alterna la
   // inclinación y el borde rasgado.
   const etiquetas = [
-    partes && {
-      id: "eu-cuenta", guion: "Contando los días", titulo: "Faltan",
-      cuerpo: cuenta ? (
-        <div className="eu-cuenta" role="timer" aria-labelledby="eu-cuenta">
-          {[["dias", "días"], ["horas", "horas"], ["min", "min"], ["seg", "seg"]].map(([k, l]) => (
-            <div key={k}><span className="n">{cuenta[k]}</span><span className="l">{l}</span></div>
-          ))}
-        </div>
-      ) : <p className="eu-llego">¡Llegó el gran día!</p>,
-    },
     (padresElla.length > 0 || padresEl.length > 0) && {
-      id: "eu-padres", guion: welcome.padresTexto || "Con la bendición de", titulo: "Nuestros padres",
+      id: "eu-padres", titulo: welcome.padresTexto || "Nuestros padres",
       cuerpo: (
         <div className="eu-padres">
           {padresElla.length > 0 && (
@@ -218,7 +226,7 @@ export default function Eucalipto({ site, contenidoDe, invitacion, onEnviarRSVP,
       ),
     },
     (partes || lugar) && {
-      id: "eu-lugar", guion: info.overline || "La ceremonia", titulo: info.tituloSeccion || "Cuándo y dónde",
+      id: "eu-lugar", titulo: info.tituloSeccion || "Cuándo y dónde",
       arte: <EuAnillos className="eu-arte eu-arte-anillos" />,
       cuerpo: (
         <>
@@ -243,7 +251,7 @@ export default function Eucalipto({ site, contenidoDe, invitacion, onEnviarRSVP,
       ),
     },
     (cronograma.length > 0 || mensajePrograma) && {
-      id: "eu-programa", guion: "Celebremos juntos", titulo: info.tituloItinerario || "Itinerario",
+      id: "eu-programa", titulo: info.tituloItinerario || "Itinerario",
       arte: <EuCopas className="eu-arte eu-arte-copas" />,
       cuerpo: cronograma.length > 0 ? (
         <ol className="eu-programa">
@@ -252,7 +260,7 @@ export default function Eucalipto({ site, contenidoDe, invitacion, onEnviarRSVP,
       ) : <p className="eu-texto">{mensajePrograma}</p>,
     },
     activo("vestimenta") && (vestimenta.titulo || permitidos.length > 0 || evitar.length > 0) && {
-      id: "eu-vestimenta", guion: "Código de vestimenta", titulo: vestimenta.titulo || "Vestimenta",
+      id: "eu-vestimenta", titulo: vestimenta.titulo || "Vestimenta",
       cuerpo: (
         <>
           {vestimenta.nota && <p className="eu-texto">{vestimenta.nota}</p>}
@@ -266,7 +274,7 @@ export default function Eucalipto({ site, contenidoDe, invitacion, onEnviarRSVP,
       ),
     },
     activo("padrinos") && grupos.length > 0 && {
-      id: "eu-padrinos", guion: "Nos acompañan", titulo: padrinos.titulo || "Padrinos",
+      id: "eu-padrinos", titulo: padrinos.titulo || "Padrinos",
       cuerpo: (
         <div className="eu-grupos">
           {grupos.map((g, k) => (
@@ -279,7 +287,7 @@ export default function Eucalipto({ site, contenidoDe, invitacion, onEnviarRSVP,
       ),
     },
     activo("historia") && historia.texto && {
-      id: "eu-historia", guion: "Así empezó todo", titulo: historia.titulo || "Nuestra historia",
+      id: "eu-historia", titulo: historia.titulo || "Nuestra historia",
       cuerpo: (
         <div className="eu-historia">
           <p>{historia.texto}</p>
@@ -288,7 +296,7 @@ export default function Eucalipto({ site, contenidoDe, invitacion, onEnviarRSVP,
       ),
     },
     fotos.length > 0 && {
-      id: "eu-fotos", guion: fotosSec.subtitulo || "Momentos", titulo: fotosSec.titulo || "Nosotros",
+      id: "eu-fotos", titulo: fotosSec.titulo || "Nosotros",
       cuerpo: (
         <div className="eu-fotos">
           {fotos.slice(0, 4).map((f, k) => <img key={f} src={f} alt={`Foto ${k + 1} de ${nombres.join(" y ")}`} loading="lazy" />)}
@@ -296,7 +304,7 @@ export default function Eucalipto({ site, contenidoDe, invitacion, onEnviarRSVP,
       ),
     },
     activo("sobres") && sobres.texto && {
-      id: "eu-sobres", guion: "Un detalle", titulo: "Lluvia de sobres",
+      id: "eu-sobres", titulo: "Lluvia de sobres",
       arte: (
         <div className="eu-lluvia" aria-hidden="true">
           <EuSobre className="s1" /><EuSobre className="s2" /><EuSobre className="s3" />
@@ -305,7 +313,7 @@ export default function Eucalipto({ site, contenidoDe, invitacion, onEnviarRSVP,
       cuerpo: <p className="eu-texto">{sobres.texto}</p>,
     },
     activo("regalos") && (regalos.texto || enlaces.length > 0 || regalos.datosTransferencia) && {
-      id: "eu-regalos", guion: "Con cariño", titulo: regalos.titulo || "Mesa de regalos",
+      id: "eu-regalos", titulo: regalos.titulo || "Mesa de regalos",
       cuerpo: (
         <>
           {regalos.texto && <p className="eu-texto">{regalos.texto}</p>}
@@ -324,7 +332,7 @@ export default function Eucalipto({ site, contenidoDe, invitacion, onEnviarRSVP,
       ),
     },
     activo("info_importante") && (puntos.length > 0 || importante.nota) && {
-      id: "eu-info", guion: "Ten presente", titulo: "Información importante",
+      id: "eu-info", titulo: "Información importante",
       cuerpo: (
         <>
           {puntos.length > 0 && <ul className="eu-lista">{puntos.map((t, k) => <li key={k}>{t}</li>)}</ul>}
@@ -333,7 +341,7 @@ export default function Eucalipto({ site, contenidoDe, invitacion, onEnviarRSVP,
       ),
     },
     activo("faq") && preguntas.length > 0 && {
-      id: "eu-faq", guion: "Por si te lo preguntas", titulo: "Preguntas frecuentes",
+      id: "eu-faq", titulo: "Preguntas frecuentes",
       cuerpo: (
         <div className="eu-faq">
           {preguntas.map((f, k) => <details key={k}><summary>{f.p}</summary><p>{f.r}</p></details>)}
@@ -341,11 +349,11 @@ export default function Eucalipto({ site, contenidoDe, invitacion, onEnviarRSVP,
       ),
     },
     confirmar && {
-      id: "eu-confirmar", guion: "¿Nos acompañas?", titulo: "Confirma tu asistencia", className: "eu-rsvp",
-      arte: <EuSello iniciales={iniciales} className="eu-arte eu-arte-sello" />,
+      id: "eu-confirmar", titulo: "Confirma tu asistencia", className: "eu-rsvp",
+      arte: <EuCintaIniciales iniciales={iniciales} className="eu-arte eu-arte-cinta" />,
       cuerpo: (
         <>
-          {pases > 0 && <p className="eu-pases eu-pases-claro">{pases} {pases === 1 ? "pase reservado" : "pases reservados"} para ti</p>}
+          <Lugares n={pases} className="eu-lugares-rsvp" />
           {confirmar.href ? (
             <a className="eu-btn eu-btn-grande" href={confirmar.href} target="_blank" rel="noopener noreferrer">
               {confirmar.texto} <b>{confirmar.grande}</b>
@@ -364,8 +372,8 @@ export default function Eucalipto({ site, contenidoDe, invitacion, onEnviarRSVP,
       {audioSrc && <audio ref={audioRef} src={audioSrc} loop preload="none" />}
       {audioSrc && abierta && (
         <button className="eu-musica" type="button" aria-pressed={sonando} onClick={alternarMusica} aria-label={sonando ? "Pausar música" : "Reproducir música"}>
-          {sonando ? Icono.pausa : Icono.musica}
-          <span>{sonando ? "Pausar" : "Música"}</span>
+          <EuHojaBoton className="eu-musica-hoja" />
+          <span className="eu-musica-icono">{sonando ? Icono.pausa : Icono.musica}</span>
         </button>
       )}
 
@@ -378,25 +386,41 @@ export default function Eucalipto({ site, contenidoDe, invitacion, onEnviarRSVP,
         </div>
 
         {fase !== "abierta" && (
-          <div className="eu-entrada" onClick={abrir} aria-hidden={fase !== "cerrada"}>
-            <div className="eu-medallon">
-              {invitacion?.nombre ? (
-                <>
-                  <p className="eu-k">Invitación especial para</p>
-                  <p className="eu-invitado">{invitacion.nombre}</p>
-                  {pases > 0 && <span className="eu-pases">{pases} {pases === 1 ? "pase reservado" : "pases reservados"}</span>}
-                </>
-              ) : (
-                <p className="eu-k">{welcome.bienvenidaTexto || "Nuestra boda"}</p>
+          <div className="eu-entrada" aria-hidden={fase !== "cerrada"}>
+            <div className="eu-colgador">
+              <EuVara className="eu-vara" />
+              <div className="eu-tag eu-tag-novios">
+                <EuHilo className="eu-hilo" />
+                <EuOjal className="eu-ojal" />
+                <div className="eu-sombra">
+                  <div className="eu-papel" style={{ clipPath: BORDES[0] }}>
+                    <p className="eu-tag-ante">{welcome.bienvenidaTexto || "Nos casamos"}</p>
+                    <p className="eu-tag-nombres">
+                      {nombres[0]}{nombres[1] && <><span className="eu-y">&amp;</span>{nombres[1]}</>}
+                    </p>
+                    {partes && <p className="eu-tag-fecha">{partes.diaDos} · {partes.mesNum} · {partes.anio}</p>}
+                  </div>
+                </div>
+              </div>
+              {invitacion?.nombre && (
+                <div className="eu-tag eu-tag-invitado">
+                  <span className="eu-tag-hilo" />
+                  <EuOjal className="eu-ojal" />
+                  <div className="eu-sombra">
+                    <div className="eu-papel" style={{ clipPath: BORDES[1] }}>
+                      <p className="eu-para">para</p>
+                      <p className="eu-invitado">{invitacion.nombre}</p>
+                      <Lugares n={pases} />
+                    </div>
+                  </div>
+                </div>
               )}
-              <EuHojas className="eu-filete" />
-              <p className="eu-medallon-nombres">
-                {nombres[0]}{nombres[1] && <><span className="eu-y">&amp;</span>{nombres[1]}</>}
-              </p>
-              {partes && <p className="eu-medallon-fecha">{partes.diaDos} · {partes.mesNum} · {partes.anio}</p>}
             </div>
-            <button type="button" className="eu-abrir" onClick={(e) => { e.stopPropagation(); abrir(); }} disabled={fase !== "cerrada"}>
-              Toca para abrir
+            <button type="button" className="eu-cinta" onClick={abrir} disabled={fase !== "cerrada"} aria-label="Tira de la cinta para abrir la invitación">
+              <span className="eu-cinta-banda eu-cinta-izq"><EuCinta /></span>
+              <span className="eu-cinta-banda eu-cinta-der"><EuCinta espejo /></span>
+              <EuNudo className="eu-nudo" />
+              <span className="eu-cinta-texto">Tira de la cinta</span>
             </button>
           </div>
         )}
@@ -422,18 +446,45 @@ export default function Eucalipto({ site, contenidoDe, invitacion, onEnviarRSVP,
 
       {abierta && (
         <main className="eu-cuerpo">
+          {partes && (
+            <section className="eu-cuenta" aria-labelledby="eu-cuenta-t" data-reveal style={{ "--incl": "0deg" }}>
+              <h2 className="eu-h2" id="eu-cuenta-t"><EuHojita className="eu-h2-hoja" /><span>{cuenta ? "Faltan" : "¡Llegó el gran día!"}</span></h2>
+              {cuenta && (
+                <div className="eu-guirnalda" role="timer" aria-labelledby="eu-cuenta-t">
+                  <EuGuirnalda className="eu-guirnalda-hilo" />
+                  {[["dias", "días"], ["horas", "horas"], ["min", "minutos"], ["seg", "segundos"]].map(([k, l], j) => (
+                    <div
+                      key={k}
+                      className="eu-mini"
+                      style={{
+                        "--x": `${(EuGuirnalda.nudos[j][0] / 360) * 100}%`,
+                        "--y": EuGuirnalda.nudos[j][1],
+                        "--largo": `${[14, 6, 20, 10][j]}px`,
+                        "--d": `${-j * 0.9}s`,
+                      }}
+                    >
+                      <span className="eu-mini-hilo" />
+                      <div className="eu-mini-papel">
+                        <span className="n">{String(cuenta[k]).padStart(2, "0")}</span>
+                        <span className="l">{l}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          )}
           <div className="eu-colgantes" ref={colgantesRef}>
             <div className="eu-tallo" aria-hidden="true">
               {Array.from({ length: tramos }, (_, k) => <EuTallo key={k} espejo={k % 2 === 1} />)}
             </div>
-            <EuRamito className="eu-ramito-arriba" />
             {etiquetas.map((e, k) => (
-              <Etiqueta key={e.id} i={k} id={e.id} guion={e.guion} titulo={e.titulo} arte={e.arte} className={e.className}>
+              <Etiqueta key={e.id} i={k} id={e.id} titulo={e.titulo} arte={e.arte} className={e.className}>
                 {e.cuerpo}
               </Etiqueta>
             ))}
           </div>
-          <footer className="eu-final">
+          <footer className="eu-final" data-reveal style={{ "--incl": "1.2deg" }}>
             <EuRamito className="eu-ramito-final" />
             <p className="eu-te-esperamos">¡Los esperamos!</p>
             {nombres.length > 0 && <p className="eu-texto">Con cariño, {nombres.map((n) => n.split(" ")[0]).join(" & ")}</p>}
@@ -445,9 +496,9 @@ export default function Eucalipto({ site, contenidoDe, invitacion, onEnviarRSVP,
 
       {rsvpAbierto && invitacion && (
         <div className="eu-modal" role="dialog" aria-modal="true" aria-label="Confirmar asistencia" onClick={(e) => e.target === e.currentTarget && setRsvpAbierto(false)}>
-          <div className="eu-modal-caja">
-            <button type="button" className="eu-cerrar" onClick={() => setRsvpAbierto(false)} aria-label="Cerrar">×</button>
-            <EuHojas className="eu-filete eu-modal-hojas" />
+          <div className="eu-modal-caja" style={{ clipPath: BORDES[2] }}>
+            <button type="button" className="eu-cerrar" onClick={() => setRsvpAbierto(false)} aria-label="Cerrar"><span aria-hidden="true">×</span></button>
+            <EuCintaIniciales iniciales={iniciales} className="eu-modal-cinta" />
             <RSVP
               invitacion={invitacion}
               fechaLimite={info.fechaLimiteConfirmacion || site.fechaLimiteConfirmacion}

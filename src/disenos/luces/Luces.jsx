@@ -4,21 +4,29 @@ import RSVP from "../../components/RSVP";
 import {
   partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer,
 } from "../comun";
-import { LuCielo, LuGuirnalda, LuVela, LuFlores, LuMesa, LuFilete, LuBorla, Icono } from "./arte";
+import {
+  LuMesaCenital, LuPlato, LuCubierto, LuGuirnalda, LuVela, LuFlores, LuPortavela, LuLlama, LuBrindis,
+  LuBombillaBoton, LuBorla, Icono,
+} from "./arte";
 
 // Diseño «Luces de verano»: boda de noche cálida al aire libre, con mantel
 // de lino crema, luces colgantes, velas y flores blancas.
-// - Entrada: cielo de atardecer (durazno → azul polvo) con ramas en silueta y
-//   una guirnalda de bombillas apagadas. Un cordel con borla invita a «Tira
-//   para encender»: al tocarlo el cielo pasa a crepúsculo, las bombillas se
-//   encienden una a una y aparecen los nombres con el botón «Entrar».
+// - Entrada: la mesa larga del banquete vista desde arriba (cenital): mantel
+//   de lino, puestos con plato y cubiertos, camino de olivo y flores con
+//   velas apagadas y tres guirnaldas de bombillas apagadas que la cruzan. En
+//   la cabecera, el plato del invitado con su tarjeta de puesto. Un cordel
+//   con borla invita a «Tira para encender»: las bombillas se prenden una a
+//   una, la luz pasa de fría a cálida, se encienden las velas y la carta de
+//   la cena se posa en la mesa con los nombres y «Tomar asiento».
 // - Cuerpo: claro, sobre lino. Cada sección es una tarjeta de mesa doblada
-//   (place card) con su vela encendida al lado; el programa es un «menú de
-//   cena» alto con tiempos; la guirnalda reaparece como separador y se
-//   enciende al entrar en pantalla. Cierra con la mesa larga (LuMesa).
+//   (place card) que se posa con un destello de bombilla; los títulos van en
+//   caligrafía de menú con un filete de luces; la cuenta regresiva son cuatro
+//   velas que se consumen; el programa es un «menú de cena»; cierra con un
+//   brindis de copas bajo la guirnalda.
 // Colores del tema: principal = ámbar, claro = ámbar claro, oscuro = ámbar
 // tostado, papel = lino crema, mármol = cartulina de las tarjetas, sello =
-// azul crepúsculo. Todo el color de marca sale del tema.
+// azul crepúsculo (velo frío de la entrada). Todo el color de marca sale del
+// tema.
 
 const FUENTES =
   "https://fonts.googleapis.com/css2?family=Gloock&family=Petit+Formal+Script&family=Raleway:wght@300;400;500;600&display=swap";
@@ -27,16 +35,28 @@ const TIEMPOS = ["Primer", "Segundo", "Tercer", "Cuarto", "Quinto", "Sexto", "S�
 
 const reducido = () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+// Título de sección: caligrafía de carta de cena con un filete de bombillas
+// que se encienden cuando la tarjeta se posa.
+function Titulo({ id, sobre, children }) {
+  return (
+    <>
+      <h2 className="lu-h2" id={id}>{children}</h2>
+      <div className="lu-filete-luces" aria-hidden="true"><LuGuirnalda n={5} ancho={140} alto={5} r={2.6} /></div>
+      {sobre && <p className="lu-sobre">{sobre}</p>}
+    </>
+  );
+}
+
 // Tarjeta de mesa doblada: cara de cartulina con la sombra del pliegue arriba,
-// sombra de contacto sobre el mantel y una vela encendida a un lado.
-function Tarjeta({ etiqueta, titulo, id, vela = "der", inclina = 0, className = "", children }) {
+// sombra de contacto sobre el mantel, una vela encendida a un lado y el
+// destello de bombilla que salta cuando se posa.
+function Tarjeta({ titulo, sobre, id, vela = "der", inclina = 0, className = "", children }) {
   return (
     <section className={`lu-tarjeta ${className}`} style={{ "--inclina": `${inclina}deg` }} aria-labelledby={titulo ? id : undefined} data-reveal>
       <div className="lu-tarjeta-cara">
+        <span className="lu-destello" aria-hidden="true" />
         {vela && <span className={`lu-tarjeta-brillo lu-brillo-${vela}`} aria-hidden="true" />}
-        {etiqueta && <p className="lu-etiqueta">{etiqueta}</p>}
-        {titulo && <h2 className="lu-h2" id={id}>{titulo}</h2>}
-        {titulo && <LuFilete />}
+        {titulo && <Titulo id={id} sobre={sobre}>{titulo}</Titulo>}
         {children}
       </div>
       {vela && <LuVela className={`lu-tarjeta-vela lu-vela-${vela}`} />}
@@ -52,15 +72,67 @@ function Separador() {
   );
 }
 
-// Entrada: cielo de atardecer, guirnalda apagada y cordel con borla.
+// El puesto del invitado: plato visto desde arriba con su tarjeta de puesto
+// doblada encima y, debajo, un cubierto por cada pase.
+function Puesto({ nombre, pases, className = "" }) {
+  return (
+    <div className={`lu-puesto ${className}`}>
+      <div className="lu-puesto-mesa">
+        <LuPlato className="lu-puesto-plato" />
+        {nombre && (
+          <div className="lu-place">
+            <span className="lu-place-dorso" aria-hidden="true" />
+            <div className="lu-place-cara">
+              <p className="lu-place-nombre">{nombre}</p>
+            </div>
+          </div>
+        )}
+      </div>
+      {nombre && pases > 0 && (
+        <p className="lu-cubiertos">
+          <span className="lu-cubiertos-fila" aria-hidden="true">
+            {Array.from({ length: Math.min(pases, 6) }, (_, i) => <LuCubierto key={i} />)}
+          </span>
+          <span>{pases} {pases === 1 ? "puesto" : "puestos"} en nuestra mesa</span>
+        </p>
+      )}
+    </div>
+  );
+}
+
+// Cuenta regresiva: cuatro velas en candeleros de latón que se consumen
+// (días sobre un año, horas sobre 24, minutos y segundos sobre 60).
+const VELAS = [["dias", "días", 365], ["horas", "horas", 24], ["min", "minutos", 60], ["seg", "segundos", 60]];
+function CuentaVelas({ cuenta }) {
+  return (
+    <div className="lu-velas" role="timer" aria-labelledby="lu-cuenta">
+      {VELAS.map(([k, l, max]) => {
+        const f = Math.max(0.1, Math.min(1, Number(cuenta[k]) / max));
+        return (
+          <div key={k} className={`lu-vc lu-vc-${k}`} style={{ "--f": f.toFixed(3) }}>
+            <div className="lu-vc-cuerpo">
+              <LuLlama className="lu-vc-llama" />
+              <span className="lu-vc-cera" />
+            </div>
+            <LuPortavela className="lu-vc-base" />
+            <span className="lu-vc-n">{cuenta[k]}</span>
+            <span className="lu-vc-l">{l}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// Entrada: la mesa vista desde arriba, con guirnaldas apagadas y el cordel.
 function Entrada({ welcome, partes, invitacion, onTirar, onEntrar }) {
-  // fase 0: atardecer, esperando el tirón · 1: encendiendo · 2: nombres y «Entrar».
+  // fase 0: luz fría, esperando el tirón · 1: encendiendo · 2: carta y «Tomar asiento».
   const [fase, setFase] = useState(0);
   const pases = pasesDe(invitacion);
   const nombres = [welcome.novioEl, welcome.novioElla].filter(Boolean);
   useEffect(() => {
     if (fase !== 1) return;
-    const t = setTimeout(() => setFase(2), reducido() ? 50 : 2900);
+    const t = setTimeout(() => setFase(2), reducido() ? 50 : 3300);
     return () => clearTimeout(t);
   }, [fase]);
 
@@ -72,28 +144,18 @@ function Entrada({ welcome, partes, invitacion, onTirar, onEntrar }) {
 
   return (
     <section className={`lu-entrada ${fase ? "lu-luces-on" : ""} ${fase === 2 ? "lu-entrar-listo" : ""}`} aria-label="Abrir invitación">
-      <LuCielo />
-      <div className="lu-entrada-luces" aria-hidden="true">
-        <LuGuirnalda className="lu-guirnalda-lejos" n={8} alto={34} r={4.2} inicio={1} />
-        <LuGuirnalda className="lu-guirnalda-cerca" n={9} alto={58} r={7} inicio={0} />
-      </div>
-
-      <div className="lu-entrada-texto">
-        {invitacion?.nombre && (
-          <div className="lu-invitado">
-            <span>Invitación especial para</span>
-            <p>{invitacion.nombre}</p>
-            {pases > 0 && <span className="lu-pases">{pases} {pases === 1 ? "pase reservado" : "pases reservados"}</span>}
-          </div>
-        )}
-        <div className="lu-entrada-nombres" aria-hidden={fase !== 2}>
-          {welcome.bienvenidaTexto && <p className="lu-etiqueta lu-claro">{welcome.bienvenidaTexto}</p>}
-          <h1 className="lu-entrada-h1">
+      <div className="lu-escena">
+        <LuMesaCenital />
+        <Puesto nombre={invitacion?.nombre} pases={pases} className="lu-puesto-cabecera" />
+        <div className="lu-carta" aria-hidden={fase !== 2}>
+          {welcome.bienvenidaTexto && <p className="lu-carta-sobre">{welcome.bienvenidaTexto}</p>}
+          <h1 className="lu-carta-h1">
             {nombres[0]}
             {nombres[1] && <><span className="lu-y">&amp;</span>{nombres[1]}</>}
           </h1>
-          {partes && <p className="lu-entrada-fecha">{partes.dia} · {partes.mes} · {partes.anio}</p>}
-          <button type="button" className="lu-btn lu-btn-luz" onClick={onEntrar} tabIndex={fase === 2 ? 0 : -1}>Entrar</button>
+          <div className="lu-filete-luces" aria-hidden="true"><LuGuirnalda n={5} ancho={140} alto={5} r={2.6} /></div>
+          {partes && <p className="lu-carta-fecha">{partes.dia} · {partes.mes} · {partes.anio}</p>}
+          <button type="button" className="lu-asiento" onClick={onEntrar} tabIndex={fase === 2 ? 0 : -1}>Tomar asiento</button>
         </div>
       </div>
 
@@ -196,9 +258,8 @@ export default function Luces({ site, contenidoDe, invitacion, onEnviarRSVP, enE
     <div className="lu" ref={raiz}>
       {audioSrc && <audio ref={audioRef} src={audioSrc} loop />}
       {audioSrc && abierta && (
-        <button className="lu-musica" type="button" aria-pressed={sonando} onClick={alternarMusica} aria-label="Música de fondo">
-          {sonando ? Icono.pausa : Icono.musica}
-          <span>{sonando ? "Pausar" : "Música"}</span>
+        <button className="lu-musica" type="button" aria-pressed={sonando} onClick={alternarMusica} aria-label={sonando ? "Pausar la música" : "Encender la música"}>
+          <LuBombillaBoton />
         </button>
       )}
 
@@ -228,30 +289,23 @@ export default function Luces({ site, contenidoDe, invitacion, onEnviarRSVP, enE
 
           {/* La primera tarjeta es la del invitado: su lugar en la mesa. */}
           {invitacion?.nombre && (
-            <Tarjeta etiqueta="Invitación especial para" vela="izq" inclina={-0.8} className="lu-lugar">
-              <p className="lu-lugar-nombre">{invitacion.nombre}</p>
-              {pases > 0 && <span className="lu-pases">{pases} {pases === 1 ? "pase reservado" : "pases reservados"}</span>}
-            </Tarjeta>
+            <section className="lu-puesto-sec" aria-label={`Puesto de ${invitacion.nombre}`} data-reveal>
+              <span className="lu-destello" aria-hidden="true" />
+              <Puesto nombre={invitacion.nombre} pases={pases} />
+            </section>
           )}
 
           {partes && (
-            <Tarjeta etiqueta="La cena empieza en" titulo="Faltan" id="lu-cuenta" vela="der" inclina={0.6}>
-              {cuenta ? (
-                <div className="lu-cuenta" role="timer" aria-labelledby="lu-cuenta">
-                  {[["dias", "días"], ["horas", "horas"], ["min", "min"], ["seg", "seg"]].map(([k, l]) => (
-                    <div key={k}><span className="n">{cuenta[k]}</span><span className="l">{l}</span></div>
-                  ))}
-                </div>
-              ) : (
-                <p className="lu-texto">¡Llegó el gran día!</p>
-              )}
-            </Tarjeta>
+            <section className="lu-cuenta-sec" aria-labelledby="lu-cuenta" data-reveal>
+              <Titulo id="lu-cuenta" sobre={cuenta ? "para encender las velas de la cena" : null}>{cuenta ? "Faltan" : "¡Llegó el gran día!"}</Titulo>
+              {cuenta && <CuentaVelas cuenta={cuenta} />}
+            </section>
           )}
 
           <Separador />
 
           {(partes || info.lugar) && (
-            <Tarjeta etiqueta={info.overline || "Cuándo y dónde"} titulo={info.tituloSeccion || "La celebración"} id="lu-lugar" vela="izq" inclina={-0.5}>
+            <Tarjeta sobre={info.overline} titulo={info.tituloSeccion || "La celebración"} id="lu-lugar" vela="izq" inclina={-0.5}>
               {partes && (
                 <p className="lu-cuando">
                   <span className="lu-cuando-sem">{partes.semana}</span>
@@ -283,8 +337,7 @@ export default function Luces({ site, contenidoDe, invitacion, onEnviarRSVP, enE
               <div className="lu-menu">
                 <LuFlores className="lu-menu-flores" />
                 <p className="lu-etiqueta">{nombres.join(" & ")}</p>
-                <h2 className="lu-menu-titulo" id="lu-menu">{info.tituloItinerario || "Menú de la noche"}</h2>
-                <LuFilete />
+                <Titulo id="lu-menu">{info.tituloItinerario || "Menú de la noche"}</Titulo>
                 <ol className="lu-menu-lista">
                   {cronograma.map((c, i) => (
                     <li key={i} style={{ "--d": `${i * 90}ms` }}>
@@ -300,13 +353,13 @@ export default function Luces({ site, contenidoDe, invitacion, onEnviarRSVP, enE
           )}
 
           {mensajePrograma && (
-            <Tarjeta etiqueta="La noche" titulo={info.tituloItinerario || "Programa"} id="lu-programa" vela="der">
+            <Tarjeta titulo={info.tituloItinerario || "Programa"} id="lu-programa" vela="der">
               <p className="lu-texto">{info.cronogramaMensaje}</p>
             </Tarjeta>
           )}
 
           {activo("vestimenta") && (vestimenta.titulo || vestimenta.nota) && (
-            <Tarjeta etiqueta="Código de vestimenta" titulo={vestimenta.titulo || "Vestimenta"} id="lu-vestimenta" vela="der" inclina={0.7}>
+            <Tarjeta sobre="código de vestimenta" titulo={vestimenta.titulo || "Vestimenta"} id="lu-vestimenta" vela="der" inclina={0.7}>
               {vestimenta.nota && <p className="lu-texto">{vestimenta.nota}</p>}
               {permitidos.length > 0 && (
                 <div className="lu-paletas">
@@ -336,7 +389,7 @@ export default function Luces({ site, contenidoDe, invitacion, onEnviarRSVP, enE
           {(hayPadres || grupos.length > 0) && <Separador />}
 
           {hayPadres && (
-            <Tarjeta etiqueta={welcome.padresTexto || "Con la bendición de nuestros padres"} vela="izq" inclina={-0.6} className="lu-padres">
+            <Tarjeta titulo="Nuestros padres" sobre={welcome.padresTexto || "Con la bendición de nuestros padres"} id="lu-padres" vela="izq" inclina={-0.6} className="lu-padres">
               <div className="lu-dos">
                 {padresEl.length > 0 && <div>{padresEl.map((n) => <p key={n}>{n}</p>)}</div>}
                 {padresElla.length > 0 && <div>{padresElla.map((n) => <p key={n}>{n}</p>)}</div>}
@@ -345,7 +398,7 @@ export default function Luces({ site, contenidoDe, invitacion, onEnviarRSVP, enE
           )}
 
           {grupos.length > 0 && (
-            <Tarjeta etiqueta="Nos acompañan" titulo={padrinos.titulo || "Padrinos"} id="lu-padrinos" vela="der" inclina={0.5}>
+            <Tarjeta sobre="nos acompañan" titulo={padrinos.titulo || "Padrinos"} id="lu-padrinos" vela="der" inclina={0.5}>
               <div className="lu-grupos">
                 {grupos.map((g, i) => (
                   <div key={i} className="lu-grupo">
@@ -358,7 +411,7 @@ export default function Luces({ site, contenidoDe, invitacion, onEnviarRSVP, enE
           )}
 
           {activo("historia") && historia.texto && (
-            <Tarjeta etiqueta="Sobremesa" titulo={historia.titulo || "Nuestra historia"} id="lu-historia" vela="izq" inclina={-0.4}>
+            <Tarjeta sobre="para la sobremesa" titulo={historia.titulo || "Nuestra historia"} id="lu-historia" vela="izq" inclina={-0.4}>
               <p className="lu-historia">{historia.texto}</p>
               {nombres.length > 0 && <p className="lu-firma">{nombres.map((n) => n.split(" ")[0]).join(" & ")}</p>}
             </Tarjeta>
@@ -366,8 +419,7 @@ export default function Luces({ site, contenidoDe, invitacion, onEnviarRSVP, enE
 
           {fotos.length > 0 && (
             <section className="lu-fotos" aria-labelledby="lu-fotos" data-reveal>
-              <p className="lu-etiqueta">{fotosSec.subtitulo || "Recuerdos"}</p>
-              <h2 className="lu-h2" id="lu-fotos">{fotosSec.titulo || "Momentos"}</h2>
+              <Titulo id="lu-fotos" sobre={fotosSec.subtitulo}>{fotosSec.titulo || "Momentos"}</Titulo>
               <div className="lu-fotos-mesa">
                 {fotos.slice(0, 6).map((f, i) => (
                   <figure key={f + i} className="lu-foto" style={{ "--inclina": `${[-3, 2.5, -1.5, 3, -2, 1.5][i]}deg` }}>
@@ -381,7 +433,7 @@ export default function Luces({ site, contenidoDe, invitacion, onEnviarRSVP, enE
           {(hayRegalos || haySobres) && <Separador />}
 
           {(hayRegalos || haySobres) && (
-            <Tarjeta etiqueta="Un detalle" titulo={(hayRegalos && regalos.titulo) || "Regalos"} id="lu-regalos" vela="der" inclina={0.6}>
+            <Tarjeta titulo={(hayRegalos && regalos.titulo) || "Regalos"} id="lu-regalos" vela="der" inclina={0.6}>
               {hayRegalos && regalos.texto && <p className="lu-texto">{regalos.texto}</p>}
               {hayRegalos && regalos.datosTransferencia && (
                 <div className="lu-transferir">
@@ -402,14 +454,14 @@ export default function Luces({ site, contenidoDe, invitacion, onEnviarRSVP, enE
           )}
 
           {activo("info_importante") && (puntos.length > 0 || importante.nota) && (
-            <Tarjeta etiqueta="Antes de la cena" titulo="Ten en cuenta" id="lu-info" vela="izq" inclina={-0.5}>
+            <Tarjeta sobre="antes de la cena" titulo="Ten en cuenta" id="lu-info" vela="izq" inclina={-0.5}>
               {importante.nota && <p className="lu-texto">{importante.nota}</p>}
               {puntos.length > 0 && <ul className="lu-lista">{puntos.map((p, i) => <li key={i}>{p}</li>)}</ul>}
             </Tarjeta>
           )}
 
           {activo("faq") && preguntas.length > 0 && (
-            <Tarjeta etiqueta="Por si te lo preguntas" titulo="Preguntas frecuentes" id="lu-faq" vela="der" inclina={0.4}>
+            <Tarjeta titulo="Preguntas frecuentes" id="lu-faq" vela="der" inclina={0.4}>
               <div className="lu-faq">
                 {preguntas.map((f, i) => (
                   <details key={i}>
@@ -424,7 +476,7 @@ export default function Luces({ site, contenidoDe, invitacion, onEnviarRSVP, enE
           {confirmar && <Separador />}
 
           {confirmar && (
-            <Tarjeta etiqueta="R.S.V.P." titulo="¿Nos acompañas?" id="lu-confirmar" vela="izq" className="lu-rsvp">
+            <Tarjeta titulo="¿Nos acompañas?" id="lu-confirmar" vela="izq" className="lu-rsvp">
               {confirmar.href ? (
                 <a className="lu-btn lu-btn-grande" href={confirmar.href} target="_blank" rel="noopener noreferrer">
                   {Icono.whatsapp}<span>{confirmar.texto} <b>{confirmar.grande}</b></span>
@@ -438,8 +490,9 @@ export default function Luces({ site, contenidoDe, invitacion, onEnviarRSVP, enE
 
           <footer className="lu-final" data-reveal>
             <div className="lu-final-luces" aria-hidden="true"><LuGuirnalda n={12} alto={34} r={5} /></div>
-            <LuMesa />
-            <p className="lu-te-esperamos">Te esperamos en la mesa</p>
+            <LuBrindis />
+            <p className="lu-te-esperamos">¡Salud por el amor!</p>
+            <p className="lu-final-sub">Te esperamos en la mesa</p>
             {nombres.length > 0 && <p className="lu-etiqueta">{nombres.join(" & ")}</p>}
           </footer>
         </main>
@@ -449,9 +502,16 @@ export default function Luces({ site, contenidoDe, invitacion, onEnviarRSVP, enE
 
       {rsvpAbierto && invitacion && (
         <div className="lu-modal" role="dialog" aria-modal="true" aria-label="Confirmar asistencia" onClick={(e) => e.target === e.currentTarget && setRsvpAbierto(false)}>
-          <div className="lu-modal-caja">
-            <button type="button" className="lu-cerrar" onClick={() => setRsvpAbierto(false)} aria-label="Cerrar">×</button>
-            <p className="lu-modal-guion">Con cariño, guardamos tu lugar</p>
+          <div className="lu-modal-carta">
+            <span className="lu-modal-dorso" aria-hidden="true" />
+            <div className="lu-modal-caja">
+            <button type="button" className="lu-cerrar" onClick={() => setRsvpAbierto(false)} aria-label="Cerrar">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5 L15 15 M15 5 L5 15" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" /></svg>
+            </button>
+            <div className="lu-modal-cabeza is-in">
+              <p className="lu-modal-guion">Guardamos tu lugar</p>
+              <div className="lu-filete-luces" aria-hidden="true"><LuGuirnalda n={7} ancho={180} alto={6} r={2.8} /></div>
+            </div>
             <RSVP
               invitacion={invitacion}
               fechaLimite={info.fechaLimiteConfirmacion || site.fechaLimiteConfirmacion}
@@ -461,6 +521,7 @@ export default function Luces({ site, contenidoDe, invitacion, onEnviarRSVP, enE
               }}
               onSubmit={onEnviarRSVP}
             />
+            </div>
           </div>
         </div>
       )}

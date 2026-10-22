@@ -1,4 +1,4 @@
-/* Diseño «Medianoche»: gala en negro liso y oro fino. Letras: Federo para
+/* Diseño «Medianoche»: gala art-déco tipo Gatsby en esmeralda profundo y oro. Letras: Federo para
    títulos y nombres (no hay cursiva: fuente-guion también es Federo) y DM Sans
    para el cuerpo; el tema puede cambiarlas. Todo el color sale del tema. */
 .md {
@@ -28,7 +28,12 @@
   font-family: var(--f-cuerpo);
   font-size: 16px;
   line-height: 1.6;
-  background: var(--papel);
+  /* Escamas de abanico art-déco, muy tenues, sobre el esmeralda del tema. */
+  --escama: radial-gradient(circle at 50% 100%, transparent 0 13px, rgb(var(--color-gold) / .07) 13.5px 14.5px, transparent 15px 21px, rgb(var(--color-gold) / .045) 21.5px 22.5px, transparent 23px);
+  background:
+    var(--escama) 0 0 / 48px 24px,
+    var(--escama) 24px 12px / 48px 24px,
+    var(--papel);
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
 }
@@ -61,26 +66,40 @@
 /* ───────── Entrada: reloj de bolsillo a medianoche ───────── */
 .md .md-entrada {
   position: relative; min-height: 100svh; overflow: hidden;
-  display: grid; grid-template-rows: auto 1fr auto; justify-items: center; gap: 8px;
-  padding: max(32px, env(safe-area-inset-top)) 16px max(84px, calc(env(safe-area-inset-bottom) + 76px));
+  display: grid; grid-template-rows: auto 1fr; justify-items: center; gap: 4px;
+  padding: max(28px, env(safe-area-inset-top)) 16px max(72px, calc(env(safe-area-inset-bottom) + 64px));
   text-align: center;
-  background: radial-gradient(120% 70% at 50% 46%, color-mix(in srgb, var(--tarjeta) 70%, var(--papel)) 0%, var(--papel) 62%);
+  background:
+    radial-gradient(120% 70% at 50% 62%, color-mix(in srgb, var(--tarjeta) 80%, transparent) 0%, transparent 62%),
+    var(--escama) 0 0 / 48px 24px, var(--escama) 24px 12px / 48px 24px, var(--papel);
 }
-.md .md-entrada-arriba { display: grid; justify-items: center; gap: 6px; transition: opacity .8s var(--curva); }
-.md .md-para { font-size: 12px; letter-spacing: .32em; text-transform: uppercase; color: var(--suave); }
-.md .md-para-nombre { font-family: var(--f-guion); font-size: clamp(24px, 7vw, 30px); line-height: 1.2; letter-spacing: .04em; color: var(--champana); overflow-wrap: anywhere; }
-.md .md-pases {
-  display: inline-block; margin-top: 4px; padding: 5px 14px; border: 1px solid var(--filete-2); border-radius: 999px;
-  font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--oro);
-}
+.md .md-entrada-arriba { display: grid; justify-items: center; gap: 6px; width: 100%; transition: opacity .8s var(--curva); }
+.md .md-para { font: 400 18px/1.3 var(--f-titulos); letter-spacing: .04em; color: var(--champana); }
 
-.md .md-escena { position: relative; width: 100%; display: grid; place-items: center; min-height: 360px; }
+.md .md-escena { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 380px; }
+/* «Presiona la corona»: leyenda con un filete que baja hasta la corona. */
+.md .md-llamado {
+  position: relative; z-index: 2; display: grid; justify-items: center; gap: 4px; margin-bottom: -6px;
+  font: 400 16px/1.2 var(--f-titulos); letter-spacing: .05em; color: var(--champana); transition: opacity .5s;
+}
+.md .md-llamado i { width: 1px; height: 22px; background: linear-gradient(var(--oro), transparent); position: relative; }
+.md .md-llamado i::after { content: ""; position: absolute; bottom: -2px; left: 50%; width: 5px; height: 5px; translate: -50% 0; rotate: 45deg; background: var(--oro); animation: md-gota 1.6s ease-in-out infinite; }
+@keyframes md-gota { 0%, 100% { transform: translate(0, -6px); opacity: .3; } 60% { transform: none; opacity: 1; } }
+.md .md-fase-cuenta .md-llamado, .md .md-fase-fuegos .md-llamado { opacity: 0; }
 .md .md-reloj-boton {
   position: relative; z-index: 1; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 50%;
-  width: min(66vw, 260px); transition: transform 1.1s var(--curva), opacity 1s var(--curva), filter 1s;
+  width: min(58vw, 232px); transition: transform 1.1s var(--curva), opacity 1s var(--curva), filter 1s;
 }
+/* La corona se hunde y vuelve, como un reloj de verdad. */
+.md .md-reloj-corona { transform-box: view-box; }
+.md .md-fase-cuenta .md-reloj-corona { animation: md-presiona .5s cubic-bezier(.3, 0, .2, 1) both; }
+@keyframes md-presiona { 0% { transform: none; } 35% { transform: translateY(7px); } 100% { transform: none; } }
+@media (hover: hover) { .md .md-reloj-boton:not(:disabled):hover .md-reloj-corona { transform: translateY(2px); transition: transform .2s; } }
+.md .md-corona-ondas ellipse { transform-box: fill-box; transform-origin: center; animation: md-onda 2.2s ease-out infinite; opacity: 0; }
+.md .md-corona-ondas ellipse + ellipse { animation-delay: 1.1s; }
+@keyframes md-onda { 0% { opacity: .9; transform: scale(.7); } 100% { opacity: 0; transform: scale(1.9); } }
 .md .md-reloj-boton:disabled { cursor: default; }
-.md .md-reloj-entrada { display: block; width: 100%; height: auto; filter: drop-shadow(0 18px 30px rgb(0 0 0 / .45)); animation: md-flota 5s ease-in-out infinite; }
+.md .md-reloj-entrada { display: block; width: 100%; height: auto; filter: drop-shadow(0 18px 30px rgb(0 0 0 / .35)); animation: md-flota 5s ease-in-out infinite; }
 .md .md-reloj-entrada .md-reloj-hora, .md .md-reloj-entrada .md-reloj-minuto { transition: transform 2.6s cubic-bezier(.5, 0, .2, 1); }
 .md .md-reloj-seg { animation: md-segundero 60s steps(60) infinite; }
 @keyframes md-segundero { to { transform: rotate(360deg); } }
@@ -144,10 +163,37 @@
 @keyframes md-aparece { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 .md .md-fase-fuegos .md-revela { opacity: 1; pointer-events: auto; }
 .md .md-fase-fuegos .md-reloj-boton { opacity: 0; transform: scale(.7); visibility: hidden; transition: transform 1.1s var(--curva) .3s, opacity 1s var(--curva) .3s, visibility 0s linear 1.4s; }
-.md .md-fase-fuegos .md-entrada-arriba,
-.md .md-fase-cuenta .md-entrada-abajo, .md .md-fase-fuegos .md-entrada-abajo { opacity: 0; pointer-events: none; }
-.md .md-entrada-abajo { transition: opacity .5s; }
-.md .md-tocar { min-width: 260px; }
+.md .md-fase-fuegos .md-entrada-arriba { opacity: 0; pointer-events: none; }
+
+/* ───────── Tarjeta de mesa reservada (invitado) ───────── */
+.md .md-mesa { display: grid; justify-items: center; width: min(100%, 300px); margin: 0; perspective: 700px; filter: drop-shadow(0 10px 14px rgb(0 0 0 / .28)); }
+.md .md-mesa-placa {
+  position: relative; width: 100%; display: grid; justify-items: center; gap: 2px; padding: 22px 22px 18px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--tarjeta) 82%, var(--oro)), var(--tarjeta) 40%);
+  transform-origin: 50% 100%;
+}
+.md .md-mesa-rayos { position: absolute; inset: auto 0 0; width: 100%; height: 70%; pointer-events: none; }
+.md .md-mesa-num {
+  position: relative; display: flex; align-items: center; gap: 10px;
+  font: 400 15px/1 var(--f-titulos); letter-spacing: .08em; color: var(--oro);
+}
+.md .md-mesa-num b { font-weight: 400; font-size: 30px; color: var(--champana); }
+.md .md-mesa-num i { width: 26px; height: 1px; background: var(--filete); }
+.md .md-mesa-para { position: relative; margin-top: 6px; font-size: 14px; font-weight: 300; color: var(--suave); }
+.md .md-mesa-nombre { position: relative; font: 400 clamp(22px, 6.6vw, 27px)/1.2 var(--f-guion); letter-spacing: .03em; color: var(--tinta); overflow-wrap: anywhere; text-wrap: balance; }
+.md .md-mesa-copas { position: relative; display: grid; justify-items: center; gap: 2px; margin-top: 8px; font-size: 13.5px; color: var(--champana); }
+.md .md-mesa-copas-fila { display: flex; gap: 2px; }
+.md .md-copa { width: 20px; height: auto; }
+.md .md-copa-liquido { transform-box: view-box; transform-origin: 12px 38px; }
+.md .md-mesa-atril { display: block; width: calc(100% + 24px); height: 30px; margin-top: -1px; }
+/* En la entrada la tarjeta se levanta sobre el atril y las copas se llenan. */
+.md .md-mesa-entrada .md-mesa-placa { animation: md-levanta 1.2s cubic-bezier(.2, .8, .2, 1) .2s both; }
+@keyframes md-levanta { from { transform: rotateX(78deg); opacity: 0; } 40% { opacity: 1; } to { transform: none; } }
+.md .md-mesa-entrada .md-copa-liquido { animation: md-llena .9s ease-out both; animation-delay: calc(1.2s + var(--i, 0) * .35s); }
+@keyframes md-llena { from { transform: scaleY(0); } to { transform: none; } }
+.md .md-mesa-entrada .md-copa:nth-child(even) { animation: md-chin .5s ease-in-out both; animation-delay: calc(1.8s + var(--i, 0) * .35s); transform-origin: 50% 100%; }
+@keyframes md-chin { 40% { transform: rotate(-9deg); } }
+.md .md-mesa-hero { width: min(100%, 280px); margin-top: 22px; }
 
 /* ───────── Cuerpo: programa de gala art-déco ───────── */
 .md .md-cuerpo { max-width: 480px; margin: 0 auto; padding: 56px 16px 120px; animation: md-fundido 1s var(--curva) both; }
@@ -176,15 +222,19 @@
   clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px);
 }
 .md .md-fecha-mes { grid-column: 1 / -1; font-family: var(--f-titulos); font-size: 15px; letter-spacing: .3em; text-transform: uppercase; color: var(--suave); }
-.md .md-hero-para { margin-top: 16px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px 10px; font-size: 14px; color: var(--suave); }
-.md .md-hero-para b { font-weight: 500; color: var(--champana); }
-.md .md-hero-para .md-pases { margin: 0; }
 
-/* El marco escalonado: dos filetes (0,5 px y 7,5 px) y esquinas en SVG. */
-.md .md-programa { position: relative; padding: 64px 22px 56px; }
-.md .md-programa::before, .md .md-programa::after { content: ""; position: absolute; pointer-events: none; }
-.md .md-programa::before { inset: 0; border: 1px solid var(--filete); }
-.md .md-programa::after { inset: 7px; border: 1px solid var(--filete-2); }
+/* El marco escalonado: dos filetes (0,5 px y 7,5 px) y esquinas en SVG. Con
+   recorte, la caja sigue la misma escalera por fuera. */
+.md .md-marco { position: relative; }
+.md .md-marco::before, .md .md-marco::after { content: ""; position: absolute; pointer-events: none; }
+.md .md-marco::before { inset: 0; border: 1px solid var(--filete); }
+.md .md-marco::after { inset: 7px; border: 1px solid var(--filete-2); }
+.md .md-marco-recorte {
+  clip-path: polygon(0 18px, 6px 18px, 6px 6px, 18px 6px, 18px 0, calc(100% - 18px) 0, calc(100% - 18px) 6px, calc(100% - 6px) 6px, calc(100% - 6px) 18px, 100% 18px,
+    100% calc(100% - 18px), calc(100% - 6px) calc(100% - 18px), calc(100% - 6px) calc(100% - 6px), calc(100% - 18px) calc(100% - 6px), calc(100% - 18px) 100%,
+    18px 100%, 18px calc(100% - 6px), 6px calc(100% - 6px), 6px calc(100% - 18px), 0 calc(100% - 18px));
+}
+.md .md-programa { padding: 64px 22px 56px; }
 .md .md-esq { position: absolute; z-index: 1; width: 28px; height: 28px; }
 .md .md-esq-ai { top: 0; left: 0; }
 .md .md-esq-ad { top: 0; right: 0; transform: scaleX(-1); }
@@ -204,12 +254,12 @@
 .md .md-cabeza .md-ante { font-size: 11px; color: var(--tenue); letter-spacing: .3em; }
 .md .md-texto { max-width: 34ch; color: var(--suave); font-weight: 300; }
 
-/* Cuenta regresiva */
-.md .md-cuenta { display: grid; grid-template-columns: repeat(4, 1fr); width: min(100%, 330px); }
-.md .md-cuenta > div { display: grid; gap: 6px; padding: 4px 0; }
-.md .md-cuenta > div + div { border-left: 1px solid var(--filete-2); }
-.md .md-cuenta .n { font: 400 clamp(30px, 9vw, 38px)/1 var(--f-titulos); color: var(--tinta); font-variant-numeric: tabular-nums; }
-.md .md-cuenta .l { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--tenue); }
+/* Cuenta regresiva: esfera de reloj art-déco */
+.md .md-cuenta { display: grid; justify-items: center; gap: 10px; width: 100%; }
+.md .md-cuenta-esfera { width: min(100%, 264px); height: auto; filter: drop-shadow(0 12px 18px rgb(0 0 0 / .28)); }
+.md .md-esf-hora, .md .md-esf-min { transition: transform .8s var(--curva); }
+.md .md-cuenta-leyenda { max-width: 30ch; font: 400 18px/1.4 var(--f-titulos); letter-spacing: .03em; color: var(--suave); text-wrap: balance; }
+.md .md-cuenta-leyenda b { font-weight: 400; font-size: 22px; color: var(--champana); font-variant-numeric: tabular-nums; }
 .md .md-llego { font: 400 24px/1.2 var(--f-titulos); color: var(--oro); letter-spacing: .08em; }
 
 /* Lugar */
@@ -310,19 +360,38 @@
 .md .md-burbuja { animation: md-burbuja 2.6s ease-in infinite var(--b, 0ms); }
 @keyframes md-burbuja { from { translate: 0 0; opacity: .85; } to { translate: 0 -40px; opacity: 0; } }
 
-/* Aparición al entrar en pantalla */
-.md [data-reveal] { opacity: 0; transform: translateY(20px); transition: opacity .9s var(--curva), transform .9s var(--curva); }
-.md [data-reveal].is-in { opacity: 1; transform: none; }
+/* Aparición: cada bloque se despliega como un abanico art-déco desde el
+   centro de su borde superior (máscara cónica que se abre hacia los lados),
+   y el abanico pequeño de su encabezado abre sus varillas. */
+@property --md-abre { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+.md [data-reveal], .md .md-modal-caja {
+  --md-abre: 0deg;
+  -webkit-mask-image: conic-gradient(from 180deg at 50% 0, #000 var(--md-abre), transparent 0 calc(360deg - var(--md-abre)), #000 0);
+  mask-image: conic-gradient(from 180deg at 50% 0, #000 var(--md-abre), transparent 0 calc(360deg - var(--md-abre)), #000 0);
+}
+.md [data-reveal] { transition: --md-abre 1.2s cubic-bezier(.3, .1, .2, 1); }
+.md [data-reveal].is-in { --md-abre: 100deg; }
+.md .md-rayo { transform: rotate(var(--g)); transform-origin: 32px 30px; transition: transform 1s var(--curva) .15s; }
+.md [data-reveal]:not(.is-in) .md-rayo { transform: rotate(0deg); }
 
 /* Música y aviso */
+/* Música: un disco de gramófono que gira mientras suena. */
 .md .md-musica {
-  position: fixed; z-index: 25; top: 12px; right: 12px; display: inline-flex; align-items: center; gap: 8px;
-  height: 44px; padding: 0 16px 0 12px; border: 1px solid var(--filete); border-radius: 999px; cursor: pointer;
-  background: rgb(var(--color-paper) / .86); color: var(--champana); backdrop-filter: blur(6px);
-  font: 500 12px/1 var(--f-cuerpo); letter-spacing: .18em; text-transform: uppercase;
+  position: fixed; z-index: 25; top: 10px; right: 10px; width: 58px; height: 58px; padding: 0; border: 0; border-radius: 50%;
+  cursor: pointer; background: none; filter: drop-shadow(0 4px 8px rgb(0 0 0 / .35));
 }
-.md .md-musica svg { width: 18px; height: 18px; }
-.md .md-musica[aria-pressed="true"] { background: var(--brillo-oro); color: var(--papel); border-color: transparent; }
+.md .md-disco { display: block; width: 100%; height: 100%; }
+.md .md-disco-gira { transform-box: view-box; transform-origin: 28px 32px; animation: md-gira 2.4s linear infinite paused; }
+.md .md-sonando .md-disco-gira { animation-play-state: running; }
+@keyframes md-gira { to { transform: rotate(360deg); } }
+.md .md-disco-brazo { transform-box: view-box; transform-origin: 53px 7px; transform: rotate(-24deg); transition: transform .6s var(--curva); }
+.md .md-disco-brazo-on { transform: none; }
+.md .md-musica-marca {
+  position: absolute; left: 4px; bottom: 2px; display: grid; place-items: center; width: 20px; height: 20px;
+  background: var(--brillo-oro); color: var(--papel);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+.md .md-musica-marca svg { width: 9px; height: 9px; }
 .md .md-aviso {
   position: fixed; z-index: 90; left: 16px; right: 16px; bottom: 72px; max-width: 360px; margin: 0 auto; padding: 12px 16px;
   text-align: center; font-size: 14px; letter-spacing: .08em; color: var(--papel); background: var(--champana);
@@ -331,20 +400,30 @@
 .md .md-aviso.is-visible { opacity: 1; transform: none; }
 
 /* ───────── Modal RSVP: el formulario común vestido de gala ───────── */
-.md .md-modal { position: fixed; inset: 0; z-index: 80; display: flex; align-items: flex-end; justify-content: center; background: rgb(0 0 0 / .7); animation: md-fundido .25s ease; }
+/* La caja es el marco escalonado art-déco y se abre en abanico. */
+.md .md-modal {
+  position: fixed; inset: 0; z-index: 80; display: flex; align-items: center; justify-content: center; padding: 10px;
+  background: rgb(var(--color-paper) / .8); backdrop-filter: blur(4px); animation: md-fundido .25s ease;
+}
 .md .md-modal-caja {
-  position: relative; width: 100%; max-width: 520px; max-height: 92svh; overflow: auto; overscroll-behavior: contain;
-  background: var(--papel); border-top: 1px solid var(--filete); box-shadow: inset 0 6px 0 var(--papel), inset 0 7px 0 var(--filete-2);
-  animation: md-subir .4s var(--curva);
+  display: flex; flex-direction: column; width: 100%; max-width: 520px; max-height: calc(100svh - 20px);
+  background:
+    radial-gradient(90% 30% at 50% 0, rgb(var(--color-gold) / .12), transparent 70%),
+    var(--escama) 0 0 / 48px 24px, var(--escama) 24px 12px / 48px 24px, var(--papel);
+  animation: md-abanico-abre .8s cubic-bezier(.45, 0, .15, 1) both;
 }
-@media (min-width: 600px) { .md .md-modal-caja { border: 1px solid var(--filete); } }
-@media (min-width: 600px) { .md .md-modal { align-items: center; } }
-@keyframes md-subir { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes md-abanico-abre { from { --md-abre: 0deg; } to { --md-abre: 100deg; } }
+.md .md-modal-scroll { min-height: 0; overflow: auto; overscroll-behavior: contain; margin: 9px; }
+/* Cerrar: un rombo escalonado de oro */
 .md .md-cerrar {
-  position: absolute; z-index: 2; top: 14px; right: 14px; width: 44px; height: 44px; border: 1px solid var(--filete-2); border-radius: 50%;
-  background: var(--papel); color: var(--champana); font: 300 24px/1 var(--f-cuerpo); cursor: pointer;
+  position: absolute; z-index: 2; top: 18px; right: 18px; width: 46px; height: 46px; padding: 0; border: 0; cursor: pointer;
+  display: grid; place-items: center; background: var(--brillo-oro); color: var(--papel);
+  clip-path: polygon(50% 0, 62% 12%, 100% 50%, 62% 88%, 50% 100%, 38% 88%, 0 50%, 38% 12%);
+  font: 400 24px/1 var(--f-titulos);
 }
-.md .md-modal-abanico { display: block; width: 52px; height: auto; margin: 34px auto 0; }
+.md .md-cerrar span { translate: 0 -1px; }
+.md .md-modal-abanico { display: block; width: 64px; height: auto; margin: 36px auto 0; }
+
 .md .md-modal #rsvp { position: relative; z-index: 1; padding: 6px 24px 40px; border-top: 0; font-family: var(--f-cuerpo); color: var(--tinta); }
 .md .md-modal #rsvp img { display: none; }
 .md .md-modal #rsvp .font-mono { font-family: var(--f-cuerpo); letter-spacing: .22em; }
@@ -381,8 +460,12 @@
 .md .md-modal #rsvp .text-ink\/40, .md .md-modal #rsvp .text-ink\/50, .md .md-modal #rsvp .text-ink\/55 { color: var(--tenue); }
 
 @media (prefers-reduced-motion: reduce) {
-  .md [data-reveal] { opacity: 1; transform: none; transition: none; }
-  .md .md-reloj-entrada, .md .md-reloj-boton::before, .md .md-reloj-seg, .md .md-copas-destello, .md .md-burbuja { animation: none; }
+  .md [data-reveal], .md .md-modal-caja { -webkit-mask-image: none; mask-image: none; transition: none; animation: none; }
+  .md .md-rayo { transition: none; }
+  .md [data-reveal]:not(.is-in) .md-rayo { transform: rotate(var(--g)); }
+  .md .md-reloj-entrada, .md .md-reloj-boton::before, .md .md-reloj-seg, .md .md-copas-destello, .md .md-burbuja,
+  .md .md-corona-ondas ellipse, .md .md-llamado i::after, .md .md-mesa-placa, .md .md-copa-liquido, .md .md-copa, .md .md-disco-gira, .md .md-reloj-corona { animation: none; }
+  .md .md-esf-hora, .md .md-esf-min, .md .md-disco-brazo { transition: none; }
   .md .md-reloj-entrada .md-reloj-hora, .md .md-reloj-entrada .md-reloj-minuto { transition: none; }
   .md .md-fuegos-capa { display: none; }
   .md .md-revela, .md .md-reloj-boton { transition-duration: .3s; transition-delay: 0s; }

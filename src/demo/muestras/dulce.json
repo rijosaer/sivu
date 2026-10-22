@@ -7,13 +7,13 @@
       "diseno": "dulce"
     },
     "tema": {
-      "color-paper": "#FBF3F5",
-      "color-ink": "#4B3440",
-      "color-gold": "#E2B4C2",
-      "color-gold-light": "#F6E1E8",
-      "color-gold-dark": "#A86F82",
-      "color-marble": "#FFFFFF",
-      "color-seal": "#C8AFD9",
+      "color-paper": "#FBF5EC",
+      "color-ink": "#4A3426",
+      "color-gold": "#C68B59",
+      "color-gold-light": "#F1DEC6",
+      "color-gold-dark": "#8E5A33",
+      "color-marble": "#FFFDF8",
+      "color-seal": "#E4A9A0",
       "fuente-guion": "Yesteryear",
       "fuente-titulos": "Italiana",
       "fuente-cuerpo": "Montserrat"
@@ -90,17 +90,17 @@
         "id": 49,
         "tipo": "vestimenta",
         "contenido": {
-          "titulo": "Cóctel en tonos pastel",
-          "nota": "Rosa, lila, durazno, menta o vainilla: elige tu favorito.",
+          "titulo": "Cóctel en tonos de pastelería",
+          "nota": "Vainilla, caramelo, café con leche, frutos rojos o pistacho: elige tu favorito.",
           "permitidos": [
             {
-              "nombre": "Tonos pastel",
+              "nombre": "Tonos dulces",
               "colores": [
-                "#F4C7D3",
-                "#D9C6EA",
-                "#F8D8C0",
-                "#CFE8DC",
-                "#F3EAD3"
+                "#F3E6CC",
+                "#C68B59",
+                "#A8795A",
+                "#B5344A",
+                "#BFD39A"
               ]
             }
           ],

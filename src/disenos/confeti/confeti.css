@@ -80,16 +80,22 @@
 .cf .cf-btn-linea { color: var(--rotulo); background: var(--blanco); border: 1.5px solid var(--durazno); box-shadow: none; }
 .cf .cf-botones { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 16px; }
 
+/* Botón de música: un globito dorado con una nota; sube y baja mientras suena. */
 .cf .cf-musica {
-  position: fixed; z-index: 45; top: 12px; right: 12px;
-  display: inline-flex; align-items: center; gap: 7px; height: 44px; padding: 0 16px 0 12px;
-  border: 1px solid color-mix(in srgb, var(--durazno) 70%, transparent); border-radius: 999px;
-  background: color-mix(in srgb, var(--blanco) 92%, transparent); color: var(--rotulo);
-  font: 500 13px/1 var(--f-texto); cursor: pointer; backdrop-filter: blur(6px);
-  box-shadow: 0 6px 18px -10px var(--terracota);
+  position: fixed; z-index: 45; top: 8px; right: 10px;
+  display: block; width: 50px; height: 70px; padding: 0; border: 0; background: none; cursor: pointer;
+  filter: drop-shadow(0 8px 10px color-mix(in srgb, var(--terracota) 30%, transparent));
 }
-.cf .cf-musica svg { width: 18px; height: 18px; }
-.cf .cf-musica[aria-pressed="true"] { background: var(--boton); color: #fff; border-color: transparent; }
+.cf .cf-musica-globo { position: absolute; left: 3px; top: 0; width: 44px; height: auto; transform-origin: 50% 100%; transition: filter .3s ease; }
+.cf .cf-musica-nota { position: absolute; left: 3px; top: 0; width: 44px; height: 50px; display: grid; place-items: center; color: #fff; }
+.cf .cf-musica-nota svg { width: 20px; height: 20px; filter: drop-shadow(0 1px 1px color-mix(in srgb, var(--tinta) 45%, transparent)); }
+.cf .cf-musica-tachon { position: absolute; width: 26px; height: 2.2px; border-radius: 2px; background: #fff; rotate: -40deg; box-shadow: 0 0 0 1px color-mix(in srgb, var(--oro) 70%, var(--tinta)); }
+.cf .cf-musica:not(.is-on) .cf-musica-globo { filter: saturate(.55) brightness(1.04); }
+.cf .cf-musica.is-on .cf-musica-globo, .cf .cf-musica.is-on .cf-musica-nota { animation: cf-flota 2.6s ease-in-out infinite; transform-origin: 50% 140%; }
+@keyframes cf-flota { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-4px) rotate(4deg); } }
+.cf .cf-notas-sueltas b { position: absolute; left: 4px; top: 6px; font: 600 14px/1 var(--f-texto); color: var(--oro); opacity: 0; animation: cf-nota-suelta 2.8s ease-out infinite; }
+.cf .cf-notas-sueltas b + b { left: 30px; animation-delay: 1.4s; }
+@keyframes cf-nota-suelta { 0% { opacity: 0; transform: translate(0, 10px) scale(.7); } 25% { opacity: 1; } 100% { opacity: 0; transform: translate(-10px, -26px) rotate(-14deg) scale(1.1); } }
 
 /* ---------- Confeti (piezas) ---------- */
 .cf .cf-pieza { position: absolute; display: block; width: calc(8px * var(--tam)); height: calc(14px * var(--tam)); }
@@ -110,7 +116,7 @@
 .cf .cf-lluvia { position: fixed; inset: 0; z-index: 60; overflow: hidden; pointer-events: none; }
 .cf .cf-lluvia .cf-pieza b { animation: cf-aleteo var(--aleteo) linear infinite; }
 /* Primera ola: sale del globo hacia afuera y luego cae girando. */
-.cf .cf-sale { left: 50%; top: 52%; opacity: 0; animation: cf-estallido var(--dur) forwards; }
+.cf .cf-sale { left: 49%; top: 31%; opacity: 0; animation: cf-estallido var(--dur) forwards; }
 @keyframes cf-estallido {
   0% { opacity: 1; transform: translate(0, 0) scale(.3); animation-timing-function: cubic-bezier(.1, .75, .3, 1); }
   16% { opacity: 1; transform: translate(var(--bx), var(--by)) scale(1) rotate(calc(var(--gira) * .2)); animation-timing-function: cubic-bezier(.45, 0, .85, .6); }
@@ -127,82 +133,122 @@
 }
 @keyframes cf-aleteo { from { transform: rotate3d(1, .4, 0, 0deg); } to { transform: rotate3d(1, .4, 0, 360deg); } }
 
-/* ---------- Entrada: «¡Revienta el globo!» ---------- */
+/* ---------- Entrada: «¡Revienta el globo!» ----------
+   Escena de 360 × 610 px: el globo grande con su cuerda baja hasta el ojal
+   de una etiqueta de kraft escrita a mano (el invitado); del mismo ojal
+   salen los globitos de los pases. Un alfiler dibujado apunta al globo. */
 .cf .cf-entrada {
   position: fixed; inset: 0; z-index: 50; overflow: hidden auto;
-  display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-  padding: max(34px, env(safe-area-inset-top)) 20px 92px; text-align: center;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: max(24px, env(safe-area-inset-top)) 0 84px; text-align: center;
   background:
     var(--grano),
-    radial-gradient(60% 40% at 50% 52%, color-mix(in srgb, var(--rubor) 85%, transparent), transparent 75%),
+    radial-gradient(60% 34% at 50% 30%, color-mix(in srgb, var(--rubor) 85%, transparent), transparent 75%),
     radial-gradient(90% 30% at 50% 100%, color-mix(in srgb, var(--rubor) 60%, transparent), transparent 80%),
     var(--papel);
   background-size: 180px 180px, auto, auto, auto;
 }
-.cf .cf-entrada.cf-reventado { animation: cf-desvanece .7s ease .55s forwards; }
+.cf .cf-entrada.cf-reventado { animation: cf-desvanece .7s ease .6s forwards; }
 @keyframes cf-desvanece { to { opacity: 0; visibility: hidden; } }
 .cf .cf-fondo-globos { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-.cf .cf-globito { position: absolute; width: 74px; opacity: .55; filter: blur(.6px); animation: cf-sube 9s ease-in-out infinite alternate; }
-.cf .cf-globito-1 { left: -12px; top: 22%; width: 82px; }
-.cf .cf-globito-2 { right: -8px; top: 10%; width: 64px; animation-delay: -3s; opacity: .5; }
-.cf .cf-globito-3 { right: 14px; bottom: 6%; width: 70px; animation-delay: -6s; opacity: .6; }
+.cf .cf-globito { position: absolute; width: 74px; opacity: .5; filter: blur(.8px); animation: cf-sube 9s ease-in-out infinite alternate; }
+.cf .cf-globito-1 { left: -18px; top: 46%; width: 70px; }
+.cf .cf-globito-2 { left: 8px; top: 4%; width: 54px; animation-delay: -3s; opacity: .45; }
+.cf .cf-globito-3 { right: -14px; bottom: 4%; width: 66px; animation-delay: -6s; opacity: .55; }
 @keyframes cf-sube { from { transform: translateY(0) rotate(-4deg); } to { transform: translateY(-26px) rotate(4deg); } }
 
-.cf .cf-entrada-arriba, .cf .cf-entrada-abajo { position: relative; z-index: 2; transition: opacity .3s ease, transform .3s ease; }
-.cf .cf-reventado .cf-entrada-arriba, .cf .cf-reventado .cf-entrada-abajo { opacity: 0; transform: scale(.96); }
-.cf .cf-invitado { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-.cf .cf-invitado-nombre { font: 400 clamp(40px, 12vw, 52px)/1.1 var(--f-guion); color: var(--rotulo); overflow-wrap: anywhere; }
-.cf .cf-pases {
-  display: inline-block; margin-top: 8px; padding: 6px 16px; border-radius: 999px;
-  font: 500 13px/1.3 var(--f-texto); color: var(--rotulo); background: var(--blanco);
-  border: 1px solid color-mix(in srgb, var(--oro) 70%, transparent); box-shadow: 0 6px 16px -10px var(--terracota);
-}
+.cf .cf-escena { position: relative; z-index: 1; flex: none; width: 360px; height: 610px; }
+@media (max-width: 359px) { .cf .cf-escena { zoom: .88; } }
 
-.cf .cf-globo-zona { position: relative; z-index: 1; flex: 1; display: grid; place-items: center; width: 100%; min-height: 300px; }
-.cf .cf-halo { position: absolute; left: 50%; top: 46%; width: 240px; height: 240px; transform: translate(-50%, -50%); border-radius: 50%;
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--durazno) 35%, transparent), transparent); animation: cf-latido 2.8s ease-in-out infinite; }
-@keyframes cf-latido { 0%, 100% { opacity: .55; transform: translate(-50%, -50%) scale(.92); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.06); } }
-.cf .cf-globo-btn { position: relative; padding: 0; border: 0; background: none; cursor: pointer; width: min(220px, 56vw); touch-action: manipulation;
-  transform-origin: 50% 100%; animation: cf-vaiven 4.6s ease-in-out infinite; }
-.cf .cf-globo-grande { display: block; width: 100%; height: auto; filter: drop-shadow(0 22px 22px color-mix(in srgb, var(--terracota) 30%, transparent)); transform-origin: 50% 35%; }
-@keyframes cf-vaiven {
-  0%, 100% { transform: translateY(0) rotate(-3deg); }
-  50% { transform: translateY(-14px) rotate(3deg); }
+/* Llamado: letrero a mano arriba a la derecha + alfiler que apunta al globo. */
+.cf .cf-llamado { position: absolute; right: 10px; top: 0; padding: 0; border: 0; background: none; cursor: pointer; text-align: right; }
+.cf .cf-revienta { display: block; font: 400 46px/.86 var(--f-guion); color: var(--rotulo); rotate: -4deg; text-shadow: 0 2px 0 color-mix(in srgb, var(--blanco) 70%, transparent); }
+.cf .cf-alfiler-zona { position: absolute; left: 330px; top: 108px; width: 0; height: 0; }
+/* La cabeza queda en (330, 120); la punta mira al costado del globo. */
+.cf .cf-alfiler { position: absolute; left: -13px; top: -12px; width: 112px; height: 24px; transform-origin: 13px 12px; rotate: 141deg;
+  animation: cf-pincha 2.6s ease-in-out infinite; }
+@keyframes cf-pincha {
+  0%, 55%, 100% { translate: 0 0; }
+  66% { translate: -6px 5px; }
+  74% { translate: 1px -1px; }
 }
-@media (hover: hover) { .cf .cf-globo-btn:hover .cf-globo-grande { transform: scale(1.03); transition: transform .3s var(--curva); } }
-/* Al tocarlo: se infla de golpe y desaparece. */
+.cf .cf-reventado .cf-alfiler { animation: cf-clava .5s cubic-bezier(.3, 1.4, .5, 1) forwards; }
+@keyframes cf-clava { 0% { translate: 0 0; } 35% { translate: -16px 13px; } 100% { translate: -10px 8px; } }
+
+.cf .cf-halo { position: absolute; left: 175px; top: 170px; width: 250px; height: 250px; transform: translate(-50%, -50%); border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--durazno) 32%, transparent), transparent); animation: cf-latido 2.8s ease-in-out infinite; }
+@keyframes cf-latido { 0%, 100% { opacity: .55; transform: translate(-50%, -50%) scale(.92); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.06); } }
+
+/* Globo grande: la cuerda termina en el ojal, y desde ahí se mece. */
+.cf .cf-globo-btn { position: absolute; z-index: 2; left: calc(var(--ojal-x) - 93px); top: calc(var(--ojal-y) - 305px); width: 186px; padding: 0; border: 0; background: none; cursor: pointer;
+  touch-action: manipulation; transform-origin: 50% 100%; animation: cf-vaiven 4.6s ease-in-out infinite; }
+.cf .cf-globo-grande { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 22px 22px color-mix(in srgb, var(--terracota) 28%, transparent)); }
+@keyframes cf-vaiven { 0%, 100% { transform: rotate(-2.6deg); } 50% { transform: rotate(2.6deg) scaleY(1.01); } }
+.cf .cf-latex { transform-box: fill-box; transform-origin: 50% 50%; }
+@media (hover: hover) { .cf .cf-globo-btn:hover .cf-latex { transform: scale(1.03); transition: transform .3s var(--curva); } }
+
+/* Globitos de los pases, inclinados desde el ojal. */
+.cf .cf-pase-globo { position: absolute; z-index: 1; left: calc(var(--ojal-x) - 22px); top: calc(var(--ojal-y) - var(--alto)); width: 44px; transform-origin: 50% 100%;
+  rotate: var(--giro); animation: cf-pase 3.4s ease-in-out calc(var(--i) * -.7s) infinite alternate; }
+.cf .cf-pase-globo svg { display: block; width: 100%; height: auto; filter: drop-shadow(0 8px 8px color-mix(in srgb, var(--terracota) 22%, transparent)); }
+@keyframes cf-pase { from { transform: rotate(-3deg); } to { transform: rotate(3deg) translateY(-2px); } }
+
+/* La etiqueta kraft cuelga del ojal y se mece un poco a destiempo. */
+.cf .cf-kraft { position: absolute; z-index: 3; left: calc(var(--ojal-x) - 105px); top: calc(var(--ojal-y) - 24px); width: 210px; height: 212px;
+  transform-origin: 105px 24px; animation: cf-cuelga 4.6s ease-in-out -1.2s infinite; }
+@keyframes cf-cuelga { 0%, 100% { transform: rotate(2.4deg); } 50% { transform: rotate(-2deg); } }
+.cf .cf-kraft-fondo { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(1px 6px 7px rgb(107 68 38 / .3)); }
+/* Escrito a mano con tinta oscura sobre el cartón. */
+.cf .cf-kraft-texto { position: absolute; inset: 44px 14px 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: color-mix(in srgb, var(--tinta) 92%, #2a1a10); rotate: -2deg; }
+.cf .cf-kraft-para { font: 400 26px/1 var(--f-guion); opacity: .8; }
+.cf .cf-kraft-nombre { font: 400 46px/.92 var(--f-guion); overflow-wrap: anywhere; text-wrap: balance; }
+.cf .cf-kraft-medio .cf-kraft-nombre { font-size: 38px; }
+.cf .cf-kraft-largo .cf-kraft-nombre { font-size: 31px; }
+.cf .cf-kraft-pases { display: flex; flex-direction: column; align-items: center; margin-top: 10px; padding-top: 8px; width: 82%;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--tinta) 45%, transparent) 15% 85%, transparent) top / 100% 1px no-repeat; }
+.cf .cf-kraft-pases span { font: 400 27px/1 var(--f-guion); }
+.cf .cf-kraft-pases small { margin-top: 3px; font: 500 10.5px/1.2 var(--f-texto); letter-spacing: .04em; opacity: .75; }
+
+.cf .cf-pista { position: absolute; left: 0; right: 0; bottom: 0; font: 400 13px/1.4 var(--f-texto); letter-spacing: .03em; color: var(--suave); }
+
+/* Al tocar: el alfiler pincha, el látex se infla de golpe y desaparece, la
+   etiqueta cae con su cuerda y los globitos se escapan hacia arriba. */
 .cf .cf-reventado .cf-globo-btn { animation-play-state: paused; pointer-events: none; }
-.cf .cf-reventado .cf-globo-grande { animation: cf-revienta .26s cubic-bezier(.5, 0, .9, .5) forwards; }
+.cf .cf-reventado .cf-latex { animation: cf-revienta .24s cubic-bezier(.5, 0, .9, .5) .12s forwards; }
 @keyframes cf-revienta {
   0% { transform: scale(1); opacity: 1; }
   70% { transform: scale(1.14, 1.1); opacity: 1; }
   100% { transform: scale(1.32); opacity: 0; }
 }
+.cf .cf-reventado .cf-hilo { animation: cf-hilo-cae .7s ease-in .3s forwards; }
+@keyframes cf-hilo-cae { to { opacity: 0; transform: translateY(60px); } }
+.cf .cf-reventado .cf-kraft { animation: cf-cae-kraft .9s cubic-bezier(.5, 0, .9, .6) .3s forwards; }
+@keyframes cf-cae-kraft { to { transform: translateY(420px) rotate(18deg); opacity: .2; } }
+.cf .cf-reventado .cf-pase-globo { animation: cf-escapa 1.1s cubic-bezier(.4, 0, .8, .5) calc(.25s + var(--i) * .08s) forwards; }
+@keyframes cf-escapa { to { transform: translateY(-640px) rotate(8deg); } }
+.cf .cf-reventado .cf-llamado, .cf .cf-reventado .cf-pista, .cf .cf-reventado .cf-halo { opacity: 0; transition: opacity .25s ease; }
 /* El ¡pum!: un anillo de aire y un destello. */
-.cf .cf-pum { position: absolute; left: 50%; top: 38%; width: 180px; height: 180px; margin: -90px 0 0 -90px; border-radius: 50%; opacity: 0; pointer-events: none;
+.cf .cf-pum { position: absolute; left: 175px; top: 170px; width: 180px; height: 180px; margin: -90px 0 0 -90px; border-radius: 50%; opacity: 0; pointer-events: none;
   border: 3px solid color-mix(in srgb, var(--oro) 80%, white);
   background: radial-gradient(closest-side, rgb(255 255 255 / .9), color-mix(in srgb, var(--rubor) 50%, transparent) 60%, transparent); }
-.cf .cf-reventado .cf-pum { animation: cf-pum .55s ease-out .2s forwards; }
+.cf .cf-reventado .cf-pum { animation: cf-pum .55s ease-out .3s forwards; }
 @keyframes cf-pum { 0% { opacity: 1; transform: scale(.4); } 100% { opacity: 0; transform: scale(2.2); border-width: 1px; } }
-.cf .cf-pedazos { position: absolute; left: 50%; top: 38%; width: 0; height: 0; pointer-events: none; }
+.cf .cf-pedazos { position: absolute; left: 175px; top: 170px; width: 0; height: 0; pointer-events: none; }
 .cf .cf-pedazos svg { position: absolute; width: 26px; height: 20px; margin: -10px 0 0 -13px; opacity: 0; fill: var(--durazno);
   filter: drop-shadow(0 2px 2px color-mix(in srgb, var(--terracota) 40%, transparent)); }
-.cf .cf-reventado .cf-pedazos svg { animation: cf-pedazo .6s cubic-bezier(.15, .8, .35, 1) .22s forwards; }
+.cf .cf-reventado .cf-pedazos svg { animation: cf-pedazo .6s cubic-bezier(.15, .8, .35, 1) .32s forwards; }
 @keyframes cf-pedazo {
   0% { opacity: 1; transform: translate(0, 0) rotate(0) scale(.6); }
   80% { opacity: 1; }
   100% { opacity: 0; transform: translate(var(--dx), calc(var(--dy) + 30px)) rotate(var(--gira)) scale(1); }
 }
 
-.cf .cf-revienta { font: 400 clamp(44px, 13vw, 54px)/1.05 var(--f-guion); color: var(--rotulo); }
-.cf .cf-pista { margin-top: 6px; font: 400 13.5px/1.4 var(--f-texto); letter-spacing: .04em; color: var(--suave); }
-
 /* ---------- Tarjeta (lo que descubre el confeti) ---------- */
 .cf .cf-cuerpo { max-width: 520px; margin: 0 auto; padding: 70px 16px 110px; }
 .cf .cf-portada { position: relative; padding-top: 34px; }
-.cf .cf-portada-ramo { position: absolute; z-index: 2; right: 10px; top: -40px; width: 118px; height: auto; transform: rotate(8deg);
+.cf .cf-portada-ramo { position: absolute; z-index: 2; left: 4px; top: -44px; width: 112px; height: auto; transform: rotate(-8deg);
   filter: drop-shadow(0 12px 14px color-mix(in srgb, var(--terracota) 22%, transparent)); animation: cf-ramo 6s ease-in-out infinite alternate; transform-origin: 50% 100%; }
-@keyframes cf-ramo { from { transform: rotate(6deg) translateY(0); } to { transform: rotate(10deg) translateY(-8px); } }
+@keyframes cf-ramo { from { transform: rotate(-6deg) translateY(0); } to { transform: rotate(-10deg) translateY(-8px); } }
 .cf .cf-tarjeta {
   position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; text-align: center;
   padding: 46px 22px 30px; border-radius: 6px; background: var(--grano), var(--blanco);
@@ -272,15 +318,27 @@
 }
 
 /* Contenido de cada polaroid */
-.cf .cf-pastel { width: 150px; height: auto; margin: -6px 0 2px; filter: drop-shadow(0 8px 10px color-mix(in srgb, var(--terracota) 20%, transparent)); }
+.cf .cf-pastel { width: 140px; height: auto; margin: -6px 0 2px; filter: drop-shadow(0 8px 10px color-mix(in srgb, var(--terracota) 20%, transparent)); }
 .cf .cf-llama { transform-box: fill-box; transform-origin: 50% 100%; animation: cf-llama 1.4s ease-in-out infinite alternate; }
 .cf .cf-llama-halo { animation: cf-halo-llama 1.4s ease-in-out infinite alternate; }
 @keyframes cf-llama { from { transform: scale(1, 1) skewX(-3deg); } to { transform: scale(.9, 1.1) skewX(3deg); } }
 @keyframes cf-halo-llama { from { opacity: .7; } to { opacity: 1; } }
-.cf .cf-cuenta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; width: 100%; margin-top: 4px; }
-.cf .cf-cuenta div { display: flex; flex-direction: column; align-items: center; padding: 10px 0 8px; border-radius: 4px; background: rgb(255 255 255 / .62); }
-.cf .cf-cuenta .n { font: 400 27px/1.1 var(--f-titulo); color: var(--tinta); font-variant-numeric: tabular-nums; }
-.cf .cf-cuenta .l { font: 500 10.5px/1.4 var(--f-texto); letter-spacing: .16em; text-transform: uppercase; color: var(--rotulo); }
+/* Cuenta regresiva: cuatro globos con número, cada uno con su cuerda. */
+.cf .cf-cuenta-nota { font: 400 25px/1.1 var(--f-guion); color: var(--rotulo); }
+.cf .cf-cuenta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; width: 100%; margin-top: 6px; }
+.cf .cf-numglobo { position: relative; display: flex; flex-direction: column; align-items: center; transform-origin: 50% 100%;
+  animation: cf-numglobo 3.2s ease-in-out calc(var(--i) * -.8s) infinite alternate; }
+.cf .cf-numglobo:nth-child(even) { margin-top: 14px; }
+.cf .cf-numglobo-svg { display: block; width: 100%; max-width: 70px; height: auto; filter: drop-shadow(0 8px 8px color-mix(in srgb, var(--terracota) 24%, transparent)); }
+@keyframes cf-numglobo { from { transform: rotate(-3deg); } to { transform: rotate(3deg) translateY(-3px); } }
+/* El número va pintado sobre el látex, a la altura del centro del globo. */
+.cf .cf-num { position: absolute; left: 0; right: 0; top: 0; aspect-ratio: 200 / 210; max-width: 70px; margin: 0 auto; display: grid; place-items: center;
+  font: 400 25px/1 var(--f-titulo); font-variant-numeric: tabular-nums; color: #fff; text-shadow: 0 1px 2px color-mix(in srgb, var(--terracota) 60%, transparent); }
+.cf .cf-num-3 { font-size: 21px; }
+.cf .cf-t-crema .cf-num, .cf .cf-t-rubor .cf-num { color: var(--rotulo); text-shadow: 0 1px 0 rgb(255 255 255 / .6); }
+.cf .cf-numglobo:last-child .cf-num { animation: cf-tic .5s var(--curva); }
+@keyframes cf-tic { from { transform: scale(1.18); } to { transform: scale(1); } }
+.cf .cf-unidad { margin-top: -2px; font: 400 23px/1 var(--f-guion); color: var(--rotulo); }
 
 .cf .cf-icono-grande { display: grid; place-items: center; width: 50px; height: 50px; border-radius: 50%; background: rgb(255 255 255 / .7); color: var(--rotulo); margin-bottom: 4px; }
 .cf .cf-icono-grande svg { width: 24px; height: 24px; }
@@ -346,12 +404,26 @@
 .cf .cf-album.is-in .cf-polaroid-foto { animation: cf-columpio 1.8s var(--curva) both; }
 .cf .cf-album.is-in .cf-fila .cf-polaroid-foto:nth-child(3) { animation-delay: .15s; }
 
-/* Pie */
-.cf .cf-final { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 56px; text-align: center; }
-.cf .cf-final[data-reveal] { opacity: 0; transform: translateY(16px); transition: opacity .8s var(--curva), transform .8s var(--curva); }
-.cf .cf-final[data-reveal].is-in { opacity: 1; transform: none; }
-.cf .cf-final-ramo { width: 128px; height: auto; margin-bottom: 4px; filter: drop-shadow(0 10px 12px color-mix(in srgb, var(--terracota) 20%, transparent)); }
-.cf .cf-te-espero { font: 400 52px/1 var(--f-guion); color: var(--rotulo); }
+/* Cierre: globos sueltos que se van volando hacia arriba, sin fin. */
+.cf .cf-final { position: relative; height: 380px; margin: 40px -16px 0; overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 22%, #000 88%, transparent); mask-image: linear-gradient(to bottom, transparent, #000 22%, #000 88%, transparent); }
+.cf .cf-vuelo { position: absolute; inset: 0; pointer-events: none; }
+.cf .cf-vuela { position: absolute; top: 100%; opacity: 0; }
+.cf .cf-vuela svg { display: block; width: 100%; height: auto; filter: drop-shadow(0 10px 10px color-mix(in srgb, var(--terracota) 20%, transparent)); }
+.cf .cf-final.is-in .cf-vuela { animation: cf-vuela var(--dur) linear var(--retraso) infinite; }
+.cf .cf-final.is-in .cf-vuela svg { animation: cf-vaiven-vuelo 3.4s ease-in-out infinite alternate; transform-origin: 50% 30%; }
+@keyframes cf-vuela {
+  0% { opacity: 1; transform: translate(0, 0); }
+  50% { transform: translate(var(--vaiven), -340px); }
+  100% { opacity: 1; transform: translate(calc(var(--vaiven) * -.4), -700px); }
+}
+@keyframes cf-vaiven-vuelo { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
+.cf .cf-final-texto { position: absolute; z-index: 1; left: 50%; top: 50%; translate: -50% -50%; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  width: max-content; max-width: 86%; padding: 18px 26px; text-align: center;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--papel) 88%, transparent), transparent); }
+.cf .cf-final[data-reveal] .cf-final-texto { opacity: 0; transition: opacity 1s ease .4s; }
+.cf .cf-final[data-reveal].is-in .cf-final-texto { opacity: 1; }
+.cf .cf-te-espero { font: 400 56px/1 var(--f-guion); color: var(--rotulo); }
 
 /* Aviso de copiado */
 .cf .cf-aviso { position: fixed; z-index: 90; left: 16px; right: 16px; bottom: 70px; max-width: 420px; margin: 0 auto; padding: 12px 16px; border-radius: 999px;
@@ -361,15 +433,34 @@
 /* ---------- Formulario de confirmación con la ropa del diseño ----------
    El RSVP es un componente común (Tailwind, letra mono de 10-11 px): aquí
    toma Poppins, Cookie para el título y los botones de píldora. */
-.cf .cf-modal { position: fixed; inset: 0; z-index: 80; display: flex; align-items: flex-end; justify-content: center; padding-top: 30px;
-  background: color-mix(in srgb, var(--tinta) 45%, transparent); animation: cf-fundido .25s ease; }
-.cf .cf-modal-caja { position: relative; width: 100%; max-width: 520px; max-height: 90svh; overflow: auto; border-radius: 22px 22px 0 0;
-  background: var(--grano), var(--blanco); animation: cf-subir .4s var(--curva); }
-@media (min-width: 600px) { .cf .cf-modal { align-items: center; } .cf .cf-modal-caja { border-radius: 18px; } }
-.cf .cf-modal-pinza { position: absolute; left: 50%; top: -6px; width: 18px; height: 44px; margin-left: -9px; }
-.cf .cf-cerrar { position: absolute; z-index: 2; top: 12px; right: 12px; width: 44px; height: 44px; border: 0; border-radius: 50%; background: color-mix(in srgb, var(--rubor) 60%, white);
-  color: var(--rotulo); font-size: 26px; line-height: 1; cursor: pointer; }
-.cf .cf-modal #rsvp { padding: 64px 22px 36px; border-top: 0; font-family: var(--f-texto); color: var(--tinta); background: transparent; }
+/* El modal: una polaroid grande colgada de un cordel con su pinza. */
+.cf .cf-modal { position: fixed; inset: 0; z-index: 80; display: flex; align-items: flex-start; justify-content: center; padding: 34px 14px 20px;
+  background: color-mix(in srgb, var(--tinta) 42%, transparent); animation: cf-fundido .25s ease; }
+.cf .cf-modal-cordel { position: absolute; left: 0; top: 10px; width: 100%; height: 34px; overflow: visible; pointer-events: none; }
+.cf .cf-modal-cordel path { fill: none; stroke: color-mix(in srgb, var(--oro) 70%, white); stroke-width: 1.6px; }
+.cf .cf-modal-caja { position: relative; width: 100%; max-width: 440px; padding: 14px 14px 0; border-radius: 2px;
+  background: var(--grano), var(--blanco); rotate: -1.2deg; transform-origin: 50% -20px;
+  box-shadow: 0 30px 50px -24px rgb(0 0 0 / .45), 0 4px 10px -4px rgb(0 0 0 / .2);
+  animation: cf-modal-cuelga 1.1s var(--curva); }
+@keyframes cf-modal-cuelga {
+  0% { opacity: 0; transform: translateY(-60px) rotate(6deg); }
+  35% { opacity: 1; transform: translateY(0) rotate(-3deg); }
+  65% { transform: rotate(1.4deg); }
+  100% { transform: none; }
+}
+.cf .cf-modal-pinza { position: absolute; z-index: 3; left: 50%; top: -30px; width: 22px; height: 54px; margin-left: -11px; }
+.cf .cf-modal-foto { max-height: calc(100svh - 160px); overflow: auto; overscroll-behavior: contain;
+  background:
+    radial-gradient(120% 50% at 20% 0%, rgb(255 255 255 / .8), transparent 60%),
+    radial-gradient(90% 60% at 100% 100%, color-mix(in srgb, var(--durazno) 22%, transparent), transparent 70%),
+    color-mix(in srgb, var(--rubor) 45%, var(--papel));
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / .04), inset 0 2px 10px color-mix(in srgb, var(--terracota) 14%, transparent); }
+.cf .cf-modal-pie { min-height: 62px; display: grid; place-items: center; font: 400 32px/1 var(--f-guion); color: var(--rotulo); rotate: -1.5deg; }
+/* Cerrar: un confeti redondo dorado pegado en la esquina, con una X a mano. */
+.cf .cf-cerrar { position: absolute; z-index: 4; top: -14px; right: -12px; width: 46px; height: 46px; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
+  background: var(--oro-brillo); box-shadow: 0 6px 12px -4px rgb(0 0 0 / .3), inset 0 1px 0 rgb(255 255 255 / .5); rotate: 8deg; }
+.cf .cf-cerrar svg { width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2.6; stroke-linecap: round; }
+.cf .cf-modal #rsvp { padding: 30px 18px 28px; border-top: 0; font-family: var(--f-texto); color: var(--tinta); background: transparent; }
 .cf .cf-modal #rsvp img { display: none; }
 .cf .cf-modal #rsvp .font-mono { font-family: var(--f-texto); letter-spacing: .14em; }
 .cf .cf-modal #rsvp p.font-mono, .cf .cf-modal #rsvp span.font-mono { font-size: 11.5px; font-weight: 600; color: var(--rotulo); }
@@ -394,12 +485,17 @@
 .cf .cf-modal #rsvp button[type="submit"]:disabled { opacity: .45; }
 .cf .cf-modal #rsvp .border-gold\/40 { border-color: color-mix(in srgb, var(--oro) 60%, transparent); background: color-mix(in srgb, var(--papel) 60%, white); }
 @keyframes cf-fundido { from { opacity: 0; } to { opacity: 1; } }
-@keyframes cf-subir { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 
 /* ---------- Movimiento reducido ---------- */
 @media (prefers-reduced-motion: reduce) {
   .cf .cf-globo-btn, .cf .cf-globito, .cf .cf-halo, .cf .cf-portada-ramo, .cf .cf-llama, .cf .cf-llama-halo { animation: none; }
+  .cf .cf-alfiler, .cf .cf-pase-globo, .cf .cf-kraft, .cf .cf-numglobo, .cf .cf-num, .cf .cf-musica-globo, .cf .cf-musica-nota, .cf .cf-notas-sueltas, .cf .cf-modal-caja { animation: none !important; }
   .cf .cf-tarjeta { animation: none; }
-  .cf .cf-colgada[data-reveal], .cf .cf-album[data-reveal], .cf .cf-final[data-reveal] { opacity: 1; transform: none; transition: none; }
+  .cf .cf-colgada[data-reveal], .cf .cf-album[data-reveal] { opacity: 1; transform: none; transition: none; }
+  .cf .cf-final[data-reveal] .cf-final-texto { opacity: 1; transition: none; }
   .cf .cf-colgada.is-in .cf-polaroid, .cf .cf-album.is-in .cf-polaroid-foto { animation: none; }
+  /* Sin vuelo: los globos se quedan quietos a distintas alturas. */
+  .cf .cf-final .cf-vuela, .cf .cf-final.is-in .cf-vuela, .cf .cf-final.is-in .cf-vuela svg { animation: none; opacity: 1; }
+  .cf .cf-vuela:nth-child(odd) { transform: translateY(-330px); }
+  .cf .cf-vuela:nth-child(even) { transform: translateY(-230px); }
 }

@@ -7,13 +7,13 @@
       "diseno": "eucalipto"
     },
     "tema": {
-      "color-paper": "#F6F4EC",
-      "color-ink": "#2F3A33",
-      "color-gold": "#8FA58F",
-      "color-gold-light": "#D6E0D2",
-      "color-gold-dark": "#5C7262",
+      "color-paper": "#F1F4F4",
+      "color-ink": "#2C3A40",
+      "color-gold": "#6F8F98",
+      "color-gold-light": "#CFDDE0",
+      "color-gold-dark": "#46626B",
       "color-marble": "#FFFFFF",
-      "color-seal": "#B89A5E",
+      "color-seal": "#B7A07A",
       "fuente-guion": "Allura",
       "fuente-titulos": "Gilda Display",
       "fuente-cuerpo": "Mulish"
@@ -100,17 +100,17 @@
           "nota": "Para ellas, vestido largo o de coctel; para ellos, traje oscuro. Les pedimos reservar el blanco para la novia.",
           "permitidos": [
             {
-              "nombre": "Salvia",
+              "nombre": "Gris perla",
               "colores": [
-                "#8FA58F",
-                "#B9C8B5"
+                "#B9C2C6",
+                "#DDE2E4"
               ]
             },
             {
-              "nombre": "Arena",
+              "nombre": "Champaña",
               "colores": [
-                "#D8CBB5",
-                "#B5A58C"
+                "#E6D6B8",
+                "#C9B48E"
               ]
             },
             {

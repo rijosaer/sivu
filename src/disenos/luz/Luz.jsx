@@ -4,7 +4,9 @@ import RSVP from "../../components/RSVP";
 import {
   partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer,
 } from "../comun";
-import { LbVela, LbLlama, LbOlivo, LbPaloma, LbPila } from "./arte";
+import {
+  LbVela, LbLlama, LbOlivo, LbPaloma, LbPila, LbCinta, LbVotiva, LbChispa, LbCerilla, LbConcha, LbCampana,
+} from "./arte";
 
 // Diseño «Luz de bautizo»: sereno, puro y luminoso. Marfil, oro suave,
 // olivo y flores blancas bajo una luz cálida.
@@ -12,11 +14,15 @@ import { LbVela, LbLlama, LbOlivo, LbPaloma, LbPila } from "./arte";
 //   (marfil apagado, no negro) con una vela bautismal alta, con cinta y
 //   ramito de olivo. Al tocar la mecha aparece la llama, que titila, y un
 //   halo de luz cálida se abre desde ella hasta iluminar toda la pantalla y
-//   revelar el nombre del bebé.
+//   revelar el nombre del bebé. El invitado va escrito en la cinta de raso
+//   que envuelve la vela (como un recordatorio de bautizo) y sus pases son
+//   velitas votivas encendidas. El llamado a tocar es una cerilla con chispas
+//   que se enciende al tocar.
 // - Cuerpo «arcos de capilla»: cada sección vive en una ventana de medio
-//   punto con filete dorado fino, alféizar y una luz suave que entra desde
-//   arriba; al aparecer, la luz «entra» en la ventana. Una paloma pequeña
-//   acompaña algunos títulos.
+//   punto con filete dorado fino y alféizar. El título va en un nicho con una
+//   cruz de luz. Al aparecer, la sombra de la ventana baja y la luz entra
+//   desde la clave del arco. La cuenta regresiva son cuatro velas votivas y
+//   el cierre, una concha bautismal que deja caer una gota en la luz.
 // Colores del tema: principal = oro suave, claro = oro pálido, oscuro = oro
 // viejo, papel = marfil, mármol = blanco de las ventanas, sello = olivo.
 
@@ -27,51 +33,36 @@ const trazo = { fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLi
 const Icono = {
   pin: <svg viewBox="0 0 24 24" {...trazo} aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z" /><circle cx="12" cy="9.5" r="2.5" /></svg>,
   copiar: <svg viewBox="0 0 24 24" {...trazo} aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2" /><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" /></svg>,
-  musica: <svg viewBox="0 0 24 24" {...trazo} aria-hidden="true"><path d="M9 18V5l11-2v13" /><circle cx="6.5" cy="18" r="2.5" /><circle cx="17.5" cy="16" r="2.5" /></svg>,
-  pausa: <svg viewBox="0 0 24 24" {...trazo} aria-hidden="true"><path d="M9 6v12M15 6v12" /></svg>,
   regalo: <svg viewBox="0 0 24 24" {...trazo} aria-hidden="true"><rect x="3.5" y="9" width="17" height="11.5" rx="1.5" /><path d="M2.5 9h19M12 9v11.5M12 9c-1.5-3.5-6-4.5-6-1.8C6 8.8 9 9 12 9zm0 0c1.5-3.5 6-4.5 6-1.8C18 8.8 15 9 12 9z" /></svg>,
   whatsapp: <svg viewBox="0 0 24 24" {...trazo} aria-hidden="true"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19.1z" /><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1.2-1.4-1.9-1-.9.8a4 4 0 0 1-2.3-2.3l.8-.9-1-1.9z" /></svg>,
 };
 
-// Clave del arco: pequeña cruz dorada con un rayo de luz.
-function Clave() {
-  return (
-    <svg className="lb-clave" viewBox="0 0 40 40" aria-hidden="true">
-      <circle cx="20" cy="20" r="13" fill="none" stroke="currentColor" strokeWidth=".8" opacity=".6" />
-      <path d="M18.6 9h2.8v8.2h7.4v2.8h-7.4V31h-2.8V20h-7.4v-2.8h7.4z" fill="currentColor" />
-    </svg>
-  );
+// Cruz de luz: dos haces finos que brillan en la clave del nicho.
+function CruzDeLuz({ className = "" }) {
+  return <span className={`lb-cruz ${className}`} aria-hidden="true"><i /></span>;
 }
 
-// Filete dorado: línea fina con un rombo y dos puntos.
-function Filete() {
-  return (
-    <svg className="lb-filete" viewBox="0 0 160 12" aria-hidden="true">
-      <path d="M4 6h60M96 6h60" stroke="currentColor" strokeWidth=".8" />
-      <path d="M80 1.5l4.5 4.5-4.5 4.5-4.5-4.5z" fill="currentColor" />
-      <circle cx="69" cy="6" r="1.4" fill="currentColor" />
-      <circle cx="91" cy="6" r="1.4" fill="currentColor" />
-    </svg>
-  );
-}
-
-// Ventana de capilla: arco de medio punto con filete dorado, luz que entra
-// desde arriba y alféizar. `paloma` pone una paloma pequeña junto al título.
-function Arco({ id, ante, titulo, paloma, pieza, angosto, children }) {
+// Ventana de capilla: arco de medio punto con filete dorado y alféizar. El
+// título vive en un nicho con una cruz de luz en su clave; el texto de apoyo
+// va debajo, en cursiva. Al aparecer, la sombra (lb-velo) baja y la luz entra.
+function Arco({ id, ante, anteArriba, titulo, paloma, pieza, angosto, children }) {
   return (
     <section className={`lb-seccion ${angosto ? "lb-angosto" : ""}`} aria-labelledby={id} data-reveal>
       <div className="lb-ventana">
         <span className="lb-luz" aria-hidden="true" />
         <span className="lb-rayos" aria-hidden="true" />
-        <Clave />
         <div className="lb-dentro">
           {pieza}
-          {paloma && <LbPaloma className="lb-paloma-titulo" ramita />}
-          {ante && <p className="lb-ante">{ante}</p>}
-          <h2 className="lb-h2" id={id}>{titulo}</h2>
-          <Filete />
+          <header className="lb-nicho">
+            <CruzDeLuz />
+            {paloma && <LbPaloma className="lb-paloma-titulo" ramita />}
+            {ante && anteArriba && <p className="lb-ante">{ante}</p>}
+            <h2 className="lb-h2" id={id}>{titulo}</h2>
+            {ante && !anteArriba && <p className="lb-ante">{ante}</p>}
+          </header>
           {children}
         </div>
+        <span className="lb-velo" aria-hidden="true" />
       </div>
       <span className="lb-alfeizar" aria-hidden="true" />
     </section>
@@ -112,18 +103,6 @@ function Portada({ welcome, partes, invitacion, encendida, instantanea, onEncend
       <span className="lb-penumbra" aria-hidden="true" />
       <span className="lb-calidez" aria-hidden="true" />
 
-      <div className="lb-portada-arriba">
-        {invitacion?.nombre ? (
-          <div className="lb-invitado">
-            <p className="lb-invitado-ante">Invitación especial para</p>
-            <p className="lb-invitado-nombre">{invitacion.nombre}</p>
-            {pases > 0 && <p className="lb-pases">{pases} {pases === 1 ? "pase reservado" : "pases reservados"}</p>}
-          </div>
-        ) : (
-          <p className="lb-invitado-ante">{welcome.bienvenidaTexto || "Mi bautizo"}</p>
-        )}
-      </div>
-
       <div className="lb-escena">
         <LbOlivo className="lb-escena-olivo lb-escena-olivo-1" />
         <LbOlivo className="lb-escena-olivo lb-escena-olivo-2" />
@@ -133,6 +112,11 @@ function Portada({ welcome, partes, invitacion, encendida, instantanea, onEncend
           <span className="lb-llama-sitio" ref={llama}>
             <LbLlama className="lb-llama" />
           </span>
+          {/* La cinta de raso que envuelve la vela lleva el nombre del invitado. */}
+          <div className="lb-cinta-sitio">
+            <LbCinta className="lb-cinta" texto={invitacion?.nombre || welcome.bienvenidaTexto || "Mi bautizo"} />
+            {invitacion?.nombre && <p className="lb-oculto">Invitación para {invitacion.nombre}</p>}
+          </div>
           <button
             type="button"
             className="lb-mecha"
@@ -140,15 +124,26 @@ function Portada({ welcome, partes, invitacion, encendida, instantanea, onEncend
             disabled={encendida}
             aria-label="Encender la vela y abrir la invitación"
           >
-            <span />
+            <LbChispa className="lb-chispa" />
           </button>
         </div>
       </div>
 
+      {pases > 0 && (
+        <div className="lb-votivas">
+          <div className="lb-votivas-fila" aria-hidden="true">
+            {Array.from({ length: Math.min(pases, 6) }, (_, i) => (
+              <LbVotiva key={i} className="lb-votivita" style={{ "--i": i }} />
+            ))}
+          </div>
+          <p className="lb-votivas-texto">{pases} {pases === 1 ? "lugar para ti" : "lugares para ti"}</p>
+        </div>
+      )}
+
       <div className="lb-portada-abajo">
         <button type="button" className="lb-pista" onClick={encender} tabIndex={encendida ? -1 : 0} aria-hidden={encendida}>
-          <svg viewBox="0 0 24 24" {...trazo} aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6" /></svg>
-          Toca la mecha para encender
+          <LbCerilla className="lb-cerilla" />
+          <span>Toca la mecha</span>
         </button>
         <div className="lb-revelado">
           <p className="lb-revelado-ante">{welcome.bienvenidaTexto || "Mi bautizo"}</p>
@@ -248,9 +243,8 @@ export default function Luz({ site, contenidoDe, invitacion, onEnviarRSVP, enEdi
     <div className="lb" ref={raiz}>
       {audioSrc && <audio ref={audioRef} src={audioSrc} loop />}
       {audioSrc && encendida && (
-        <button className="lb-musica" type="button" aria-pressed={sonando} onClick={alternarMusica} aria-label={sonando ? "Pausar música" : "Reproducir música"}>
-          {sonando ? Icono.pausa : Icono.musica}
-          <span>{sonando ? "Pausar" : "Música"}</span>
+        <button className={`lb-musica ${sonando ? "lb-sonando" : ""}`} type="button" aria-pressed={sonando} onClick={alternarMusica} aria-label={sonando ? "Pausar música" : "Reproducir música"}>
+          <LbCampana className="lb-campana" />
         </button>
       )}
 
@@ -266,7 +260,7 @@ export default function Luz({ site, contenidoDe, invitacion, onEnviarRSVP, enEdi
       {encendida && (
         <main className="lb-cuerpo">
           {hayBienvenida && (
-            <Arco id="lb-bienvenida" ante={welcome.padresTexto || "Hijo de"} titulo={padres.join(" y ") || nombres.join(" & ")} paloma>
+            <Arco id="lb-bienvenida" ante={welcome.padresTexto || "Hijo de"} anteArriba titulo={padres.join(" y ") || nombres.join(" & ")} paloma>
               {padresElla.length > 0 && <p className="lb-padres-2">y {padresElla.join(" y ")}</p>}
               {welcome.fraseIntro && <p className="lb-texto">{welcome.fraseIntro}</p>}
               {welcome.versiculo && (
@@ -282,8 +276,14 @@ export default function Luz({ site, contenidoDe, invitacion, onEnviarRSVP, enEdi
             <Arco id="lb-cuenta" ante={`${partes.semana} ${partes.dia} de ${partes.mes}`} titulo={cuenta ? "Faltan" : "¡Llegó el gran día!"} angosto>
               {cuenta && (
                 <div className="lb-cuenta" role="timer" aria-labelledby="lb-cuenta">
-                  {[["dias", "días"], ["horas", "horas"], ["min", "min"], ["seg", "seg"]].map(([k, l]) => (
-                    <div key={k}><span className="n">{cuenta[k]}</span><span className="l">{l}</span></div>
+                  {[["dias", "días"], ["horas", "horas"], ["min", "min"], ["seg", "seg"]].map(([k, l], i) => (
+                    <div key={k} className="lb-cuenta-vela" style={{ "--i": i }}>
+                      <span className="lb-cuenta-vaso">
+                        <LbVotiva className="lb-cuenta-votiva" />
+                        <span className={`n ${String(cuenta[k]).length > 2 ? "n-largo" : ""}`}>{cuenta[k]}</span>
+                      </span>
+                      <span className="l">{l}</span>
+                    </div>
                   ))}
                 </div>
               )}
@@ -434,10 +434,9 @@ export default function Luz({ site, contenidoDe, invitacion, onEnviarRSVP, enEdi
           )}
 
           <footer className="lb-final" data-reveal>
-            <LbPaloma className="lb-final-paloma" ramita />
+            <LbConcha className="lb-concha" />
             <p className="lb-final-gracias">¡Te esperamos!</p>
-            {nombres.length > 0 && <p className="lb-texto">Con amor, la familia de {nombres.join(" & ")}</p>}
-            <LbOlivo className="lb-final-olivo" />
+            {nombres.length > 0 && <p className="lb-texto lb-final-firma">Con amor, la familia de {nombres.join(" & ")}</p>}
           </footer>
         </main>
       )}
@@ -447,17 +446,22 @@ export default function Luz({ site, contenidoDe, invitacion, onEnviarRSVP, enEdi
       {rsvpAbierto && invitacion && (
         <div className="lb-modal" role="dialog" aria-modal="true" aria-label="Confirmar asistencia" onClick={(e) => e.target === e.currentTarget && setRsvpAbierto(false)}>
           <div className="lb-modal-caja">
-            <button type="button" className="lb-cerrar" onClick={() => setRsvpAbierto(false)} aria-label="Cerrar">×</button>
-            <LbPaloma className="lb-modal-paloma" ramita />
-            <RSVP
-              invitacion={invitacion}
-              fechaLimite={info.fechaLimiteConfirmacion || site.fechaLimiteConfirmacion}
-              opciones={{
-                mostrarRestriccion: info.mostrarRestriccion !== false,
-                mostrarObservaciones: info.mostrarObservaciones !== false,
-              }}
-              onSubmit={onEnviarRSVP}
-            />
+            <button type="button" className="lb-cerrar" onClick={() => setRsvpAbierto(false)} aria-label="Cerrar">
+              <svg viewBox="0 0 24 24" {...trazo} aria-hidden="true"><path d="M7 7l10 10M17 7L7 17" /></svg>
+            </button>
+            <div className="lb-modal-arco">
+              <CruzDeLuz className="lb-modal-cruz" />
+              <LbPaloma className="lb-modal-paloma" ramita />
+              <RSVP
+                invitacion={invitacion}
+                fechaLimite={info.fechaLimiteConfirmacion || site.fechaLimiteConfirmacion}
+                opciones={{
+                  mostrarRestriccion: info.mostrarRestriccion !== false,
+                  mostrarObservaciones: info.mostrarObservaciones !== false,
+                }}
+                onSubmit={onEnviarRSVP}
+              />
+            </div>
           </div>
         </div>
       )}

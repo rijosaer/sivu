@@ -39,11 +39,12 @@ function Grano({ id, fuerza = 0.12, frecuencia = 0.9 }) {
 const CUERPO_GLOBO = "M100 8 C 151 8 184 50 184 103 C 184 160 142 205 104 213 L 96 213 C 58 205 16 160 16 103 C 16 50 49 8 100 8 Z";
 
 // Un globo de látex (sin cuerda), dibujado en un cuadro de 200 × 230.
-function Globo({ uid, tono = "durazno" }) {
+// `clase` va en el grupo del látex (para reventarlo sin tocar la cuerda).
+function Globo({ uid, tono = "durazno", clase }) {
   const t = TONOS[tono] || TONOS.durazno;
   const id = (s) => `${uid}-${s}`;
   return (
-    <g>
+    <g className={clase}>
       <defs>
         <radialGradient id={id("c")} cx=".36" cy=".28" r=".82">
           <stop offset="0" style={{ stopColor: t.luz }} />
@@ -82,25 +83,135 @@ function Globo({ uid, tono = "durazno" }) {
   );
 }
 
+// Cuerda ondulada que baja del nudo (100, 228) hasta (100, 228 + largo).
+function trazoCuerda(largo) {
+  const fin = 228 + largo;
+  let d = "M100 228";
+  let y = 228;
+  let i = 0;
+  while (y < fin - 0.5) {
+    const paso = Math.min(48, fin - y);
+    const s = i % 2 ? 1 : -1;
+    d += ` C ${100 + 7 * s} ${(y + paso * 0.33).toFixed(1)} ${100 - 7 * s} ${(y + paso * 0.66).toFixed(1)} 100 ${(y + paso).toFixed(1)}`;
+    y += paso;
+    i++;
+  }
+  return d;
+}
+
 // SDXL: cf_globo
-export function CfGlobo({ tono = "durazno", cuerda = true, className = "" }) {
+// `largo` = largo de la cuerda (en unidades del globo de 200 de ancho); la
+// cuerda termina justo en el borde inferior del SVG, centrada.
+export function CfGlobo({ tono = "durazno", cuerda = true, largo = 100, className = "", claseLatex, claseCuerda, style }) {
   const uid = useId().replace(/:/g, "");
   return (
-    <svg className={className} viewBox={`0 0 200 ${cuerda ? 330 : 232}`} aria-hidden="true">
-      <defs>
-        <radialGradient id={`${uid}-s`} cx=".5" cy=".5" r=".5">
-          <stop offset="0" style={{ stopColor: C.oscuro }} stopOpacity=".18" />
-          <stop offset="1" style={{ stopColor: C.oscuro }} stopOpacity="0" />
-        </radialGradient>
-      </defs>
+    <svg className={className} style={style} viewBox={`0 0 200 ${cuerda ? 228 + largo : 232}`} aria-hidden="true">
       {cuerda && (
         <path
-          d="M100 228 C 92 246 110 258 101 276 C 93 292 108 304 100 328"
+          className={claseCuerda}
+          d={trazoCuerda(largo)}
           fill="none" strokeWidth="1.4" strokeLinecap="round"
-          style={{ stroke: mezcla(C.oscuro, C.tinta, 70) }} opacity=".7"
+          style={{ stroke: mezcla(C.oscuro, C.tinta, 70) }} opacity=".75"
+          vectorEffect="non-scaling-stroke"
         />
       )}
-      <Globo uid={uid} tono={tono} />
+      <Globo uid={uid} tono={tono} clase={claseLatex} />
+    </svg>
+  );
+}
+
+// SDXL: cf_etiqueta_kraft
+// Etiqueta de cartón kraft, de las de colgar en un regalo: esquinas de arriba
+// cortadas, ojal reforzado con un anillo más oscuro y un nudo de cabuya. El
+// kraft es color natural (fijo); la fibra sale de un ruido alargado.
+export function CfKraft({ className = "" }) {
+  const uid = useId().replace(/:/g, "");
+  const id = (s) => `${uid}-${s}`;
+  const forma = "M34 4 L 176 4 Q 180 4 183 7 L 203 30 Q 206 33 206 38 L 206 198 Q 206 206 198 206 L 12 206 Q 4 206 4 198 L 4 38 Q 4 33 7 30 L 27 7 Q 30 4 34 4 Z";
+  return (
+    <svg className={className} viewBox="0 0 210 212" aria-hidden="true">
+      <defs>
+        <linearGradient id={id("k")} x1="0" y1="0" x2=".35" y2="1">
+          <stop offset="0" stopColor="#D9B88F" />
+          <stop offset=".5" stopColor="#CDA77A" />
+          <stop offset="1" stopColor="#BE966A" />
+        </linearGradient>
+        <radialGradient id={id("luz")} cx=".3" cy=".25" r=".8">
+          <stop offset="0" stopColor="#fff" stopOpacity=".22" />
+          <stop offset="1" stopColor="#fff" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id={id("anillo")} cx=".45" cy=".4" r=".6">
+          <stop offset="0" stopColor="#B88E61" />
+          <stop offset="1" stopColor="#9F774D" />
+        </radialGradient>
+        {/* Fibra del cartón: ruido estirado + grano fino */}
+        <filter id={id("fibra")} x="0" y="0" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency=".9 .05" numOctaves="2" seed="4" result="f" />
+          <feColorMatrix in="f" type="matrix" values="0 0 0 0 .35  0 0 0 0 .22  0 0 0 0 .1  0 0 0 .28 0" result="fc" />
+          <feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="1" seed="9" result="p" />
+          <feColorMatrix in="p" type="matrix" values="0 0 0 0 .3  0 0 0 0 .2  0 0 0 0 .1  0 0 0 .16 0" result="pc" />
+          <feMerge result="m"><feMergeNode in="SourceGraphic" /><feMergeNode in="fc" /><feMergeNode in="pc" /></feMerge>
+          <feComposite in="m" in2="SourceAlpha" operator="in" />
+        </filter>
+        <mask id={id("ojal")}>
+          <rect width="210" height="212" fill="#fff" />
+          <circle cx="105" cy="24" r="5.4" fill="#000" />
+        </mask>
+      </defs>
+      <g>
+        <g mask={`url(#${id("ojal")})`}>
+          <path d={forma} fill={`url(#${id("k")})`} filter={`url(#${id("fibra")})`} />
+          <path d={forma} fill={`url(#${id("luz")})`} />
+          {/* Borde un poco más oscuro, como cartón cortado */}
+          <path d={forma} fill="none" stroke="#9C7348" strokeOpacity=".35" strokeWidth="1.2" />
+          <circle cx="105" cy="24" r="12" fill={`url(#${id("anillo")})`} />
+          <circle cx="105" cy="24" r="12" fill="none" stroke="#7E5A36" strokeOpacity=".35" strokeWidth=".8" />
+        </g>
+      </g>
+      {/* Nudo de cabuya en el ojal */}
+      <g fill="none" strokeLinecap="round">
+        <path d="M105 24 C 96 18 90 12 96 8 C 101 5 104 12 105 24" stroke="#8C6A45" strokeWidth="2.2" />
+        <path d="M105 24 C 114 18 120 12 114 8 C 109 5 106 12 105 24" stroke="#8C6A45" strokeWidth="2.2" />
+        <path d="M105 24 C 101 30 97 36 92 40 M105 24 C 108 31 112 36 117 39" stroke="#8C6A45" strokeWidth="1.8" />
+        <path d="M97 9 C 99 8 101 10 102 13 M113 9 C 111 8 109 10 108 13" stroke="#E6CDA8" strokeOpacity=".7" strokeWidth=".8" />
+      </g>
+      <circle cx="105" cy="24" r="3" fill="#7A5733" />
+    </svg>
+  );
+}
+
+// SDXL: cf_alfiler
+// Alfiler de costura con cabeza de perla (del tema) y aguja de acero. La
+// punta queda a la derecha; la cabeza, centrada en (16, 15).
+export function CfAlfiler({ className = "" }) {
+  const uid = useId().replace(/:/g, "");
+  const id = (s) => `${uid}-${s}`;
+  return (
+    <svg className={className} viewBox="0 0 140 30" aria-hidden="true">
+      <defs>
+        <linearGradient id={id("acero")} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#FBFBFA" />
+          <stop offset=".45" stopColor="#C9C7C3" />
+          <stop offset="1" stopColor="#6F6B66" />
+        </linearGradient>
+        <radialGradient id={id("perla")} cx=".36" cy=".32" r=".75">
+          <stop offset="0" style={{ stopColor: mezcla(C.durazno, "white", 25) }} />
+          <stop offset=".5" style={{ stopColor: mezcla(C.durazno, C.oscuro, 55) }} />
+          <stop offset="1" style={{ stopColor: mezcla(C.oscuro, C.tinta, 70) }} />
+        </radialGradient>
+        <filter id={id("s")} x="-10%" y="-40%" width="125%" height="200%">
+          <feDropShadow dx="1" dy="3" stdDeviation="1.8" floodColor="#5a3a28" floodOpacity=".3" />
+        </filter>
+      </defs>
+      <g filter={`url(#${id("s")})`}>
+        {/* Aguja que se afila hasta la punta */}
+        <path d="M24 13.6 L 126 14.2 L 139 15 L 126 15.8 L 24 16.4 Z" fill={`url(#${id("acero")})`} />
+        <path d="M26 14.3 L 124 14.7" stroke="#fff" strokeOpacity=".8" strokeWidth=".5" />
+        {/* Cabeza de perla */}
+        <circle cx="16" cy="15" r="12.5" fill={`url(#${id("perla")})`} />
+        <ellipse cx="11.5" cy="10" rx="4.2" ry="2.8" transform="rotate(-30 11.5 10)" fill="#fff" opacity=".8" />
+        <circle cx="21" cy="21" r="3" fill="#fff" opacity=".18" />
+      </g>
     </svg>
   );
 }

@@ -7,13 +7,13 @@
       "diseno": "birrete"
     },
     "tema": {
-      "color-paper": "#F8F5EE",
-      "color-ink": "#1F2228",
-      "color-gold": "#B8913F",
-      "color-gold-light": "#E9D7A9",
-      "color-gold-dark": "#7C6024",
+      "color-paper": "#F7F3EE",
+      "color-ink": "#2A1E22",
+      "color-gold": "#7A2638",
+      "color-gold-light": "#E8C9CF",
+      "color-gold-dark": "#4F1424",
       "color-marble": "#FFFFFF",
-      "color-seal": "#2E3A55",
+      "color-seal": "#B8913F",
       "fuente-guion": "Imperial Script",
       "fuente-titulos": "Cinzel Decorative",
       "fuente-cuerpo": "EB Garamond"

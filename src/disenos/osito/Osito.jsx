@@ -1,18 +1,23 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "./osito.css";
 import RSVP from "../../components/RSVP";
 import {
   partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer,
 } from "../comun";
-import { OsOsito, OsNube, OsMovil, OsCubo, OsCoche, OsRopita, OsPampas, OsGlobo, OsSobre } from "./arte";
+import {
+  OsOsito, OsNube, OsMovil, OsCubo, OsCoche, OsRopita, OsPampas, OsGlobo, OsSobre,
+  OsMantita, OsPatita, OsTirador, OsSonajero, OsBotonCostura, OsParche,
+} from "./arte";
 
 // Diseño «Osito»: baby shower tierno, neutro y elegante. Fondo crema, osito
 // de peluche beige, nubes, globos beige y salvia, pampas y eucalipto.
 // - Entrada: un móvil de cuna de madera cuelga desde arriba con nubes de
-//   fieltro, luna y estrellas; abajo, un mar de nubes. Al tocar («Toca para
-//   despertar al móvil») el móvil gira suavemente y las nubes se apartan
+//   fieltro, luna y estrellas; abajo, un mar de nubes. Al jalar el cordón
+//   del móvil, el móvil gira suavemente y las nubes se apartan
 //   hacia los lados, revelando al osito sentado y el nombre del bebé. Esa
-//   escena queda como portada y el cuerpo sigue debajo.
+//   escena queda como portada y el cuerpo sigue debajo. El llamado a tocar
+//   es el cordón del móvil, que se jala; el invitado aparece bordado en una
+//   mantita y sus pases son patitas de oso.
 // - Cuerpo: «cubos de madera». Cada sección arranca con un cubo de juguete
 //   pintado (vista 3/4) con el ícono de la sección en la cara frontal; el
 //   cubo cae y se apila sobre una tarjeta suave y redondeada, con una leve
@@ -85,17 +90,43 @@ function Bloque({ n, icono, ante, titulo, id, children, className = "", tono: fi
   );
 }
 
-function Entrada({ welcome, partes, invitacion, despierta, onDespertar }) {
+const texto = (n) => `${n} ${n === 1 ? "lugar" : "lugares"} para ti`;
+
+// Huellas de osito, una por pase (hasta 8; con más, se escribe el número).
+function Patitas({ n, className = "" }) {
+  const visibles = Math.min(n, 8);
+  return (
+    <span className={`os-patitas ${className}`} aria-hidden="true">
+      {Array.from({ length: visibles }, (_, i) => (
+        <OsPatita key={i} className="os-patita" style={{ "--i": i, "--g": `${i % 2 ? 14 : -10}deg`, "--y": `${i % 2 ? -5 : 3}px` }} />
+      ))}
+    </span>
+  );
+}
+
+function Entrada({ welcome, partes, invitacion, despierta, jalando, onJalar }) {
   const pases = pasesDe(invitacion);
   const nombre = welcome.novioEl || "";
   return (
-    <section className={`os-entrada ${despierta ? "is-despierta" : ""}`} aria-labelledby="os-nombre">
+    <section className={`os-entrada ${despierta ? "is-despierta" : ""} ${jalando ? "is-jalando" : ""}`} aria-labelledby="os-nombre">
       <div className="os-cielo" aria-hidden="true">
         <OsNube className="os-cielo-nube n1" />
         <OsNube className="os-cielo-nube n2" />
       </div>
 
       <OsMovil girando={despierta} />
+
+      {/* Cordón del móvil: se jala para despertarlo */}
+      <div className="os-cordon">
+        <span className="os-cordon-hilo" aria-hidden="true" />
+        <button type="button" className="os-tirador" onClick={onJalar} disabled={despierta} aria-label="Jalar el cordón del móvil para abrir la invitación">
+          <OsTirador />
+        </button>
+        <span className="os-cordon-pista" aria-hidden="true">
+          <svg viewBox="0 0 40 30"><path d="M36 4 C 26 4 16 10 10 24 M10 24 L 6 16 M10 24 L 17 20" /></svg>
+          jala el cordón
+        </span>
+      </div>
 
       {/* Escena escondida bajo las nubes */}
       <div className="os-escena" aria-hidden="true">
@@ -111,22 +142,34 @@ function Entrada({ welcome, partes, invitacion, despierta, onDespertar }) {
 
       <div className="os-letrero">
         <div className="os-letrero-antes">
-          {invitacion?.nombre ? (
-            <>
-              <p className="os-ante">Invitación especial para</p>
-              <p className="os-invitado">{invitacion.nombre}</p>
-              {pases > 0 && <span className="os-pases">{pases} {pases === 1 ? "pase reservado" : "pases reservados"}</span>}
-            </>
-          ) : (
-            <p className="os-ante">Una invitación con mucho amor</p>
+          {/* Mantita con el nombre bordado */}
+          <div className="os-mantita">
+            <OsMantita className="os-mantita-tela" />
+            {invitacion?.nombre ? (
+              <>
+                <p className="os-mantita-para">bordada para</p>
+                <p className="os-bordado">{invitacion.nombre}</p>
+              </>
+            ) : (
+              <p className="os-bordado os-bordado-sin">Con mucho amor</p>
+            )}
+          </div>
+          {invitacion?.nombre && pases > 0 && (
+            <p className="os-huellas">
+              <Patitas n={pases} />
+              <span>{texto(pases)}</span>
+            </p>
           )}
         </div>
         <div className="os-letrero-despues">
-          {welcome.bienvenidaTexto && <p className="os-ante">{welcome.bienvenidaTexto}</p>}
+          {welcome.bienvenidaTexto && <p className="os-bienvenida">{welcome.bienvenidaTexto}</p>}
           <h1 className="os-nombre" id="os-nombre">{nombre}</h1>
           {partes && <p className="os-fecha"><span>{partes.semana}</span> {partes.dia} de {partes.mes} · {partes.anio}</p>}
           {invitacion?.nombre && despierta && (
-            <p className="os-para">Para <b>{invitacion.nombre}</b>{pases > 0 && <> · {pases} {pases === 1 ? "pase" : "pases"}</>}</p>
+            <p className="os-para">
+              {pases > 0 && <Patitas n={Math.min(pases, 4)} className="is-mini" />}
+              <span><b>{invitacion.nombre}</b>{pases > 0 && <>, {texto(pases)}</>}</span>
+            </p>
           )}
         </div>
       </div>
@@ -141,13 +184,7 @@ function Entrada({ welcome, partes, invitacion, despierta, onDespertar }) {
         ))}
       </div>
 
-      {!despierta && (
-        <button type="button" className="os-despertar" onClick={onDespertar}>
-          <svg className="os-despertar-estrella" viewBox="0 0 24 24" aria-hidden="true">{ICONO.estrella}</svg>
-          Toca para despertar al móvil
-        </button>
-      )}
-      {!despierta && <button type="button" className="os-toque" onClick={onDespertar} tabIndex={-1} aria-hidden="true" />}
+      {!despierta && <button type="button" className="os-toque" onClick={onJalar} tabIndex={-1} aria-hidden="true" />}
       {despierta && <span className="os-desliza" aria-hidden="true">{UI.abajo}</span>}
     </section>
   );
@@ -160,6 +197,7 @@ export default function Osito({ site, contenidoDe, invitacion, onEnviarRSVP, enE
   const [rsvpAbierto, setRsvpAbierto] = useState(false);
   const [sonando, setSonando] = useState(false);
   const [aviso, setAviso] = useState("");
+  const [jalando, setJalando] = useState(false);
   const audioRef = useRef(null);
   const raiz = useAparecer(abierta, "[data-reveal]", "is-in");
 
@@ -199,10 +237,16 @@ export default function Osito({ site, contenidoDe, invitacion, onEnviarRSVP, enE
     return primero.length > 0 && primero.length <= 6 ? [...primero.toUpperCase()] : primero ? [primero[0].toUpperCase()] : [];
   })();
 
-  function despertar() {
-    if (abierta) return;
-    setAbierta(true);
+  // Jalar el cordón: el cordón baja y rebota, y entonces el móvil despierta.
+  // La música arranca en el mismo toque (el navegador lo exige).
+  const temporizador = useRef(0);
+  useEffect(() => () => clearTimeout(temporizador.current), []);
+  function jalar() {
+    if (abierta || jalando) return;
+    setJalando(true);
     audioRef.current?.play().then(() => setSonando(true)).catch(() => {});
+    const quieto = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    temporizador.current = setTimeout(() => { setAbierta(true); setJalando(false); }, quieto ? 0 : 620);
   }
   function alternarMusica() {
     const a = audioRef.current;
@@ -234,12 +278,14 @@ export default function Osito({ site, contenidoDe, invitacion, onEnviarRSVP, enE
     <div className="os" ref={raiz}>
       {audioSrc && <audio ref={audioRef} src={audioSrc} loop />}
       {audioSrc && abierta && (
-        <button className="os-musica" type="button" aria-pressed={sonando} onClick={alternarMusica} aria-label={sonando ? "Pausar música" : "Reproducir música"}>
-          {sonando ? UI.pausa : UI.musica}
+        <button className={`os-musica ${sonando ? "is-sonando" : ""}`} type="button" aria-pressed={sonando} onClick={alternarMusica} aria-label={sonando ? "Pausar música" : "Reproducir música"}>
+          <span className="os-musica-ondas" aria-hidden="true"><i /><i /></span>
+          <OsSonajero className="os-sonajero" />
+          {!sonando && <span className="os-musica-pausa" aria-hidden="true">{UI.musica}</span>}
         </button>
       )}
 
-      <Entrada welcome={welcome} partes={partes} invitacion={invitacion} despierta={abierta} onDespertar={despertar} />
+      <Entrada welcome={welcome} partes={partes} invitacion={invitacion} despierta={abierta} jalando={jalando} onJalar={jalar} />
 
       {abierta && (
         <main className="os-cuerpo">
@@ -261,8 +307,14 @@ export default function Osito({ site, contenidoDe, invitacion, onEnviarRSVP, enE
               <p className="os-dia"><span>{partes.semana}</span> {partes.dia} de {partes.mes} · {partes.hora}</p>
               {cuenta && (
                 <div className="os-cuenta" role="timer" aria-labelledby="os-cuenta">
-                  {[["dias", "días"], ["horas", "horas"], ["min", "min"], ["seg", "seg"]].map(([k, l]) => (
-                    <div key={k}><span className="n">{cuenta[k]}</span><span className="l">{l}</span></div>
+                  {[["dias", "días", "beige"], ["horas", "horas", "salvia"], ["min", "minutos", "claro"], ["seg", "segundos", "beige"]].map(([k, l, tono], i) => (
+                    <div key={k} className="os-cuenta-cubo" style={{ "--giro": `${[-5, 4, -3, 6][i]}deg`, "--i": i }}>
+                      <span className="os-cuenta-salto" key={k === "seg" ? cuenta.seg : k}>
+                        <OsCubo tono={tono} letra={String(cuenta[k]).padStart(k === "dias" ? 1 : 2, "0")} />
+                      </span>
+                      <span className="os-cuenta-l">{l}</span>
+                      <span className="os-oculto">{cuenta[k]} {l}</span>
+                    </div>
                   ))}
                 </div>
               )}
@@ -432,17 +484,19 @@ export default function Osito({ site, contenidoDe, invitacion, onEnviarRSVP, enE
       {rsvpAbierto && invitacion && (
         <div className="os-modal" role="dialog" aria-modal="true" aria-label="Confirmar asistencia" onClick={(e) => e.target === e.currentTarget && setRsvpAbierto(false)}>
           <div className="os-modal-caja">
-            <button type="button" className="os-cerrar" onClick={() => setRsvpAbierto(false)} aria-label="Cerrar">×</button>
-            <div className="os-modal-cubo"><OsCubo tono="salvia">{ICONO.biberon}</OsCubo></div>
-            <RSVP
-              invitacion={invitacion}
-              fechaLimite={info.fechaLimiteConfirmacion || site.fechaLimiteConfirmacion}
-              opciones={{
-                mostrarRestriccion: info.mostrarRestriccion !== false,
-                mostrarObservaciones: info.mostrarObservaciones !== false,
-              }}
-              onSubmit={onEnviarRSVP}
-            />
+            <button type="button" className="os-cerrar" onClick={() => setRsvpAbierto(false)} aria-label="Cerrar"><OsBotonCostura /></button>
+            <div className="os-modal-tela">
+              <div className="os-modal-parche"><OsParche /></div>
+              <RSVP
+                invitacion={invitacion}
+                fechaLimite={info.fechaLimiteConfirmacion || site.fechaLimiteConfirmacion}
+                opciones={{
+                  mostrarRestriccion: info.mostrarRestriccion !== false,
+                  mostrarObservaciones: info.mostrarObservaciones !== false,
+                }}
+                onSubmit={onEnviarRSVP}
+              />
+            </div>
           </div>
         </div>
       )}

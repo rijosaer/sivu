@@ -1,12 +1,13 @@
-/* Diseño «Eucalipto»: boda de jardín romántica y fresca. Papel crema, rosas y
-   peonías blancas, gipsofila y eucalipto plateado; etiquetas de papel de
-   algodón con borde rasgado colgadas de un tallo.
+/* Diseño «Eucalipto»: boda de jardín romántica y fresca. Papel gris perla,
+   rosas y peonías blancas, gipsofila y eucalipto azul plata; etiquetas de
+   papel de algodón con borde rasgado colgadas de un tallo, cintas de lino
+   champaña e hilo.
    Letras propias: Allura (guion, nombres), Gilda Display (títulos, cifras) y
    Mulish (texto). El tema puede cambiarlas (fuente-guion, fuente-titulos,
    fuente-cuerpo). Todo el color de marca sale del tema. */
 .eu {
-  /* principal = verde eucalipto, claro = salvia pálido, oscuro = eucalipto
-     profundo, papel = crema, mármol = blanco algodón, sello = oro viejo. */
+  /* principal = azul eucalipto, claro = plata pálida, oscuro = azul pizarra,
+     papel = gris perla, mármol = blanco algodón, sello = champaña. */
   --papel: rgb(var(--color-paper));
   --tinta: rgb(var(--color-ink));
   --verde: rgb(var(--color-gold));
@@ -16,6 +17,7 @@
   --oro: rgb(var(--color-seal));
   --suave: color-mix(in srgb, var(--tinta) 74%, white);
   --linea: color-mix(in srgb, var(--verde) 45%, transparent);
+  --hilo: color-mix(in srgb, var(--oro) 85%, #3a3020);
   --grano: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .32 0 0 0 0 .26 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
   --fibras: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.02 .3' numOctaves='3' seed='8'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .52 0 0 0 0 .44 0 0 0 .09 -.01'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
 
@@ -69,22 +71,23 @@
 @media (hover: hover) { .eu .eu-btn-linea:hover { background: color-mix(in srgb, var(--salvia) 45%, transparent); } }
 .eu .eu-botones { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 16px; }
 
-.eu .eu-pases {
-  display: inline-block; margin-top: 8px; padding: 5px 16px; border-radius: 999px;
-  font: 700 12px/1.4 var(--f-texto); letter-spacing: .14em; text-transform: uppercase;
-  color: #fff; background: var(--profundo);
-}
-.eu .eu-pases-claro { color: var(--profundo); background: color-mix(in srgb, var(--salvia) 70%, white); margin: 0 0 18px; }
+/* Lugares: una hojita por cada uno, que brotan contadas */
+.eu .eu-lugares { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 8px; font: 400 14px/1.3 var(--f-texto); color: var(--suave); }
+.eu .eu-lugares-hojas { display: flex; align-items: flex-end; gap: 1px; }
+.eu .eu-hojita { width: 18px; height: 24px; transform-origin: 50% 85%; transform: rotate(var(--g, 0deg));
+  animation: eu-brota .7s var(--curva) both calc(1.3s + var(--k, 0) * .35s); }
+.eu .eu-lugares-rsvp { margin: 0 0 16px; font-size: 15px; }
+.eu .eu-colgante:not(.is-in) .eu-hojita { animation-play-state: paused; }
+@keyframes eu-brota { from { opacity: 0; transform: rotate(var(--g, 0deg)) scale(.15); } }
 
-.eu .eu-musica {
-  position: fixed; z-index: 40; top: 12px; right: 12px;
-  display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px 0 12px;
-  border: 1px solid var(--verde); border-radius: 999px; background: color-mix(in srgb, var(--algodon) 90%, transparent);
-  color: var(--profundo); font: 700 12px/1 var(--f-texto); letter-spacing: .14em; text-transform: uppercase; cursor: pointer;
-  backdrop-filter: blur(6px); box-shadow: 0 8px 18px -12px var(--profundo);
-}
-.eu .eu-musica svg { width: 19px; height: 19px; }
-.eu .eu-musica[aria-pressed="true"] { background: var(--profundo); color: #fff; border-color: transparent; }
+/* Música: una hoja de eucalipto dólar de plata que se mece mientras suena */
+.eu .eu-musica { position: fixed; z-index: 40; top: 8px; right: 10px; width: 50px; height: 60px; padding: 0; border: 0; background: none; cursor: pointer;
+  transform-origin: 50% 100%; -webkit-tap-highlight-color: transparent; }
+.eu .eu-musica-hoja { position: absolute; inset: 0; width: 100%; height: 100%; }
+.eu .eu-musica-icono { position: absolute; left: 0; right: 0; top: 15px; display: grid; place-items: center; color: #fff; filter: drop-shadow(0 1px 1px rgb(44 58 64 / .45)); }
+.eu .eu-musica-icono svg { width: 20px; height: 20px; }
+.eu .eu-musica[aria-pressed="true"] { animation: eu-viento 3.2s ease-in-out infinite; }
+@keyframes eu-viento { 0%, 100% { transform: rotate(-7deg); } 50% { transform: rotate(6deg); } }
 
 /* ---------- Portada: cortina de flores ---------- */
 .eu .eu-portada { position: relative; min-height: 100svh; display: grid; place-items: center; overflow: hidden; }
@@ -92,7 +95,7 @@
   -webkit-mask-image: linear-gradient(#000 88%, transparent); mask-image: linear-gradient(#000 88%, transparent); }
 .eu.eu-cerrada .eu-marco { -webkit-mask-image: none; mask-image: none; }
 .eu .eu-rama { position: absolute; top: -4%; height: 112%; min-height: 660px; width: calc(max(112svh, 660px) * .34); will-change: transform;
-  transition: transform 1.9s var(--suelta); }
+  transition: transform 1.9s var(--suelta) .55s; }
 .eu .eu-rama svg { display: block; width: 100%; height: 100%; }
 /* Cerrada: cada rama cubre casi tres cuartos de la pantalla y se cruzan al centro. */
 .eu .eu-rama-izq { left: 0; transform-origin: 0 50%; transform: translateX(-4%); }
@@ -102,27 +105,58 @@
 .eu:not(.eu-cerrada) .eu-rama-izq { transform: translateX(-74%) rotate(-2deg); }
 .eu:not(.eu-cerrada) .eu-rama-der { transform: translateX(74%) rotate(2deg); }
 
-/* Medallón entre las ramas */
-.eu .eu-entrada { position: absolute; inset: 0; z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
-  padding: 24px 16px 92px; cursor: pointer; transition: opacity .7s ease, transform .9s var(--curva); }
-.eu.eu-abriendo .eu-entrada { opacity: 0; transform: scale(.94); pointer-events: none; }
-.eu .eu-medallon { position: relative; width: min(78vw, 300px); padding: 46px 24px 40px; text-align: center; border-radius: 50%;
-  background: var(--fibras), radial-gradient(closest-side, var(--algodon) 70%, color-mix(in srgb, var(--algodon) 92%, var(--papel)));
-  box-shadow: 0 0 0 7px color-mix(in srgb, var(--algodon) 70%, transparent), 0 0 0 8px color-mix(in srgb, var(--oro) 70%, transparent),
-    0 22px 40px -18px rgb(47 58 51 / .45);
-  animation: eu-asoma 1.2s var(--curva) both .2s; }
-.eu .eu-medallon::after { content: ""; position: absolute; inset: 8px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--oro) 55%, transparent); pointer-events: none; }
-.eu .eu-invitado { margin-top: 4px; font: 400 clamp(34px, 10vw, 42px)/1.1 var(--f-guion); color: var(--profundo); overflow-wrap: anywhere; }
-.eu .eu-medallon .eu-filete { width: 120px; margin: 14px auto 6px; }
-.eu .eu-medallon-nombres { font: 400 clamp(46px, 13.5vw, 58px)/1.02 var(--f-guion); color: var(--profundo); overflow-wrap: anywhere; }
-.eu .eu-medallon-fecha { margin-top: 10px; font: 400 15px/1 var(--f-titulo); letter-spacing: .3em; color: var(--suave); }
-.eu .eu-abrir { position: relative; min-height: 50px; padding: 12px 28px; border: 1px solid color-mix(in srgb, var(--oro) 80%, transparent); border-radius: 999px;
-  background: color-mix(in srgb, var(--algodon) 92%, transparent); color: var(--profundo); backdrop-filter: blur(4px);
-  font: 700 12.5px/1.2 var(--f-texto); letter-spacing: .26em; text-transform: uppercase; cursor: pointer;
-  box-shadow: 0 12px 24px -14px var(--profundo); animation: eu-latir 2.6s ease-in-out infinite 1.4s; }
-@keyframes eu-asoma { from { opacity: 0; transform: scale(.92); } to { opacity: 1; transform: none; } }
-@keyframes eu-latir { 0%, 100% { box-shadow: 0 12px 24px -14px var(--profundo), 0 0 0 0 color-mix(in srgb, var(--verde) 45%, transparent); }
-  50% { box-shadow: 0 12px 24px -14px var(--profundo), 0 0 0 10px color-mix(in srgb, var(--verde) 0%, transparent); } }
+/* Etiquetas colgadas de una vara entre las ramas */
+.eu .eu-entrada { position: absolute; inset: 0; z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 0 0 70px; }
+.eu .eu-colgador { position: relative; width: min(300px, 78vw); transition: opacity .8s ease .45s, transform 1.3s var(--curva) .35s; }
+.eu .eu-colgador:has(.eu-tag-invitado) { padding-bottom: 178px; }
+.eu.eu-abriendo .eu-colgador { opacity: 0; transform: translateY(-36px); }
+.eu .eu-colgador::before { content: ""; position: absolute; z-index: 0; inset: 40px -60px -30px; pointer-events: none;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--papel) 78%, transparent), transparent); }
+.eu .eu-vara { position: relative; z-index: 3; display: block; width: calc(100% + 40px); height: auto; margin: 0 -20px; animation: eu-asoma 1.1s var(--curva) both .1s; }
+.eu .eu-tag { position: relative; transform-origin: 50% 9.5px; }
+.eu .eu-tag-novios { z-index: 2; width: 236px; margin: -71px auto 0; padding-top: 78px; animation: eu-mecer 4.8s ease-in-out infinite; }
+.eu .eu-tag .eu-papel { padding: 54px 18px 26px; }
+.eu .eu-tag-ante { font: 400 15px/1.3 var(--f-titulo); letter-spacing: .08em; color: var(--suave); }
+.eu .eu-tag-nombres { margin-top: 4px; font: 400 clamp(46px, 13vw, 54px)/1 var(--f-guion); color: var(--profundo); overflow-wrap: anywhere; }
+.eu .eu-tag-fecha { margin-top: 12px; font: 400 15px/1 var(--f-titulo); letter-spacing: .24em; color: var(--tinta); }
+/* La etiquetita del invitado: atada con su propio hilo a la punta de la vara */
+.eu .eu-tag-invitado { position: absolute; z-index: 1; top: 30px; right: -22px; width: 152px; padding-top: 312px; transform-origin: 50% 0;
+  animation: eu-mecer 3.7s ease-in-out infinite -1.3s; }
+.eu .eu-tag-hilo { position: absolute; top: 0; left: 50%; width: 1.2px; height: 330px; margin-left: -.6px; background: var(--hilo); }
+.eu .eu-tag-hilo::before { content: ""; position: absolute; top: -3px; left: -3px; width: 7px; height: 6px; border-radius: 50%; background: var(--hilo); }
+.eu .eu-tag-invitado .eu-ojal { top: calc(312px + 4px); width: 32px; height: 32px; margin-left: -16px; }
+.eu .eu-tag-invitado .eu-papel { padding: 40px 12px 16px; }
+.eu .eu-tag-invitado .eu-sombra { transform: rotate(-3deg); }
+.eu .eu-para { font: 400 22px/1 var(--f-guion); color: var(--suave); }
+.eu .eu-invitado { font: 400 30px/1.05 var(--f-guion); color: var(--profundo); overflow-wrap: anywhere; }
+@keyframes eu-mecer { 0%, 100% { transform: rotate(-2.2deg); } 50% { transform: rotate(2.2deg); } }
+@keyframes eu-asoma { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+
+/* «Tira de la cinta»: la cinta de lino ata las dos ramas con un nudo */
+.eu .eu-cinta { position: relative; z-index: 4; display: block; width: 100%; height: 148px; margin-top: 0; padding: 0; border: 0; background: none; cursor: pointer; color: inherit; }
+.eu .eu-cinta-banda { position: absolute; top: 20px; width: 53%; height: 30px; filter: drop-shadow(0 4px 4px rgb(44 58 64 / .18));
+  transition: transform 1.1s var(--suelta) .15s, opacity .5s ease .7s; }
+.eu .eu-cinta-banda svg { display: block; width: 100%; height: 100%; }
+.eu .eu-cinta-izq { left: 0; }
+.eu .eu-cinta-der { right: 0; }
+.eu .eu-nudo { position: absolute; z-index: 1; left: 50%; top: 9px; width: 124px; height: auto; margin-left: -62px; transform-origin: 50% 20%;
+  animation: eu-tiron 2.8s ease-in-out infinite 1.4s; }
+.eu .eu-nudo g { transform-box: fill-box; transition: transform .8s var(--suelta), opacity .5s ease .2s; }
+.eu .eu-punta-izq { transform-origin: 90% 0; }
+.eu .eu-punta-der { transform-origin: 10% 0; }
+.eu .eu-nudo-bulto { transform-origin: 50% 50%; }
+.eu .eu-cinta-texto { position: absolute; left: 0; right: 0; top: 108px; font: 400 32px/1.1 var(--f-guion); color: var(--profundo);
+  text-shadow: 0 0 6px var(--papel), 0 0 14px var(--papel), 0 0 2px var(--papel); transition: opacity .4s ease; }
+@keyframes eu-tiron { 0%, 70%, 100% { transform: none; } 78% { transform: translateY(3px) rotate(-3deg); } 88% { transform: translateY(-1px) rotate(2deg); } }
+/* Al tirar: el nudo se afloja, las puntas caen y la cinta se corre a los lados */
+.eu.eu-abriendo .eu-nudo { animation: none; }
+.eu.eu-abriendo .eu-nudo-bulto { transform: scale(.3); opacity: 0; }
+.eu.eu-abriendo .eu-punta-izq { transform: translate(-30px, 46px) rotate(28deg); opacity: 0; }
+.eu.eu-abriendo .eu-punta-der { transform: translate(30px, 46px) rotate(-28deg); opacity: 0; }
+.eu.eu-abriendo .eu-cinta-izq { transform: translateX(-108%) translateY(10px) rotate(-4deg); opacity: 0; }
+.eu.eu-abriendo .eu-cinta-der { transform: translateX(108%) translateY(10px) rotate(4deg); opacity: 0; }
+.eu.eu-abriendo .eu-cinta-texto { opacity: 0; }
 
 /* Texto de la portada ya abierta */
 .eu .eu-portada-texto { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 8px;
@@ -130,11 +164,11 @@
 .eu .eu-portada-texto::before { content: ""; position: absolute; inset: 0 -40px; z-index: -1;
   background: radial-gradient(closest-side, color-mix(in srgb, var(--papel) 92%, transparent), transparent); }
 .eu .eu-portada-texto > * { opacity: 0; transform: translateY(14px); animation: eu-sube 1.1s var(--curva) forwards; }
-.eu .eu-portada-texto > :nth-child(1) { animation-delay: .7s; }
-.eu .eu-portada-texto > :nth-child(2) { animation-delay: .85s; }
-.eu .eu-portada-texto > :nth-child(3) { animation-delay: 1.05s; }
-.eu .eu-portada-texto > :nth-child(4) { animation-delay: 1.2s; }
-.eu .eu-portada-texto > :nth-child(5) { animation-delay: 1.6s; }
+.eu .eu-portada-texto > :nth-child(1) { animation-delay: 1.2s; }
+.eu .eu-portada-texto > :nth-child(2) { animation-delay: 1.35s; }
+.eu .eu-portada-texto > :nth-child(3) { animation-delay: 1.55s; }
+.eu .eu-portada-texto > :nth-child(4) { animation-delay: 1.7s; }
+.eu .eu-portada-texto > :nth-child(5) { animation-delay: 2.1s; }
 .eu.eu-abierta .eu-portada-texto > * { animation-delay: 0s; }
 @keyframes eu-sube { to { opacity: 1; transform: none; } }
 .eu .eu-ante { font: 700 12px/1.4 var(--f-texto); letter-spacing: .34em; text-transform: uppercase; color: var(--profundo); }
@@ -151,10 +185,9 @@
 /* ---------- Cuerpo: tallo y etiquetas colgantes ---------- */
 .eu .eu-cuerpo { position: relative; width: 100%; max-width: 480px; margin: 0 auto; padding: 0 16px; }
 .eu .eu-colgantes { position: relative; display: flex; flex-direction: column; align-items: center; padding-bottom: 40px; }
-.eu .eu-tallo { position: absolute; z-index: 0; top: 150px; bottom: 0; left: 50%; width: 110px; margin-left: -55px; overflow: hidden;
-  -webkit-mask-image: linear-gradient(#000 calc(100% - 120px), transparent); mask-image: linear-gradient(#000 calc(100% - 120px), transparent); }
+.eu .eu-tallo { position: absolute; z-index: 0; top: 0; bottom: 0; left: 50%; width: 110px; margin-left: -55px; overflow: hidden;
+  -webkit-mask-image: linear-gradient(transparent, #000 70px, #000 calc(100% - 120px), transparent); mask-image: linear-gradient(transparent, #000 70px, #000 calc(100% - 120px), transparent); }
 .eu .eu-tallo svg { display: block; width: 110px; height: auto; margin-top: -1px; }
-.eu .eu-ramito-arriba { position: relative; z-index: 1; width: 190px; height: auto; margin-top: -30px; }
 
 .eu .eu-colgante { position: relative; z-index: 1; width: min(100%, 360px); padding-top: 78px; transform-origin: 50% 9px; }
 .eu .eu-colgante:first-of-type { padding-top: 70px; }
@@ -162,16 +195,18 @@
 .eu .eu-colgante:first-of-type .eu-hilo { top: -8px; }
 .eu .eu-ojal { position: absolute; z-index: 4; left: 50%; top: calc(78px + 6px); width: 40px; height: 40px; margin-left: -20px; }
 .eu .eu-colgante:first-of-type .eu-ojal { top: calc(70px + 6px); }
-.eu .eu-sombra { filter: drop-shadow(0 14px 16px rgb(47 58 51 / .16)) drop-shadow(0 2px 2px rgb(47 58 51 / .08)); }
+.eu .eu-sombra { filter: drop-shadow(0 14px 16px rgb(44 58 64 / .16)) drop-shadow(0 2px 2px rgb(44 58 64 / .08)); }
 .eu .eu-papel { position: relative; padding: 58px 24px 32px; text-align: center;
   background: var(--fibras), var(--grano), linear-gradient(180deg, var(--algodon), color-mix(in srgb, var(--algodon) 94%, var(--papel)));
   box-shadow: inset 0 0 10px color-mix(in srgb, var(--papel) 80%, #b9ae92); }
-.eu .eu-guion { font: 400 32px/1.1 var(--f-guion); color: var(--verde); }
-.eu .eu-h2 { margin-top: 2px; font: 400 21px/1.3 var(--f-titulo); letter-spacing: .16em; text-transform: uppercase; color: var(--tinta); overflow-wrap: anywhere; }
+/* Títulos escritos a mano sobre la etiqueta, con una hojita a la izquierda */
+.eu .eu-h2 { display: block; margin: 0 0 14px; text-align: center; font: 400 clamp(36px, 10.4vw, 42px)/1.1 var(--f-guion);
+  color: var(--profundo); overflow-wrap: anywhere; }
+.eu .eu-h2-hoja { display: inline-block; width: 20px; height: 26px; margin: 0 6px 0 -4px; vertical-align: -2px; transform: rotate(-34deg); }
 .eu .eu-arte { display: block; height: auto; margin: -14px auto 4px; }
 .eu .eu-arte-anillos { width: 150px; }
 .eu .eu-arte-copas { width: 130px; }
-.eu .eu-arte-sello { width: 84px; margin-bottom: 8px; }
+.eu .eu-arte-cinta { width: 230px; margin: -18px auto 4px; }
 
 /* Aparición: la etiqueta cae de su hilo y se mece hasta quedarse quieta. */
 .eu [data-reveal] { opacity: 0; transform: translateY(-12px) rotate(calc(var(--incl, 0deg) * -3)); }
@@ -184,13 +219,21 @@
   100% { opacity: 1; transform: rotate(var(--incl)); }
 }
 
-/* Cuenta regresiva */
-.eu .eu-cuenta { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 4px; }
-.eu .eu-cuenta > div { display: grid; justify-items: center; gap: 6px; padding: 4px 0; }
-.eu .eu-cuenta > div + div { border-left: 1px solid var(--linea); }
-.eu .eu-cuenta .n { font: 400 clamp(32px, 9vw, 40px)/1 var(--f-titulo); color: var(--profundo); font-variant-numeric: lining-nums tabular-nums; }
-.eu .eu-cuenta .l { font: 700 10.5px/1.2 var(--f-texto); letter-spacing: .2em; text-transform: uppercase; color: var(--suave); }
-.eu .eu-llego { font: 400 46px/1.1 var(--f-guion); color: var(--profundo); }
+/* Cuenta regresiva: cuatro etiquetitas colgadas de un mismo hilo */
+.eu .eu-cuenta { position: relative; z-index: 1; padding: 34px 0 6px; text-align: center; }
+.eu .eu-cuenta .eu-h2 { margin-bottom: 6px; }
+.eu .eu-guirnalda { position: relative; width: min(100%, 360px); height: 178px; margin: 0 auto; container-type: inline-size; }
+.eu .eu-guirnalda-hilo { position: absolute; top: 0; left: 0; width: 100%; height: auto; }
+.eu .eu-mini { position: absolute; left: var(--x); top: calc(var(--y) * 100cqw / 360 - 1px); width: 66px; margin-left: -33px; transform-origin: 50% 0;
+  filter: drop-shadow(0 8px 8px rgb(44 58 64 / .16)); animation: eu-mecer 3.9s ease-in-out infinite var(--d, 0s); }
+.eu .eu-mini-hilo { position: relative; z-index: 2; display: block; width: 1.1px; height: calc(var(--largo, 10px) + 11px); margin: 0 auto -11px; background: var(--hilo); }
+.eu .eu-mini-papel { position: relative; display: grid; justify-items: center; gap: 2px; padding: 20px 2px 10px;
+  clip-path: polygon(24% 0, 76% 0, 100% 15%, 100% 100%, 0 100%, 0 15%);
+  background: var(--fibras), var(--grano), linear-gradient(180deg, var(--algodon), color-mix(in srgb, var(--algodon) 92%, var(--papel))); }
+.eu .eu-mini-papel::before { content: ""; position: absolute; top: 6px; left: 50%; width: 9px; height: 9px; margin-left: -4.5px; border-radius: 50%;
+  background: var(--papel); box-shadow: 0 0 0 2px color-mix(in srgb, var(--oro) 80%, white), inset 0 1px 2px rgb(44 58 64 / .3); }
+.eu .eu-mini .n { font: 400 30px/1 var(--f-titulo); color: var(--profundo); font-variant-numeric: lining-nums tabular-nums; }
+.eu .eu-mini .l { font: 400 19px/1 var(--f-guion); color: var(--suave); }
 
 /* Padres y padrinos */
 .eu .eu-padres, .eu .eu-grupos { display: grid; gap: 18px; }
@@ -218,7 +261,7 @@
 .eu .eu-paleta { margin-top: 18px; }
 .eu .eu-paleta ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 18px; margin-top: 10px; }
 .eu .eu-paleta li { display: grid; justify-items: center; gap: 6px; font-size: 13.5px; color: var(--suave); max-width: 90px; }
-.eu .eu-muestra { width: 42px; height: 42px; border-radius: 50%; border: 3px solid var(--algodon); box-shadow: 0 0 0 1px var(--linea), 0 6px 10px -6px rgb(47 58 51 / .4); }
+.eu .eu-muestra { width: 42px; height: 42px; border-radius: 50%; border: 3px solid var(--algodon); box-shadow: 0 0 0 1px var(--linea), 0 6px 10px -6px rgb(44 58 64 / .4); }
 .eu .eu-tachado .eu-muestra { position: relative; }
 .eu .eu-tachado .eu-muestra::after { content: ""; position: absolute; left: -4px; right: -4px; top: 50%; height: 1.5px; background: var(--tinta); transform: rotate(-45deg); opacity: .6; }
 
@@ -229,7 +272,7 @@
 
 /* Fotos: copias pegadas sobre la etiqueta */
 .eu .eu-fotos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 6px; }
-.eu .eu-fotos img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; padding: 5px; background: #fff; box-shadow: 0 8px 14px -10px rgb(47 58 51 / .5); }
+.eu .eu-fotos img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; padding: 5px; background: #fff; box-shadow: 0 8px 14px -10px rgb(44 58 64 / .5); }
 .eu .eu-fotos img:nth-child(odd) { transform: rotate(-1.5deg); }
 .eu .eu-fotos img:nth-child(even) { transform: rotate(1.8deg); }
 
@@ -275,8 +318,8 @@
 .eu .eu-limite b { color: var(--tinta); }
 
 /* Pie */
-.eu .eu-final { position: relative; z-index: 1; padding: 6px 0 110px; text-align: center; }
-.eu .eu-ramito-final { display: block; width: 210px; height: auto; margin: 0 auto; }
+.eu .eu-final { position: relative; z-index: 1; padding: 6px 0 110px; text-align: center; transform-origin: 50% 0; }
+.eu .eu-ramito-final { display: block; width: 240px; height: auto; margin: 0 auto; }
 .eu .eu-te-esperamos { margin-top: 2px; font: 400 clamp(52px, 15vw, 66px)/1.1 var(--f-guion); color: var(--profundo); }
 
 .eu .eu-aviso { position: fixed; z-index: 60; left: 16px; right: 16px; bottom: 70px; max-width: 420px; margin: 0 auto; padding: 12px 16px; border-radius: 999px;
@@ -284,17 +327,24 @@
 .eu .eu-aviso.is-visible { opacity: 1; transform: none; }
 
 /* ---------- Formulario de confirmación con la ropa del diseño ---------- */
-.eu .eu-modal { position: fixed; inset: 0; z-index: 80; display: flex; align-items: flex-end; justify-content: center; background: rgb(47 58 51 / .45); animation: eu-fundido .25s ease; }
-.eu .eu-modal-caja { position: relative; width: 100%; max-width: 520px; max-height: 92svh; overflow: auto; border-radius: 22px 22px 0 0;
-  background: var(--fibras), var(--grano), var(--algodon); animation: eu-subir .4s var(--curva); }
-@media (min-width: 600px) { .eu .eu-modal { align-items: center; } .eu .eu-modal-caja { border-radius: 22px; } }
-.eu .eu-cerrar { position: absolute; z-index: 2; top: 10px; right: 12px; width: 44px; height: 44px; border: 1px solid var(--linea); border-radius: 50%;
-  background: var(--algodon); color: var(--profundo); font-size: 24px; line-height: 1; cursor: pointer; }
-.eu .eu-modal-hojas { margin: 30px auto 0; }
+.eu .eu-modal { position: fixed; inset: 0; z-index: 80; display: flex; align-items: flex-end; justify-content: center; background: rgb(44 58 64 / .45); animation: eu-fundido .25s ease; }
+/* La caja es otra etiqueta de algodón con borde rasgado; la encabeza la cinta
+   de lino con las iniciales bordadas y se cierra con una etiquetita «×». */
+.eu .eu-modal-caja { position: relative; width: 100%; max-width: 520px; max-height: 92svh; overflow: auto;
+  background: var(--fibras), var(--grano), linear-gradient(180deg, var(--algodon), color-mix(in srgb, var(--algodon) 94%, var(--papel)));
+  animation: eu-subir .5s var(--curva); }
+@media (min-width: 600px) { .eu .eu-modal { align-items: center; } }
+.eu .eu-cerrar { position: absolute; z-index: 2; top: 8px; right: 42px; width: 44px; height: 54px; padding: 14px 0 0; border: 0; cursor: pointer;
+  clip-path: polygon(24% 0, 76% 0, 100% 20%, 100% 100%, 0 100%, 0 20%);
+  background: var(--fibras), color-mix(in srgb, var(--salvia) 70%, white); color: var(--profundo); font: 400 28px/1 var(--f-titulo); }
+.eu .eu-cerrar::before { content: ""; position: absolute; top: 5px; left: 50%; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%;
+  background: var(--algodon); box-shadow: 0 0 0 2px color-mix(in srgb, var(--oro) 80%, white); }
+.eu .eu-modal-cinta { display: block; width: 230px; height: auto; margin: 34px auto -4px; }
 .eu .eu-modal #rsvp { padding: 6px 22px 36px; border-top: 0; font-family: var(--f-texto); color: var(--tinta); }
 .eu .eu-modal #rsvp img { display: none; }
 .eu .eu-modal #rsvp .font-mono { font-family: var(--f-texto); letter-spacing: .2em; }
 .eu .eu-modal #rsvp p.font-mono, .eu .eu-modal #rsvp span.font-mono { font-size: 11.5px; font-weight: 700; color: var(--profundo); }
+.eu .eu-modal #rsvp > div > p.font-mono:first-child, .eu .eu-modal #rsvp p.font-mono:first-of-type { font: italic 400 15px/1.4 var(--f-texto); letter-spacing: .01em; text-transform: none; color: var(--suave); }
 .eu .eu-modal #rsvp h2 { font-family: var(--f-guion); font-weight: 400; font-size: clamp(40px, 11vw, 48px); line-height: 1.15; color: var(--profundo); margin: 4px 0; }
 .eu .eu-modal #rsvp .font-body { font-family: var(--f-texto); font-size: 16.5px; color: var(--tinta); }
 .eu .eu-modal #rsvp p.text-xs, .eu .eu-modal #rsvp p.text-sm { font-size: 15px; line-height: 1.55; color: var(--suave); }
@@ -318,8 +368,9 @@
 @keyframes eu-subir { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .eu .eu-rama, .eu .eu-entrada { transition: none; }
-  .eu .eu-abrir, .eu .eu-medallon, .eu .eu-desliza svg, .eu .eu-colgante.is-in .eu-lluvia svg { animation: none; }
+  .eu .eu-rama { transition: none; }
+  .eu .eu-nudo, .eu .eu-vara, .eu .eu-tag, .eu .eu-mini, .eu .eu-hojita, .eu .eu-musica, .eu .eu-desliza svg, .eu .eu-colgante.is-in .eu-lluvia svg { animation: none; }
+  .eu .eu-cinta-banda, .eu .eu-nudo g, .eu .eu-colgador { transition: none; }
   .eu .eu-portada-texto > * { animation: none; opacity: 1; transform: none; }
   .eu [data-reveal], .eu [data-reveal].is-in { opacity: 1; transform: rotate(var(--incl, 0deg)); animation: none; }
 }

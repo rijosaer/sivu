@@ -40,7 +40,9 @@
 .os svg[aria-hidden="true"] { pointer-events: none; user-select: none; }
 .os :focus-visible { outline: 2px solid var(--oscuro); outline-offset: 3px; }
 
-.os-ante { font: 600 12px/1.4 var(--f-cuerpo); letter-spacing: .22em; text-transform: uppercase; color: var(--oscuro); }
+/* Rótulo pequeño: hilo salvia, sin mayúsculas espaciadas. */
+.os-ante { font: 600 14px/1.4 var(--f-cuerpo); letter-spacing: .01em; color: color-mix(in srgb, var(--salvia) 50%, var(--tinta)); }
+.os-oculto { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* ================= Entrada: móvil de cuna y mar de nubes ================= */
 .os-entrada {
@@ -103,16 +105,40 @@
 @keyframes os-flota { from { transform: translateY(0) rotate(var(--r)); } to { transform: translateY(-8px) rotate(calc(var(--r) * -.4)); } }
 
 /* Letrero central: invitado antes, nombre del bebé después */
-.os-letrero { position: absolute; z-index: 4; left: 16px; right: 16px; top: 35svh; display: grid; text-align: center; pointer-events: none; }
+.os-letrero { position: absolute; z-index: 6; left: 16px; right: 16px; top: 35svh; display: grid; text-align: center; pointer-events: none; }
 .os-letrero > div { grid-area: 1 / 1; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: opacity .7s ease, transform .9s var(--curva); }
-.os-letrero-antes { padding-top: 2svh; }
-.os-invitado { font: 400 clamp(34px, 10vw, 44px)/1.15 var(--f-guion); color: var(--oscuro); overflow-wrap: anywhere; }
-.os-pases { display: inline-block; margin-top: 6px; padding: 6px 16px; border-radius: 999px; background: var(--blanco); border: 1px solid var(--claro); color: var(--oscuro); font: 600 13px/1.2 var(--f-cuerpo); letter-spacing: .04em; box-shadow: 0 6px 16px -10px rgb(var(--color-gold-dark) / .5); }
+.os-letrero-antes { padding-top: 3.5svh; perspective: 700px; }
+
+/* Mantita con el nombre bordado */
+.os-mantita { position: relative; isolation: isolate; width: min(282px, 100%); padding: 30px 30px 46px; transform-origin: 50% 0; rotate: -2.5deg;
+  animation: os-desdobla 1s var(--curva) .25s both; }
+.os-mantita-tela { position: absolute; z-index: -1; inset: 0; width: 100%; height: 100%; }
+.os-mantita-para { font: 600 13.5px/1.3 var(--f-cuerpo); letter-spacing: .02em; color: color-mix(in srgb, var(--salvia) 55%, var(--tinta)); }
+.os-bordado { margin-top: 2px; padding: 0 4px 6px; font: 400 clamp(32px, 9.4vw, 40px)/1.2 var(--f-guion); overflow-wrap: anywhere;
+  color: transparent; -webkit-background-clip: text; background-clip: text;
+  background-image: repeating-linear-gradient(118deg, var(--oscuro) 0 1.4px, color-mix(in srgb, var(--oscuro) 62%, var(--beige)) 1.4px 2.3px, color-mix(in srgb, var(--oscuro) 80%, white) 2.3px 2.8px);
+  filter: drop-shadow(0 1px 0 rgb(255 255 255 / .9)) drop-shadow(0 1.5px 1px rgb(var(--color-gold-dark) / .35));
+  clip-path: inset(0 100% 0 0); animation: os-bordar 1.9s steps(18, end) 1s forwards; }
+.os-bordado-sin { font-size: clamp(32px, 9vw, 40px); }
+@keyframes os-desdobla { from { transform: rotateX(-82deg) scaleY(.35); opacity: 0; } 60% { opacity: 1; } to { transform: none; opacity: 1; } }
+@keyframes os-bordar { to { clip-path: inset(0 -4% 0 0); } }
+
+/* Patitas de oso: una por pase */
+.os-huellas { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: 10px; font: 400 17px/1.3 var(--f-titulos); color: var(--tinta); }
+.os-huellas > span:last-child { opacity: 0; animation: os-aparece-1 .6s ease 3.2s forwards; }
+.os-patitas { display: inline-flex; gap: 7px; align-items: center; height: 36px; }
+.os-patita { width: 27px; height: 27px; opacity: 0; transform: translateY(var(--y)) rotate(var(--g)) scale(1.7);
+  animation: os-pisa .34s var(--rebote) calc(2.5s + var(--i) * .3s) forwards; }
+@keyframes os-pisa { to { opacity: 1; transform: translateY(var(--y)) rotate(var(--g)); } }
+@keyframes os-aparece-1 { to { opacity: 1; } }
+.os-patitas.is-mini { height: 18px; gap: 3px; }
+.os-patitas.is-mini .os-patita { width: 14px; height: 14px; animation-delay: calc(2.4s + var(--i) * .2s); }
 .os-letrero-despues { opacity: 0; transform: translateY(14px); }
+.os-bienvenida { font: 400 17px/1.3 var(--f-titulos); color: var(--suave); }
 .os-nombre { font: 400 clamp(68px, 23vw, 104px)/1 var(--f-guion); color: var(--oscuro); margin: 2px 0 2px; overflow-wrap: anywhere; text-shadow: 0 2px 0 rgb(255 255 255 / .6); }
 .os-fecha { font: 400 17px/1.3 var(--f-titulos); color: var(--tinta); }
 .os-fecha span { text-transform: capitalize; }
-.os-para { margin-top: 6px; font-size: 13.5px; color: var(--suave); }
+.os-para { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 14px; color: var(--suave); }
 .os-para b { font-weight: 600; color: var(--oscuro); }
 .is-despierta .os-letrero-antes { opacity: 0; transform: translateY(-14px); transition-duration: .4s; }
 .is-despierta .os-letrero-despues { opacity: 1; transform: none; transition-delay: 1.2s; transition-duration: 1s; }
@@ -133,21 +159,32 @@
 .is-despierta .os-mar-izq { transform: translateX(-80%); }
 .is-despierta .os-mar-der { transform: translateX(80%); }
 
-/* Toque para despertar */
+/* Cordón del móvil: se jala para despertarlo */
 .os-toque { position: absolute; inset: 0; z-index: 8; border: 0; background: none; cursor: pointer; }
-.os-despertar {
-  position: absolute; z-index: 9; left: 50%; bottom: calc(9svh + env(safe-area-inset-bottom)); transform: translateX(-50%);
-  display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 24px 0 18px; white-space: nowrap;
-  border: 1px solid var(--claro); border-radius: 999px; cursor: pointer;
-  background: color-mix(in srgb, var(--blanco) 92%, transparent); color: var(--oscuro);
-  font: 600 15px/1 var(--f-cuerpo); letter-spacing: .02em;
-  box-shadow: 0 14px 30px -16px rgb(var(--color-gold-dark) / .55), 0 0 0 6px rgb(255 255 255 / .35);
-  animation: os-llama 2.6s ease-in-out infinite;
-}
-.os-despertar-estrella { width: 22px; height: 22px; color: var(--salvia); }
-.os-despertar-estrella svg, .os-despertar-estrella g { overflow: visible; }
-.os-despertar svg { width: 22px; height: 22px; }
-@keyframes os-llama { 0%, 100% { box-shadow: 0 14px 30px -16px rgb(var(--color-gold-dark) / .55), 0 0 0 6px rgb(255 255 255 / .35); } 50% { box-shadow: 0 14px 30px -16px rgb(var(--color-gold-dark) / .55), 0 0 0 12px rgb(255 255 255 / .15); } }
+.os-cordon { --largo: calc(23svh - var(--vara)); position: absolute; z-index: 9; top: calc(var(--vara) + 4px); left: 50%; width: 0; height: 0;
+  transform-origin: 50% 0; animation: os-mece 3.2s ease-in-out infinite alternate; transition: opacity .5s ease .2s; }
+.os-cordon-hilo { position: absolute; top: 0; left: -.6px; width: 1.2px; height: var(--largo); background: color-mix(in srgb, var(--tinta) 50%, transparent); }
+.os-tirador { position: absolute; top: calc(var(--largo) - 4px); left: -32px; width: 64px; height: 96px; padding: 0 10px; border: 0; background: none; cursor: grab;
+  animation: os-invita 3.6s ease-in-out 1.6s infinite; }
+.os-tirador svg { display: block; width: 44px; height: auto; filter: drop-shadow(0 6px 8px rgb(var(--color-gold-dark) / .18)); }
+.os-tirador:disabled { cursor: default; }
+.os-cordon-pista { position: absolute; top: calc(var(--largo) + 44px); left: 30px; display: flex; flex-direction: column; align-items: flex-start; white-space: nowrap;
+  font: 400 21px/1 var(--f-guion); color: var(--oscuro); opacity: 0; animation: os-aparece-1 .8s ease 1.2s forwards; }
+.os-cordon-pista svg { width: 30px; height: 22px; margin: 0 0 2px 2px; fill: none; stroke: var(--oscuro); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transform: scaleY(-1); opacity: .75; }
+@keyframes os-mece { from { rotate: -2deg; } to { rotate: 2deg; } }
+@keyframes os-invita { 0%, 70%, 100% { translate: 0 0; } 78% { translate: 0 7px; } 86% { translate: 0 -2px; } }
+/* Jalón: el cordón se estira y rebota */
+.is-jalando .os-cordon { animation: none; }
+.is-jalando .os-cordon-hilo { animation: os-estira .62s var(--curva); }
+.is-jalando .os-tirador { animation: os-tiro .62s var(--curva); }
+.is-jalando .os-cordon-pista { opacity: 0; animation: none; transition: opacity .2s; }
+@keyframes os-estira { 0% { height: var(--largo); } 35% { height: calc(var(--largo) + 30px); } 70% { height: calc(var(--largo) - 6px); } 100% { height: var(--largo); } }
+@keyframes os-tiro { 0% { translate: 0 0; } 35% { translate: 0 30px; } 70% { translate: 0 -6px; } 100% { translate: 0 0; } }
+/* Al despertar, el cordón se recoge dentro del móvil */
+.is-despierta .os-cordon { animation: none; opacity: 0; pointer-events: none; }
+.is-despierta .os-cordon-hilo { height: 0; transition: height .7s var(--curva); }
+.is-despierta .os-tirador { translate: 0 calc(var(--largo) * -1); transition: translate .7s var(--curva); animation: none; }
+.is-despierta .os-cordon-pista { display: none; }
 .os-desliza { position: absolute; z-index: 6; left: 50%; bottom: 10px; width: 34px; height: 34px; margin-left: -17px; color: var(--oscuro); opacity: 0; animation: os-aparece .8s ease 3s forwards, os-salta 1.8s ease-in-out 3.8s infinite; }
 .os-desliza svg { width: 100%; height: 100%; }
 @keyframes os-aparece { to { opacity: .8; } }
@@ -157,6 +194,7 @@
   .os-movil { transform: translateX(-50%) scale(.82); }
   @keyframes os-dormido { from { transform: translateX(-50%) scale(.82) rotate(-1.2deg); } to { transform: translateX(-50%) scale(.82) rotate(1.2deg); } }
   .os-letrero { top: 33svh; }
+  .os-cordon { --largo: calc(21svh - var(--vara)); }
 }
 
 /* ================= Cuerpo: cubos de madera ================= */
@@ -183,10 +221,17 @@
 
 .os-dia { font: 400 18px/1.4 var(--f-titulos); color: var(--tinta); margin-bottom: 16px; }
 .os-dia span { text-transform: capitalize; }
-.os-cuenta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.os-cuenta > div { padding: 12px 0 10px; border-radius: 16px; background: color-mix(in srgb, var(--claro) 45%, var(--blanco)); box-shadow: inset 0 -3px 0 color-mix(in srgb, var(--claro) 90%, var(--beige)); }
-.os-cuenta .n { display: block; font: 700 28px/1.1 var(--f-titulos); color: var(--oscuro); font-variant-numeric: tabular-nums; }
-.os-cuenta .l { display: block; margin-top: 2px; font: 600 11px/1.2 var(--f-cuerpo); letter-spacing: .14em; text-transform: uppercase; color: var(--suave); }
+/* Cuenta regresiva en cubos de madera: caen uno a uno y el de los
+   segundos da un saltito cada vez que cambia. */
+.os-cuenta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin: 4px -8px 0; }
+.os-cuenta-cubo { display: flex; flex-direction: column; align-items: center; min-width: 0;
+  transform: translateY(-90px) rotate(calc(var(--giro) * -3)); opacity: 0;
+  transition: transform .95s var(--rebote) calc(.75s + var(--i) * .14s), opacity .25s ease calc(.75s + var(--i) * .14s); }
+.os-bloque.is-in .os-cuenta-cubo { transform: rotate(var(--giro)); opacity: 1; }
+.os-cuenta-salto { display: block; width: 100%; animation: os-salto .5s var(--rebote); }
+.os-cuenta-salto svg { display: block; width: 100%; height: auto; overflow: visible; }
+.os-cuenta-l { margin-top: -4px; font: 400 18px/1.2 var(--f-guion); color: var(--oscuro); }
+@keyframes os-salto { 0% { transform: translateY(0); } 40% { transform: translateY(-7px) rotate(-2deg); } 100% { transform: none; } }
 
 .os-botones { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 18px; }
 .os-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 11px 22px; border: 0; border-radius: 999px; cursor: pointer;
@@ -273,11 +318,20 @@
 .os-final .os-texto { position: relative; margin-top: 4px; }
 
 /* Música */
-.os-musica { position: fixed; z-index: 25; top: 12px; right: 12px; display: grid; place-items: center; width: 46px; height: 46px; padding: 0; border-radius: 50%; cursor: pointer;
-  border: 1px solid var(--claro); background: color-mix(in srgb, var(--blanco) 92%, transparent); color: var(--oscuro); backdrop-filter: blur(6px);
-  box-shadow: 0 8px 18px -10px rgb(var(--color-gold-dark) / .6); }
-.os-musica svg { width: 20px; height: 20px; }
-.os-musica[aria-pressed="true"] { background: var(--oscuro); color: #fff; border-color: transparent; }
+/* Música: un sonajero que se agita mientras suena */
+.os-musica { position: fixed; z-index: 25; top: 6px; right: 6px; width: 64px; height: 64px; padding: 4px; border: 0; cursor: pointer;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--blanco) 88%, transparent) 55%, transparent); }
+.os-sonajero { display: block; width: 100%; height: 100%; transform-origin: 78% 78%; rotate: -8deg; transition: rotate .4s var(--curva); }
+.os-musica.is-sonando .os-sonajero { animation: os-agita 1.8s ease-in-out infinite; }
+.os-musica:not(.is-sonando) .os-sonajero { rotate: 18deg; }
+@keyframes os-agita { 0%, 46%, 100% { transform: rotate(0); } 8% { transform: rotate(-16deg); } 16% { transform: rotate(13deg); } 24% { transform: rotate(-10deg); } 32% { transform: rotate(6deg); } 40% { transform: rotate(-2deg); } }
+.os-musica-ondas { position: absolute; left: 0; top: 2px; width: 24px; height: 24px; opacity: 0; }
+.os-musica-ondas i { position: absolute; inset: 0; border: 2px solid transparent; border-left-color: var(--salvia); border-top-color: var(--salvia); border-radius: 50%; }
+.os-musica-ondas i + i { inset: -6px; opacity: .6; }
+.os-musica.is-sonando .os-musica-ondas { animation: os-ondas 1.8s ease-out infinite; }
+@keyframes os-ondas { 0% { opacity: 0; transform: scale(.7); } 12% { opacity: 1; } 45%, 100% { opacity: 0; transform: scale(1.15); } }
+.os-musica-pausa { position: absolute; left: 4px; bottom: 6px; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--salvia); color: #fff; }
+.os-musica-pausa svg { width: 12px; height: 12px; }
 
 .os-aviso { position: fixed; z-index: 90; left: 16px; right: 16px; bottom: 70px; max-width: 420px; margin: 0 auto; padding: 12px 16px; border-radius: 999px;
   background: var(--tinta); color: #fff; font: 600 14px/1.4 var(--f-cuerpo); text-align: center; opacity: 0; transform: translateY(12px); pointer-events: none; transition: opacity .2s, transform .2s; }
@@ -288,16 +342,37 @@
 .os [data-reveal].is-in { opacity: 1; transform: none; }
 
 /* ================= Modal RSVP con la ropa del diseño ================= */
-.os-modal { position: fixed; inset: 0; z-index: 80; display: flex; align-items: flex-end; justify-content: center; background: rgb(var(--color-ink) / .42); animation: os-fundido .25s ease; }
-.os-modal-caja { position: relative; width: 100%; max-width: 520px; max-height: 92svh; overflow: auto; padding-top: 18px; border-radius: 30px 30px 0 0; background: var(--papel); animation: os-subir .4s var(--curva); }
-@media (min-width: 600px) { .os-modal { align-items: center; } .os-modal-caja { border-radius: 30px; } }
-.os-modal-cubo { width: 74px; margin: 0 auto -4px; transform: rotate(-5deg); }
-.os-modal-cubo svg { display: block; width: 100%; height: auto; }
-.os-cerrar { position: absolute; z-index: 2; top: 12px; right: 12px; width: 44px; height: 44px; border: 1px solid var(--claro); border-radius: 50%; background: var(--blanco); color: var(--oscuro); font-size: 24px; line-height: 1; cursor: pointer; }
+/* La caja es una mantita acolchada con ribete salvia y punto de festón;
+   se despliega desde abajo. El parche del osito va cosido arriba y se
+   cierra con un botón de madera cosido en cruz. */
+.os-modal { position: fixed; inset: 0; z-index: 80; display: flex; align-items: flex-end; justify-content: center; background: rgb(var(--color-ink) / .42); animation: os-fundido .25s ease; perspective: 1200px; }
+.os-modal-caja { position: relative; display: flex; flex-direction: column; width: 100%; max-width: 520px; max-height: 92svh;
+  border: 7px solid var(--salvia); border-bottom: 0; border-radius: 34px 34px 0 0; transform-origin: 50% 100%;
+  background:
+    repeating-linear-gradient(45deg, transparent 0 34px, color-mix(in srgb, var(--claro) 80%, transparent) 34px 35.5px, rgb(255 255 255 / .8) 35.5px 36.5px),
+    repeating-linear-gradient(-45deg, transparent 0 34px, color-mix(in srgb, var(--claro) 80%, transparent) 34px 35.5px, rgb(255 255 255 / .8) 35.5px 36.5px),
+    radial-gradient(130% 70% at 30% 0%, var(--blanco), color-mix(in srgb, var(--claro) 30%, var(--blanco)));
+  box-shadow: 0 -18px 40px -20px rgb(var(--color-gold-dark) / .5), inset 0 2px 0 rgb(255 255 255 / .35);
+  animation: os-despliega .6s var(--curva); }
+.os-modal-caja::before { content: ""; position: absolute; z-index: 1; inset: 6px 6px 0; border: 1.6px dashed color-mix(in srgb, var(--oscuro) 50%, transparent); border-bottom: 0; border-radius: 26px 26px 0 0; pointer-events: none; }
+@media (min-width: 600px) {
+  .os-modal { align-items: center; }
+  .os-modal-caja { border-bottom: 7px solid var(--salvia); border-radius: 34px; }
+  .os-modal-caja::before { bottom: 6px; border-bottom: 1.6px dashed color-mix(in srgb, var(--oscuro) 50%, transparent); border-radius: 26px; }
+}
+.os-modal-tela { flex: 1 1 auto; min-height: 0; overflow: auto; padding-top: 16px; border-radius: 26px 26px 0 0; }
+.os-modal-parche { width: 82px; margin: 0 auto 0; rotate: -6deg; animation: os-cose .6s var(--rebote) .25s both; }
+.os-modal-parche svg { display: block; width: 100%; height: auto; }
+.os-cerrar { position: absolute; z-index: 3; top: 12px; right: 14px; width: 50px; height: 50px; padding: 2px; border: 0; background: none; cursor: pointer; transition: rotate .3s var(--curva); }
+.os-cerrar svg { display: block; width: 100%; height: 100%; }
+.os-cerrar:active { rotate: 25deg; }
+@keyframes os-despliega { from { transform: rotateX(-62deg) scaleY(.5); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes os-cose { from { transform: scale(.4) rotate(-40deg); opacity: 0; } to { transform: none; opacity: 1; } }
 .os-modal #rsvp { padding: 6px 22px 36px; border-top: 0; font-family: var(--f-cuerpo); color: var(--tinta); }
 .os-modal #rsvp img { display: none; }
-.os-modal #rsvp .font-mono { font-family: var(--f-cuerpo); letter-spacing: .18em; }
-.os-modal #rsvp p.font-mono, .os-modal #rsvp span.font-mono { font-size: 12px; font-weight: 600; color: var(--oscuro); }
+.os-modal #rsvp .font-mono { font-family: var(--f-cuerpo); letter-spacing: .01em; }
+.os-modal #rsvp .uppercase { text-transform: none; }
+.os-modal #rsvp p.font-mono, .os-modal #rsvp span.font-mono { font-size: 14px; font-weight: 600; color: color-mix(in srgb, var(--salvia) 50%, var(--tinta)); }
 .os-modal #rsvp h2 { font-family: var(--f-guion); font-weight: 400; font-size: clamp(32px, 9vw, 40px); line-height: 1.2; color: var(--oscuro); margin: 6px 0 4px; }
 .os-modal #rsvp .font-body { font-family: var(--f-cuerpo); font-size: 16.5px; font-weight: 500; color: var(--tinta); }
 .os-modal #rsvp p.text-xs, .os-modal #rsvp p.text-sm { font-size: 15px; line-height: 1.55; color: var(--suave); }
@@ -309,7 +384,7 @@
 .os-modal #rsvp form > div > button[type="button"]:not([aria-pressed]), .os-modal #rsvp .border-dashed { border-radius: 999px; padding: 11px 18px; font: 600 14px/1.2 var(--f-cuerpo); }
 .os-modal #rsvp input[type="text"], .os-modal #rsvp textarea { font: 16px/1.4 var(--f-cuerpo); color: var(--tinta); padding: 12px 14px; border: 1px solid var(--claro); border-radius: 14px; background: var(--blanco); }
 .os-modal #rsvp input[type="text"]:focus, .os-modal #rsvp textarea:focus { border-color: var(--beige); box-shadow: 0 0 0 3px rgb(var(--color-gold) / .2); outline: none; }
-.os-modal #rsvp button[type="submit"] { min-height: 54px; border-radius: 999px; border: 0; font: 600 15px/1.2 var(--f-cuerpo); letter-spacing: .08em; color: #fff;
+.os-modal #rsvp button[type="submit"] { min-height: 54px; border-radius: 999px; border: 0; font: 600 16px/1.2 var(--f-cuerpo); letter-spacing: .01em; color: #fff;
   background: linear-gradient(180deg, color-mix(in srgb, var(--oscuro) 82%, var(--beige)), var(--oscuro)); box-shadow: 0 12px 22px -14px rgb(var(--color-gold-dark)); }
 .os-modal #rsvp button[type="submit"]:disabled { opacity: .45; }
 .os-modal #rsvp .border-gold\/40 { border-color: var(--claro); background: var(--blanco); border-radius: 18px; }
@@ -321,6 +396,9 @@
   .os *, .os *::before, .os *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; transition-delay: 0s !important; }
   .os-movil-carrusel, .os-movil-cara, .os-movil-pieza, .os-movil, .os-mar-nube, .os-globo { animation: none !important; }
   .os-desliza { opacity: .8; }
-  .os [data-reveal], .os-bloque-cubo, .os-letras span { opacity: 1; transform: none; }
+  .os [data-reveal], .os-bloque-cubo, .os-letras span, .os-cuenta-cubo { opacity: 1; transform: none; }
+  .os-bordado { clip-path: none; }
+  .os-patita, .os-huellas > span:last-child, .os-cordon-pista { opacity: 1; transform: translateY(var(--y, 0)) rotate(var(--g, 0deg)); }
+  .os-cordon, .os-tirador, .os-sonajero { animation: none !important; }
   .os-bloque-sobres .os-lluvia { display: none; }
 }

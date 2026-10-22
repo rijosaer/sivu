@@ -173,15 +173,15 @@ const TEMA_CELEBRACION_AZUL = [
   ["fuente-cuerpo", "Libre Baskerville"],
 ];
 
-// Eucalipto: principal = verde eucalipto, claro = salvia pálida, oscuro = verde bosque, sello = oro viejo.
+// Eucalipto: principal = azul plata del eucalipto, claro = gris azulado pálido, oscuro = pizarra, sello = champaña.
 const TEMA_EUCALIPTO = [
-  ["color-paper", "#F6F4EC"],
-  ["color-ink", "#2F3A33"],
-  ["color-gold", "#8FA58F"],
-  ["color-gold-light", "#D6E0D2"],
-  ["color-gold-dark", "#5C7262"],
+  ["color-paper", "#F1F4F4"],
+  ["color-ink", "#2C3A40"],
+  ["color-gold", "#6F8F98"],
+  ["color-gold-light", "#CFDDE0"],
+  ["color-gold-dark", "#46626B"],
   ["color-marble", "#FFFFFF"],
-  ["color-seal", "#B89A5E"],
+  ["color-seal", "#B7A07A"],
   ["fuente-guion", "Allura"],
   ["fuente-titulos", "Gilda Display"],
   ["fuente-cuerpo", "Mulish"],
@@ -201,15 +201,15 @@ const TEMA_LUCES = [
   ["fuente-cuerpo", "Raleway"],
 ];
 
-// Vals rosa: principal = rosa palo, claro = rubor, oscuro = rosa vino, sello = oro de las capitulares.
+// Vals lila: principal = lila, claro = lavanda pálida, oscuro = violeta ciruela, sello = plata.
 const TEMA_VALS = [
-  ["color-paper", "#FBF1F1"],
-  ["color-ink", "#4A2E36"],
-  ["color-gold", "#D8A1AE"],
-  ["color-gold-light", "#F3D9DE"],
-  ["color-gold-dark", "#9C5C6C"],
+  ["color-paper", "#F6F2FA"],
+  ["color-ink", "#3D3350"],
+  ["color-gold", "#A493C4"],
+  ["color-gold-light", "#E3DAF0"],
+  ["color-gold-dark", "#6B5B8E"],
   ["color-marble", "#FFFFFF"],
-  ["color-seal", "#C2A15E"],
+  ["color-seal", "#A9A9B8"],
   ["fuente-guion", "Norican"],
   ["fuente-titulos", "Prata"],
   ["fuente-cuerpo", "Karla"],
@@ -243,42 +243,42 @@ const TEMA_CONFETI = [
   ["fuente-cuerpo", "Poppins"],
 ];
 
-// Dulce 30: principal = rosa pastel, claro = rosa crema, oscuro = malva, sello = lila de los macarons.
+// Dulce 30: principal = caramelo, claro = vainilla, oscuro = toffee, sello = rosa macaron.
 const TEMA_DULCE = [
-  ["color-paper", "#FBF3F5"],
-  ["color-ink", "#4B3440"],
-  ["color-gold", "#E2B4C2"],
-  ["color-gold-light", "#F6E1E8"],
-  ["color-gold-dark", "#A86F82"],
-  ["color-marble", "#FFFFFF"],
-  ["color-seal", "#C8AFD9"],
+  ["color-paper", "#FBF5EC"],
+  ["color-ink", "#4A3426"],
+  ["color-gold", "#C68B59"],
+  ["color-gold-light", "#F1DEC6"],
+  ["color-gold-dark", "#8E5A33"],
+  ["color-marble", "#FFFDF8"],
+  ["color-seal", "#E4A9A0"],
   ["fuente-guion", "Yesteryear"],
   ["fuente-titulos", "Italiana"],
   ["fuente-cuerpo", "Montserrat"],
 ];
 
-// Birrete: principal = oro, claro = oro pálido, oscuro = bronce, sello = azul tinta de las pestañas.
+// Birrete: principal = vino académico, claro = rosa vino pálido, oscuro = burdeos, sello = oro.
 const TEMA_BIRRETE = [
-  ["color-paper", "#F8F5EE"],
-  ["color-ink", "#1F2228"],
-  ["color-gold", "#B8913F"],
-  ["color-gold-light", "#E9D7A9"],
-  ["color-gold-dark", "#7C6024"],
+  ["color-paper", "#F7F3EE"],
+  ["color-ink", "#2A1E22"],
+  ["color-gold", "#7A2638"],
+  ["color-gold-light", "#E8C9CF"],
+  ["color-gold-dark", "#4F1424"],
   ["color-marble", "#FFFFFF"],
-  ["color-seal", "#2E3A55"],
+  ["color-seal", "#B8913F"],
   ["fuente-guion", "Imperial Script"],
   ["fuente-titulos", "Cinzel Decorative"],
   ["fuente-cuerpo", "EB Garamond"],
 ];
 
-// Medianoche: fondo oscuro a propósito (gala de fin de año, como Gala). principal = oro, claro = champaña, oscuro = bronce, sello = champaña clara.
+// Medianoche: fondo esmeralda profundo (art-déco), principal = oro, claro = champaña, oscuro = bronce, sello = champaña clara.
 const TEMA_MEDIANOCHE = [
-  ["color-paper", "#15161A"],
-  ["color-ink", "#F4EEDF"],
+  ["color-paper", "#0F2A24"],
+  ["color-ink", "#F3EEDF"],
   ["color-gold", "#C9A45A"],
   ["color-gold-light", "#E8D6A6"],
   ["color-gold-dark", "#8D6E2E"],
-  ["color-marble", "#22232A"],
+  ["color-marble", "#16352E"],
   ["color-seal", "#E7D8B4"],
   ["fuente-guion", "Federo"],
   ["fuente-titulos", "Federo"],

@@ -4,7 +4,7 @@ import RSVP from "../../components/RSVP";
 import {
   partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer,
 } from "../comun";
-import { CfGlobo, CfRamo, CfPinza, CfPastel, CfRegalo } from "./arte";
+import { CfGlobo, CfRamo, CfPinza, CfPastel, CfRegalo, CfKraft, CfAlfiler } from "./arte";
 
 // Diseño «Confeti»: cumpleaños alegre pero elegante. Globos durazno, rubor,
 // crema y oro sobre papel crema, con confeti dorado.
@@ -72,14 +72,19 @@ const IMPRESO = [
   [4, 46, 15, "punto", "claro"], [96, 52, -50, "tira", "oro"], [8, 84, 70, "tira", "durazno"], [16, 94, 10, "punto", "oro"],
   [90, 88, -15, "rombo", "oro"], [80, 96, 40, "tira", "claro"], [50, 2, 90, "punto", "oro"], [2, 66, -60, "rombo", "durazno"],
 ];
+const UNIDADES = [["dias", "días", "durazno"], ["horas", "horas", "oro"], ["min", "min", "rubor"], ["seg", "seg", "crema"]];
+// Globos que se van volando en el cierre: [x %, ancho px, tono, duración s, retraso s, vaivén px].
+const VUELO = [
+  [6, 58, "durazno", 11, 0, 18], [74, 70, "oro", 13, 1.2, -22], [30, 46, "crema", 10, 2.6, 14], [86, 50, "rubor", 12, 4.1, -16],
+  [16, 64, "oro", 14, 5.4, 20], [58, 54, "durazno", 11.5, 6.8, -14], [44, 42, "rubor", 12.5, 8.3, 16],
+];
 const GIROS = [-2.2, 1.8, -1.4, 2.3, -1.9, 1.3, -2.5, 1.6];
 
 const trazo = { fill: "none", stroke: "currentColor", strokeWidth: 1.6, strokeLinecap: "round", strokeLinejoin: "round" };
 const Icono = {
   pin: <svg viewBox="0 0 24 24" {...trazo} aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z" /><circle cx="12" cy="9.5" r="2.5" /></svg>,
   copiar: <svg viewBox="0 0 24 24" {...trazo} aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2" /><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" /></svg>,
-  musica: <svg viewBox="0 0 24 24" {...trazo} aria-hidden="true"><path d="M9 18V5l11-2v13" /><circle cx="6.5" cy="18" r="2.5" /><circle cx="17.5" cy="16" r="2.5" /></svg>,
-  pausa: <svg viewBox="0 0 24 24" {...trazo} aria-hidden="true"><path d="M9 6v12M15 6v12" /></svg>,
+  nota: <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17.2V5.6l8-1.8v10.6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" /><ellipse cx="7.6" cy="17.4" rx="3" ry="2.4" transform="rotate(-18 7.6 17.4)" fill="currentColor" /><ellipse cx="15.6" cy="15.4" rx="3" ry="2.4" transform="rotate(-18 15.6 15.4)" fill="currentColor" /></svg>,
   whatsapp: <svg viewBox="0 0 24 24" {...trazo} aria-hidden="true"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z" /><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 .8a4 4 0 0 1-2-2l.8-1-1-2z" /></svg>,
   enlace: <svg viewBox="0 0 24 24" {...trazo} aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1" /><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" /></svg>,
 };
@@ -140,8 +145,21 @@ function Colgada({ n, titulo, id, children, className = "" }) {
   );
 }
 
+// Escena de la entrada, en px sobre un lienzo de 360 × 610:
+// - el globo grande (con su cuerda) termina en el ojal de la etiqueta;
+// - de ese mismo ojal salen, inclinados, los globitos de los pases;
+// - el alfiler dibujado, arriba a la derecha, apunta al globo.
+const OJAL = { x: 175, y: 377 };
+// [giro en grados, largo de la cuerda en px, tono] de cada globito de pase.
+const GLOBITOS = [
+  [-40, 92, "rubor"], [40, 96, "oro"], [-63, 84, "crema"], [63, 80, "durazno"], [-20, 112, "oro"], [20, 116, "rubor"],
+];
+
 function Entrada({ welcome, invitacion, reventando, onReventar }) {
   const pases = pasesDe(invitacion);
+  const nombre = invitacion?.nombre || "";
+  const largoNombre = nombre.length > 22 ? "cf-kraft-largo" : nombre.length > 13 ? "cf-kraft-medio" : "";
+  const globitos = GLOBITOS.slice(0, Math.min(pases, GLOBITOS.length));
   return (
     <section className={`cf-entrada ${reventando ? "cf-reventado" : ""}`} aria-label="Abrir invitación">
       <div className="cf-fondo-globos" aria-hidden="true">
@@ -149,24 +167,26 @@ function Entrada({ welcome, invitacion, reventando, onReventar }) {
         <CfGlobo tono="oro" className="cf-globito cf-globito-2" />
         <CfGlobo tono="crema" className="cf-globito cf-globito-3" />
       </div>
-      <div className="cf-entrada-arriba">
-        {invitacion?.nombre ? (
-          <div className="cf-invitado">
-            <span className="cf-etiqueta">Invitación especial para</span>
-            <p className="cf-invitado-nombre">{invitacion.nombre}</p>
-            {pases > 0 && <span className="cf-pases">{pases} {pases === 1 ? "pase reservado" : "pases reservados"}</span>}
-          </div>
-        ) : (
-          <div className="cf-invitado">
-            <span className="cf-etiqueta">{welcome.bienvenidaTexto || "Estás invitado"}</span>
-            <p className="cf-invitado-nombre">¡Hay fiesta!</p>
-          </div>
-        )}
-      </div>
-      <div className="cf-globo-zona">
+
+      <div className="cf-escena" style={{ "--ojal-x": `${OJAL.x}px`, "--ojal-y": `${OJAL.y}px` }}>
+        <button type="button" className="cf-llamado" onClick={onReventar} tabIndex={-1} aria-hidden="true">
+          <span className="cf-revienta">¡Revienta<br />el globo!</span>
+        </button>
+        <span className="cf-alfiler-zona" aria-hidden="true">
+          <CfAlfiler className="cf-alfiler" />
+        </span>
+
         <span className="cf-halo" aria-hidden="true" />
-        <button type="button" className="cf-globo-btn" onClick={onReventar} aria-label="Reventar el globo y abrir la invitación">
-          <CfGlobo tono="durazno" className="cf-globo-grande" />
+
+        {/* Globitos de los pases: atados al mismo ojal de la etiqueta. */}
+        {globitos.map(([giro, largo, tono], i) => (
+          <span key={i} className="cf-pase-globo" style={{ "--giro": `${giro}deg`, "--alto": `${largo + 51}px`, "--i": i }} aria-hidden="true">
+            <CfGlobo tono={tono} largo={largo / 0.22} />
+          </span>
+        ))}
+
+        <button type="button" className="cf-globo-btn" onClick={onReventar} aria-label="¡Revienta el globo! Tócalo para abrir la invitación">
+          <CfGlobo tono="durazno" largo={100} className="cf-globo-grande" claseLatex="cf-latex" claseCuerda="cf-hilo" />
         </button>
         <span className="cf-pum" aria-hidden="true" />
         <span className="cf-pedazos" aria-hidden="true">
@@ -176,10 +196,30 @@ function Entrada({ welcome, invitacion, reventando, onReventar }) {
             </svg>
           ))}
         </span>
-      </div>
-      <div className="cf-entrada-abajo">
-        <p className="cf-revienta">¡Revienta el globo!</p>
-        <p className="cf-pista">Tócalo para abrir tu invitación</p>
+
+        {/* La etiqueta de kraft, escrita a mano, colgando del hilo. */}
+        <div className={`cf-kraft ${largoNombre}`}>
+          <CfKraft className="cf-kraft-fondo" />
+          {nombre ? (
+            <div className="cf-kraft-texto">
+              <span className="cf-kraft-para">para</span>
+              <p className="cf-kraft-nombre">{nombre}</p>
+              {pases > 0 && (
+                <p className="cf-kraft-pases">
+                  <span>{pases} {pases === 1 ? "globo para ti" : "globos para ti"}</span>
+                  <small>{pases === 1 ? "es tu pase a la fiesta" : "uno por cada pase"}</small>
+                </p>
+              )}
+            </div>
+          ) : (
+            <div className="cf-kraft-texto">
+              <span className="cf-kraft-para">{welcome.bienvenidaTexto || "estás invitado"}</span>
+              <p className="cf-kraft-nombre">¡Hay fiesta!</p>
+            </div>
+          )}
+        </div>
+
+        <p className="cf-pista">Toca el globo para abrir tu invitación</p>
       </div>
     </section>
   );
@@ -288,9 +328,10 @@ export default function Confeti({ site, contenidoDe, invitacion, onEnviarRSVP, e
     <div className="cf" ref={raiz}>
       {audioSrc && <audio ref={audioRef} src={audioSrc} loop preload="none" />}
       {audioSrc && abierta && (
-        <button className="cf-musica" type="button" aria-pressed={sonando} onClick={alternarMusica} aria-label={sonando ? "Pausar la música" : "Poner música"}>
-          {sonando ? Icono.pausa : Icono.musica}
-          <span>{sonando ? "Pausar" : "Música"}</span>
+        <button className={`cf-musica ${sonando ? "is-on" : ""}`} type="button" aria-pressed={sonando} onClick={alternarMusica} aria-label={sonando ? "Pausar la música" : "Poner música"}>
+          <CfGlobo tono="oro" largo={70} className="cf-musica-globo" />
+          <span className="cf-musica-nota">{Icono.nota}{!sonando && <i className="cf-musica-tachon" />}</span>
+          {sonando && <span className="cf-notas-sueltas" aria-hidden="true"><b>♪</b><b>♫</b></span>}
         </button>
       )}
 
@@ -344,18 +385,26 @@ export default function Confeti({ site, contenidoDe, invitacion, onEnviarRSVP, e
           <div className="cf-tendedero">
             {partes && (
               <Colgada n={sig()} id="cf-cuenta" titulo={cuenta ? "¡Ya casi!" : "¡Hoy es el día!"}>
-                <CfPastel className="cf-pastel" />
                 {cuenta ? (
                   <>
-                    <p className="cf-k">Faltan para soplar las velas</p>
-                    <div className="cf-cuenta" role="timer" aria-label="Cuenta regresiva">
-                      {[["dias", "días"], ["horas", "horas"], ["min", "min"], ["seg", "seg"]].map(([k, l]) => (
-                        <div key={k}><span className="n">{cuenta[k]}</span><span className="l">{l}</span></div>
+                    <p className="cf-cuenta-nota">Lo que falta, en globos</p>
+                    {/* Cuenta regresiva en globos con número, cada uno con su
+                        cuerda y la unidad escrita a mano al final del hilo. */}
+                    <div className="cf-cuenta" role="timer" aria-label={`Faltan ${cuenta.dias} días, ${cuenta.horas} horas y ${cuenta.min} minutos`}>
+                      {UNIDADES.map(([k, l, tono], i) => (
+                        <div key={k} className={`cf-numglobo cf-t-${tono}`} style={{ "--i": i }} aria-hidden="true">
+                          <CfGlobo tono={tono} largo={150} className="cf-numglobo-svg" />
+                          <span className={`cf-num ${String(cuenta[k]).length > 2 ? "cf-num-3" : ""}`} key={cuenta[k]}>{String(cuenta[k]).padStart(2, "0")}</span>
+                          <span className="cf-unidad">{l}</span>
+                        </div>
                       ))}
                     </div>
                   </>
                 ) : (
-                  <p className="cf-lead">¡Llegó el gran día!</p>
+                  <>
+                    <CfPastel className="cf-pastel" />
+                    <p className="cf-lead">¡Llegó el gran día!</p>
+                  </>
                 )}
               </Colgada>
             )}
@@ -509,10 +558,19 @@ export default function Confeti({ site, contenidoDe, invitacion, onEnviarRSVP, e
             )}
           </div>
 
+          {/* Cierre: globos sueltos que se van volando hacia arriba. */}
           <footer className="cf-final" data-reveal>
-            <CfRamo className="cf-final-ramo" />
-            <p className="cf-te-espero">{varios ? "¡Te esperamos!" : "¡Te espero!"}</p>
-            {firma && <p className="cf-texto">Con cariño, {firma}</p>}
+            <div className="cf-vuelo" aria-hidden="true">
+              {VUELO.map(([x, ancho, tono, dur, retraso, vaiven], i) => (
+                <span key={i} className="cf-vuela" style={{ left: `${x}%`, width: `${ancho}px`, "--dur": `${dur}s`, "--retraso": `${retraso}s`, "--vaiven": `${vaiven}px` }}>
+                  <CfGlobo tono={tono} largo={190} />
+                </span>
+              ))}
+            </div>
+            <div className="cf-final-texto">
+              <p className="cf-te-espero">{varios ? "¡Te esperamos!" : "¡Te espero!"}</p>
+              {firma && <p className="cf-texto">Con cariño, {firma}</p>}
+            </div>
           </footer>
         </main>
       )}
@@ -521,18 +579,27 @@ export default function Confeti({ site, contenidoDe, invitacion, onEnviarRSVP, e
 
       {rsvpAbierto && invitacion && (
         <div className="cf-modal" role="dialog" aria-modal="true" aria-label="Confirmar asistencia" onClick={(e) => e.target === e.currentTarget && setRsvpAbierto(false)}>
+          {/* El modal es una polaroid grande colgada de su propio cordel. */}
+          <svg className="cf-modal-cordel" viewBox="0 0 100 20" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M-2 4 Q 25 12 50 15 Q 75 12 102 4" vectorEffect="non-scaling-stroke" />
+          </svg>
           <div className="cf-modal-caja">
             <CfPinza className="cf-modal-pinza" />
-            <button type="button" className="cf-cerrar" onClick={() => setRsvpAbierto(false)} aria-label="Cerrar">×</button>
-            <RSVP
-              invitacion={invitacion}
-              fechaLimite={info.fechaLimiteConfirmacion || site.fechaLimiteConfirmacion}
-              opciones={{
-                mostrarRestriccion: info.mostrarRestriccion !== false,
-                mostrarObservaciones: info.mostrarObservaciones !== false,
-              }}
-              onSubmit={onEnviarRSVP}
-            />
+            <button type="button" className="cf-cerrar" onClick={() => setRsvpAbierto(false)} aria-label="Cerrar">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7.5 C 10 10 14 14 17 16.8 M16.6 7 C 13.6 10.4 10.4 13.6 7.4 17" /></svg>
+            </button>
+            <div className="cf-modal-foto">
+              <RSVP
+                invitacion={invitacion}
+                fechaLimite={info.fechaLimiteConfirmacion || site.fechaLimiteConfirmacion}
+                opciones={{
+                  mostrarRestriccion: info.mostrarRestriccion !== false,
+                  mostrarObservaciones: info.mostrarObservaciones !== false,
+                }}
+                onSubmit={onEnviarRSVP}
+              />
+            </div>
+            <p className="cf-modal-pie" aria-hidden="true">¡Nos vemos en la fiesta!</p>
           </div>
         </div>
       )}

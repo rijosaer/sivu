@@ -4,24 +4,32 @@ import RSVP from "../../components/RSVP";
 import {
   partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer,
 } from "../comun";
-import { VrTelon, VrSalon, VrRosas, VrQuince, VrTiara, VrZapatillas, VrCapital, VrEsquina, VrFilete } from "./arte";
+import {
+  VrTelon, VrSalon, VrRosas, VrQuince, VrTiara, VrZapatillas, VrCapital, VrEsquina, VrFilete,
+  VrBorla, VrCordonLapiz, VrRelojPie, VrCajita,
+} from "./arte";
 
-// Diseño «Vals rosa» (XV años): cuento de hadas fino en rosa palo, rosas de
-// jardín, oro suave y un salón con candelabro. Todo el arte es SVG (arte.jsx).
-// - Entrada: un telón de terciopelo rosa palo con pliegues, cenefa y borlas
-//   doradas cubre la pantalla; al centro una cartela bordada con el nombre.
-//   Al tocar, las dos mitades se recogen hacia los lados como en un teatro
-//   (se fruncen y quedan atadas con un cordón) y aparece el salón con el
-//   candelabro y la quinceañera de espaldas. El escenario queda como portada.
+// Diseño «Vals lila» (XV años): cuento de hadas fino en lila y plata, rosas
+// de lavanda y blancas y un salón con candelabro. Todo el arte es SVG (arte.jsx).
+// - Entrada: un telón de terciopelo lila con pliegues, cenefa y borlas de
+//   plata cubre la pantalla; al centro una cartela bordada con el nombre y,
+//   colgando de ella, el carnet de baile del invitado («Este vals es para…»,
+//   con sus pases como piezas ya reservadas a lápiz). Al lado cuelga una
+//   borla de plata: al jalarla, las dos mitades se recogen hacia los lados y
+//   aparece el salón con la quinceañera de espaldas, de vestido lila.
 // - Cuerpo: un «libro de cuento». Cada sección es una página de papel marfil
-//   con orla, letra capital dorada iluminada (la primera letra del título),
-//   viñeta de rosas y folio; las páginas entran girando sobre el lomo, como
-//   si se pasaran.
-// Colores del tema: principal (gold) = rosa palo, claro = rosa claro,
-// oscuro = rosa antiguo, papel = fondo, mármol = tarjetas, sello = oro suave.
+//   con orla, letra capital ornamentada en plata, viñeta de rosas y folio; las
+//   páginas entran girando sobre el lomo. La cuenta regresiva es un reloj de
+//   pie con un índice de lo que falta; el cierre, el carnet de baile cerrado
+//   con «Fin»; la música, una cajita de música; la confirmación, una página.
+// Colores del tema: principal (gold) = lila, claro = lila claro, oscuro =
+// lila profundo, papel = fondo, mármol = tarjetas, sello = plata.
 
 const FUENTES =
   "https://fonts.googleapis.com/css2?family=Karla:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Norican&family=Prata&display=swap";
+
+// Piezas del carnet de baile: una línea ya reservada por cada pase.
+const PIEZAS = ["Vals", "Pasillo", "Bambuco", "Mazurca", "Polca", "Contradanza", "Danza", "Bolero", "Merengue", "Cumbia"];
 
 const ROMANOS = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI"];
 
@@ -62,11 +70,11 @@ function Pagina({ n, titulo, id, vineta = "ramo", children }) {
         <VrEsquina className="vr-esq vr-esq-3" />
         <VrEsquina className="vr-esq vr-esq-4" />
         <VrRosas className={`vr-vineta vr-vineta-${vineta}`} variante={vineta === "ramo" ? "ramo" : "rama"} />
-        <p className="vr-capitulo">Capítulo {ROMANOS[n] || n}</p>
         <h2 className="vr-titulo" id={id} aria-label={titulo}>
           {letra && <VrCapital letra={letra} className="vr-capital" />}
           <span aria-hidden="true">{resto}</span>
         </h2>
+        <p className="vr-capitulo" aria-hidden="true">capítulo {ROMANOS[n] || n}</p>
         <div className="vr-contenido">{children}</div>
         <p className="vr-folio" aria-hidden="true"><VrFilete className="vr-folio-filete" /><span>{n}</span></p>
       </article>
@@ -74,8 +82,67 @@ function Pagina({ n, titulo, id, vineta = "ramo", children }) {
   );
 }
 
+// Carnet de baile del invitado: cuelga de un cordón de plata con su lapicito.
+// Cada pase es una pieza ya reservada a lápiz.
+function Carnet({ invitacion, className = "" }) {
+  const n = Math.max(pasesDe(invitacion), 1);
+  const lineas = PIEZAS.slice(0, Math.min(n, PIEZAS.length));
+  return (
+    <div className={`vr-carnet ${className}`}>
+      <VrCordonLapiz className="vr-carnet-cordon" />
+      <div className="vr-carnet-tarjeta">
+        <p className="vr-carnet-para">Este vals es para…</p>
+        <p className="vr-carnet-nombre">{invitacion.nombre}</p>
+        <ol className="vr-carnet-lineas" aria-label={`${n} ${n === 1 ? "pase reservado" : "pases reservados"}`}>
+          {lineas.map((pieza, i) => (
+            <li key={pieza} style={{ "--i": i }}>
+              <span className="vr-carnet-n">{i + 1}.</span>
+              <span className="vr-carnet-pieza">{pieza}</span>
+              <span className="vr-carnet-puntos" aria-hidden="true" />
+              <span className="vr-carnet-firma">reservado</span>
+            </li>
+          ))}
+        </ol>
+        <p className="vr-carnet-pie">{n === 1 ? "Un lugar a tu nombre" : `${n} lugares a tu nombre`}</p>
+      </div>
+    </div>
+  );
+}
+
+// Borla de plata que se jala (también se puede arrastrar hacia abajo).
+function Jalar({ abierto, onAbrir }) {
+  const [jalando, setJalando] = useState(false);
+  const [tiro, setTiro] = useState(0);
+  const inicio = useRef(null);
+  function jalar() {
+    if (abierto || jalando) return;
+    setJalando(true);
+    setTiro(0);
+    const quieto = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    setTimeout(onAbrir, quieto ? 0 : 560);
+  }
+  return (
+    <>
+      <div className={`vr-jalar ${jalando ? "is-jalando" : ""} ${tiro ? "is-arrastre" : ""}`} style={{ "--tiro": `${tiro}px` }}>
+        <span className="vr-jalar-cordon" aria-hidden="true" />
+        <button
+          type="button" className="vr-jalar-borla" onClick={jalar} tabIndex={abierto ? -1 : 0}
+          aria-label="Jala la borla para abrir el telón"
+          onPointerDown={(e) => { inicio.current = e.clientY; }}
+          onPointerMove={(e) => { if (inicio.current != null) setTiro(Math.max(0, Math.min(70, e.clientY - inicio.current))); }}
+          onPointerUp={() => { inicio.current = null; }}
+          onPointerCancel={() => { inicio.current = null; setTiro(0); }}
+        >
+          <VrBorla className="vr-jalar-svg" />
+        </button>
+      </div>
+      <p className="vr-jalar-texto" aria-hidden="true">jala la borla<svg viewBox="0 0 40 24"><path d="M2 18 C 14 20 26 16 34 6 M27 6 H34 V13" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" /></svg></p>
+      {!abierto && <button type="button" className="vr-toque" onClick={jalar} tabIndex={-1} aria-hidden="true" />}
+    </>
+  );
+}
+
 function Escenario({ abierto, onAbrir, welcome, partes, invitacion }) {
-  const pases = pasesDe(invitacion);
   const nombre = welcome.novioEl || "";
   const antetitulo = welcome.bienvenidaTexto || "Mis XV años";
   return (
@@ -93,7 +160,7 @@ function Escenario({ abierto, onAbrir, welcome, partes, invitacion }) {
       <VrQuince className="vr-quince" />
       <VrRosas className="vr-escena-rosas vr-escena-rosas-izq" />
       <VrRosas className="vr-escena-rosas vr-escena-rosas-der" />
-      <p className="vr-desliza" aria-hidden="true">Desliza y abre el cuento<span /></p>
+      <p className="vr-desliza" aria-hidden="true">desliza y abre el cuento<span /></p>
 
       <div className="vr-telon vr-telon-izq" aria-hidden="true">
         <div className="vr-tela"><VrTelon lado="izq" className="vr-tela-svg" /></div>
@@ -111,21 +178,11 @@ function Escenario({ abierto, onAbrir, welcome, partes, invitacion }) {
           <p className="vr-cartela-ante">{antetitulo}</p>
           <p className="vr-cartela-nombre">{nombre}</p>
           <VrFilete className="vr-cartela-filete" />
-          {invitacion?.nombre ? (
-            <div className="vr-invitado">
-              <span>Invitación especial para</span>
-              <b>{invitacion.nombre}</b>
-              {pases > 0 && <span className="vr-pases">{pases} {pases === 1 ? "pase reservado" : "pases reservados"}</span>}
-            </div>
-          ) : partes ? (
-            <p className="vr-cartela-fecha">{partes.dia} · {partes.mes} · {partes.anio}</p>
-          ) : null}
+          {partes && <p className="vr-cartela-fecha">{partes.dia} de {partes.mes} · {partes.anio}</p>}
         </div>
-        <button type="button" className="vr-abrir" onClick={onAbrir} tabIndex={abierto ? -1 : 0}>
-          Toca para abrir el telón
-        </button>
+        {invitacion?.nombre && <Carnet invitacion={invitacion} className="vr-carnet-telon" />}
       </div>
-      {!abierto && <button type="button" className="vr-toque" onClick={onAbrir} tabIndex={-1} aria-hidden="true" />}
+      <Jalar abierto={abierto} onAbrir={onAbrir} />
     </section>
   );
 }
@@ -155,7 +212,6 @@ export default function Vals({ site, contenidoDe, invitacion, onEnviarRSVP, enEd
   const partes = useMemo(() => partesFecha(info.fecha), [info.fecha]);
   const cuenta = useCuentaRegresiva(partes?.fecha);
   const limite = limiteLegible(info.fechaLimiteConfirmacion || site.fechaLimiteConfirmacion);
-  const pases = pasesDe(invitacion);
   const nombre = welcome.novioEl || "";
   const audioSrc = site.audioUrl || musica.src;
   const telefono = (info.telefonoConfirmar || "").trim();
@@ -217,10 +273,16 @@ export default function Vals({ site, contenidoDe, invitacion, onEnviarRSVP, enEd
           </div>
         )}
         {partes && (cuenta ? (
-          <div className="vr-cuenta" role="timer" aria-label="Cuenta regresiva">
-            {[["dias", "días"], ["horas", "horas"], ["min", "min"], ["seg", "seg"]].map(([k, l]) => (
-              <div key={k}><span className="n">{cuenta[k]}</span><span className="l">{l}</span></div>
-            ))}
+          <div className="vr-reloj" role="timer" aria-label={`Faltan ${cuenta.dias} días, ${cuenta.horas} horas y ${cuenta.min} minutos`}>
+            <VrRelojPie className="vr-reloj-svg" horas={cuenta.horas} min={cuenta.min} seg={cuenta.seg} />
+            <div className="vr-indice" aria-hidden="true">
+              <p className="vr-indice-titulo">Lo que falta del cuento</p>
+              <ol>
+                {[["dias", "Días"], ["horas", "Horas"], ["min", "Minutos"], ["seg", "Segundos"]].map(([k, l]) => (
+                  <li key={k}><span>{l}</span><i /><b>{String(cuenta[k]).padStart(k === "dias" ? 1 : 2, "0")}</b></li>
+                ))}
+              </ol>
+            </div>
           </div>
         ) : (
           <p className="vr-llego">¡Llegó el gran día!</p>
@@ -378,13 +440,7 @@ export default function Vals({ site, contenidoDe, invitacion, onEnviarRSVP, enEd
   if (confirmar) {
     agregar("confirmar", "Confirma tu asistencia", (
       <>
-        {invitacion?.nombre && (
-          <div className="vr-invitado vr-invitado-pagina">
-            <span>Invitación especial para</span>
-            <b>{invitacion.nombre}</b>
-            {pases > 0 && <span className="vr-pases">{pases} {pases === 1 ? "pase reservado" : "pases reservados"}</span>}
-          </div>
-        )}
+        {invitacion?.nombre && <Carnet invitacion={invitacion} className="vr-carnet-pagina" />}
         {confirmar.href ? (
           <a className="vr-btn vr-btn-grande" href={confirmar.href} target="_blank" rel="noopener noreferrer">
             {Icono.whatsapp} <span>{confirmar.texto} <b>{confirmar.grande}</b></span>
@@ -401,9 +457,8 @@ export default function Vals({ site, contenidoDe, invitacion, onEnviarRSVP, enEd
     <div className="vr" ref={raiz}>
       {audioSrc && <audio ref={audioRef} src={audioSrc} loop preload="none" />}
       {audioSrc && abierta && (
-        <button className="vr-musica" type="button" aria-pressed={sonando} onClick={alternarMusica} aria-label={sonando ? "Pausar la música" : "Reproducir la música"}>
-          {sonando ? Icono.pausa : Icono.musica}
-          <span>{sonando ? "Pausar" : "Música"}</span>
+        <button className={`vr-musica ${sonando ? "is-sonando" : ""}`} type="button" aria-pressed={sonando} onClick={alternarMusica} aria-label={sonando ? "Pausar la música" : "Reproducir la música"}>
+          <VrCajita className="vr-musica-caja" />
         </button>
       )}
 
@@ -417,11 +472,27 @@ export default function Vals({ site, contenidoDe, invitacion, onEnviarRSVP, enEd
             </Pagina>
           ))}
           <footer className="vr-fin" data-reveal>
-            <VrTiara className="vr-fin-tiara" />
             <p className="vr-fin-texto">…y la noche apenas comienza.</p>
+            <div className="vr-fin-carnet">
+              <div className="vr-fin-interior" aria-hidden="true">
+                {PIEZAS.slice(0, 4).map((p) => <span key={p}>{p}</span>)}
+              </div>
+              <div className="vr-fin-tapa">
+                <div className="vr-fin-cara">
+                  <VrEsquina className="vr-esq vr-esq-1" />
+                  <VrEsquina className="vr-esq vr-esq-2" />
+                  <VrEsquina className="vr-esq vr-esq-3" />
+                  <VrEsquina className="vr-esq vr-esq-4" />
+                  <span className="vr-fin-de">carnet de baile</span>
+                  <p className="vr-fin-fin">Fin</p>
+                  <VrFilete className="vr-fin-filete" />
+                  {nombre && <p className="vr-fin-firma">{nombre}</p>}
+                </div>
+                <div className="vr-fin-dorso" aria-hidden="true" />
+              </div>
+              <VrCordonLapiz className="vr-fin-cordon" />
+            </div>
             <p className="vr-fin-guion">¡Te espero!</p>
-            {nombre && <p className="vr-fin-firma">{nombre}</p>}
-            <p className="vr-fin-fin">Fin</p>
             <VrRosas className="vr-fin-rosas" />
           </footer>
         </main>
@@ -432,8 +503,11 @@ export default function Vals({ site, contenidoDe, invitacion, onEnviarRSVP, enEd
       {rsvpAbierto && invitacion && (
         <div className="vr-modal" role="dialog" aria-modal="true" aria-label="Confirmar asistencia" onClick={(e) => e.target === e.currentTarget && setRsvpAbierto(false)}>
           <div className="vr-modal-caja">
-            <button type="button" className="vr-cerrar" onClick={() => setRsvpAbierto(false)} aria-label="Cerrar">×</button>
-            <VrTiara className="vr-modal-tiara" />
+            <button type="button" className="vr-cerrar" onClick={() => setRsvpAbierto(false)} aria-label="Cerrar"><span aria-hidden="true">×</span></button>
+            <VrEsquina className="vr-esq vr-esq-1" />
+            <VrEsquina className="vr-esq vr-esq-4" />
+            <p className="vr-modal-cabeza">una página para tu respuesta</p>
+            <VrFilete className="vr-modal-filete" />
             <RSVP
               invitacion={invitacion}
               fechaLimite={info.fechaLimiteConfirmacion || site.fechaLimiteConfirmacion}
@@ -443,6 +517,7 @@ export default function Vals({ site, contenidoDe, invitacion, onEnviarRSVP, enEd
               }}
               onSubmit={onEnviarRSVP}
             />
+            <p className="vr-modal-folio" aria-hidden="true">{paginas.length + 1}</p>
           </div>
         </div>
       )}
