@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import { cspPlugin } from "../csp.config.js";
+import { cspPlugin } from "./csp.config.js";
 
 // Panel: guarda el token de sesión, así que su CSP es la más cerrada. Solo
 // habla con la API, carga sus letras de Google Fonts e incrusta el sitio
