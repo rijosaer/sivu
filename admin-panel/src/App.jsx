@@ -16,8 +16,9 @@ const AjustesEvento = lazy(() => import("./pages/AjustesEvento"));
 const Cargando = () => <p className="text-sm text-ink-tenue">Cargando...</p>;
 import {
   api,
-  hasToken,
-  clearToken,
+  comprobarSesion,
+  cerrarSesion,
+  setEventoFijo,
   SITIO_BASE,
   getInvitacionActual,
   setInvitacionActual,
@@ -206,7 +207,9 @@ function Cascara({ onSalir, evento, onCambiarEvento, tramos }) {
 }
 
 export default function App() {
-  const [logueado, setLogueado] = useState(hasToken());
+  // null = preguntando a la API si hay sesión (la cookie no se puede leer
+  // desde aquí); true/false = la respuesta.
+  const [logueado, setLogueado] = useState(null);
   const tramos = useRuta();
   // El evento que se está editando: lo dice la dirección (/evento/12/...).
   // Si es el mismo que quedó guardado, se usa sin pedirlo otra vez.
@@ -216,6 +219,32 @@ export default function App() {
     return actual;
   });
   const [errorEvento, setErrorEvento] = useState("");
+
+  useEffect(() => {
+    let vivo = true;
+    comprobarSesion().then((sesion) => {
+      if (!vivo) return;
+      if (sesion) {
+        // El evento de un cliente lo dice el servidor, no lo que haya quedado
+        // guardado en este navegador.
+        setEventoFijo(Boolean(sesion.invitacion));
+        if (sesion.invitacion) {
+          setInvitacionActual(sesion.invitacion);
+          actualizarSitioBase(sesion.invitacion.slug);
+          setEvento({
+            id: String(sesion.invitacion.id),
+            slug: sesion.invitacion.slug,
+            nombre: sesion.invitacion.nombre,
+            tipo_evento: sesion.invitacion.tipo_evento,
+          });
+        }
+      }
+      setLogueado(Boolean(sesion));
+    });
+    return () => {
+      vivo = false;
+    };
+  }, []);
 
   const enEvento = tramos[0] === "evento" && tramos[1];
   const idRuta = enEvento ? String(tramos[1]) : null;
@@ -266,8 +295,8 @@ export default function App() {
     ir("/eventos");
   }
 
-  function salir() {
-    clearToken();
+  async function salir() {
+    await cerrarSesion();
     clearInvitacionActual();
     setEvento(null);
     setLogueado(false);
@@ -275,7 +304,9 @@ export default function App() {
   }
 
   let contenido;
-  if (!logueado) {
+  if (logueado === null) {
+    contenido = <div className="min-h-screen panel-lienzo" />;
+  } else if (!logueado) {
     contenido = (
       <Login
         onLogin={(inv) => {

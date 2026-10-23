@@ -299,7 +299,7 @@ export default function Dulce({ site, contenidoDe, invitacion, onEnviarRSVP, enE
                     <button className="dl-btn dl-btn-linea" type="button" onClick={() => copiar(lugar, "Dirección copiada")}>{Icono.copiar} Copiar</button>
                   </div>
                   {mapa && (
-                    <iframe className="dl-mapa" src={mapa} title={`Mapa de ${info.lugar || "la celebración"}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+                    <iframe className="dl-mapa" src={mapa} title={`Mapa de ${info.lugar || "la celebración"}`} loading="lazy" referrerPolicy="strict-origin-when-cross-origin" />
                   )}
                 </div>
               )}

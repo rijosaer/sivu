@@ -223,7 +223,7 @@ export function FormularioNuevo({ plantillas, onCreado, onCancelar }) {
               className="campo"
               value={clave}
               onChange={(e) => setClave(e.target.value)}
-              placeholder="Mínimo 6 caracteres"
+              placeholder="Mínimo 10 caracteres"
               autoComplete="new-password"
             />
           </label>

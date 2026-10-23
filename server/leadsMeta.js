@@ -37,7 +37,7 @@ const configurado = () => Boolean(process.env.META_PAGE_TOKEN && (process.env.ME
 async function graph(ruta, params = {}) {
   const url = new URL(`${API}/${ruta}`);
   for (const [k, v] of Object.entries({ ...params, access_token: process.env.META_PAGE_TOKEN })) url.searchParams.set(k, v);
-  const r = await fetch(url);
+  const r = await fetch(url, { signal: AbortSignal.timeout(20_000) });
   const json = await r.json().catch(() => ({}));
   if (!r.ok || json.error) throw new Error(json.error?.message || `Meta respondió ${r.status}`);
   return json;

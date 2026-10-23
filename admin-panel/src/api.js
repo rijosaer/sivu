@@ -1,14 +1,44 @@
 export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 export const SITIO_URL = import.meta.env.VITE_SITIO_URL || "http://localhost:5173";
+// Origen del sitio incrustado en la vista previa: es el único del que se
+// aceptan mensajes y el único al que se le mandan.
+export const ORIGEN_SITIO = new URL(SITIO_URL).origin;
+
+// ¿Este mensaje viene de verdad del sitio que está dentro de este iframe?
+// Sin esta comprobación, cualquier página que abriera el panel en otra
+// pestaña podía mandarle órdenes («mueve esta decoración») que el panel
+// guardaba con la sesión del usuario.
+export function mensajeDelSitio(e, iframe) {
+  return e.origin === ORIGEN_SITIO && Boolean(iframe) && e.source === iframe.contentWindow;
+}
 
 // El servidor devuelve rutas relativas para imágenes y audio.
 export function urlMedia(ruta) {
   return ruta ? `${API_URL}${ruta}` : ruta;
 }
 
-function getToken() {
-  return localStorage.getItem("admin_token") || "";
+// Un archivo que llega de afuera (WhatsApp, comprobantes) se convierte en un
+// blob: con el origen del panel. Si fuera HTML o SVG y se abriera en una
+// pestaña, correría con la sesión del dueño. Solo se conserva el tipo si es
+// imagen, audio, video o PDF; lo demás queda como binario (se descarga).
+const TIPOS_VISIBLES = /^(image\/(jpeg|png|gif|webp|avif|heic|heif)|audio\/[a-z0-9.+-]+|video\/(mp4|webm|3gpp|quicktime)|application\/pdf)$/;
+async function blobSeguro(res) {
+  const blob = await res.blob();
+  const tipo = blob.type.split(";")[0].trim().toLowerCase();
+  return TIPOS_VISIBLES.test(tipo) && tipo !== "image/svg+xml"
+    ? blob
+    : new Blob([blob], { type: "application/octet-stream" });
 }
+
+// La sesión vive en una cookie HttpOnly que pone la API: este código nunca
+// ve el token, así que ni un script inyectado podría llevárselo. Lo único que
+// se guarda (en memoria, no en localStorage) es el token CSRF de la sesión,
+// que la API exige en todo lo que cambia datos.
+let csrf = "";
+const credenciales = { credentials: "include" };
+
+// Restos de la versión anterior, que guardaba el token en localStorage.
+localStorage.removeItem("admin_token");
 
 // El sistema aloja muchos eventos (multi-invitación): todo lo que cuelga de
 // uno solo (secciones, tema, invitados...) viaja bajo
@@ -65,16 +95,21 @@ function scoped(path) {
 }
 
 async function request(path, options = {}) {
+  const metodo = (options.method || "GET").toUpperCase();
   const res = await fetch(`${API_URL}${path}`, {
     ...options,
+    ...credenciales,
     headers: {
       "Content-Type": "application/json",
-      ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
+      ...(metodo !== "GET" && csrf ? { "X-CSRF-Token": csrf } : {}),
       ...options.headers,
     },
   });
-  if (res.status === 401) {
-    localStorage.removeItem("admin_token");
+  // Sesión vencida o cerrada en otro lado: al recargar, el panel pregunta a la
+  // API (/api/auth/yo) y, sin sesión, muestra el login. El login en sí no
+  // recarga: un 401 ahí es solo "contraseña incorrecta".
+  if (res.status === 401 && path !== "/api/auth/login") {
+    csrf = "";
     window.location.reload();
     throw new Error("Sesión expirada");
   }
@@ -86,8 +121,11 @@ async function request(path, options = {}) {
 }
 
 export const api = {
-  login: (usuario, password) =>
-    request("/api/auth/login", { method: "POST", body: JSON.stringify({ usuario, password }) }),
+  login: async (usuario, password) => {
+    const datos = await request("/api/auth/login", { method: "POST", body: JSON.stringify({ usuario, password }) });
+    csrf = datos.csrf || "";
+    return datos;
+  },
 
   // ---------- Invitaciones (los eventos en sí): sin scoping, es lo que hay
   // por ENCIMA de un evento concreto — crear, listar, editar, borrar. ----------
@@ -157,11 +195,9 @@ export const api = {
     usarArchivo: (id) => request(`/api/admin/crm/archivos/${id}/usar`, { method: "POST" }),
     // El archivo viaja con la sesión: se baja como blob y se abre/guarda.
     descargarArchivo: async (id, nombre) => {
-      const res = await fetch(`${API_URL}/api/admin/crm/archivos/${id}`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
+      const res = await fetch(`${API_URL}/api/admin/crm/archivos/${id}`, credenciales);
       if (!res.ok) throw new Error("No se pudo descargar");
-      const url = URL.createObjectURL(await res.blob());
+      const url = URL.createObjectURL(await blobSeguro(res));
       const a = document.createElement("a");
       a.href = url;
       a.download = nombre || "archivo";
@@ -187,11 +223,9 @@ export const api = {
     // Los archivos piden el token, así que se bajan con fetch y se muestran
     // como blob (un <img src> normal no lo manda).
     chatMedia: async (id) => {
-      const res = await fetch(`${API_URL}/api/admin/crm/bandeja/media/${id}`, {
-        headers: getToken() ? { Authorization: `Bearer ${getToken()}` } : {},
-      });
+      const res = await fetch(`${API_URL}/api/admin/crm/bandeja/media/${id}`, credenciales);
       if (!res.ok) throw new Error("No se pudo abrir el archivo");
-      return URL.createObjectURL(await res.blob());
+      return URL.createObjectURL(await blobSeguro(res));
     },
     pagosPorConfirmar: (recientes) => request(`/api/admin/crm/pagos-por-confirmar${recientes ? "?recientes=1" : ""}`),
     confirmarPago: (id, datos) =>
@@ -199,11 +233,9 @@ export const api = {
     rechazarPago: (id) => request(`/api/admin/crm/pagos-reportados/${id}/rechazar`, { method: "POST" }),
     // El comprobante viaja con la sesión: se baja como blob para mostrarlo.
     comprobante: async (id) => {
-      const res = await fetch(`${API_URL}/api/admin/crm/pagos-reportados/${id}/comprobante`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
+      const res = await fetch(`${API_URL}/api/admin/crm/pagos-reportados/${id}/comprobante`, credenciales);
       if (!res.ok) throw new Error("Sin comprobante");
-      const blob = await res.blob();
+      const blob = await blobSeguro(res);
       return { url: URL.createObjectURL(blob), tipo: blob.type };
     },
   },
@@ -239,6 +271,7 @@ export const api = {
   borrarMedio: (id) => request(scoped(`/medios/${id}`), { method: "DELETE" }),
 
   decoraciones: () => request(scoped("/decoraciones")),
+  tokenVista: () => request(scoped("/vista")),
   crearDecoracion: (etiqueta, datos) =>
     request(scoped("/decoraciones"), { method: "POST", body: JSON.stringify({ etiqueta, datos }) }),
   actualizarDecoracion: (clave, datos) =>
@@ -281,11 +314,33 @@ export const api = {
   borrarMiembro: (id) => request(scoped(`/miembros/${id}`), { method: "DELETE" }),
 };
 
-export function setToken(token) {
-  localStorage.setItem("admin_token", token);
+// ¿Hay sesión? Lo responde la API mirando la cookie. Devuelve
+// { usuario, invitacion, csrf } o null. Un cliente recibe aquí su evento.
+export async function comprobarSesion() {
+  try {
+    const res = await fetch(`${API_URL}/api/auth/yo`, credenciales);
+    if (!res.ok) return null;
+    const datos = await res.json();
+    csrf = datos.csrf || "";
+    return datos;
+  } catch {
+    return null;
+  }
 }
-export function clearToken() {
-  localStorage.removeItem("admin_token");
+
+// Salir: la API invalida la sesión (en todos los dispositivos) y borra la
+// cookie. Si la llamada falla, igual se sale de la pantalla.
+export async function cerrarSesion() {
+  try {
+    await fetch(`${API_URL}/api/auth/logout`, {
+      method: "POST",
+      ...credenciales,
+      headers: csrf ? { "X-CSRF-Token": csrf } : {},
+    });
+  } catch {
+    // sin red: la cookie vence sola en unas horas
+  }
+  csrf = "";
   localStorage.removeItem("evento_fijo");
 }
 
@@ -299,6 +354,4 @@ export function setEventoFijo(fijo) {
 export function esEventoFijo() {
   return localStorage.getItem("evento_fijo") === "1";
 }
-export function hasToken() {
-  return Boolean(getToken());
-}
+

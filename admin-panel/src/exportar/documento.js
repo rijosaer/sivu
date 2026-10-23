@@ -84,7 +84,12 @@ function hoyLargo() {
 // Los colores de la invitación. En blanco y negro se cambian por grises: sale
 // más barato de imprimir y se lee igual.
 function paleta(tema, color) {
-  const t = (clave, respaldo) => tema?.[clave] || respaldo;
+  // Estos valores van dentro de un <style>: solo se acepta un color de
+  // verdad, para que un valor raro no pueda cerrar la etiqueta e inyectar HTML.
+  const t = (clave, respaldo) => {
+    const v = String(tema?.[clave] || "").trim();
+    return /^(#[0-9a-f]{3}|#[0-9a-f]{6}|\d{1,3}[\s,]+\d{1,3}[\s,]+\d{1,3})$/i.test(v) ? v : respaldo;
+  };
   if (!color) {
     return {
       oro: "#8a8a8a",

@@ -10,6 +10,10 @@ if (!usuario || !password || !slug) {
   console.log("Uso: node seed-cliente.js <usuario> <contraseña> <slug-del-evento>");
   process.exit(1);
 }
+if (password.length < 10) {
+  console.log("La contraseña del cliente necesita mínimo 10 caracteres.");
+  process.exit(1);
+}
 
 const { rows } = await pool.query("SELECT id, nombre FROM invitaciones WHERE slug = $1", [slug]);
 if (!rows.length) {
@@ -25,11 +29,12 @@ if (previo.rows.length && previo.rows[0].invitacion_id === null) {
   process.exit(1);
 }
 
-const hash = bcrypt.hashSync(password, 10);
+const hash = bcrypt.hashSync(password, 12);
 await pool.query(
   `INSERT INTO admin_usuarios (usuario, password_hash, invitacion_id) VALUES ($1, $2, $3)
    ON CONFLICT (usuario) DO UPDATE
-     SET password_hash = EXCLUDED.password_hash, invitacion_id = EXCLUDED.invitacion_id`,
+     SET password_hash = EXCLUDED.password_hash, invitacion_id = EXCLUDED.invitacion_id,
+         sesion_version = admin_usuarios.sesion_version + 1`,
   [usuario, hash, evento.id]
 );
 

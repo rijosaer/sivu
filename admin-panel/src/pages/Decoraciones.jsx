@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api, urlMedia, SITIO_BASE } from "../api";
+import { api, urlMedia, SITIO_BASE, ORIGEN_SITIO, mensajeDelSitio } from "../api";
 import { comprimirDecoracion } from "../archivos";
+import { conVista, useTokenVista } from "../vistaPrevia";
 import GestorFondo from "./GestorFondo";
 
 const FUENTE = "invitacion-editor";
@@ -59,7 +60,7 @@ export default function Decoraciones() {
   const guardadoPendiente = useRef({});
 
   const avisarAlSitio = useCallback((mensaje) => {
-    iframeRef.current?.contentWindow?.postMessage({ fuente: FUENTE, ...mensaje }, "*");
+    iframeRef.current?.contentWindow?.postMessage({ fuente: FUENTE, ...mensaje }, ORIGEN_SITIO);
   }, []);
 
   const cargar = useCallback(async () => {
@@ -88,6 +89,7 @@ export default function Decoraciones() {
   // Mensajes que llegan del sitio incrustado.
   useEffect(() => {
     function alRecibir(e) {
+      if (!mensajeDelSitio(e, iframeRef.current)) return;
       const d = e.data;
       if (!d || d.fuente !== FUENTE) return;
       if (d.tipo === "seleccionar") setSeleccionadaId(d.id ?? null);
@@ -109,7 +111,8 @@ export default function Decoraciones() {
   // previa tiene que recargarse al pasar de una a otra. Como el src solo
   // cambia al cruzar esa frontera, moverse entre secciones del cuerpo no
   // recarga nada.
-  const srcPrevia = `${SITIO_BASE}?editor=1${seccionActiva === PORTADA ? "&portada=1" : ""}`;
+  const tokenVista = useTokenVista();
+  const srcPrevia = conVista(`${SITIO_BASE}?editor=1${seccionActiva === PORTADA ? "&portada=1" : ""}`, tokenVista);
 
   // Los deslizadores se mueven muy seguido: se refleja al instante en la
   // previa y se guarda una sola vez cuando el usuario se detiene.
@@ -383,7 +386,7 @@ export default function Decoraciones() {
             <iframe
               ref={iframeRef}
               title="Vista previa de la invitación"
-              src={srcPrevia}
+              src={tokenVista === null ? "about:blank" : srcPrevia}
               className="w-[390px] h-[720px] bg-white border border-borde rounded-lg"
             />
           </div>

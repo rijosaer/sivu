@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { api, SITIO_BASE, esEventoFijo } from "../api";
+import { api, SITIO_BASE, esEventoFijo, ORIGEN_SITIO } from "../api";
 import CampoValor, { etiquetaDe } from "./EditorCampos";
+import { conVista, useTokenVista } from "../vistaPrevia";
 import { vocabulario, etiquetaCampo, campoVisible } from "../vocabulario";
 import GestorFotos from "./GestorFotos";
 import EditorServidores from "./EditorServidores";
@@ -237,7 +238,7 @@ export default function Contenido() {
   const arrastrado = useRef(null);
 
   const avisarVista = useCallback((mensaje) => {
-    iframeRef.current?.contentWindow?.postMessage({ fuente: FUENTE, ...mensaje }, "*");
+    iframeRef.current?.contentWindow?.postMessage({ fuente: FUENTE, ...mensaje }, ORIGEN_SITIO);
   }, []);
 
   async function cargar() {
@@ -298,10 +299,11 @@ export default function Contenido() {
   // La tarjeta de los servidores no se dibuja dentro de la invitación: vive en
   // su propio enlace. Para verla mientras se edita, la previa tiene que pedir
   // esa página en vez de la invitación.
-  const previaSrc =
-    actual?.tipo === "servidores"
-      ? `${SITIO_BASE}?editor=1&servidores=${PRIMERA}`
-      : `${SITIO_BASE}?editor=1`;
+  const tokenVista = useTokenVista();
+  const previaSrc = conVista(
+    actual?.tipo === "servidores" ? `${SITIO_BASE}?editor=1&servidores=${PRIMERA}` : `${SITIO_BASE}?editor=1`,
+    tokenVista
+  );
 
   // Vista previa en vivo: se manda el contenido de la sección abierta al sitio
   // incrustado mientras se escribe (con un pequeño retardo para no saturar).
@@ -437,7 +439,7 @@ export default function Contenido() {
                 <iframe
                   ref={iframeRef}
                   title="Vista previa de la invitación"
-                  src={previaSrc}
+                  src={tokenVista === null ? "about:blank" : previaSrc}
                   className="w-[390px] h-[560px] bg-white"
                 />
               </div>

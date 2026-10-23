@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { pool } from "../db.js";
 import { capturar } from "../errores.js";
+import { enviarAdjunto } from "../archivos.js";
 import { enviarArchivo, enviarTexto, whatsappConectado } from "../whatsappWeb.js";
 import { guardarMedia, quienEs, registrar } from "../waOrden.js";
 import { anotar } from "../prospectos.js";
@@ -107,10 +108,7 @@ bandejaRouter.get(
       Number(req.params.id) || 0,
     ]);
     if (!a?.datos) return res.status(404).json({ error: "Ese archivo no está guardado" });
-    res.set("Content-Type", a.mime || "application/octet-stream");
-    res.set("Cache-Control", "private, max-age=604800");
-    if (a.nombre) res.set("Content-Disposition", `inline; filename="${encodeURIComponent(a.nombre)}"`);
-    res.send(a.datos);
+    enviarAdjunto(res, a.mime, a.datos, { nombre: a.nombre, cache: "private, max-age=604800" });
   })
 );
 

@@ -24,6 +24,8 @@ async function aplicar(nombre, sql) {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
+    // Una migración puede tardar más que el tope normal de db.js.
+    await client.query("SET LOCAL statement_timeout = 0");
     await client.query(sql);
     await client.query("INSERT INTO migraciones (archivo) VALUES ($1)", [nombre]);
     await client.query("COMMIT");

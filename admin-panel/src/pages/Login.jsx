@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { api, setToken, setInvitacionActual, setEventoFijo } from "../api";
+import { api, setInvitacionActual, setEventoFijo } from "../api";
 
 export default function Login({ onLogin }) {
   const [usuario, setUsuario] = useState("");
@@ -12,8 +12,8 @@ export default function Login({ onLogin }) {
     setError("");
     setCargando(true);
     try {
-      const { token, invitacion } = await api.login(usuario, password);
-      setToken(token);
+      // La API deja la sesión en una cookie HttpOnly; aquí no llega ningún token.
+      const { invitacion } = await api.login(usuario, password);
       // Un cliente entra directo a su evento; el dueño elige en "Tus eventos".
       setEventoFijo(Boolean(invitacion));
       if (invitacion) setInvitacionActual(invitacion);

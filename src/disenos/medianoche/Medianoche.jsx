@@ -331,7 +331,7 @@ export default function Medianoche({ site, contenidoDe, invitacion, onEnviarRSVP
                 <p className="md-lugar">{info.lugar || info.direccion}</p>
                 {info.lugar && info.direccion && <p className="md-texto">{info.direccion}</p>}
                 {info.mapaEmbed && /^https:\/\//.test(info.mapaEmbed) && (
-                  <div className="md-mapa"><iframe src={info.mapaEmbed} title={`Mapa de ${info.lugar || "el lugar"}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div>
+                  <div className="md-mapa"><iframe src={info.mapaEmbed} title={`Mapa de ${info.lugar || "el lugar"}`} loading="lazy" referrerPolicy="strict-origin-when-cross-origin" /></div>
                 )}
                 <div className="md-botones">
                   {info.mapsUrl && <a className="md-btn md-btn-linea" href={info.mapsUrl} target="_blank" rel="noopener noreferrer">{Icono.pin} Cómo llegar</a>}

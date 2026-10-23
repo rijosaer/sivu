@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { randomInt } from "node:crypto";
 import { pool } from "../db.js";
 import { capturar } from "../errores.js";
 import { temaDeDiseno } from "../plantillas.js";
@@ -6,6 +7,9 @@ import { resolverDiseno } from "../disenos.js";
 import { soloDueno } from "../auth.js";
 import { RITMO } from "../envioMasivo.js";
 import { estadoWhatsapp } from "../whatsappWeb.js";
+import { AUDIOS, IMAGENES, leerDataUrl, urlMedio } from "../archivos.js";
+import { CLAVE_RE, esIdValido, validarParam } from "../seguridad.js";
+import { tokenVista } from "../middlewareInvitacion.js";
 
 // Todo lo de aquí cuelga de una invitación concreta: se monta en admin.js
 // bajo /invitaciones/:invitacionId, con resolverInvitacionAdmin puesto antes
@@ -57,16 +61,26 @@ recursosRouter.use(
   })
 );
 
-const MAX_BYTES = 12 * 1024 * 1024; // tope por archivo, ya decodificado
+// Todo :id de estas rutas es un entero; cualquier otra cosa ni llega a la base.
+recursosRouter.param("id", validarParam(esIdValido));
+recursosRouter.param("clave", validarParam((v) => CLAVE_RE.test(v)));
 
-// Acepta "data:image/png;base64,AAA..." y devuelve mime + bytes.
-function leerDataUrl(dataUrl) {
-  const m = /^data:([^;,]+);base64,(.*)$/s.exec(dataUrl || "");
-  if (!m) return null;
-  const buffer = Buffer.from(m[2], "base64");
-  if (!buffer.length || buffer.length > MAX_BYTES) return null;
-  return { mime: m[1], buffer };
+// Qué formatos acepta cada tipo de archivo.
+const FORMATOS = { foto: IMAGENES, fondo: IMAGENES, audio: AUDIOS };
+const MAX_CONTENIDO = 256 * 1024; // JSON de una sección (textos, listas)
+
+// [{id, orden}] bien formado y de tamaño razonable.
+function ordenValido(orden) {
+  return (
+    Array.isArray(orden) &&
+    orden.length <= 500 &&
+    orden.every((o) => esIdValido(o?.id) && Number.isInteger(o?.orden) && o.orden >= 0 && o.orden < 100000)
+  );
 }
+
+// Token para que la vista previa del panel abra la invitación aunque sea
+// «solo con enlace personal» (ver exigirAccesoPublico).
+recursosRouter.get("/vista", (req, res) => res.json({ token: tokenVista(req.invitacionId) }));
 
 // ---------- Secciones (contenido, orden, activo/inactivo) ----------
 
@@ -85,6 +99,20 @@ recursosRouter.put(
   "/secciones/:id",
   capturar(async (req, res) => {
     const { contenido, activo, orden } = req.body;
+    if (contenido !== undefined && contenido !== null) {
+      if (typeof contenido !== "object" || Array.isArray(contenido)) {
+        return res.status(400).json({ error: "El contenido no es válido" });
+      }
+      if (JSON.stringify(contenido).length > MAX_CONTENIDO) {
+        return res.status(400).json({ error: "El contenido es demasiado grande" });
+      }
+    }
+    if (activo !== undefined && activo !== null && typeof activo !== "boolean") {
+      return res.status(400).json({ error: "El valor de «activo» no es válido" });
+    }
+    if (orden !== undefined && orden !== null && !Number.isInteger(orden)) {
+      return res.status(400).json({ error: "El orden no es válido" });
+    }
     const { rows } = await pool.query(
       `UPDATE secciones SET
          contenido = COALESCE($3, contenido),
@@ -103,6 +131,7 @@ recursosRouter.post(
   "/secciones/reordenar",
   capturar(async (req, res) => {
     const { orden } = req.body; // [{id, orden}]
+    if (!ordenValido(orden)) return res.status(400).json({ error: "El orden no es válido" });
     const client = await pool.connect();
     try {
       await client.query("BEGIN");
@@ -161,6 +190,17 @@ recursosRouter.put(
   "/tema/:clave",
   capturar(async (req, res) => {
     const { valor } = req.body;
+    // El tema guarda colores, letras y plantillas de mensajes: siempre texto,
+    // con tope. Las claves ya vienen validadas por recursosRouter.param.
+    if (typeof valor !== "string" || valor.length > 5000) {
+      return res.status(400).json({ error: "El valor no es válido" });
+    }
+    if (/^color-/.test(req.params.clave) && !/^(#[0-9a-f]{3}|#[0-9a-f]{6}|\d{1,3}[\s,]+\d{1,3}[\s,]+\d{1,3})$/i.test(valor.trim())) {
+      return res.status(400).json({ error: "El color no es válido" });
+    }
+    if (/^fuente-/.test(req.params.clave) && !/^[\p{L}0-9 ,'"-]{0,120}$/u.test(valor)) {
+      return res.status(400).json({ error: "La letra no es válida" });
+    }
     await pool.query(
       `INSERT INTO tema (invitacion_id, clave, valor) VALUES ($1, $2, $3)
        ON CONFLICT (invitacion_id, clave) DO UPDATE SET valor = EXCLUDED.valor`,
@@ -177,13 +217,14 @@ recursosRouter.put(
 recursosRouter.get(
   "/medios",
   capturar(async (req, res) => {
-    const { tipo } = req.query;
+    const tipo = typeof req.query.tipo === "string" ? req.query.tipo : undefined;
+    if (tipo && !FORMATOS[tipo]) return res.status(400).json({ error: "Tipo de archivo no válido" });
     const { rows } = await pool.query(
       `SELECT id, tipo, mime, nombre, orden, octet_length(datos) AS bytes, creado_en
        FROM medios WHERE invitacion_id = $1 ${tipo ? "AND tipo = $2" : ""} ORDER BY orden, id`,
       tipo ? [req.invitacionId, tipo] : [req.invitacionId]
     );
-    res.json(rows.map((r) => ({ ...r, url: `/api/public/medio/${r.id}` })));
+    res.json(rows.map((r) => ({ ...r, url: urlMedio(r.id) })));
   })
 );
 
@@ -191,12 +232,16 @@ recursosRouter.post(
   "/medios",
   capturar(async (req, res) => {
     const { tipo, nombre, datos } = req.body;
-    if (!["foto", "audio", "fondo"].includes(tipo)) {
+    if (!FORMATOS[tipo]) {
       return res.status(400).json({ error: "Tipo de archivo no válido" });
     }
-    const archivo = leerDataUrl(datos);
+    const archivo = leerDataUrl(datos, FORMATOS[tipo]);
     if (!archivo) {
-      return res.status(400).json({ error: "Archivo vacío, dañado o mayor a 12 MB" });
+      return res.status(400).json({
+        error: tipo === "audio"
+          ? "Audio vacío, dañado, mayor a 12 MB o de un formato no admitido (MP3, M4A, AAC, OGG, WAV, WEBM)"
+          : "Imagen vacía, dañada, mayor a 12 MB o de un formato no admitido (JPG, PNG, WEBP, GIF, AVIF)",
+      });
     }
 
     // Del audio y del fondo solo puede haber uno: el nuevo reemplaza al anterior.
@@ -214,9 +259,9 @@ recursosRouter.post(
     const { rows } = await pool.query(
       `INSERT INTO medios (invitacion_id, tipo, mime, nombre, datos, orden) VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id, tipo, mime, nombre, orden`,
-      [req.invitacionId, tipo, archivo.mime, nombre || "", archivo.buffer, siguiente.rows[0].orden]
+      [req.invitacionId, tipo, archivo.mime, String(nombre || "").slice(0, 200), archivo.buffer, siguiente.rows[0].orden]
     );
-    res.status(201).json({ ...rows[0], url: `/api/public/medio/${rows[0].id}` });
+    res.status(201).json({ ...rows[0], url: urlMedio(rows[0].id) });
   })
 );
 
@@ -224,6 +269,7 @@ recursosRouter.post(
   "/medios/reordenar",
   capturar(async (req, res) => {
     const { orden } = req.body; // [{id, orden}]
+    if (!ordenValido(orden)) return res.status(400).json({ error: "El orden no es válido" });
     const client = await pool.connect();
     try {
       await client.query("BEGIN");
@@ -283,11 +329,15 @@ recursosRouter.get(
 recursosRouter.post(
   "/decoraciones",
   capturar(async (req, res) => {
-    const { etiqueta, datos } = req.body;
-    if (!etiqueta?.trim()) return res.status(400).json({ error: "Ponle un nombre a la decoración" });
-    if (!leerDataUrl(datos)) {
-      return res.status(400).json({ error: "Imagen vacía, dañada o mayor a 12 MB" });
+    const { etiqueta } = req.body;
+    if (typeof etiqueta !== "string" || !etiqueta.trim() || etiqueta.length > 80) {
+      return res.status(400).json({ error: "Ponle un nombre a la decoración (máximo 80 caracteres)" });
     }
+    const imagen = leerDataUrl(req.body.datos, IMAGENES);
+    if (!imagen) {
+      return res.status(400).json({ error: "Imagen vacía, dañada, mayor a 12 MB o de un formato no admitido" });
+    }
+    const datos = imagen.dataUrl;
 
     // Clave legible derivada del nombre, con sufijo si ya existe EN ESTA
     // invitación (otra invitación puede tener perfectamente la misma clave).
@@ -320,9 +370,14 @@ recursosRouter.post(
 recursosRouter.put(
   "/decoraciones/:clave",
   capturar(async (req, res) => {
-    const { datos } = req.body; // data URL, o null para volver a la de fábrica
-    if (datos !== null && !leerDataUrl(datos)) {
-      return res.status(400).json({ error: "Imagen vacía, dañada o mayor a 12 MB" });
+    // data URL, o null para volver a la de fábrica
+    let datos = null;
+    if (req.body.datos !== null) {
+      const imagen = leerDataUrl(req.body.datos, IMAGENES);
+      if (!imagen) {
+        return res.status(400).json({ error: "Imagen vacía, dañada, mayor a 12 MB o de un formato no admitido" });
+      }
+      datos = imagen.dataUrl;
     }
     const { rowCount } = await pool.query(
       "UPDATE decoraciones SET datos = $3, actualizado_en = now() WHERE clave = $1 AND invitacion_id = $2",
@@ -350,6 +405,16 @@ recursosRouter.delete(
 
 // ---------- Dónde va cada decoración ----------
 
+// Números dentro de rangos sensatos (los que no vienen se dejan como están).
+function ubicacionValida({ x, y, ancho, rotacion, opacidad, capa }) {
+  const num = (v, min, max) => v == null || (typeof v === "number" && Number.isFinite(v) && v >= min && v <= max);
+  return (
+    num(x, -1000, 1000) && num(y, -1000, 1000) && num(ancho, 0, 1000) &&
+    num(rotacion, -3600, 3600) && num(opacidad, 0, 1) &&
+    (capa == null || capa === "detras" || capa === "delante")
+  );
+}
+
 recursosRouter.get(
   "/ubicaciones",
   capturar(async (req, res) => {
@@ -367,9 +432,10 @@ recursosRouter.post(
   "/ubicaciones",
   capturar(async (req, res) => {
     const { clave, seccion_tipo, x, y, ancho, rotacion, opacidad, capa } = req.body;
-    if (!clave || !seccion_tipo) {
+    if (typeof clave !== "string" || !CLAVE_RE.test(clave) || typeof seccion_tipo !== "string" || !CLAVE_RE.test(seccion_tipo)) {
       return res.status(400).json({ error: "Falta la decoración o la sección" });
     }
+    if (!ubicacionValida(req.body)) return res.status(400).json({ error: "La ubicación no es válida" });
     const existe = await pool.query(
       "SELECT 1 FROM decoraciones WHERE clave = $1 AND invitacion_id = $2",
       [clave, req.invitacionId]
@@ -395,6 +461,10 @@ recursosRouter.put(
   "/ubicaciones/:id",
   capturar(async (req, res) => {
     const { x, y, ancho, rotacion, opacidad, capa, seccion_tipo } = req.body;
+    if (!ubicacionValida(req.body)) return res.status(400).json({ error: "La ubicación no es válida" });
+    if (seccion_tipo != null && (typeof seccion_tipo !== "string" || !CLAVE_RE.test(seccion_tipo))) {
+      return res.status(400).json({ error: "La sección no es válida" });
+    }
     const { rows } = await pool.query(
       `UPDATE decoracion_ubicaciones SET
          x = COALESCE($3, x), y = COALESCE($4, y), ancho = COALESCE($5, ancho),
@@ -471,10 +541,13 @@ recursosRouter.get(
   })
 );
 
+// Aleatoriedad criptográfica: con Math.random los códigos se pueden predecir
+// conociendo unos pocos. 6 caracteres de 32 = ~1.070 millones de opciones; con
+// el freno a los códigos fallidos (public.js), recorrerlas es inviable.
 function generarCodigo() {
   const alfabeto = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // sin caracteres ambiguos
   let codigo = "";
-  for (let i = 0; i < 6; i++) codigo += alfabeto[Math.floor(Math.random() * alfabeto.length)];
+  for (let i = 0; i < 6; i++) codigo += alfabeto[randomInt(alfabeto.length)];
   return codigo;
 }
 
@@ -740,7 +813,9 @@ recursosRouter.delete(
 recursosRouter.get(
   "/novedades",
   capturar(async (req, res) => {
-    const desde = req.query.desde || null;
+    const desde = typeof req.query.desde === "string" && !Number.isNaN(Date.parse(req.query.desde))
+      ? req.query.desde
+      : null;
     const { rows } = await pool.query(
       `SELECT * FROM (
          SELECT 'respuesta' AS tipo, m.nombre, m.estado,

@@ -2,6 +2,7 @@ import { Router } from "express";
 import crypto from "node:crypto";
 import { pool } from "../db.js";
 import { capturar } from "../errores.js";
+import { enviarAdjunto } from "../archivos.js";
 import { normalizarTelefono, telefonosDe } from "../avisosWhatsapp.js";
 import { whatsappConectado } from "../whatsappWeb.js";
 import { CLAVES, DEFECTOS, leerAjustes, guardarAjuste, leerAjuste, SITIO } from "../ajustes.js";
@@ -535,9 +536,7 @@ crmRouter.get(
   capturar(async (req, res) => {
     const { rows: [a] } = await pool.query("SELECT nombre, mime, datos FROM datos_archivos WHERE id = $1", [req.params.id]);
     if (!a) return res.status(404).json({ error: "Ese archivo no existe" });
-    res.setHeader("Content-Type", a.mime);
-    res.setHeader("Content-Disposition", `attachment; filename="${encodeURIComponent(a.nombre || "archivo")}"`);
-    res.send(a.datos);
+    enviarAdjunto(res, a.mime, a.datos, { nombre: a.nombre, inline: false });
   })
 );
 
@@ -624,8 +623,7 @@ crmRouter.get(
   capturar(async (req, res) => {
     const { rows: [r] } = await pool.query("SELECT comprobante, comprobante_mime FROM pagos_reportados WHERE id = $1", [req.params.id]);
     if (!r?.comprobante) return res.status(404).json({ error: "Sin comprobante" });
-    res.setHeader("Content-Type", r.comprobante_mime || "application/octet-stream");
-    res.send(r.comprobante);
+    enviarAdjunto(res, r.comprobante_mime, r.comprobante, { nombre: "comprobante" });
   })
 );
 

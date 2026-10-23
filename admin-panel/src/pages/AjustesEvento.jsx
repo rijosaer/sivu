@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, getInvitacionActual } from "../api";
+import { api, getInvitacionActual, setInvitacionActual, sitioUrlInvitacion } from "../api";
 import { ir } from "../ruta";
 import { NOMBRE_TIPO_EVENTO } from "../tiposEvento";
 import { useCatalogoDisenos } from "../catalogoDisenos";
@@ -92,6 +92,26 @@ export default function AjustesEvento() {
     }
   }
 
+  // El enlace cambia: lo que el panel tenía guardado (el slug para armar
+  // enlaces y la vista previa) se pone al día recargando.
+  async function regenerarEnlace() {
+    const ok = window.confirm(
+      "Se crea un enlace nuevo, difícil de adivinar. Los enlaces que ya mandaste con el actual dejan de abrir, " +
+        "incluidos los personales de cada invitado: hay que volver a enviarlos. ¿Seguir?"
+    );
+    if (!ok) return;
+    setGuardando(true);
+    try {
+      const r = await api.actualizarInvitacion(inv.id, { regenerar_enlace: true });
+      setInvitacionActual(r);
+      toast(`Enlace nuevo: ${sitioUrlInvitacion(r.slug)}`);
+      setTimeout(() => window.location.reload(), 1200);
+    } catch (e) {
+      toast(e.message, "error");
+      setGuardando(false);
+    }
+  }
+
   async function borrarEvento() {
     try {
       await api.borrarInvitacion(inv.id);
@@ -147,6 +167,39 @@ export default function AjustesEvento() {
             />
             Usar como plantilla para nuevos eventos de {NOMBRE_TIPO_EVENTO[inv.tipo_evento] || "este tipo"}
           </label>
+        </Bloque>
+
+        <Bloque
+          titulo="Privacidad del enlace"
+          ayuda="Quien adivine el enlace general de un evento ve la fecha, el lugar y los nombres de la familia. Con «solo con enlace personal», la invitación únicamente abre con el enlace de cada invitado."
+        >
+          <label className="flex items-start gap-2 text-sm text-ink-suave cursor-pointer">
+            <input
+              type="checkbox"
+              className="mt-0.5"
+              checked={Boolean(inv.solo_codigo)}
+              disabled={guardando}
+              onChange={() =>
+                cambiar(
+                  { solo_codigo: !inv.solo_codigo },
+                  inv.solo_codigo ? "El enlace general vuelve a abrir la invitación" : "Ahora solo abren los enlaces personales"
+                )
+              }
+            />
+            <span>
+              Solo con enlace personal
+              <span className="ayuda block">
+                El enlace general ({sitioUrlInvitacion(inv.slug)}) deja de abrir, y también las páginas de participación y de servidores. Úsalo si
+                cada invitado recibe su propio enlace.
+              </span>
+            </span>
+          </label>
+          <div className="flex flex-wrap items-center gap-3 mt-3">
+            <span className="text-sm text-ink-suave break-all">{sitioUrlInvitacion(inv.slug)}</span>
+            <button className="boton-secundario" disabled={guardando} onClick={regenerarEnlace}>
+              Cambiar por un enlace difícil de adivinar
+            </button>
+          </div>
         </Bloque>
 
         <Bloque titulo="Estado">
