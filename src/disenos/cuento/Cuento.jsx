@@ -380,7 +380,7 @@ export default function Cuento({ config, site, contenidoDe, invitacion, onEnviar
             {info.direccion && <p className="cu-texto">{info.direccion}</p>}
             {mapa && (
               <div className="cu-mapa">
-                <iframe src={mapa} title={`Mapa de ${info.lugar || "la ceremonia"}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+                <iframe src={mapa} title={`Mapa de ${info.lugar || "la ceremonia"}`} loading="lazy" referrerPolicy="strict-origin-when-cross-origin" />
               </div>
             )}
             <div className="cu-botones">
