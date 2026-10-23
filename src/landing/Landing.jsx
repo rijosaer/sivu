@@ -72,22 +72,31 @@ function urlVista(modelo, demo) {
 }
 
 // Aparición suave al hacer scroll (respeta "reducir movimiento").
+// Vigila también lo que se agrega después de cargar: los modelos llegan de la
+// API y reemplazan a los de respaldo, y sin esto los nuevos se quedaban
+// invisibles para siempre (el espacio vacío debajo de la primera fila).
 function useAparecer() {
   const ref = useRef(null);
   useEffect(() => {
     const raiz = ref.current;
     if (!raiz) return;
-    const els = raiz.querySelectorAll("[data-aparece]");
+    const pendientes = () => raiz.querySelectorAll("[data-aparece]:not(.cv-visto)");
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) {
-      els.forEach((e) => e.classList.add("cv-visto"));
-      return;
+      const mostrar = () => pendientes().forEach((e) => e.classList.add("cv-visto"));
+      mostrar();
+      const mo = new MutationObserver(mostrar);
+      mo.observe(raiz, { childList: true, subtree: true });
+      return () => mo.disconnect();
     }
     const io = new IntersectionObserver(
       (entradas) => entradas.forEach((en) => { if (en.isIntersecting) { en.target.classList.add("cv-visto"); io.unobserve(en.target); } }),
       { threshold: 0.15 }
     );
-    els.forEach((e) => io.observe(e));
-    return () => io.disconnect();
+    const vigilar = () => pendientes().forEach((e) => io.observe(e));
+    vigilar();
+    const mo = new MutationObserver(vigilar);
+    mo.observe(raiz, { childList: true, subtree: true });
+    return () => { mo.disconnect(); io.disconnect(); };
   }, []);
   return ref;
 }

@@ -163,7 +163,7 @@
 .ga .ga-portada { flex: 1; display: grid; place-items: center; padding-block: var(--s6); }
 .ga .gate { width: 100%; --od-gap: var(--s5); align-items: center; }
 .ga .gate-kicker { text-align: center; }
-.ga .gticket { width: 100%; color: var(--on-accent); }
+.ga .gticket { width: 100%; min-width: 0; max-width: 100%; color: var(--on-accent); }
 .ga .gticket :focus-visible { outline-color: var(--bg); }
 .ga .gt-main, .ga .gt-stub { background: var(--accent); }
 .ga .gt-main {
@@ -173,7 +173,10 @@
       transition: transform var(--dur-exit) var(--ease-in), opacity var(--dur-exit) var(--ease-in);
     }
 .ga .gt-top { justify-content: space-between; font-family: var(--font-display); font-size: var(--fs-12); font-weight: 600; letter-spacing: .12em; text-transform: uppercase; line-height: 1.4; }
-.ga .gt-title { font-family: var(--font-display); font-weight: 800; font-size: 48px; line-height: .95; letter-spacing: -.04em; text-transform: uppercase; }
+/* Una sola palabra larga («LANZAMIENTO») a 48 px no cabe en un celular de 390 px
+   y empujaba la tarjeta fuera de la pantalla: el tamaño baja con el ancho y,
+   en último caso, la palabra se parte en vez de desbordarse. */
+.ga .gt-title { font-family: var(--font-display); font-weight: 800; font-size: clamp(26px, 9vw, 48px); line-height: .95; letter-spacing: -.04em; text-transform: uppercase; overflow-wrap: anywhere; }
 .ga .gt-title .line { display: block; }
 .ga .gt-sub { font-size: var(--fs-28); line-height: 1.1; }
 .ga .gt-meta { --od-cols: 2; --od-gap: var(--s4); padding-top: var(--s4); border-top: 1.5px solid rgba(10,10,11,.2); }
