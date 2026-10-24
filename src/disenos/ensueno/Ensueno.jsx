@@ -2,8 +2,7 @@ import { useMemo, useRef, useState } from "react";
 import "./ensueno.css";
 import RSVP from "../../components/RSVP";
 import {
-  partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer, enlaceCalendario,
-} from "../comun";
+  partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer, enlaceCalendario, alTocarPortada } from "../comun";
 import { Defs } from "./arte";
 import fondo from "./arte/fondo.webp";
 import guirnalda from "./arte/guirnalda.webp";
@@ -69,7 +68,7 @@ function Portada({ welcome, invitacion, monograma, onAbrir }) {
     setTimeout(onAbrir, reducido ? 300 : 2700);
   }
   return (
-    <section className={`en-portada ${abriendo ? "en-abriendo" : ""}`} aria-labelledby="gate-title">
+    <section className={`en-portada ${abriendo ? "en-abriendo" : ""}`} aria-labelledby="gate-title" onClick={alTocarPortada(abrir)}>
       <Arte src={ramo} className="en-ramo en-ramo-sup" />
       <Arte src={ramo} className="en-ramo en-ramo-inf" />
       <div className="en-portada-in">

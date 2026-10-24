@@ -17,6 +17,10 @@ const Cotizacion = lazy(() => import('./negocio/Cotizacion.jsx'))
 const DatosEvento = lazy(() => import('./negocio/DatosEvento.jsx'))
 const negocio = paginaNegocio()
 
+// Invitaciones y demos se ven sin barra de desplazamiento (se sigue bajando con
+// el dedo, la rueda o el teclado). La landing y las páginas de negocio la conservan.
+if (!negocio && (demo !== null || !mostrarLanding())) document.documentElement.classList.add('invitacion')
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     {negocio ? (

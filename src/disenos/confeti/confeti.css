@@ -209,7 +209,7 @@
 .cf .cf-kraft-pases span { font: 400 27px/1 var(--f-guion); }
 .cf .cf-kraft-pases small { margin-top: 3px; font: 500 10.5px/1.2 var(--f-texto); letter-spacing: .04em; opacity: .75; }
 
-.cf .cf-pista { position: absolute; left: 0; right: 0; bottom: 0; font: 400 13px/1.4 var(--f-texto); letter-spacing: .03em; color: var(--suave); }
+.cf .cf-pista { position: absolute; left: 0; right: 0; bottom: 0; font: 600 16px/1.4 var(--f-texto); letter-spacing: .02em; color: var(--suave); }
 
 /* Al tocar: el alfiler pincha, el látex se infla de golpe y desaparece, la
    etiqueta cae con su cuerda y los globitos se escapan hacia arriba. */

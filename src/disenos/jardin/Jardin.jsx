@@ -107,7 +107,7 @@ function Portada({ welcome, invitacion, onAbrir }) {
     setTimeout(onAbrir, reducido ? 300 : 2700);
   }
   return (
-    <div className={`jd-portada ${abriendo ? "jd-abriendo" : ""}`}>
+    <div className={`jd-portada ${abriendo ? "jd-abriendo" : ""}`} onClick={(e) => { if (!e.target.closest("button, a")) abrir(); }}>
       <Arte src={esquina} className="jd-esquina jd-esquina-sup" />
       <Arte src={esquina} className="jd-esquina jd-esquina-inf" />
       <div className="jd-portada-in">

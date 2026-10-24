@@ -2,8 +2,7 @@ import { useMemo, useRef, useState } from "react";
 import "./dulce.css";
 import RSVP from "../../components/RSVP";
 import {
-  partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer,
-} from "../comun";
+  partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer, alTocarPortada } from "../comun";
 import {
   DlPastel, DlHumo, DlSoplido, DlTemporizador, DlMacarons, DlCopas, DlTarta, DlCajita,
   DlCajaCierre, DlBatidor, DlToldo, DlEtiqueta, DlCordon, DlMacaronSuelto,
@@ -90,7 +89,7 @@ function Entrada({ nombre, edad, antetitulo, invitacion, alSoplar, onAbrir }) {
     setTimeout(onAbrir, 2500);
   }
   return (
-    <section className={`dl-entrada ${soplando ? "dl-sopladas" : ""} ${saliendo ? "dl-saliendo" : ""}`} aria-labelledby="dl-entrada-nombre">
+    <section className={`dl-entrada ${soplando ? "dl-sopladas" : ""} ${saliendo ? "dl-saliendo" : ""}`} aria-labelledby="dl-entrada-nombre" onClick={alTocarPortada(soplar)}>
       <div className="dl-entrada-arriba">
         {antetitulo && <p className="dl-antetitulo">{antetitulo}</p>}
         <h1 className="dl-entrada-nombre" id="dl-entrada-nombre">{nombre}</h1>
@@ -116,7 +115,7 @@ function Entrada({ nombre, edad, antetitulo, invitacion, alSoplar, onAbrir }) {
           <DlSoplido className="dl-soplido" />
           <span className="dl-soplar-texto">{soplando ? "¡Pide un deseo!" : "Sopla las velas"}</span>
         </button>
-        <p className="dl-pista" aria-live="polite">{soplando ? "Abriendo tu invitación…" : "y abre tu invitación"}</p>
+        <p className="dl-pista" aria-live="polite">{soplando ? "Abriendo tu invitación…" : "Toca el pastel para abrir tu invitación"}</p>
       </div>
     </section>
   );

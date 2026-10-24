@@ -2,8 +2,7 @@ import { useMemo, useState } from "react";
 import "./gala.css";
 import RSVP from "../../components/RSVP";
 import {
-  ZONA, partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer, enlaceCalendario,
-} from "../comun";
+  ZONA, partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer, enlaceCalendario, alTocarPortada } from "../comun";
 import { Mapa } from "./arte";
 
 // Diseño «Gala»: editorial nocturna en negro y lima neón, llevado desde la
@@ -49,6 +48,12 @@ function puntoActual(cronograma, fecha) {
 }
 
 // Parte el título en dos renglones parejos ("Fin de año" → "Fin" / "de año").
+// La palabra más larga del título manda el tamaño: «LANZAMIENTO» no cabía y se
+// partía en «LANZAMIENT / O».
+function letrasMax(texto) {
+  return Math.max(6, ...String(texto || "").trim().split(/\s+/).map((p) => p.length));
+}
+
 function renglones(texto) {
   const palabras = String(texto || "").trim().split(/\s+/).filter(Boolean);
   if (palabras.length < 2) return palabras;
@@ -71,7 +76,7 @@ function Portada({ welcome, partes, invitacion, onAbrir }) {
     setTimeout(onAbrir, reducido ? 100 : 420);
   }
   return (
-    <section className={`view ga-portada ${abriendo ? "is-opening" : ""}`} aria-labelledby="gate-title">
+    <section className={`view ga-portada ${abriendo ? "is-opening" : ""}`} aria-labelledby="gate-title" onClick={alTocarPortada(abrir)}>
       <div className="gate od-stack">
         <p className="eyebrow gate-kicker">{invitacion?.nombre ? `${invitacion.nombre}, tienes una invitación` : "Tienes una invitación"}</p>
         <div className="gticket">
@@ -80,7 +85,7 @@ function Portada({ welcome, partes, invitacion, onAbrir }) {
               <span className="ph">{welcome.novioElla || welcome.bienvenidaTexto || "Te invitamos"}</span>
               {partes && <span className="od-nowrap">{partes.anio}</span>}
             </div>
-            <h1 className="gt-title" id="gate-title">
+            <h1 className="gt-title" id="gate-title" style={{ "--letras": letrasMax(welcome.novioEl) }}>
               {renglones(welcome.novioEl).map((r, i) => <span key={i} className="line">{r}</span>)}
             </h1>
             {welcome.bienvenidaTexto && welcome.novioElla && <p className="gt-sub serif">{welcome.bienvenidaTexto}</p>}

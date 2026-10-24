@@ -72,11 +72,16 @@ export default function Welcome({ novios, padres, frase, bienvenidaTexto, invita
   return (
     // Sin fondo propio a propósito: así se ve el de toda la invitación, sea
     // el papel de CSS o la imagen que se haya subido desde el panel.
-    <div className="fixed inset-0 z-50 text-ink overflow-y-auto overflow-x-hidden">
+    <div
+      className="fixed inset-0 z-50 text-ink overflow-y-auto overflow-x-hidden"
+      // Un toque en cualquier parte de la portada abre (en el editor no: ahí se
+      // arrastran las decoraciones).
+      onClick={(e) => { if (!editor.activo && !e.target.closest("button, a")) onOpen(); }}
+    >
       {/* Este envoltorio relativo es el que ancla las decoraciones de la
           portada: sus posiciones son porcentajes de esta caja, así que tiene
           que envolver todo el contenido, no solo la parte visible. */}
-      <div className="relative min-h-full flex flex-col items-center justify-center px-6 py-10 text-center">
+      <div className="relative min-h-full flex flex-col items-center justify-center px-6 pt-10 pb-24 text-center">
         <CapaDecorativa seccionTipo="welcome" capa="detras" />
 
         {/* Todo el texto por encima de las decoraciones, pase lo que pase. En
@@ -116,7 +121,7 @@ export default function Welcome({ novios, padres, frase, bienvenidaTexto, invita
 
           <button
             onClick={onOpen}
-            className="mt-10 border transition-colors duration-300 px-8 py-3 font-mono text-xs tracking-widest2 uppercase border-gold/60 text-gold-dark hover:bg-gold hover:text-paper"
+            className="mt-10 min-h-[48px] border transition-colors duration-300 px-9 py-3.5 font-mono text-[15px] tracking-widest2 uppercase border-gold-dark bg-gold-dark text-paper hover:bg-gold hover:border-gold"
           >
             Abrir invitación
           </button>

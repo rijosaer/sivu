@@ -31,6 +31,9 @@
   min-height: 100vh;
   min-height: 100svh;
   overflow-x: hidden;
+  /* clip recorta lo que sobresale a los lados sin volver a .cu una caja con
+     scroll propio: con hidden salían dos barras (la de la página y la de .cu). */
+  overflow-x: clip;
   color: var(--tinta);
   font-family: var(--f-cuerpo);
   font-size: 17px;

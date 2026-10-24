@@ -112,7 +112,7 @@
 .dl-soplar:disabled { cursor: default; }
 .dl-sopladas .dl-soplido { animation: dl-rafaga 1s cubic-bezier(.5, 0, .3, 1) forwards; }
 .dl-sopladas .dl-aire { animation-duration: .6s; }
-.dl-pista { margin-top: -4px; font: 500 13px/1.4 var(--f-texto); letter-spacing: .04em; color: var(--suave); }
+.dl-pista { margin-top: -4px; font: 600 16px/1.4 var(--f-texto); letter-spacing: .02em; color: var(--suave); }
 
 /* Placa de chocolate blanco con el nombre escrito con manga. */
 .dl-placa {

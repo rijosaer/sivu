@@ -2,8 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import "./osito.css";
 import RSVP from "../../components/RSVP";
 import {
-  partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer,
-} from "../comun";
+  partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer, alTocarPortada } from "../comun";
 import {
   OsOsito, OsNube, OsMovil, OsCubo, OsCoche, OsRopita, OsPampas, OsGlobo, OsSobre,
   OsMantita, OsPatita, OsTirador, OsSonajero, OsBotonCostura, OsParche,
@@ -108,7 +107,7 @@ function Entrada({ welcome, partes, invitacion, despierta, jalando, onJalar }) {
   const pases = pasesDe(invitacion);
   const nombre = welcome.novioEl || "";
   return (
-    <section className={`os-entrada ${despierta ? "is-despierta" : ""} ${jalando ? "is-jalando" : ""}`} aria-labelledby="os-nombre">
+    <section className={`os-entrada ${despierta ? "is-despierta" : ""} ${jalando ? "is-jalando" : ""}`} aria-labelledby="os-nombre" onClick={alTocarPortada(onJalar)}>
       <div className="os-cielo" aria-hidden="true">
         <OsNube className="os-cielo-nube n1" />
         <OsNube className="os-cielo-nube n2" />
@@ -119,12 +118,12 @@ function Entrada({ welcome, partes, invitacion, despierta, jalando, onJalar }) {
       {/* Cordón del móvil: se jala para despertarlo */}
       <div className="os-cordon">
         <span className="os-cordon-hilo" aria-hidden="true" />
-        <button type="button" className="os-tirador" onClick={onJalar} disabled={despierta} aria-label="Jalar el cordón del móvil para abrir la invitación">
+        <button type="button" className="os-tirador" onClick={onJalar} disabled={despierta} aria-label="Toca el cordón del móvil para abrir la invitación">
           <OsTirador />
         </button>
         <span className="os-cordon-pista" aria-hidden="true">
           <svg viewBox="0 0 40 30"><path d="M36 4 C 26 4 16 10 10 24 M10 24 L 6 16 M10 24 L 17 20" /></svg>
-          jala el cordón
+          toca el cordón
         </span>
       </div>
 

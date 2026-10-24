@@ -178,6 +178,8 @@
    en último caso, la palabra se parte en vez de desbordarse. */
 .ga .gt-title { font-family: var(--font-display); font-weight: 800; font-size: clamp(26px, 9vw, 48px); line-height: .95; letter-spacing: -.04em; text-transform: uppercase; overflow-wrap: anywhere; }
 .ga .gt-title .line { display: block; }
+.ga .gt-main { container-type: inline-size; }
+.ga .gt-title { overflow-wrap: normal; font-size: min(clamp(26px, 9vw, 48px), calc(100cqi / (var(--letras, 8) * .7))); }
 .ga .gt-sub { font-size: var(--fs-28); line-height: 1.1; }
 .ga .gt-meta { --od-cols: 2; --od-gap: var(--s4); padding-top: var(--s4); border-top: 1.5px solid rgba(10,10,11,.2); }
 .ga .gt-meta .od-stat { --od-gap: 0; }

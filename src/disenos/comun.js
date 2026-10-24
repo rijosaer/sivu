@@ -6,6 +6,15 @@ import { useEffect, useRef, useState } from "react";
 
 export const ZONA = "America/Bogota";
 
+// Toda la portada abre la invitación con un toque, no solo el objeto (sello,
+// globo, velas, cinta…): quien no le atina al punto exacto igual entra. Los
+// botones y enlaces de la portada siguen haciendo lo suyo (y no abren dos veces).
+export function alTocarPortada(abrir) {
+  return (e) => {
+    if (!e.target.closest("button, a, input, select, textarea, label")) abrir();
+  };
+}
+
 export function partesFecha(iso) {
   if (!iso) return null;
   const d = new Date(iso);

@@ -467,7 +467,7 @@ export default function Birrete({ site, contenidoDe, invitacion, onEnviarRSVP, e
         <div className="bi-pie-entrada">
           <button type="button" className="bi-tirar" onClick={desenrollar} tabIndex={fase === "enrollado" ? 0 : -1} aria-hidden={fase !== "enrollado"}>
             <span className="bi-tirar-cola" aria-hidden="true" />
-            <span className="bi-tirar-cinta">Tira para desenrollar</span>
+            <span className="bi-tirar-cinta">Toca para desenrollar</span>
           </button>
           <p className="bi-desliza" aria-hidden="true">{Icono.abajo}<span>Desliza</span></p>
         </div>

@@ -2,8 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import "./eucalipto.css";
 import RSVP from "../../components/RSVP";
 import {
-  partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer,
-} from "../comun";
+  partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer, alTocarPortada } from "../comun";
 import {
   EuRama, EuTallo, EuRamito, EuAnillos, EuCopas, EuSobre, EuOjal, EuHilo,
   EuVara, EuHojita, EuCinta, EuNudo, EuCintaIniciales, EuHojaBoton, EuGuirnalda,
@@ -386,7 +385,7 @@ export default function Eucalipto({ site, contenidoDe, invitacion, onEnviarRSVP,
         </div>
 
         {fase !== "abierta" && (
-          <div className="eu-entrada" aria-hidden={fase !== "cerrada"}>
+          <div className="eu-entrada" aria-hidden={fase !== "cerrada"} onClick={alTocarPortada(abrir)}>
             <div className="eu-colgador">
               <EuVara className="eu-vara" />
               <div className="eu-tag eu-tag-novios">
@@ -416,11 +415,11 @@ export default function Eucalipto({ site, contenidoDe, invitacion, onEnviarRSVP,
                 </div>
               )}
             </div>
-            <button type="button" className="eu-cinta" onClick={abrir} disabled={fase !== "cerrada"} aria-label="Tira de la cinta para abrir la invitación">
+            <button type="button" className="eu-cinta" onClick={abrir} disabled={fase !== "cerrada"} aria-label="Toca la cinta para abrir la invitación">
               <span className="eu-cinta-banda eu-cinta-izq"><EuCinta /></span>
               <span className="eu-cinta-banda eu-cinta-der"><EuCinta espejo /></span>
               <EuNudo className="eu-nudo" />
-              <span className="eu-cinta-texto">Tira de la cinta</span>
+              <span className="eu-cinta-texto">Toca la cinta</span>
             </button>
           </div>
         )}

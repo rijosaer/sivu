@@ -2,8 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import "./confeti.css";
 import RSVP from "../../components/RSVP";
 import {
-  partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer,
-} from "../comun";
+  partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer, alTocarPortada } from "../comun";
 import { CfGlobo, CfRamo, CfPinza, CfPastel, CfRegalo, CfKraft, CfAlfiler } from "./arte";
 
 // Diseño «Confeti»: cumpleaños alegre pero elegante. Globos durazno, rubor,
@@ -161,7 +160,7 @@ function Entrada({ welcome, invitacion, reventando, onReventar }) {
   const largoNombre = nombre.length > 22 ? "cf-kraft-largo" : nombre.length > 13 ? "cf-kraft-medio" : "";
   const globitos = GLOBITOS.slice(0, Math.min(pases, GLOBITOS.length));
   return (
-    <section className={`cf-entrada ${reventando ? "cf-reventado" : ""}`} aria-label="Abrir invitación">
+    <section className={`cf-entrada ${reventando ? "cf-reventado" : ""}`} aria-label="Abrir invitación" onClick={alTocarPortada(onReventar)}>
       <div className="cf-fondo-globos" aria-hidden="true">
         <CfGlobo tono="rubor" className="cf-globito cf-globito-1" />
         <CfGlobo tono="oro" className="cf-globito cf-globito-2" />

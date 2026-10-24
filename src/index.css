@@ -73,3 +73,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   10% { opacity: 1; }
   100% { transform: translateY(110vh) rotate(220deg); opacity: 0; }
 }
+
+/* Invitaciones sin barra de desplazamiento a la vista: en computador y dentro de
+   los celulares de la landing se veía una barra gris al costado. */
+html.invitacion, html.invitacion * { scrollbar-width: none; }
+html.invitacion::-webkit-scrollbar, html.invitacion ::-webkit-scrollbar { display: none; width: 0; height: 0; }
