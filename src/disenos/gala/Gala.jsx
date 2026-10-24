@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import "./gala.css";
 import RSVP from "../../components/RSVP";
 import {
@@ -66,9 +66,50 @@ function renglones(texto) {
   return [palabras.slice(0, mejor).join(" "), palabras.slice(mejor).join(" ")];
 }
 
+// El título se mide en pantalla y se achica hasta caber en la tarjeta: con una
+// palabra larga («LANZAMIENTO») la letra ancha de Gala se salía y cortaba la «O».
+function useTituloQueCabe(texto) {
+  const ref = useRef(null);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    // Dónde termina de verdad cada renglón contra el borde interior de la tarjeta
+    // (scrollWidth no lo detecta: cada renglón es un bloque del ancho del título).
+    function cabe() {
+      const caja = el.closest(".gt-main") || el.parentElement;
+      const borde = caja.getBoundingClientRect().right - parseFloat(getComputedStyle(caja).paddingRight || 0);
+      return [...el.querySelectorAll(".line")].every((linea) => {
+        const r = document.createRange();
+        r.selectNodeContents(linea);
+        return r.getBoundingClientRect().right <= borde + 0.5;
+      });
+    }
+    function ajustar() {
+      el.style.fontSize = "";
+      let tam = parseFloat(getComputedStyle(el).fontSize);
+      while (!cabe() && tam > 18) {
+        tam -= 1;
+        el.style.fontSize = `${tam}px`;
+      }
+    }
+    ajustar();
+    // La letra de Gala llega después (useFuentes la pide al montar) y es más
+    // ancha que la de respaldo: se vuelve a medir cada vez que termina de cargar una.
+    document.fonts?.ready.then(ajustar);
+    document.fonts?.addEventListener?.("loadingdone", ajustar);
+    addEventListener("resize", ajustar);
+    return () => {
+      document.fonts?.removeEventListener?.("loadingdone", ajustar);
+      removeEventListener("resize", ajustar);
+    };
+  }, [texto]);
+  return ref;
+}
+
 function Portada({ welcome, partes, invitacion, onAbrir }) {
   const [abriendo, setAbriendo] = useState(false);
   const pases = pasesDe(invitacion);
+  const titulo = useTituloQueCabe(welcome.novioEl);
   function abrir() {
     if (abriendo) return;
     setAbriendo(true);
@@ -85,7 +126,7 @@ function Portada({ welcome, partes, invitacion, onAbrir }) {
               <span className="ph">{welcome.novioElla || welcome.bienvenidaTexto || "Te invitamos"}</span>
               {partes && <span className="od-nowrap">{partes.anio}</span>}
             </div>
-            <h1 className="gt-title" id="gate-title" style={{ "--letras": letrasMax(welcome.novioEl) }}>
+            <h1 className="gt-title" id="gate-title" ref={titulo} style={{ "--letras": letrasMax(welcome.novioEl) }}>
               {renglones(welcome.novioEl).map((r, i) => <span key={i} className="line">{r}</span>)}
             </h1>
             {welcome.bienvenidaTexto && welcome.novioElla && <p className="gt-sub serif">{welcome.bienvenidaTexto}</p>}

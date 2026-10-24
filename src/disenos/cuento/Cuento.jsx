@@ -215,7 +215,12 @@ function Portada({ config, welcome, partes, invitacion, estado, onTerminar }) {
           </p>
         )}
       </div>
-      {estado === "abierta" && <p className="cu-desliza" aria-hidden="true">Desliza<i /></p>}
+      {estado === "abierta" && (
+        <p className="cu-desliza" aria-hidden="true">
+          Desliza
+          <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
+        </p>
+      )}
     </section>
   );
 }
