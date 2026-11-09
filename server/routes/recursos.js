@@ -504,7 +504,7 @@ function cuposValidos(valor) {
 
 async function invitadoConMiembros(invitacionId, id) {
   const { rows } = await pool.query(
-    `SELECT id, codigo, tipo, nombre, familia, mensaje, telefono, telefono_aux, cupos, enviado_en, creado_en
+    `SELECT id, codigo, tipo, nombre, familia, mensaje, telefono, telefono_aux, cupos, regalo_modo, enviado_en, creado_en
      FROM invitados WHERE id = $1 AND invitacion_id = $2`,
     [id, invitacionId]
   );
@@ -522,7 +522,7 @@ recursosRouter.get(
   capturar(async (req, res) => {
     const { rows } = await pool.query(
       `SELECT i.id, i.codigo, i.tipo, i.nombre, i.familia, i.mensaje,
-              i.telefono, i.telefono_aux, i.cupos, i.enviado_en, i.abierto_en, i.ultima_apertura, i.aperturas, i.creado_en,
+              i.telefono, i.telefono_aux, i.cupos, i.regalo_modo, i.enviado_en, i.abierto_en, i.ultima_apertura, i.aperturas, i.creado_en,
               COALESCE(json_agg(
                 json_build_object('id', m.id, 'nombre', m.nombre, 'orden', m.orden,
                                   'estado', m.estado, 'restriccion', m.restriccion,
@@ -625,9 +625,12 @@ recursosRouter.post(
 recursosRouter.put(
   "/invitados/:id",
   capturar(async (req, res) => {
-    const { nombre, familia, mensaje, tipo, telefono, telefono_aux, enviado, cupos } = req.body;
+    const { nombre, familia, mensaje, tipo, telefono, telefono_aux, enviado, cupos, regalo_modo } = req.body;
     if (tipo && !TIPOS.includes(tipo)) {
       return res.status(400).json({ error: "Tipo de invitación no válido" });
+    }
+    if (regalo_modo !== undefined && !["", "enlace", "lista"].includes(regalo_modo)) {
+      return res.status(400).json({ error: "Tipo de regalo no válido" });
     }
 
     // Bajar los cupos no puede dejar fuera a gente que ya confirmó: primero
@@ -663,14 +666,23 @@ recursosRouter.put(
          telefono = COALESCE($7, telefono),
          cupos = COALESCE($8, cupos),
          telefono_aux = COALESCE($9, telefono_aux),
+         regalo_modo = COALESCE($10, regalo_modo),
          enviado_en = ${marcaEnvio}
        WHERE id = $1 AND invitacion_id = $2 RETURNING id`,
       [
         req.params.id, req.invitacionId, nombre, familia, mensaje, tipo, telefono, numeroCupos,
         typeof telefono_aux === "string" ? telefono_aux.trim() : null,
+        regalo_modo ?? null,
       ]
     );
     if (!rows.length) return res.status(404).json({ error: "Invitación no encontrada" });
+    // Quien deja de tener lista suelta lo que había apartado.
+    if (regalo_modo !== undefined && regalo_modo !== "lista") {
+      await pool.query(
+        "UPDATE regalo_opciones SET reservado_por = NULL, reservado_en = NULL WHERE reservado_por = $1 AND invitacion_id = $2",
+        [rows[0].id, req.invitacionId]
+      );
+    }
     res.json(await invitadoConMiembros(req.invitacionId, rows[0].id));
   })
 );

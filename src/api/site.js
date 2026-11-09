@@ -58,6 +58,23 @@ export async function registrarApertura(slug, codigo) {
   }
 }
 
+// Aparta una opción de la lista de regalos (opcionId null la suelta). Devuelve
+// la lista al día; si otro la tomó primero, el error trae también la lista.
+export async function reservarRegalo(slug, codigo, opcionId) {
+  const res = await fetch(`${base(slug)}/regalo`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ codigo, opcionId }),
+  });
+  const cuerpo = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const error = new Error(cuerpo.error || "No se pudo apartar el regalo");
+    error.opciones = cuerpo.opciones;
+    throw error;
+  }
+  return cuerpo.opciones;
+}
+
 // respuestas: [{ id, estado, restriccion, comentario }] — una por persona.
 // acompanantes: [{ nombre, restriccion }] — solo en invitaciones por cupos,
 // donde los nombres los escribe el propio invitado al confirmar.

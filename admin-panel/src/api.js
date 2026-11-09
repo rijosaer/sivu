@@ -294,6 +294,15 @@ export const api = {
     request(scoped(`/invitados/${id}`), { method: "PUT", body: JSON.stringify(datos) }),
   borrarInvitado: (id) => request(scoped(`/invitados/${id}`), { method: "DELETE" }),
 
+  // Regalos por invitado: enlace de compra o lista de opciones para apartar
+  regalos: () => request(scoped("/regalos")),
+  guardarRegalosConfig: (datos) =>
+    request(scoped("/regalos/config"), { method: "PUT", body: JSON.stringify(datos) }),
+  crearOpcionRegalo: (datos) =>
+    request(scoped("/regalos/opciones"), { method: "POST", body: JSON.stringify(datos) }),
+  liberarOpcionRegalo: (id) => request(scoped(`/regalos/opciones/${id}/liberar`), { method: "POST" }),
+  borrarOpcionRegalo: (id) => request(scoped(`/regalos/opciones/${id}`), { method: "DELETE" }),
+
   // Envío automático por el WhatsApp de Sivú (solo el dueño)
   envioAutomatico: () => request(scoped("/envio-automatico")),
   iniciarEnvioAutomatico: (tipo, items) =>

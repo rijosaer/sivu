@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import "./valle.css";
 import RSVP from "../../components/RSVP";
+import { reservarRegalo } from "../../api/site";
 import {
   partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer, enlaceCalendario,
 } from "../comun";
@@ -235,6 +236,56 @@ function useHilo(abierta) {
 
 // `arte` y `variante` los usa Valle claro (ValleClaro.jsx): mismo diseño con
 // acuarelas más luminosas y la clase .va-v-claro.
+// Regalo de este invitado: un botón a la tienda o la lista para apartar.
+function RegaloInvitado({ regalo, slug, codigo, onAviso }) {
+  const [opciones, setOpciones] = useState(regalo.opciones || []);
+  const [ocupado, setOcupado] = useState(false);
+
+  async function elegir(opcionId) {
+    setOcupado(true);
+    try {
+      setOpciones(await reservarRegalo(slug, codigo, opcionId));
+      onAviso(opcionId === null ? "Quitaste tu regalo" : "¡Regalo apartado!");
+    } catch (e) {
+      if (e.opciones) setOpciones(e.opciones);
+      onAviso(e.message);
+    }
+    setOcupado(false);
+  }
+
+  return (
+    <section className="va-bloque va-regalo" data-arma aria-labelledby="va-regalo-invitado">
+      <span className="va-regalo-ico va-entra">{Icono.regalo}</span>
+      <Titulo id="va-regalo-invitado">{regalo.titulo || "Regalos"}</Titulo>
+      {regalo.texto && <p className="va-texto va-entra" style={{ "--d": "300ms" }}>{regalo.texto}</p>}
+      {regalo.tipo === "enlace" ? (
+        <p className="va-botones va-entra" style={{ "--d": "500ms" }}>
+          <a className="va-btn va-btn-lleno" href={regalo.url} target="_blank" rel="noopener noreferrer">{regalo.etiqueta}</a>
+        </p>
+      ) : (
+        <ul className="va-opciones va-entra" style={{ "--d": "500ms" }}>
+          {opciones.map((o) => (
+            <li key={o.id} className={`va-opcion ${o.mia ? "va-opcion-mia" : ""} ${!o.libre && !o.mia ? "va-opcion-ocupada" : ""}`}>
+              <div>
+                <p className="va-opcion-nombre">{o.nombre}</p>
+                {o.detalle && <p className="va-opcion-detalle">{o.detalle}</p>}
+                {o.mia && <p className="va-opcion-detalle">Apartado por ti</p>}
+              </div>
+              {o.mia ? (
+                <button className="va-btn" type="button" disabled={ocupado} onClick={() => elegir(null)}>Quitar</button>
+              ) : o.libre ? (
+                <button className="va-btn" type="button" disabled={ocupado} onClick={() => elegir(o.id)}>Apartar</button>
+              ) : (
+                <span className="va-opcion-estado">Apartado</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
 export default function ValleDeLuna({ site, contenidoDe, invitacion, enEditor, onEnviarRSVP, arte: arteVariante, variante }) {
   const arte = { noche, rama, esquina, hacienda, ...arteVariante };
   useFuentes(FUENTES);
@@ -519,6 +570,10 @@ export default function ValleDeLuna({ site, contenidoDe, invitacion, enEditor, o
                   </div>
                 )}
               </section>
+            )}
+
+            {invitacion?.regalo && (
+              <RegaloInvitado regalo={invitacion.regalo} slug={site.invitacion.slug} codigo={invitacion.codigo} onAviso={setAviso} />
             )}
 
             {activo("info_importante") && (puntos.length > 0 || importante.nota) && (

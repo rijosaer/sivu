@@ -7,6 +7,7 @@ const PanelDueno = lazy(() => import("./dueno/PanelDueno"));
 const Resumen = lazy(() => import("./pages/Resumen"));
 const Invitados = lazy(() => import("./pages/Invitados"));
 const Lista = lazy(() => import("./pages/Lista"));
+const Regalos = lazy(() => import("./pages/Regalos"));
 const Contenido = lazy(() => import("./pages/Contenido"));
 const Tema = lazy(() => import("./pages/Tema"));
 const Decoraciones = lazy(() => import("./pages/Decoraciones"));
@@ -56,6 +57,7 @@ const PANTALLAS = [
     partes: [
       ["invitaciones", "Invitaciones", Invitados],
       ["personas", "Lista de personas", Lista],
+      ["regalos", "Regalos", Regalos, null, "regalos"],
       ["whatsapp", "WhatsApp", WhatsappEvento],
     ],
   },
@@ -93,9 +95,9 @@ const ANTES = {
 
 // Qué pantallas ve quien entra. El dueño, todas. El cliente: Resumen e
 // Invitados, y de la invitación solo los textos si su paquete lo permite.
-function pantallasPara(dueno, permiso) {
+function pantallasPara(dueno, permiso, opciones) {
   return PANTALLAS.filter((p) => dueno || !p.soloDueno)
-    .map((p) => ({ ...p, partes: p.partes.filter((x) => dueno || x[3] !== "dueno") }))
+    .map((p) => ({ ...p, partes: p.partes.filter((x) => (dueno || x[3] !== "dueno") && (!x[4] || opciones[x[4]])) }))
     .filter((p) => dueno || p.key !== "invitacion" || permiso === "textos");
 }
 
@@ -111,13 +113,30 @@ function usePermisoCliente(dueno) {
   return permiso;
 }
 
+// Solo algunos diseños dibujan los regalos por invitado: lo dice el servidor.
+function useRegalosDisponibles(eventoId) {
+  const [disponibles, setDisponibles] = useState(false);
+  useEffect(() => {
+    let vivo = true;
+    api
+      .regalos()
+      .then((r) => vivo && setDisponibles(Boolean(r.disponible)))
+      .catch(() => {});
+    return () => {
+      vivo = false;
+    };
+  }, [eventoId]);
+  return disponibles;
+}
+
 function Cascara({ onSalir, evento, onCambiarEvento, tramos }) {
   const dueno = !esEventoFijo();
   const permiso = usePermisoCliente(dueno);
   const { hayPendientes, seccionesPendientes } = usePendientes();
   const avisos = useAvisos();
 
-  const visibles = pantallasPara(dueno, permiso);
+  const regalos = useRegalosDisponibles(evento.id);
+  const visibles = pantallasPara(dueno, permiso, { regalos });
   let [clave, sub] = [tramos[2] || "resumen", tramos[3] || ""];
   if (ANTES[clave]) [clave, sub] = ANTES[clave];
   const pantalla = visibles.find((p) => p.key === clave) || visibles[0];

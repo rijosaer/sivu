@@ -329,6 +329,14 @@
 .va-regalo .va-botones { margin-top: 18px; }
 .va-transferir { margin: 18px auto 0; max-width: 320px; padding: 16px; border: 1px dashed color-mix(in srgb, var(--oro) 60%, transparent); border-radius: 14px; font: 300 14px/1.6 var(--f-texto); white-space: pre-line; }
 .va-transferir .va-btn { margin-top: 10px; }
+.va-regalo .va-opciones { list-style: none; display: grid; gap: 10px; max-width: 340px; margin: 20px auto 0; text-align: left; }
+.va-opcion { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--oro) 45%, transparent); border-radius: 14px; background: color-mix(in srgb, var(--papel) 75%, white); }
+.va-opcion .va-btn { flex: none; padding: 10px 16px; }
+.va-opcion-nombre { font: 500 18px/1.25 var(--f-titulo); }
+.va-opcion-detalle { margin-top: 2px; font: 300 14px/1.4 var(--f-texto); }
+.va-opcion-mia { border-color: var(--azul); }
+.va-opcion-ocupada { opacity: .6; }
+.va-opcion-estado { flex: none; font: 400 13px/1 var(--f-texto); }
 .va-marco { max-width: 340px; margin: 0 auto; padding: 20px 22px; border: 1px solid color-mix(in srgb, var(--oro) 45%, transparent); border-radius: 18px; background: color-mix(in srgb, var(--papel) 75%, white); text-align: left; }
 .va-marco .va-texto { margin: 0 0 10px; text-align: center; font-size: 17px; white-space: pre-line; }
 .va-lista { list-style: none; display: grid; gap: 8px; font: 300 14.5px/1.5 var(--f-texto); }

@@ -4,6 +4,7 @@ import { capturar } from "../errores.js";
 import { exigirAccesoPublico, resolverInvitacionPublica } from "../middlewareInvitacion.js";
 import { avisarRespuesta, fotoRespuestas } from "../avisosWhatsapp.js";
 import { publicoNegocioRouter } from "./publicoNegocio.js";
+import { esSeccionPorInvitado, opcionesDeInvitado, regaloDeInvitado, reservarOpcion } from "./regalos.js";
 import { enviarArchivo, firmaValida, urlMedio } from "../archivos.js";
 import { CLAVE_RE, CODIGO_RE, esIdValido, limitador, texto } from "../seguridad.js";
 
@@ -122,7 +123,8 @@ invitacionRouter.get(
         ])
       ),
       ubicaciones: ubicaciones.rows,
-      secciones: await firmarMediosDelContenido(secciones.rows, id),
+      // Los regalos por invitado no viajan aquí: el enlace general no debe verlos.
+      secciones: await firmarMediosDelContenido(secciones.rows.filter((s) => !esSeccionPorInvitado(s)), id),
       // Aparte de las secciones a propósito: el plazo se aplica en el servidor
       // aunque "Información de la boda" esté oculta, así que el sitio también
       // tiene que conocerlo en ese caso. Si no, el invitado vería el formulario
@@ -158,7 +160,7 @@ invitacionRouter.get(
   capturar(async (req, res) => {
     if (!codigoValido(req.params.codigo)) return res.status(404).json({ error: "Invitación no encontrada" });
     const { rows } = await pool.query(
-      "SELECT id, codigo, tipo, nombre, familia, mensaje, cupos FROM invitados WHERE codigo = $1 AND invitacion_id = $2",
+      "SELECT id, codigo, tipo, nombre, familia, mensaje, cupos, regalo_modo FROM invitados WHERE codigo = $1 AND invitacion_id = $2",
       [req.params.codigo, req.invitacionId]
     );
     if (!rows.length) return res.status(404).json({ error: "Invitación no encontrada" });
@@ -180,7 +182,33 @@ invitacionRouter.get(
       // tipo "cupos"; en el resto es 0.
       cupos: invitacion.cupos,
       miembros: miembros.rows,
+      regalo: await regaloDeInvitado(req.invitacionId, invitacion),
     });
+  })
+);
+
+// El invitado aparta una opción de la lista de regalos, o la suelta con
+// opcionId null. Body: { codigo, opcionId }
+invitacionRouter.post(
+  "/regalo",
+  limiteRsvp,
+  limiteCodigos,
+  capturar(async (req, res) => {
+    const { codigo, opcionId } = req.body || {};
+    if (!codigoValido(codigo) || (opcionId !== null && !esIdValido(opcionId))) {
+      return res.status(400).json({ error: "Faltan datos para apartar el regalo" });
+    }
+    const { rows } = await pool.query(
+      "SELECT id, regalo_modo FROM invitados WHERE codigo = $1 AND invitacion_id = $2",
+      [codigo, req.invitacionId]
+    );
+    if (!rows.length) return res.status(404).json({ error: "Código no encontrado" });
+    if (rows[0].regalo_modo !== "lista") return res.status(403).json({ error: "Tu invitación no tiene lista de regalos" });
+
+    const hecho = await reservarOpcion(req.invitacionId, rows[0].id, opcionId === null ? null : Number(opcionId));
+    const opciones = await opcionesDeInvitado(req.invitacionId, rows[0].id);
+    if (!hecho) return res.status(409).json({ error: "Alguien acaba de apartar esa opción. Elige otra.", opciones });
+    res.json({ opciones });
   })
 );
 

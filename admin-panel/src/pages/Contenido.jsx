@@ -246,7 +246,10 @@ export default function Contenido() {
     const data = await api.secciones();
     // Servidores salió del menú (se hizo para una sola boda); su sección
     // sigue en la base por si un cliente la vuelve a pedir.
-    const ordenadas = data.filter((s) => s.tipo !== "servidores" && (!esEventoFijo() || s.activo)).sort((a, b) => a.orden - b.orden);
+    // Los regalos por invitado se editan en Invitados → Regalos.
+    const ordenadas = data
+      .filter((s) => s.tipo !== "servidores" && !s.contenido?.porInvitado && (!esEventoFijo() || s.activo))
+      .sort((a, b) => a.orden - b.orden);
     setSecciones(ordenadas);
     setSeleccionada((prev) => prev ?? ordenadas[0]?.id ?? null);
     setCargando(false);

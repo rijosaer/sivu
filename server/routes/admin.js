@@ -7,6 +7,7 @@ import { recursosRouter } from "./recursos.js";
 import { whatsappRouter } from "./whatsapp.js";
 import { crmRouter } from "./crm.js";
 import { mensajesEventoRouter } from "./mensajesEvento.js";
+import { regalosRouter } from "./regalos.js";
 
 // Todo /api/admin exige sesión. Dos cosas cuelgan de aquí:
 //  - /invitaciones            CRUD de los eventos en sí (crear, listar, editar).
@@ -42,3 +43,4 @@ adminRouter.use("/crm", soloDueno, crmRouter);
 adminRouter.use("/invitaciones", invitacionesRouter);
 adminRouter.use("/invitaciones/:invitacionId", resolverInvitacionAdmin, recursosRouter);
 adminRouter.use("/invitaciones/:invitacionId", resolverInvitacionAdmin, mensajesEventoRouter);
+adminRouter.use("/invitaciones/:invitacionId", resolverInvitacionAdmin, regalosRouter);
