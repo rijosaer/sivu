@@ -12,6 +12,11 @@ import { DecorProvider } from "./theme/DecorContext";
 import { EditorProvider, editorActivo, editandoPortada, mensajeDelPanel } from "./editor/EditorContext";
 import { applyTema } from "./theme/applyTema";
 import { renderSeccion } from "./SectionRenderer";
+import RegaloFlotante from "./components/RegaloPersonal";
+
+// Diseños que ya muestran el regalo de cada invitado dentro de la página;
+// en los demás sale con el botón flotante «Tu regalo».
+const REGALO_EN_LINEA = new Set(["valle", "valle-claro", "cielito", "capillita", "cometas", "bosquecito"]);
 
 // Diseños alternativos (columna invitaciones.diseno). Se cargan aparte para
 // que la boda clásica no descargue sus ilustraciones.
@@ -212,6 +217,9 @@ export default function App() {
           enEditor={enEditor}
           onEnviarRSVP={(respuestas, acompanantes) => submitRSVP(slug, codigo, respuestas, acompanantes)}
         />
+        {invitacion?.regalo && !enEditor && !REGALO_EN_LINEA.has(site.invitacion?.diseno) && (
+          <RegaloFlotante regalo={invitacion.regalo} slug={slug} codigo={codigo} />
+        )}
       </Suspense>
     );
   }
@@ -317,6 +325,9 @@ export default function App() {
               no suena: es un enlace de difusión amplia y no conviene autoplay. */}
           {!enEditor && (
             <MusicToggle src={site.audioUrl || musica.src} titulo={musica.titulo} />
+          )}
+          {!enEditor && opened && invitacion?.regalo && (
+            <RegaloFlotante regalo={invitacion.regalo} slug={slug} codigo={codigo} />
           )}
         </div>
       </DecorProvider>

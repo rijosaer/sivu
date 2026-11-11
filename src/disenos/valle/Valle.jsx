@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import "./valle.css";
 import RSVP from "../../components/RSVP";
 import { API_URL, reservarRegalo } from "../../api/site";
+import { ContenidoRegalo } from "../../components/RegaloPersonal";
 import {
   partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer, enlaceCalendario,
 } from "../comun";
@@ -276,7 +277,12 @@ function RegaloInvitado({ regalo, slug, codigo, onAviso }) {
       <span className="va-regalo-ico va-entra">{Icono.regalo}</span>
       <Titulo id="va-regalo-invitado">{regalo.titulo || "Regalos"}</Titulo>
       {regalo.texto && <p className="va-texto va-entra" style={{ "--d": "300ms" }}>{regalo.texto}</p>}
-      {regalo.tipo === "enlace" ? (
+      {regalo.tipo === "sobres" || regalo.tipo === "especifico" ? (
+        <div className="va-entra" style={{ "--d": "500ms", marginTop: 20 }}>
+          {/* El texto ya va arriba con la letra de Valle; aquí solo los datos. */}
+          <ContenidoRegalo regalo={{ ...regalo, texto: "" }} slug={slug} codigo={codigo} onAviso={onAviso} />
+        </div>
+      ) : regalo.tipo === "enlace" ? (
         <p className="va-botones va-entra" style={{ "--d": "500ms" }}>
           <a className="va-btn va-btn-lleno" href={regalo.url} target="_blank" rel="noopener noreferrer">{regalo.etiqueta}</a>
         </p>

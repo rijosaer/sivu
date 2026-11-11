@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import "./cuento.css";
 import RSVP from "../../components/RSVP";
+import { ContenidoRegalo } from "../../components/RegaloPersonal";
 import {
   partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer,
 } from "../comun";
@@ -490,6 +491,13 @@ export default function Cuento({ config, site, contenidoDe, invitacion, onEnviar
                 <button className="cu-btn" type="button" onClick={() => copiar(regalos.datosTransferencia, "Datos copiados")}>{Icono.copiar} Copiar</button>
               </div>
             )}
+          </Capitulo>
+        )}
+
+        {invitacion?.regalo && (
+          <Capitulo id="mi-regalo" ante="Para ti" titulo={corto(invitacion.regalo.titulo, "Tu regalo")}
+            escena={hayRegalo ? null : piezas.regalos} escenaClase="cu-escena-regalos">
+            <ContenidoRegalo regalo={invitacion.regalo} slug={site.invitacion.slug} codigo={invitacion.codigo} onAviso={setAviso} />
           </Capitulo>
         )}
 
