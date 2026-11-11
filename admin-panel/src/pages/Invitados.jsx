@@ -66,7 +66,32 @@ const NUEVO_VACIO = {
   telefono: "",
   telefonoAux: "",
   mensaje: "",
+  grupo: "",
 };
+
+// Grupos que se sugieren siempre; el cliente puede escribir cualquier otro
+// («Trabajo», «Colegio»…) y ese también aparece después en las sugerencias.
+const GRUPOS_SUGERIDOS = ["Novio", "Novia", "Ambos"];
+
+// Lista de grupos para el <datalist>: los sugeridos más los que ya existen.
+function gruposDe(lista) {
+  const vistos = new Map();
+  for (const g of [...GRUPOS_SUGERIDOS, ...lista.map((i) => i.grupo || "")]) {
+    const limpio = g.trim();
+    if (limpio && !vistos.has(paraBuscar(limpio))) vistos.set(paraBuscar(limpio), limpio);
+  }
+  return [...vistos.values()];
+}
+
+function OpcionesGrupo({ id, grupos }) {
+  return (
+    <datalist id={id}>
+      {grupos.map((g) => (
+        <option key={g} value={g} />
+      ))}
+    </datalist>
+  );
+}
 
 // Para buscar: sin tildes y en minúsculas. Los nombres se escriben como se
 // escriben ("Rodríguez", "Gómez"), pero al buscar nadie se detiene a poner la
@@ -380,13 +405,14 @@ function EditarIdentidad({ invitacion, onCambio, onCerrar }) {
 
 // ----------------------------------------------------------------- Tarjeta
 
-function Tarjeta({ invitacion, plantilla, plantillaRecordatorio, cuenta, onCambio, onBorrar }) {
+function Tarjeta({ invitacion, plantilla, plantillaRecordatorio, cuenta, grupos, onCambio, onBorrar }) {
   const [abierto, setAbierto] = useState(false);
   const [editando, setEditando] = useState(false);
   const [copiado, setCopiado] = useState("");
   const [telefono, setTelefono] = useState(invitacion.telefono || "");
   // Segundo número, opcional: la misma invitación puede salir también a él.
   const [telefonoAux, setTelefonoAux] = useState(invitacion.telefono_aux || "");
+  const [grupo, setGrupo] = useState(invitacion.grupo || "");
 
   const enlace = `${SITIO_BASE}?i=${invitacion.codigo}`;
   // "cupos" solo tiene valor en las invitaciones de tipo cupos; en el resto
@@ -427,6 +453,11 @@ function Tarjeta({ invitacion, plantilla, plantillaRecordatorio, cuenta, onCambi
   async function guardarTelefonoAux() {
     if (telefonoAux.trim() === (invitacion.telefono_aux || "").trim()) return;
     onCambio(await api.actualizarInvitado(invitacion.id, { telefono_aux: telefonoAux.trim() }));
+  }
+
+  async function guardarGrupo() {
+    if (grupo.trim() === (invitacion.grupo || "").trim()) return;
+    onCambio(await api.actualizarInvitado(invitacion.id, { grupo: grupo.trim() }));
   }
 
   async function marcar(valor) {
@@ -477,6 +508,7 @@ function Tarjeta({ invitacion, plantilla, plantillaRecordatorio, cuenta, onCambi
               {invitacion.nombre}
             </span>
             <span className="insignia insignia-neutra">{tipo?.label || invitacion.tipo}</span>
+            {invitacion.grupo && <span className="insignia insignia-info">{invitacion.grupo}</span>}
             <span className="font-mono text-xs text-ink-tenue">{invitacion.codigo}</span>
           </div>
 
@@ -568,6 +600,18 @@ function Tarjeta({ invitacion, plantilla, plantillaRecordatorio, cuenta, onCambi
                   : "Sin número, WhatsApp te deja elegir el contacto."}
               </p>
 
+              <span className="etiqueta mt-3">Grupo</span>
+              <input
+                value={grupo}
+                onChange={(e) => setGrupo(e.target.value)}
+                onBlur={guardarGrupo}
+                list={`grupos-${invitacion.id}`}
+                placeholder="Novio, Novia, Trabajo…"
+                className="campo"
+                aria-label={`Grupo de ${invitacion.nombre}`}
+              />
+              <OpcionesGrupo id={`grupos-${invitacion.id}`} grupos={grupos} />
+
               <span className="etiqueta mt-3">WhatsApp auxiliar (opcional)</span>
               <input
                 value={telefonoAux}
@@ -650,7 +694,7 @@ function Tarjeta({ invitacion, plantilla, plantillaRecordatorio, cuenta, onCambi
 
 // ------------------------------------------------------ Crear invitación
 
-function Crear({ onCreada, onCancelar }) {
+function Crear({ grupos, onCreada, onCancelar }) {
   const toast = useToast();
   const [nuevo, setNuevo] = useState({ ...NUEVO_VACIO });
   const [error, setError] = useState("");
@@ -706,9 +750,11 @@ function Crear({ onCreada, onCancelar }) {
         telefono_aux: nuevo.telefonoAux,
         tipo: nuevo.tipo,
         miembros,
+        grupo: nuevo.grupo,
         ...(cupos ? { cupos } : {}),
       });
-      setNuevo({ ...NUEVO_VACIO, tipo: nuevo.tipo });
+      // Se conservan tipo y grupo: suelen crearse varias seguidas del mismo.
+      setNuevo({ ...NUEVO_VACIO, tipo: nuevo.tipo, grupo: nuevo.grupo });
       toast("Invitación creada");
       onCreada();
     } catch (e2) {
@@ -857,6 +903,17 @@ function Crear({ onCreada, onCancelar }) {
           />
         </label>
         <label>
+          <span className="etiqueta">Grupo (opcional)</span>
+          <input
+            placeholder="Novio, Novia, Trabajo…"
+            value={nuevo.grupo}
+            onChange={(e) => setNuevo({ ...nuevo, grupo: e.target.value })}
+            list="grupos-nueva"
+            className="campo"
+          />
+          <OpcionesGrupo id="grupos-nueva" grupos={grupos} />
+        </label>
+        <label>
           <span className="etiqueta">Mensaje personal dentro de la invitación (opcional)</span>
           <input
             placeholder="Ej. ¡No podemos imaginarnos ese día sin ti!"
@@ -883,6 +940,8 @@ function Crear({ onCreada, onCancelar }) {
 
 // ------------------------------------------------------------- La pantalla
 
+const SIN_GRUPO = "__sin_grupo__";
+
 export default function Invitados({ irA }) {
   const toast = useToast();
   const [lista, setLista] = useState([]);
@@ -894,6 +953,8 @@ export default function Invitados({ irA }) {
   const [cargando, setCargando] = useState(true);
   const [filtro, setFiltro] = useState("");
   const [vista, setVista] = useState("todas");
+  // "" = todos los grupos; SIN_GRUPO = las que no tienen grupo.
+  const [grupoVer, setGrupoVer] = useState("");
   const [creando, setCreando] = useState(false);
   const [importando, setImportando] = useState(false);
   // El envío automático sale del número de Sivú: solo lo ve el dueño.
@@ -936,17 +997,42 @@ export default function Invitados({ irA }) {
     setLista((prev) => prev.map((i) => (i.id === actualizada.id ? actualizada : i)));
   }
 
-  // Los filtros se cuentan sobre la lista completa: el número que muestra cada
+  const grupos = useMemo(() => gruposDe(lista), [lista]);
+  const hayGrupos = lista.some((i) => (i.grupo || "").trim());
+
+  // El grupo elegido recorta todo lo demás: filtros, cuentas y envíos.
+  const delGrupo = useMemo(() => {
+    if (!grupoVer) return lista;
+    if (grupoVer === SIN_GRUPO) return lista.filter((i) => !(i.grupo || "").trim());
+    return lista.filter((i) => paraBuscar(i.grupo || "") === paraBuscar(grupoVer));
+  }, [lista, grupoVer]);
+
+  // Cuántas invitaciones, personas y confirmados tiene cada grupo.
+  const resumenGrupos = useMemo(() => {
+    const mapa = new Map();
+    for (const i of lista) {
+      const nombre = (i.grupo || "").trim() || "Sin grupo";
+      const clave = paraBuscar(nombre);
+      const g = mapa.get(clave) || { nombre, invitaciones: 0, personas: 0, asisten: 0 };
+      g.invitaciones += 1;
+      g.personas += i.tipo === "cupos" ? 1 + (i.cupos || 0) : i.miembros.length;
+      g.asisten += i.miembros.filter((m) => m.estado === "confirmado").length;
+      mapa.set(clave, g);
+    }
+    return [...mapa.values()].sort((a, b) => b.invitaciones - a.invitaciones);
+  }, [lista]);
+
+  // Los filtros se cuentan sobre el grupo elegido: el número que muestra cada
   // uno es cuántas invitaciones te esperan ahí, aunque estés viendo otro.
   const cuentas = useMemo(() => {
     const pendiente = (i) => i.miembros.some((m) => m.estado === "pendiente");
     return {
-      todas: lista.length,
-      sin_enviar: lista.filter((i) => !i.enviado_en).length,
-      sin_responder: lista.filter((i) => i.enviado_en && pendiente(i)).length,
-      respondidas: lista.filter((i) => !pendiente(i)).length,
+      todas: delGrupo.length,
+      sin_enviar: delGrupo.filter((i) => !i.enviado_en).length,
+      sin_responder: delGrupo.filter((i) => i.enviado_en && pendiente(i)).length,
+      respondidas: delGrupo.filter((i) => !pendiente(i)).length,
     };
-  }, [lista]);
+  }, [delGrupo]);
 
   const VISTAS = [
     { key: "todas", label: "Todas" },
@@ -957,7 +1043,7 @@ export default function Invitados({ irA }) {
 
   const filtrada = useMemo(() => {
     const q = paraBuscar(filtro.trim());
-    return lista.filter((i) => {
+    return delGrupo.filter((i) => {
       const pendiente = i.miembros.some((m) => m.estado === "pendiente");
       if (vista === "sin_enviar" && i.enviado_en) return false;
       if (vista === "sin_responder" && (!i.enviado_en || !pendiente)) return false;
@@ -972,7 +1058,7 @@ export default function Invitados({ irA }) {
         i.miembros.some((m) => paraBuscar(m.nombre).includes(q))
       );
     });
-  }, [lista, filtro, vista]);
+  }, [delGrupo, filtro, vista]);
 
   // Se recalcula en cada render, así que si el panel queda abierto de un día
   // para otro el mensaje sale con los días correctos igual.
@@ -986,7 +1072,7 @@ export default function Invitados({ irA }) {
   // principal.
   function armarItems(tipo) {
     const cerrado = plazoCerrado(cuenta.diasLimite);
-    return lista
+    return delGrupo
       .filter((i) => telefonoValido(i.telefono))
       .filter((i) =>
         tipo === "invitacion"
@@ -1040,6 +1126,11 @@ export default function Invitados({ irA }) {
 
       {enviando && (
         <Suspense fallback={<p className="text-sm text-ink-tenue mb-6">Cargando...</p>}>
+          {grupoVer && (
+            <p className="ayuda mb-2">
+              El envío automático va solo al grupo «{grupoVer === SIN_GRUPO ? "Sin grupo" : grupoVer}».
+            </p>
+          )}
           <EnvioAutomatico armarItems={armarItems} onCambio={cargarLista} onCerrar={() => setEnviando(false)} />
         </Suspense>
       )}
@@ -1050,7 +1141,25 @@ export default function Invitados({ irA }) {
         </Suspense>
       )}
 
-      {creando && <Crear onCreada={cargar} onCancelar={() => setCreando(false)} />}
+      {creando && <Crear grupos={grupos} onCreada={cargar} onCancelar={() => setCreando(false)} />}
+
+      {hayGrupos && (
+        <div className="flex flex-wrap gap-2 mb-3">
+          {resumenGrupos.map((g) => (
+            <button
+              key={g.nombre}
+              onClick={() => setGrupoVer(g.nombre === "Sin grupo" ? SIN_GRUPO : g.nombre)}
+              className="tarjeta-lista px-3 py-2 text-left hover:border-borde-fuerte"
+              title={`Ver solo ${g.nombre}`}
+            >
+              <span className="block text-xs font-medium text-ink">{g.nombre}</span>
+              <span className="block text-[11px] text-ink-tenue">
+                {g.invitaciones} invitaciones · {g.personas} personas · {g.asisten} asisten
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Buscador y filtros juntos: es la barra desde la que se trabaja. */}
       <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -1066,6 +1175,24 @@ export default function Invitados({ irA }) {
             className="campo pl-9"
           />
         </div>
+        {hayGrupos && (
+          <select
+            value={grupoVer}
+            onChange={(e) => setGrupoVer(e.target.value)}
+            className="campo w-auto"
+            aria-label="Ver un grupo"
+          >
+            <option value="">Todos los grupos</option>
+            {grupos
+              .filter((g) => lista.some((i) => paraBuscar(i.grupo || "") === paraBuscar(g)))
+              .map((g) => (
+                <option key={g} value={g}>
+                  {g}
+                </option>
+              ))}
+            <option value={SIN_GRUPO}>Sin grupo</option>
+          </select>
+        )}
         {VISTAS.map((v) => (
           <button
             key={v.key}
@@ -1088,6 +1215,7 @@ export default function Invitados({ irA }) {
             plantilla={plantilla}
             plantillaRecordatorio={recordatorio}
             cuenta={cuenta}
+            grupos={grupos}
             onCambio={reemplazar}
             onBorrar={borrar}
           />

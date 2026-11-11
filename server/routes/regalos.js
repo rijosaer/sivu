@@ -4,8 +4,10 @@ import { capturar } from "../errores.js";
 import { esIdValido, texto, validarParam } from "../seguridad.js";
 
 // Regalos por invitado. El panel asigna a cada invitado un modo:
-//   "enlace": ve un botón a la tienda donde puede comprar.
-//   "lista":  ve las opciones y aparta una; a los demás les sale ocupada.
+//   "sobres":     lluvia de sobres; ve el mensaje y los datos para aportar.
+//   "especifico": un regalo puntual pensado para esa persona (y dónde comprarlo).
+//   "lista":      ve las opciones y aparta una; a los demás les sale ocupada.
+//   "enlace":     ve un botón a la tienda donde puede comprar.
 // Quien no tiene modo no ve la sección. Por eso la sección "regalos" con
 // contenido.porInvitado no viaja en /site: solo llega con /invitado/:codigo.
 
@@ -15,6 +17,9 @@ const TEXTOS_BASE = {
   enlaceUrl: "",
   enlaceEtiqueta: "Ver tienda",
   textoLista: "",
+  textoSobres: "",
+  datosSobres: "",
+  textoEspecifico: "",
 };
 
 export const esSeccionPorInvitado = (s) => s.tipo === "regalos" && s.contenido?.porInvitado === true;
@@ -46,7 +51,21 @@ export async function regaloDeInvitado(invitacionId, invitado) {
   if (!invitado.regalo_modo) return null;
   const seccion = await seccionRegalos(invitacionId);
   if (!seccion?.activo || !esSeccionPorInvitado(seccion)) return null;
-  const c = seccion.contenido;
+  const c = { ...TEXTOS_BASE, ...seccion.contenido };
+  if (invitado.regalo_modo === "sobres") {
+    if (!c.textoSobres && !c.datosSobres) return null;
+    return { tipo: "sobres", titulo: c.titulo, texto: c.textoSobres, datos: c.datosSobres };
+  }
+  if (invitado.regalo_modo === "especifico") {
+    if (!invitado.regalo_detalle) return null;
+    return {
+      tipo: "especifico",
+      titulo: c.titulo,
+      texto: c.textoEspecifico,
+      regalo: invitado.regalo_detalle,
+      url: invitado.regalo_url || "",
+    };
+  }
   if (invitado.regalo_modo === "enlace") {
     if (!c.enlaceUrl) return null;
     return {
@@ -122,8 +141,8 @@ regalosRouter.get(
       [req.invitacionId]
     );
     res.json({
-      // Por ahora solo los diseños Valle dibujan esta sección.
-      disponible: /^valle/.test(req.invitacion.diseno || ""),
+      // Todos los diseños dibujan el regalo personal (componente común).
+      disponible: true,
       config: seccion && esSeccionPorInvitado(seccion) ? { ...TEXTOS_BASE, ...seccion.contenido } : { ...TEXTOS_BASE },
       opciones,
     });
@@ -139,6 +158,9 @@ regalosRouter.put(
       enlaceUrl: String(texto(req.body?.enlaceUrl, 1000) ?? "").trim(),
       enlaceEtiqueta: texto(req.body?.enlaceEtiqueta, 40),
       textoLista: texto(req.body?.textoLista, 1000),
+      textoSobres: texto(req.body?.textoSobres, 1000),
+      datosSobres: texto(req.body?.datosSobres, 500),
+      textoEspecifico: texto(req.body?.textoEspecifico, 1000),
     };
     if (Object.values(c).some((v) => v === null)) return res.status(400).json({ error: "Algún texto es demasiado largo" });
     if (!urlValida(c.enlaceUrl)) {

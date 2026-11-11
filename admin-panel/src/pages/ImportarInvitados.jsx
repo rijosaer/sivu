@@ -16,6 +16,13 @@ import { paraBuscar } from "./Invitados";
 //   - Personas / Cupos              → TOTAL de personas, titular incluido:
 //                                     1 = individual, 3 = titular + 2 cupos
 //   - Tipo (opcional)               → Individual, Pareja, Familia o Titular + cupos
+//   - Integrantes (opcional)        → nombres de la familia, separados por comas
+//   - Grupo (opcional)              → de quién es la invitación (Novio, Novia…)
+//   - Regalo (opcional)             → Lluvia de sobres, Regalo específico,
+//                                     Lista de opciones o Enlace de tienda
+//   - Detalle del regalo (opcional) → qué regalo, si es «Regalo específico»
+// La plantilla que se descarga aquí (public/plantilla-invitados-sivu.xlsx,
+// generada con scripts/plantilla_invitados.py) trae justo estas columnas.
 // Así se escriben los listados que mandan los clientes («3 cupos» es el dueño
 // de la invitación y dos más).
 //
@@ -49,6 +56,10 @@ function columnas(encabezados) {
     aux: buscar(esAux),
     personas,
     tipo: buscar((h) => h === "tipo" || h.startsWith("tipo ") || h.includes("tipo de invitacion")),
+    integrantes: buscar((h) => h.includes("integrantes")),
+    grupo: buscar((h) => h === "grupo" || h.startsWith("grupo ") || h === "lado"),
+    regalo: buscar((h) => h === "regalo" || h === "tipo de regalo"),
+    detalle: buscar((h) => h.includes("detalle del regalo") || h === "detalle"),
   };
 }
 
@@ -72,6 +83,28 @@ function tipoEscrito(valor) {
   if (t.includes("individual") || t.includes("sola") || t.includes("solo")) return "individual";
   return "";
 }
+
+// Columna Regalo → modo de regalo del invitado ("" = no ve regalos).
+const MODOS_REGALO = [
+  { key: "", label: "Sin regalo" },
+  { key: "sobres", label: "Lluvia de sobres" },
+  { key: "especifico", label: "Regalo específico" },
+  { key: "lista", label: "Lista de opciones" },
+  { key: "enlace", label: "Enlace de tienda" },
+];
+function regaloEscrito(valor) {
+  const t = paraBuscar(String(valor ?? "")).trim();
+  if (!t) return "";
+  if (t.includes("sobre")) return "sobres";
+  if (t.includes("especific")) return "especifico";
+  if (t.includes("lista") || t.includes("opcion")) return "lista";
+  if (t.includes("enlace") || t.includes("tienda") || t.includes("link")) return "enlace";
+  return "";
+}
+
+// Las cuatro filas de ejemplo de la plantilla: si el cliente no las borra,
+// no deben convertirse en invitaciones.
+const EJEMPLOS_PLANTILLA = new Set(["3001234567", "3109876543", "3204567890", "3145535187"]);
 
 // Separa «Ana, Luis y Pedro» o «Ana & Luis» en nombres sueltos.
 function separarNombres(nombre) {
@@ -137,12 +170,25 @@ function analizarHoja(datos, existentes) {
     const clave = paraBuscar(nombre);
     if (!telefono) omitir = "Sin teléfono";
     else if (!telefonoValido(telefono)) omitir = "Teléfono no válido";
+    else if (EJEMPLOS_PLANTILLA.has(telefono.slice(-10))) omitir = "Fila de ejemplo de la plantilla";
     else if (existentes.has(clave)) omitir = "Ya existe en el evento";
     else if (vistos.has(clave)) omitir = "Repetido en el archivo";
     vistos.add(clave);
 
     const escrito = col.tipo >= 0 ? tipoEscrito(fila[col.tipo]) : "";
-    filas.push({ nombre, telefono, aux, personas, avisos, omitir, ...deducirTipo(nombre, personas, escrito) });
+    const leido = (c) => (c >= 0 ? String(fila[c] ?? "").replace(/\s+/g, " ").trim() : "");
+    const tipo = deducirTipo(nombre, personas, escrito);
+    // La columna Integrantes manda sobre lo que se deduzca del nombre.
+    if (tipo.tipo === "familia" && leido(col.integrantes)) tipo.integrantes = leido(col.integrantes);
+    const regalo = regaloEscrito(leido(col.regalo));
+    const detalle = leido(col.detalle);
+    if (regalo === "especifico" && !detalle) avisos.push("Regalo específico sin detalle: no verá regalo hasta que lo escribas");
+    filas.push({
+      nombre, telefono, aux, personas, avisos, omitir, ...tipo,
+      grupo: leido(col.grupo).slice(0, 40),
+      regalo,
+      detalle,
+    });
   }
   return { filas };
 }
@@ -161,7 +207,13 @@ function efectiva(f, cambio) {
 }
 
 function cuerpo(f) {
-  const base = { telefono: f.telefono, ...(f.aux ? { telefono_aux: f.aux } : {}) };
+  const base = {
+    telefono: f.telefono,
+    ...(f.aux ? { telefono_aux: f.aux } : {}),
+    ...(f.grupo ? { grupo: f.grupo } : {}),
+    ...(f.regalo ? { regalo_modo: f.regalo } : {}),
+    ...(f.regalo === "especifico" && f.detalle ? { regalo_detalle: f.detalle } : {}),
+  };
   if (f.tipo === "pareja") {
     const a = f.p1.trim();
     const b = f.p2.trim();
@@ -200,6 +252,8 @@ export default function ImportarInvitados({ lista, onTerminado, onCerrar }) {
   const omitidas = filas.filter((f) => f.omitir);
   const totalPersonas = aCrear.reduce((s, f) => s + f.personas, 0);
   const parejas = aCrear.filter((f) => f.tipo === "pareja").length;
+  const conGrupo = filas.some((f) => f.grupo);
+  const conRegalo = filas.some((f) => f.regalo);
 
   function corregir(i, datos) {
     setCambios((c) => ({ ...c, [i]: { ...c[i], ...datos } }));
@@ -282,11 +336,16 @@ export default function ImportarInvitados({ lista, onTerminado, onCerrar }) {
         </button>
       </div>
 
-      <label className="boton-secundario cursor-pointer inline-flex">
-        {archivo ? "Elegir otro archivo" : "Elegir archivo .xlsx"}
-        <input type="file" accept=".xlsx" onChange={elegir} className="sr-only" disabled={creando} />
-      </label>
-      {archivo && <span className="ayuda ml-3">{archivo}</span>}
+      <div className="flex flex-wrap items-center gap-3">
+        <label className="boton-secundario cursor-pointer inline-flex">
+          {archivo ? "Elegir otro archivo" : "Elegir archivo .xlsx"}
+          <input type="file" accept=".xlsx" onChange={elegir} className="sr-only" disabled={creando} />
+        </label>
+        <a href="/plantilla-invitados-sivu.xlsx" download className="boton-texto">
+          Descargar plantilla
+        </a>
+        {archivo && <span className="ayuda">{archivo}</span>}
+      </div>
 
       {hojas.length > 1 && (
         <label className="block mt-3 max-w-xs">
@@ -332,6 +391,7 @@ export default function ImportarInvitados({ lista, onTerminado, onCerrar }) {
                   <th className="px-3 py-2 font-medium">Nombre</th>
                   <th className="px-3 py-2 font-medium">Teléfono</th>
                   <th className="px-3 py-2 font-medium">Tipo</th>
+                  {(conGrupo || conRegalo) && <th className="px-3 py-2 font-medium">Grupo y regalo</th>}
                   <th className="px-3 py-2 font-medium">Nota</th>
                 </tr>
               </thead>
@@ -409,6 +469,17 @@ export default function ImportarInvitados({ lista, onTerminado, onCerrar }) {
                         </div>
                       )}
                     </td>
+                    {(conGrupo || conRegalo) && (
+                      <td className="px-3 py-1.5">
+                        {f.grupo && <span className="insignia insignia-info mr-1">{f.grupo}</span>}
+                        {f.regalo && (
+                          <span className="text-ink-tenue">
+                            {MODOS_REGALO.find((m) => m.key === f.regalo)?.label}
+                            {f.regalo === "especifico" && f.detalle ? `: ${f.detalle}` : ""}
+                          </span>
+                        )}
+                      </td>
+                    )}
                     <td className="px-3 py-1.5 no-underline">
                       {f.omitir && <span className="text-amber-700 no-underline inline-block">{f.omitir}</span>}
                       {!f.omitir && f.falta && <span className="text-amber-700">{f.falta}</span>}

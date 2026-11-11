@@ -502,9 +502,31 @@ function cuposValidos(valor) {
   return Number.isInteger(n) && n >= 1 && n <= 50 ? n : null;
 }
 
+const MODOS_REGALO = ["", "enlace", "lista", "sobres", "especifico"];
+
+// Grupo y regalo específico llegan del panel o de la importación. Devuelve
+// los valores limpios o un error para el usuario; undefined = no se tocó.
+function datosExtra(body) {
+  const limpio = (v, max) => (v === undefined ? undefined : String(v ?? "").replace(/\s+/g, " ").trim().slice(0, max));
+  const grupo = limpio(body.grupo, 40);
+  const regalo_detalle = limpio(body.regalo_detalle, 300);
+  const regalo_url = limpio(body.regalo_url, 1000);
+  if (body.regalo_modo !== undefined && !MODOS_REGALO.includes(body.regalo_modo)) {
+    return { error: "Tipo de regalo no válido" };
+  }
+  if (regalo_url) {
+    try {
+      if (!["http:", "https:"].includes(new URL(regalo_url).protocol)) throw new Error();
+    } catch {
+      return { error: "El enlace del regalo debe empezar por https://" };
+    }
+  }
+  return { grupo, regalo_modo: body.regalo_modo, regalo_detalle, regalo_url };
+}
+
 async function invitadoConMiembros(invitacionId, id) {
   const { rows } = await pool.query(
-    `SELECT id, codigo, tipo, nombre, familia, mensaje, telefono, telefono_aux, cupos, regalo_modo, enviado_en, creado_en
+    `SELECT id, codigo, tipo, nombre, familia, mensaje, telefono, telefono_aux, cupos, grupo, regalo_modo, regalo_detalle, regalo_url, enviado_en, creado_en
      FROM invitados WHERE id = $1 AND invitacion_id = $2`,
     [id, invitacionId]
   );
@@ -522,7 +544,7 @@ recursosRouter.get(
   capturar(async (req, res) => {
     const { rows } = await pool.query(
       `SELECT i.id, i.codigo, i.tipo, i.nombre, i.familia, i.mensaje,
-              i.telefono, i.telefono_aux, i.cupos, i.regalo_modo, i.enviado_en, i.abierto_en, i.ultima_apertura, i.aperturas, i.creado_en,
+              i.telefono, i.telefono_aux, i.cupos, i.grupo, i.regalo_modo, i.regalo_detalle, i.regalo_url, i.enviado_en, i.abierto_en, i.ultima_apertura, i.aperturas, i.creado_en,
               COALESCE(json_agg(
                 json_build_object('id', m.id, 'nombre', m.nombre, 'orden', m.orden,
                                   'estado', m.estado, 'restriccion', m.restriccion,
@@ -557,6 +579,8 @@ recursosRouter.post(
     const { nombre, familia, mensaje, telefono, telefono_aux, tipo = "individual", miembros = [], cupos } = req.body;
     if (!nombre?.trim()) return res.status(400).json({ error: "El nombre es obligatorio" });
     if (!TIPOS.includes(tipo)) return res.status(400).json({ error: "Tipo de invitación no válido" });
+    const extra = datosExtra(req.body);
+    if (extra.error) return res.status(400).json({ error: extra.error });
 
     // Si no mandan personas, la invitación cubre a quien le da nombre.
     const personas = (miembros.length ? miembros : [{ nombre }])
@@ -597,11 +621,13 @@ recursosRouter.post(
     try {
       await client.query("BEGIN");
       const { rows } = await client.query(
-        `INSERT INTO invitados (invitacion_id, codigo, nombre, familia, mensaje, tipo, telefono, telefono_aux, cupos)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+        `INSERT INTO invitados (invitacion_id, codigo, nombre, familia, mensaje, tipo, telefono, telefono_aux, cupos,
+                                grupo, regalo_modo, regalo_detalle, regalo_url)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`,
         [
           req.invitacionId, codigo, nombre.trim(), familia || "", mensaje || "", tipo,
           (telefono || "").trim(), (telefono_aux || "").trim(), numeroCupos,
+          extra.grupo || "", extra.regalo_modo || "", extra.regalo_detalle || "", extra.regalo_url || "",
         ]
       );
       const id = rows[0].id;
@@ -629,9 +655,8 @@ recursosRouter.put(
     if (tipo && !TIPOS.includes(tipo)) {
       return res.status(400).json({ error: "Tipo de invitación no válido" });
     }
-    if (regalo_modo !== undefined && !["", "enlace", "lista"].includes(regalo_modo)) {
-      return res.status(400).json({ error: "Tipo de regalo no válido" });
-    }
+    const extra = datosExtra(req.body);
+    if (extra.error) return res.status(400).json({ error: extra.error });
 
     // Bajar los cupos no puede dejar fuera a gente que ya confirmó: primero
     // hay que quitar a esos acompañantes desde «Ver personas».
@@ -667,12 +692,18 @@ recursosRouter.put(
          cupos = COALESCE($8, cupos),
          telefono_aux = COALESCE($9, telefono_aux),
          regalo_modo = COALESCE($10, regalo_modo),
+         grupo = COALESCE($11, grupo),
+         regalo_detalle = COALESCE($12, regalo_detalle),
+         regalo_url = COALESCE($13, regalo_url),
          enviado_en = ${marcaEnvio}
        WHERE id = $1 AND invitacion_id = $2 RETURNING id`,
       [
         req.params.id, req.invitacionId, nombre, familia, mensaje, tipo, telefono, numeroCupos,
         typeof telefono_aux === "string" ? telefono_aux.trim() : null,
         regalo_modo ?? null,
+        extra.grupo ?? null,
+        extra.regalo_detalle ?? null,
+        extra.regalo_url ?? null,
       ]
     );
     if (!rows.length) return res.status(404).json({ error: "Invitación no encontrada" });

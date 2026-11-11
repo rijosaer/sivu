@@ -160,7 +160,7 @@ invitacionRouter.get(
   capturar(async (req, res) => {
     if (!codigoValido(req.params.codigo)) return res.status(404).json({ error: "Invitación no encontrada" });
     const { rows } = await pool.query(
-      "SELECT id, codigo, tipo, nombre, familia, mensaje, cupos, regalo_modo FROM invitados WHERE codigo = $1 AND invitacion_id = $2",
+      "SELECT id, codigo, tipo, nombre, familia, mensaje, cupos, regalo_modo, regalo_detalle, regalo_url FROM invitados WHERE codigo = $1 AND invitacion_id = $2",
       [req.params.codigo, req.invitacionId]
     );
     if (!rows.length) return res.status(404).json({ error: "Invitación no encontrada" });
