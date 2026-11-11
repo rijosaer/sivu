@@ -14,6 +14,7 @@ import {
 
 // El importador trae el lector de Excel: se carga solo cuando se abre.
 const ImportarInvitados = lazy(() => import("./ImportarInvitados"));
+const EnvioEnFila = lazy(() => import("./EnvioEnFila"));
 const EnvioAutomatico = lazy(() => import("./EnvioAutomatico"));
 
 // Cada tipo se explica por lo que hace el invitado al confirmar, que es lo que
@@ -957,6 +958,8 @@ export default function Invitados({ irA }) {
   const [grupoVer, setGrupoVer] = useState("");
   const [creando, setCreando] = useState(false);
   const [importando, setImportando] = useState(false);
+  // Envío uno por uno desde el WhatsApp de quien usa el panel (cliente o dueño).
+  const [enFila, setEnFila] = useState(false);
   // El envío automático sale del número de Sivú: solo lo ve el dueño.
   const [enviando, setEnviando] = useState(false);
   const esDueno = !esEventoFijo();
@@ -1082,6 +1085,7 @@ export default function Invitados({ irA }) {
       .reverse() // la lista va de la más nueva a la más vieja; se envía en el orden en que se crearon
       .map((i) => ({
         invitado_id: i.id,
+        nombre: i.nombre,
         telefono: normalizarTelefono(i.telefono),
         texto: armarMensaje(tipo === "invitacion" ? plantilla : recordatorio, {
           nombre: i.familia || i.nombre,
@@ -1114,6 +1118,9 @@ export default function Invitados({ irA }) {
               Envío automático
             </button>
           )}
+          <button onClick={() => setEnFila((v) => !v)} className="boton-secundario">
+            Enviar uno por uno
+          </button>
           <button onClick={() => setImportando((v) => !v)} className="boton-secundario">
             Importar desde Excel
           </button>
@@ -1132,6 +1139,17 @@ export default function Invitados({ irA }) {
             </p>
           )}
           <EnvioAutomatico armarItems={armarItems} onCambio={cargarLista} onCerrar={() => setEnviando(false)} />
+        </Suspense>
+      )}
+
+      {enFila && (
+        <Suspense fallback={<p className="text-sm text-ink-tenue mb-6">Cargando...</p>}>
+          {grupoVer && (
+            <p className="ayuda mb-2">
+              Solo el grupo «{grupoVer === SIN_GRUPO ? "Sin grupo" : grupoVer}».
+            </p>
+          )}
+          <EnvioEnFila armarItems={armarItems} onCambio={cargarLista} onCerrar={() => setEnFila(false)} />
         </Suspense>
       )}
 
@@ -1154,7 +1172,8 @@ export default function Invitados({ irA }) {
             >
               <span className="block text-xs font-medium text-ink">{g.nombre}</span>
               <span className="block text-[11px] text-ink-tenue">
-                {g.invitaciones} invitaciones · {g.personas} personas · {g.asisten} asisten
+                {g.invitaciones} {g.invitaciones === 1 ? "invitación" : "invitaciones"} · {g.personas}{" "}
+                {g.personas === 1 ? "persona" : "personas"} · {g.asisten} {g.asisten === 1 ? "asiste" : "asisten"}
               </span>
             </button>
           ))}
