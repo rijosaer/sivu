@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import "./valle.css";
 import RSVP from "../../components/RSVP";
-import { reservarRegalo } from "../../api/site";
+import { API_URL, reservarRegalo } from "../../api/site";
 import {
   partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer, enlaceCalendario,
 } from "../comun";
@@ -77,9 +77,21 @@ function Letras({ texto, retraso = 0, paso = 45 }) {
   return (
     <>
       <span className="va-sr">{texto}</span>
-      {[...texto].map((c, i) => (
-        <span key={i} className="va-l" aria-hidden="true" style={{ "--d": `${retraso + i * paso}ms` }}>{c === " " ? " " : c}</span>
-      ))}
+      {/* Letra por letra para la animación, pero cada palabra entera: así la
+          línea solo se puede partir entre palabras. */}
+      {texto.split(/\s+/).map((palabra, p, todas) => {
+        const inicio = todas.slice(0, p).join(" ").length + (p ? 1 : 0);
+        return (
+          <span key={p}>
+            <span className="va-pal" aria-hidden="true">
+              {[...palabra].map((c, i) => (
+                <span key={i} className="va-l" style={{ "--d": `${retraso + (inicio + i) * paso}ms` }}>{c}</span>
+              ))}
+            </span>
+            {p < todas.length - 1 ? " " : ""}
+          </span>
+        );
+      })}
     </>
   );
 }
@@ -156,6 +168,8 @@ function Valle({ src, className = "" }) {
 }
 
 function Portada({ arte, welcome, nombres, invitacion, onAbrir }) {
+  // Opcional por invitación: una foto de los novios en lugar del cielo pintado.
+  const foto = welcome.fotoPortada?.startsWith("/") ? `${API_URL}${welcome.fotoPortada}` : welcome.fotoPortada;
   const [abriendo, setAbriendo] = useState(false);
   const pases = pasesDe(invitacion);
   const iniciales = nombres.map((n) => n.trim().charAt(0).toUpperCase());
@@ -166,8 +180,12 @@ function Portada({ arte, welcome, nombres, invitacion, onAbrir }) {
     setTimeout(onAbrir, reducido ? 200 : 1100);
   }
   return (
-    <section className={`va-portada ${abriendo ? "va-abriendo" : ""}`} aria-labelledby="va-portada-titulo">
-      <Valle src={arte.noche} />
+    <section className={`va-portada ${foto ? "va-portada-foto" : ""} ${abriendo ? "va-abriendo" : ""}`} aria-labelledby="va-portada-titulo">
+      {foto ? (
+        <div className="va-portada-img"><img src={foto} alt="" fetchPriority="high" /></div>
+      ) : (
+        <Valle src={arte.noche} />
+      )}
       <Arte src={arte.rama} className="va-portada-rama va-portada-rama-izq" />
       <Arte src={arte.rama} className="va-portada-rama va-portada-rama-der" />
       <div className="va-portada-texto">
@@ -436,7 +454,7 @@ export default function ValleDeLuna({ site, contenidoDe, invitacion, enEditor, o
                   <i className="va-vr" style={{ "--d": "350ms" }} />
                   <span className="va-mes va-entra" style={{ "--d": "450ms" }}>{partes.mes}<br />{partes.anio}</span>
                   <i className="va-vr" style={{ "--d": "550ms" }} />
-                  <span className="va-hora va-entra" style={{ "--d": "650ms" }}>{partes.hora24}<small>hrs</small></span>
+                  <span className="va-hora va-entra" style={{ "--d": "650ms" }}>{partes.hora.split(" ")[0]}<small>{partes.hora.split(" ").slice(1).join(" ")}</small></span>
                 </div>
                 <Filete adorno="anillos" retraso={800} />
                 {calendario && (
@@ -503,7 +521,7 @@ export default function ValleDeLuna({ site, contenidoDe, invitacion, enEditor, o
             {activo("vestimenta") && (vestimenta.titulo || permitidos.length > 0 || evitar.length > 0) && (
               <section className="va-bloque va-vestimenta" data-arma aria-labelledby="va-vestimenta">
                 <Arte src={arte.rama} className="va-rama va-rama-izq" />
-                <div className="va-pastilla">
+                <div className={`va-pastilla ${(vestimenta.titulo || "").length > 14 ? "va-pastilla-larga" : ""}`}>
                   <svg viewBox="0 0 250 96" aria-hidden="true"><rect className="va-trazo" pathLength="1" x="1" y="1" width="248" height="94" rx="47" /></svg>
                   <p className="va-mayus va-entra" id="va-vestimenta" style={{ "--d": "500ms" }}>Código de vestimenta</p>
                   {vestimenta.titulo && <p className="va-guion va-escribe" style={{ "--d": "800ms" }}>{vestimenta.titulo}</p>}
