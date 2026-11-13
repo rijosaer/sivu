@@ -212,7 +212,7 @@ function FechaTile({ fecha }) {
   );
 }
 
-function TarjetaProduccion({ ev, metodos, onCambio, onEntrar }) {
+function TarjetaProduccion({ ev, metodos, onCambio, onEntrar, enPanel = false }) {
   const toast = useToast();
   const [abierto, setAbierto] = useState(null); // "pagos" | "datos" | "notas"
   const dias = diasHasta(ev.fecha_evento);
@@ -230,7 +230,7 @@ function TarjetaProduccion({ ev, metodos, onCambio, onEntrar }) {
   }
 
   return (
-    <div className={`tarjeta-lista p-4 flex flex-col gap-3 ${atrasado ? "!border-red-300" : ""}`}>
+    <div className={enPanel ? "flex flex-col gap-3" : `tarjeta-lista p-4 flex flex-col gap-3 ${atrasado ? "!border-red-300" : ""}`}>
       <div className="flex items-start gap-3 flex-wrap">
         <FechaTile fecha={ev.fecha_evento} />
         <div className="min-w-0 flex-1">
@@ -328,6 +328,107 @@ function TarjetaProduccion({ ev, metodos, onCambio, onEntrar }) {
   );
 }
 
+const ORDEN_ETAPAS = Object.keys(ETAPAS);
+
+// Las 6 etapas como una barrita: verde lo hecho, vino lo actual (rojo si va
+// atrasado), gris lo que falta.
+function BarraEtapa({ etapa, atrasado }) {
+  const i = ORDEN_ETAPAS.indexOf(etapa);
+  return (
+    <span className="flex gap-[3px]" aria-hidden="true">
+      {ORDEN_ETAPAS.map((k, j) => (
+        <span key={k} className={`h-[5px] w-6 rounded-full ${j < i ? "bg-emerald-600" : j === i ? (atrasado ? "bg-red-600" : "bg-marca") : "bg-borde"}`} />
+      ))}
+    </span>
+  );
+}
+
+// Todos los eventos en una tabla (fecha, en qué va, invitaciones y pago) y el
+// detalle del que se toca al lado. Antes eran tarjetas grandes una debajo de
+// otra y había que bajar mucho para comparar.
+function TablaEventos({ eventos, elegido, onElegir, onEntrar }) {
+  return (
+    <div className="tarjeta overflow-hidden">
+      <table className="w-full text-[14px]">
+        <thead className="bg-lienzo text-left text-[11.5px] uppercase tracking-[.1em] text-ink-tenue">
+          <tr>
+            <th className="font-semibold px-4 py-2.5 w-16">Fecha</th>
+            <th className="font-semibold px-3 py-2.5">Evento</th>
+            <th className="font-semibold px-3 py-2.5 hidden md:table-cell">En qué va</th>
+            <th className="font-semibold px-3 py-2.5 hidden lg:table-cell">Invitaciones</th>
+            <th className="font-semibold px-3 py-2.5 hidden sm:table-cell">Pago</th>
+            <th className="px-3 py-2.5 w-10" />
+          </tr>
+        </thead>
+        <tbody>
+          {eventos.map((ev) => {
+            const dias = diasHasta(ev.fecha_evento);
+            const atrasado = dias !== null && dias <= 10 && ["datos", "diseno", "revision"].includes(ev.etapa);
+            const pagado = ev.valor_total && ev.pagado >= ev.valor_total;
+            const sel = elegido === ev.id;
+            return (
+              <tr key={ev.id} onClick={() => onElegir(ev)} className={`border-t border-borde cursor-pointer transition-colors ${sel ? "bg-marca-suave" : "hover:bg-lienzo/70"}`}>
+                <td className="px-4 py-2.5">
+                  <FechaTile fecha={ev.fecha_evento} />
+                </td>
+                <td className="px-3 py-2.5">
+                  <span className="block font-semibold text-ink">{ev.nombre}</span>
+                  <span className="block text-[12.5px] text-ink-suave">
+                    {NOMBRE_TIPO_EVENTO[ev.tipo_evento] || ev.tipo_evento}
+                    {ev.cliente_nombre ? ` · ${ev.cliente_nombre}` : ""}
+                    {dias !== null && dias >= 0 ? ` · ${dias === 0 ? "¡es hoy!" : `faltan ${dias} días`}` : ""}
+                  </span>
+                </td>
+                <td className="px-3 py-2.5 hidden md:table-cell">
+                  <BarraEtapa etapa={ev.etapa} atrasado={atrasado} />
+                  <span className={`block text-[12.5px] mt-1 ${atrasado ? "text-red-700 font-medium" : "text-ink-suave"}`}>
+                    {ETAPAS[ev.etapa]}
+                    {atrasado ? " · atrasado" : ""}
+                  </span>
+                </td>
+                <td className="px-3 py-2.5 hidden lg:table-cell tabular-nums">{ev.invitados ? `${ev.enviados || 0} de ${ev.invitados}` : <span className="text-ink-tenue">—</span>}</td>
+                <td className="px-3 py-2.5 hidden sm:table-cell">
+                  {ev.valor_total ? (
+                    <span className="tabular-nums">
+                      <span className={`font-semibold ${pagado ? "text-emerald-700" : "text-ink"}`}>{peso(ev.pagado)}</span>
+                      <span className="text-[12.5px] text-ink-tenue"> de {peso(ev.valor_total)}</span>
+                    </span>
+                  ) : (
+                    <span className="text-ink-tenue">Sin valor</span>
+                  )}
+                </td>
+                <td className="px-3 py-2.5">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEntrar(ev);
+                    }}
+                    className="grid place-items-center w-8 h-8 rounded-full hover:bg-paper text-ink-suave"
+                    title="Entrar al evento"
+                    aria-label={`Entrar a ${ev.nombre}`}
+                  >
+                    <Icono nombre="flecha" className="w-4 h-4" />
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function Dato({ etiqueta, valor, nota, tono = "" }) {
+  return (
+    <div className="tarjeta px-5 py-4">
+      <p className="text-[11.5px] uppercase tracking-[.12em] font-semibold text-ink-tenue">{etiqueta}</p>
+      <p className={`font-display text-[1.75rem] leading-tight tabular-nums ${tono || "text-ink"}`}>{valor}</p>
+      {nota && <p className="text-[13px] text-ink-suave">{nota}</p>}
+    </div>
+  );
+}
+
 export default function Produccion({ onElegirEvento }) {
   const toast = useToast();
   const [eventos, setEventos] = useState(null);
@@ -336,6 +437,7 @@ export default function Produccion({ onElegirEvento }) {
   const [plantillas, setPlantillas] = useState([]);
   const [creando, setCreando] = useState(false);
   const [recienCreado, setRecienCreado] = useState(null); // { inv, clave }
+  const [elegido, setElegido] = useState(null);
 
   const cargar = () => api.crm.produccion().then(setEventos).catch((e) => toast(e.message, "error"));
   useEffect(() => {
@@ -354,9 +456,24 @@ export default function Produccion({ onElegirEvento }) {
     filtro === "activos" ? e.etapa !== "realizado" : filtro === "realizados" ? e.etapa === "realizado" : e.etapa === filtro
   );
   const conteo = (k) => (eventos || []).filter((e) => e.etapa === k).length;
-  const porCobrar = (eventos || [])
-    .filter((e) => e.etapa !== "realizado" && e.valor_total)
-    .reduce((s, e) => s + Math.max(0, e.valor_total - e.pagado), 0);
+  const conSaldo = (eventos || []).filter((e) => e.etapa !== "realizado" && e.valor_total && e.valor_total > e.pagado);
+  const porCobrar = conSaldo.reduce((s, e) => s + Math.max(0, e.valor_total - e.pagado), 0);
+  const atrasados = (eventos || []).filter((e) => {
+    const d = diasHasta(e.fecha_evento);
+    return d !== null && d <= 10 && ["datos", "diseno", "revision"].includes(e.etapa);
+  });
+  const proximos = (eventos || [])
+    .filter((e) => e.etapa !== "realizado" && diasHasta(e.fecha_evento) !== null && diasHasta(e.fecha_evento) >= 0)
+    .sort((a, b) => diasHasta(a.fecha_evento) - diasHasta(b.fecha_evento));
+  const estaSemana = proximos.filter((e) => diasHasta(e.fecha_evento) <= 7);
+  const abierto = (eventos || []).find((e) => e.id === elegido) || null;
+  const ordenados = [...visibles].sort((a, b) => {
+    const da = diasHasta(a.fecha_evento);
+    const db = diasHasta(b.fecha_evento);
+    if (da === null) return 1;
+    if (db === null) return -1;
+    return filtro === "realizados" ? db - da : da - db;
+  });
 
   return (
     <div>
@@ -368,12 +485,6 @@ export default function Produccion({ onElegirEvento }) {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          {porCobrar > 0 && (
-            <div className="text-right">
-              <p className="etiqueta !mb-0">Por cobrar</p>
-              <p className="font-display text-2xl text-marca-dark tabular-nums">{peso(porCobrar)}</p>
-            </div>
-          )}
           {!creando && !recienCreado && (
             <button className="boton-primario" onClick={() => setCreando(true)}>
               <Icono nombre="mas" className="w-3.5 h-3.5" />
@@ -401,6 +512,22 @@ export default function Produccion({ onElegirEvento }) {
           />
         </div>
       ) : null}
+      {eventos && eventos.length > 0 && (
+        <div className="grid sm:grid-cols-3 gap-3 mb-5">
+          <Dato etiqueta="Por cobrar" valor={peso(porCobrar)} nota={conSaldo.length ? `${conSaldo.length} ${conSaldo.length === 1 ? "saldo pendiente" : "saldos pendientes"}` : "Todo al día"} />
+          <Dato
+            etiqueta="Atrasados"
+            valor={atrasados.length ? `${atrasados.length} ${atrasados.length === 1 ? "evento" : "eventos"}` : "Ninguno"}
+            nota={atrasados.length ? atrasados.map((e) => e.nombre).slice(0, 2).join(", ") : "Nada en riesgo"}
+            tono={atrasados.length ? "text-red-700" : ""}
+          />
+          <Dato
+            etiqueta="Esta semana"
+            valor={estaSemana.length ? `${estaSemana.length} ${estaSemana.length === 1 ? "evento" : "eventos"}` : "Ninguno"}
+            nota={proximos[0] ? `El próximo: ${proximos[0].nombre}, ${fechaCorta(proximos[0].fecha_evento)}` : "Sin eventos próximos"}
+          />
+        </div>
+      )}
       <div className="flex gap-1.5 overflow-x-auto pb-2 mb-4">
         <button onClick={() => setFiltro("activos")} className={`chip-filtro shrink-0 ${filtro === "activos" ? "chip-filtro-activo" : ""}`}>
           En curso
@@ -429,23 +556,38 @@ export default function Produccion({ onElegirEvento }) {
           <p className="ayuda mt-1">Cuando un cliente firme, conviértelo en evento desde su ficha y aparece en esta lista.</p>
         </div>
       ) : (
-        <div className="flex flex-col gap-3">
-          {visibles.map((ev) =>
-            ev.plantilla ? (
+        filtro === "plantillas" ? (
+          <div className="flex flex-col gap-3">
+            {visibles.map((ev) => (
               <div key={ev.id} className="tarjeta-lista p-4 flex items-center gap-3">
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-ink truncate">{ev.nombre}</p>
-                  <p className="text-[11px] text-ink-tenue">{NOMBRE_TIPO_EVENTO[ev.tipo_evento] || ev.tipo_evento} · plantilla para eventos nuevos</p>
+                  <p className="text-[12.5px] text-ink-tenue">{NOMBRE_TIPO_EVENTO[ev.tipo_evento] || ev.tipo_evento} · plantilla para eventos nuevos</p>
                 </div>
                 <button onClick={() => entrar(ev)} className="boton-secundario">
                   Abrir →
                 </button>
               </div>
-            ) : (
-            <TarjetaProduccion key={ev.id} ev={ev} metodos={metodos} onCambio={cargar} onEntrar={entrar} />
-            )
-          )}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className={`grid gap-5 items-start ${abierto ? "xl:grid-cols-[minmax(0,1fr)_27rem]" : ""}`}>
+            <TablaEventos eventos={ordenados} elegido={abierto?.id} onElegir={(ev) => setElegido(ev.id === elegido ? null : ev.id)} onEntrar={entrar} />
+            {abierto && (
+              <>
+                <div className="xl:hidden fixed inset-0 z-40 bg-ink/40" onClick={() => setElegido(null)} />
+                <aside className="fixed xl:sticky inset-x-0 bottom-0 xl:top-4 z-50 xl:z-auto max-h-[85vh] xl:max-h-[calc(100vh-2rem)] overflow-y-auto bg-paper rounded-t-3xl xl:rounded-2xl shadow-flotante xl:shadow-tarjeta xl:border xl:border-[#F2E9DC] p-5">
+                  <div className="flex justify-end mb-1">
+                    <button onClick={() => setElegido(null)} className="grid place-items-center w-8 h-8 rounded-full hover:bg-lienzo text-ink-suave" aria-label="Cerrar el detalle">
+                      <Icono nombre="cerrar" className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <TarjetaProduccion key={abierto.id} enPanel ev={abierto} metodos={metodos} onCambio={cargar} onEntrar={entrar} />
+                </aside>
+              </>
+            )}
+          </div>
+        )
       )}
     </div>
   );
