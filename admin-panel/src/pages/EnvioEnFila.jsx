@@ -11,14 +11,14 @@ import { enlaceWhatsApp, normalizarTelefono } from "../whatsapp";
 // armarItems(tipo) es el mismo armado del envío automático (misma plantilla,
 // mismo enlace, mismo grupo elegido), con la invitación de cada mensaje.
 
-export default function EnvioEnFila({ armarItems, onCambio, onCerrar }) {
+export default function EnvioEnFila({ armarItems, onCambio, onCerrar, tipoInicial = "invitacion" }) {
   const toast = useToast();
-  const [tipo, setTipo] = useState("invitacion");
+  const [tipo, setTipo] = useState(tipoInicial);
   const [indice, setIndice] = useState(0);
   const [abiertos, setAbiertos] = useState(() => new Set());
   // Se arma al elegir el tipo y queda fijo mientras se envía: si la lista se
   // recalculara al marcar cada enviada, el siguiente se saltaría solo.
-  const [fila, setFila] = useState(() => armarItems("invitacion"));
+  const [fila, setFila] = useState(() => armarItems(tipoInicial));
   // Cuántos hay de cada tipo ahora mismo (para los botones de arriba).
   const cuenta = { invitacion: armarItems("invitacion").length, recordatorio: armarItems("recordatorio").length };
 

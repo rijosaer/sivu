@@ -910,6 +910,9 @@ recursosRouter.get(
          count(*) FILTER (WHERE tipo = 'pareja')::int AS parejas,
          count(*) FILTER (WHERE tipo = 'familia')::int AS familias,
          count(*) FILTER (WHERE tipo = 'cupos')::int AS con_cupos,
+         -- Enviadas y abiertas: alimentan «¿Ya les llegó?» en el inicio del evento.
+         count(*) FILTER (WHERE enviado_en IS NOT NULL)::int AS enviadas,
+         count(*) FILTER (WHERE abierto_en IS NOT NULL)::int AS abiertas,
          -- Cupos que siguen sin nombre: es el margen de gente que todavía
          -- podría llegar, y el catering necesita saberlo.
          COALESCE(sum(cupos) FILTER (WHERE tipo = 'cupos'), 0)::int AS cupos_totales,

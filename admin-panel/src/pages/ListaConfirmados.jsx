@@ -79,7 +79,7 @@ function hoyBogota() {
   }).format(new Date());
 }
 
-export default function ListaConfirmados() {
+export default function ListaConfirmados({ abrirExportar = false }) {
   const [filas, setFilas] = useState(null);
   const [filtro, setFiltro] = useState("confirmado");
   const [busqueda, setBusqueda] = useState("");
@@ -99,6 +99,15 @@ export default function ListaConfirmados() {
   const [evento, setEvento] = useState({});
   const [tema, setTema] = useState({});
   const [exportando, setExportando] = useState(false);
+  // Desde el inicio del evento («Descargar lista para el catering») se llega
+  // con la descarga ya abierta, en cuanto la lista termina de cargar.
+  const [yaAbierto, setYaAbierto] = useState(false);
+  useEffect(() => {
+    if (abrirExportar && filas && !yaAbierto) {
+      setYaAbierto(true);
+      setExportando(true);
+    }
+  }, [abrirExportar, filas, yaAbierto]);
 
   useEffect(() => {
     let vivo = true;

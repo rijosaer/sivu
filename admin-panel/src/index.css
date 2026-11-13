@@ -40,7 +40,8 @@
   .subnav-activo { @apply bg-paper text-marca-dark font-medium shadow-tarjeta hover:text-marca-dark; }
 
   /* ---------- Superficies ---------- */
-  .tarjeta { @apply bg-paper border border-borde rounded-2xl shadow-tarjeta; }
+  /* Profundidad con sombra suave en vez de un borde marcado en todo. */
+  .tarjeta { @apply bg-paper border border-[#F2E9DC] rounded-2xl shadow-tarjeta; }
   .tarjeta-lista { @apply bg-paper border border-borde rounded-2xl shadow-tarjeta transition-colors hover:border-borde-fuerte; }
   .panel-titulo { @apply font-display text-[2rem] sm:text-[2.4rem] leading-[1.05] font-medium tracking-[-.02em] text-ink; text-wrap: balance; }
   .panel-subtitulo { @apply text-sm text-ink-suave mt-2 max-w-[62ch]; }
@@ -82,12 +83,44 @@
   /* ---------- Bandeja de WhatsApp ----------
      Ocupa el alto de la pantalla: la lista y la conversación hacen scroll por
      dentro, como en WhatsApp Web. */
-  .bandeja { height: calc(100dvh - 4.25rem - 3.6rem); }
-  @media (min-width: 1024px) { .bandeja { height: calc(100dvh - 4.25rem - 5rem); min-height: 32rem; } }
+  .bandeja { height: calc(100dvh - 3.6rem - 3.6rem - 5rem); }
+  @media (min-width: 1024px) { .bandeja { height: calc(100dvh - 5rem); min-height: 32rem; } }
   .bandeja-fondo { background-color: #F7EFE3; background-image: radial-gradient(circle at 1px 1px, rgb(155 31 62 / .06) 1px, transparent 0); background-size: 18px 18px; }
 
   /* ---------- Tablas ---------- */
   .tabla { @apply w-full text-sm border-collapse; }
   .tabla thead th { @apply text-left px-3 py-2 font-medium text-[11px] uppercase tracking-[.08em] text-ink-tenue bg-lienzo; }
   .tabla tbody td { @apply px-3 py-2 border-t border-borde align-top; }
+
+  /* ---------- Menú del panel (fijo, colapsable) ---------- */
+  .menu { @apply hidden lg:flex flex-col shrink-0 sticky top-0 h-screen overflow-y-auto text-[#F6E7D8] transition-[width] duration-200; width: 15.5rem; background-image: linear-gradient(170deg, #4A0C20 0%, #3A0918 55%, #2E0713 100%); }
+  .menu-colapsado { width: 4.75rem; }
+  .menu-item { @apply relative w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[14px] text-[#E9D5CB] hover:bg-white/[.07] hover:text-white transition-colors; }
+  .menu-item-activo { @apply bg-white/[.12] text-white font-medium hover:bg-white/[.12]; }
+  .menu-item-activo .icono-nav { @apply text-oro opacity-100; }
+  .boton-menu { @apply grid place-items-center w-7 h-7 rounded-lg bg-white/[.08] text-[#F6E7D8] hover:bg-white/[.16] transition-colors shrink-0; }
+  .buscar-menu { @apply w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white/[.08] text-[13.5px] text-[#E9D5CB] hover:bg-white/[.12] transition-colors; }
+  .contador-flotante { @apply absolute -top-0.5 right-0.5 text-[10px] font-bold bg-oro text-marca-noche rounded-full min-w-[1.1rem] h-[1.1rem] px-1 grid place-items-center tabular-nums; }
+  .contenido-pagina { @apply w-full max-w-[76rem] mx-auto px-5 py-7 sm:px-10 sm:py-9; }
+  .barra-inferior { @apply lg:hidden fixed bottom-0 inset-x-0 z-40 grid grid-cols-4 bg-paper border-t border-borde px-2 pt-2; padding-bottom: calc(.6rem + env(safe-area-inset-bottom)); }
+  .puerta { @apply flex flex-col items-center gap-1 text-[12.5px] text-ink-suave; }
+  .puerta-icono { @apply relative grid place-items-center px-4 py-1 rounded-full; }
+  .puerta-activa { @apply text-marca font-semibold; }
+  .puerta-activa .puerta-icono { @apply bg-marca-suave; }
+  .hoja-inferior { @apply w-full bg-paper rounded-t-3xl px-5 pt-3; padding-bottom: calc(1.5rem + env(safe-area-inset-bottom)); }
+
+  /* ---------- Cabecera del evento ---------- */
+  .franja-evento { @apply flex items-center gap-5 px-5 sm:px-10 py-5; }
+  .chip-franja { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-[12.5px] font-medium; }
+  .boton-franja { @apply inline-flex items-center gap-2 px-3.5 py-2 rounded-full border text-[13px] font-medium hover:opacity-90 transition-opacity; }
+  .pestanas-evento { @apply flex items-end gap-6 px-5 sm:px-10 overflow-x-auto; scrollbar-width: none; }
+  .pestana-evento { @apply relative flex items-center gap-2.5 pt-3.5 pb-3 shrink-0; }
+  .pestana-evento::after { content: ""; @apply absolute left-0 right-0 bottom-0 h-[3px] rounded-t bg-transparent transition-colors; }
+  .pestana-evento:hover::after { @apply bg-borde-fuerte; }
+  .pestana-evento[aria-current="page"]::after { @apply bg-marca; }
+  .estado-paso { @apply grid place-items-center w-6 h-6 rounded-full text-[11.5px] font-semibold shrink-0; }
+  .contenido-evento { @apply w-full max-w-[80rem] px-5 py-6 sm:px-10 sm:py-7; }
+  /* Dentro del evento la cabecera ya dice dónde se está: los títulos de cada
+     parte van más discretos. */
+  .contenido-evento .panel-titulo { @apply text-[1.6rem] sm:text-[1.75rem]; }
 }

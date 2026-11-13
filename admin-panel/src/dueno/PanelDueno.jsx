@@ -25,7 +25,7 @@ const TABS = [
 // Direcciones de antes: siguen funcionando.
 const ANTES = { produccion: "eventos" };
 
-export default function PanelDueno({ tramos = [], onElegir, onSalir }) {
+export default function PanelDueno({ tramos = [], onElegir, onSalir, usuario }) {
   const pedida = ANTES[tramos[0]] || tramos[0];
   const tab = TABS.some((t) => t.key === pedida) ? pedida : "hoy";
   const sub = tramos[1] || null;
@@ -50,16 +50,15 @@ export default function PanelDueno({ tramos = [], onElegir, onSalir }) {
     mensajes: tablero?.hoy.sinLeer || 0,
     eventos: tablero ? tablero.hoy.atrasados.length + tablero.hoy.saldos.length : 0,
   };
-  const actual = TABS.find((t) => t.key === tab);
 
   return (
     <Marco
-      items={TABS.map((t) => ({ ...t, contador: contador[t.key] }))}
       activo={tab}
+      contadores={contador}
       onIr={irA}
       onSalir={onSalir}
-      titulo={actual.label}
-      descripcion={actual.descripcion}
+      onAbrirEvento={onElegir}
+      usuario={usuario}
     >
       <Suspense fallback={<p className="text-sm text-ink-tenue">Cargando...</p>}>
         {tab === "hoy" && <Hoy tablero={tablero} irA={irA} onCambio={cargarTablero} />}

@@ -7,6 +7,43 @@
 // Todos comparten caja de 24, trazo de 1.6 y `currentColor`, para que hereden
 // el color del texto y se vean parejos a cualquier tamaño.
 const TRAZOS = {
+  // «mas» y «volver» ya se usaban en varias pantallas sin estar dibujados (no
+  // salía nada); los demás son del panel nuevo: pestañas del evento y menú.
+  mas: <path d="M12 5v14M5 12h14" />,
+  volver: <path d="M15 18l-6-6 6-6" />,
+  flecha: <path d="M9 6l6 6-6 6" />,
+  cerrar: <path d="M6 6l12 12M18 6L6 18" />,
+  check: <path d="M5 12.5l4.5 4.5L19 7" />,
+  inicio: <path d="M4 10.5L12 4l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5.5h-5V20H5a1 1 0 0 1-1-1v-8.5z" />,
+  envio: (
+    <>
+      <path d="M21 3L10 14" />
+      <path d="M21 3l-7 18-4-7-7-4 18-7z" />
+    </>
+  ),
+  respuesta: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M8 12.5l2.7 2.7L16 9.8" />
+    </>
+  ),
+  regalo: (
+    <>
+      <rect x="3.5" y="8" width="17" height="4" rx="1" />
+      <path d="M5 12v7.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V12M12 8v12.5" />
+      <path d="M12 8C10.5 4.5 7 4.5 7 6.5S10 8 12 8zM12 8c1.5-3.5 5-3.5 5-1.5S14 8 12 8z" />
+    </>
+  ),
+  personas: (
+    <>
+      <circle cx="9" cy="8" r="3.2" />
+      <path d="M3.5 19c.6-3 2.8-4.6 5.5-4.6s4.9 1.6 5.5 4.6" />
+      <path d="M15.5 5.2a3 3 0 0 1 0 5.6M17 14.6c1.9.5 3.1 2 3.5 4.4" />
+    </>
+  ),
+  colapsar: <path d="M11 17l-5-5 5-5M18 17l-5-5 5-5" />,
+  expandir: <path d="M13 17l5-5-5-5M6 17l5-5-5-5" />,
+  menu: <path d="M4 7h16M4 12h16M4 17h16" />,
   resumen: (
     <>
       <rect x="3" y="3" width="7" height="9" rx="1.5" />

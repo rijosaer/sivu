@@ -29,12 +29,13 @@ export default {
         ink: {
           DEFAULT: "#1C1712",
           suave: "#6B5F52",
-          tenue: "#9A8C7C",
+          // Más oscuro que antes (#9A8C7C): el gris claro no se leía bien.
+          tenue: "#786A5B",
         },
         borde: { DEFAULT: "#EFE4D3", fuerte: "#E3D4BD" },
       },
       boxShadow: {
-        tarjeta: "0 1px 2px rgb(60 20 20 / .04), 0 8px 24px -18px rgb(60 20 20 / .18)",
+        tarjeta: "0 1px 2px rgb(92 15 39 / .04), 0 10px 28px -8px rgb(92 15 39 / .07)",
         flotante: "0 18px 40px -16px rgb(60 20 20 / .35)",
       },
     },

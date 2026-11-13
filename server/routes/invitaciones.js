@@ -76,7 +76,7 @@ invitacionesRouter.get(
     // El dueño ve todos los eventos; un cliente, solo el suyo.
     const soloUno = req.admin.invitacionId || null;
     const { rows } = await pool.query(
-      `SELECT id, slug, nombre, tipo_evento, diseno, diseno_variante, fecha_evento, activo, es_plantilla, solo_codigo, avisos_whatsapp, creado_en
+      `SELECT id, slug, nombre, tipo_evento, diseno, diseno_variante, fecha_evento, activo, es_plantilla, solo_codigo, avisos_whatsapp, etapa, creado_en
        FROM invitaciones WHERE ($1::int IS NULL OR id = $1) ORDER BY creado_en DESC`,
       [soloUno]
     );

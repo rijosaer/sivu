@@ -46,10 +46,10 @@ function duracionEstimada(n, ritmo) {
 const hora = (iso) =>
   new Date(iso).toLocaleTimeString("es-CO", { hour: "numeric", minute: "2-digit", timeZone: "America/Bogota" });
 
-export default function EnvioAutomatico({ armarItems, onCambio, onCerrar }) {
+export default function EnvioAutomatico({ armarItems, onCambio, onCerrar, tipoInicial = "invitacion" }) {
   const toast = useToast();
   const [info, setInfo] = useState(null);
-  const [tipo, setTipo] = useState("invitacion");
+  const [tipo, setTipo] = useState(tipoInicial);
   const [ocupado, setOcupado] = useState(false);
   const [error, setError] = useState("");
 
