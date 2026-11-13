@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { WhatsappSivu } from "../pages/SelectorEventos";
 import { ir } from "../ruta";
 import { api } from "../api";
@@ -50,7 +50,11 @@ function proximaAtencion(h) {
   return "en cuanto podamos";
 }
 
+const SeccionActiva = createContext(null);
+
 function Bloque({ id, titulo, ayuda, children, onGuardar, guardando, sucio }) {
+  const activa = useContext(SeccionActiva);
+  if (activa && id && activa !== id) return null;
   return (
     <section id={id ? `cfg-${id}` : undefined} className="tarjeta p-5 mb-5 scroll-mt-28">
       <div className="flex items-start justify-between gap-3 mb-4 flex-wrap">
@@ -204,11 +208,15 @@ function MetodoPago({ m, onCambio, onQuitar, onSubir, primero }) {
   );
 }
 
-const SECCIONES = [
-  ["whatsapp-sivu", "WhatsApp de Sivú"], ["horario", "Horario"], ["mensaje", "Mensaje automático"], ["avisos", "Avisos"], ["reporte", "Reporte"],
-  ["whatsapp", "WhatsApp"], ["seguimientos", "Seguimientos"], ["respuestas", "Respuestas"], ["planes", "Planes"],
-  ["pagos", "Métodos de pago"], ["cotizaciones", "Cotizaciones"],
+// Agrupadas por para qué sirven; antes eran 11 botones seguidos y una página
+// larguísima con todo junto.
+const GRUPOS = [
+  ["Atención al cliente", [["horario", "Horario de atención"], ["mensaje", "Mensaje automático"], ["respuestas", "Respuestas listas"], ["seguimientos", "Seguimientos"]]],
+  ["Avisos", [["avisos", "Avisos al equipo"], ["reporte", "Reporte de la mañana"]]],
+  ["Ventas", [["planes", "Planes y extras"], ["cotizaciones", "Cotizaciones"], ["pagos", "Métodos de pago"]]],
+  ["WhatsApp", [["whatsapp-sivu", "Conexión"], ["whatsapp", "Orden de los chats"]]],
 ];
+const SECCIONES = GRUPOS.flatMap(([, l]) => l);
 
 export default function Configuracion({ seccion }) {
   const toast = useToast();
@@ -224,11 +232,8 @@ export default function Configuracion({ seccion }) {
     });
   }, []);
 
-  // /configuracion/pagos lleva directo a ese bloque.
-  useEffect(() => {
-    if (!a || !seccion) return;
-    document.getElementById(`cfg-${seccion}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [Boolean(a), seccion]);
+  // /configuracion/pagos abre ese bloque; sin sección, el primero.
+  const activa = SECCIONES.some(([k]) => k === seccion) ? seccion : SECCIONES[0][0];
 
   if (!a) return <p className="text-sm text-ink-tenue">Cargando...</p>;
   const orig = JSON.parse(original);
@@ -257,25 +262,51 @@ export default function Configuracion({ seccion }) {
     proxima_atencion: proximaAtencion(a.horario),
   });
 
-  return (
-    <div>
-      <h2 className="panel-titulo">Configuración</h2>
-      <p className="panel-subtitulo mb-4">Textos, horario, avisos, reporte, respuestas y precios. Todo se cambia aquí.</p>
-      <div className="flex gap-1.5 overflow-x-auto pb-2 mb-4">
-        {SECCIONES.map(([k, t]) => (
-          <button
-            key={k}
-            onClick={() => (seccion === k ? document.getElementById(`cfg-${k}`)?.scrollIntoView({ behavior: "smooth" }) : ir(`/configuracion/${k}`, { reemplazar: true }))}
-            className={`chip-filtro shrink-0 ${seccion === k ? "chip-filtro-activo" : ""}`}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
+  const titulo = SECCIONES.find(([k]) => k === activa)?.[1];
 
-      <section id="cfg-whatsapp-sivu" className="scroll-mt-28">
-        <WhatsappSivu />
-      </section>
+  return (
+    <div className="grid lg:grid-cols-[15rem_minmax(0,1fr)] gap-6 lg:gap-10 items-start">
+      <nav className="lg:sticky lg:top-6" aria-label="Secciones de configuración">
+        <h2 className="panel-titulo !text-[2rem] mb-4">Configuración</h2>
+        {/* En el celular, una lista desplegable; en la computadora, el menú agrupado. */}
+        <select className="campo lg:hidden mb-2" value={activa} onChange={(e) => ir(`/configuracion/${e.target.value}`, { reemplazar: true })} aria-label="Sección">
+          {GRUPOS.map(([g, l]) => (
+            <optgroup key={g} label={g}>
+              {l.map(([k, t]) => (
+                <option key={k} value={k}>
+                  {t}
+                </option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
+        <div className="hidden lg:flex flex-col gap-0.5">
+          {GRUPOS.map(([g, l]) => (
+            <div key={g} className="mb-3">
+              <p className="px-3 pb-1.5 text-[11.5px] uppercase tracking-[.14em] font-semibold text-ink-tenue">{g}</p>
+              {l.map(([k, t]) => (
+                <button
+                  key={k}
+                  onClick={() => ir(`/configuracion/${k}`, { reemplazar: true })}
+                  aria-current={activa === k ? "page" : undefined}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-[14px] transition-colors ${activa === k ? "bg-marca-suave text-marca font-semibold" : "text-ink hover:bg-paper"}`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+      </nav>
+
+      <div className="min-w-0">
+        <p className="font-display text-[1.6rem] text-ink mb-4 hidden lg:block">{titulo}</p>
+        <SeccionActiva.Provider value={activa}>
+      {activa === "whatsapp-sivu" && (
+        <section id="cfg-whatsapp-sivu">
+          <WhatsappSivu />
+        </section>
+      )}
 
       <Bloque
         id="horario"
@@ -707,6 +738,8 @@ export default function Configuracion({ seccion }) {
           </label>
         </div>
       </Bloque>
+        </SeccionActiva.Provider>
+      </div>
     </div>
   );
 }
