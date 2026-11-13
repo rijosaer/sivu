@@ -284,23 +284,47 @@ export default function Regalos() {
   if (error) return <p className="text-sm text-red-600">{error}</p>;
   if (!datos) return null;
 
+  const cuenta = (modo) => invitados.filter((i) => (i.regalo_modo || "") === modo).length;
+  const apartadas = (datos.opciones || []).filter((o) => o.reservado_por).length;
+
   return (
-    <div className="space-y-4 max-w-2xl">
+    <div className="flex flex-col gap-5">
       <div>
         <h2 className="panel-titulo">Regalos</h2>
-        <p className="panel-subtitulo">Elige qué ve cada invitado en su enlace personal.</p>
+        <p className="panel-subtitulo">
+          Qué regalo ve cada invitado en su enlace personal. Lo que alguien aparta de la lista ya no lo puede tomar otro.
+        </p>
       </div>
-      <Ajustes inicial={datos.config} onGuardado={cargar} />
-      <Opciones opciones={datos.opciones} onCambio={cargar} />
-      <Asignar
-        invitados={invitados}
-        onCambio={(act) => {
-          setInvitados((l) => l.map((i) => (i.id === act.id ? { ...i, ...act } : i)));
-          // Cambiar el modo puede soltar una opción apartada (y asignar a
-          // varios de una vez cambia más de una fila).
-          cargar();
-        }}
-      />
+      {/* Cuántas invitaciones tienen cada tipo de regalo, de un vistazo. */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3">
+        {MODOS.map(([valor, etiqueta]) => (
+          <div key={valor} className="tarjeta px-4 py-3">
+            <p className="text-[13px] text-ink-suave">{etiqueta}</p>
+            <p className="flex items-baseline gap-1.5">
+              <span className={`font-display text-[1.7rem] leading-tight tabular-nums ${cuenta(valor) ? "text-ink" : "text-ink-tenue"}`}>{cuenta(valor)}</span>
+              <span className="text-[12.5px] text-ink-tenue">{cuenta(valor) === 1 ? "invitación" : "invitaciones"}</span>
+            </p>
+          </div>
+        ))}
+      </div>
+      <div className="grid xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-5 items-start">
+        <div className="flex flex-col gap-4 min-w-0">
+          <Opciones opciones={datos.opciones} onCambio={cargar} />
+          <Asignar
+            invitados={invitados}
+            onCambio={(act) => {
+              setInvitados((l) => l.map((i) => (i.id === act.id ? { ...i, ...act } : i)));
+              // Cambiar el modo puede soltar una opción apartada (y asignar a
+              // varios de una vez cambia más de una fila).
+              cargar();
+            }}
+          />
+        </div>
+        <div className="min-w-0">
+          <Ajustes inicial={datos.config} onGuardado={cargar} />
+          {apartadas > 0 && <p className="ayuda mt-2">{apartadas} {apartadas === 1 ? "opción apartada" : "opciones apartadas"} de la lista.</p>}
+        </div>
+      </div>
     </div>
   );
 }

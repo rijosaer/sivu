@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect, useMemo, useState } from "react";
-import { api, SITIO_BASE, esEventoFijo } from "../api";
+import { api, SITIO_BASE } from "../api";
 import { useToast } from "../ui/Toast";
 import Icono from "../ui/Icono";
 import {
@@ -14,8 +14,6 @@ import {
 
 // El importador trae el lector de Excel: se carga solo cuando se abre.
 const ImportarInvitados = lazy(() => import("./ImportarInvitados"));
-const EnvioEnFila = lazy(() => import("./EnvioEnFila"));
-const EnvioAutomatico = lazy(() => import("./EnvioAutomatico"));
 
 // Cada tipo se explica por lo que hace el invitado al confirmar, que es lo que
 // de verdad los diferencia. El ejemplo de abajo se muestra al elegirlo.
@@ -406,8 +404,8 @@ function EditarIdentidad({ invitacion, onCambio, onCerrar }) {
 
 // ----------------------------------------------------------------- Tarjeta
 
-function Tarjeta({ invitacion, plantilla, plantillaRecordatorio, cuenta, grupos, onCambio, onBorrar }) {
-  const [abierto, setAbierto] = useState(false);
+function Tarjeta({ invitacion, plantilla, plantillaRecordatorio, cuenta, grupos, onCambio, onBorrar, enPanel = false }) {
+  const [abierto, setAbierto] = useState(enPanel);
   const [editando, setEditando] = useState(false);
   const [copiado, setCopiado] = useState("");
   const [telefono, setTelefono] = useState(invitacion.telefono || "");
@@ -496,7 +494,7 @@ function Tarjeta({ invitacion, plantilla, plantillaRecordatorio, cuenta, grupos,
   }
 
   return (
-    <div className="tarjeta-lista p-4 mb-2.5">
+    <div className={enPanel ? "" : "tarjeta-lista p-4 mb-2.5"}>
       {/* ---- Cabecera: quién es, cómo va y la acción principal ---- */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <button
@@ -584,7 +582,7 @@ function Tarjeta({ invitacion, plantilla, plantillaRecordatorio, cuenta, grupos,
       {/* ---- Detalle: solo cuando hace falta ---- */}
       {abierto && (
         <div className="mt-4 pt-4 border-t border-borde space-y-4">
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className={`grid gap-4 ${enPanel ? "" : "sm:grid-cols-2"}`}>
             <div>
               <span className="etiqueta">WhatsApp</span>
               <input
@@ -943,6 +941,95 @@ function Crear({ grupos, onCreada, onCancelar }) {
 
 const SIN_GRUPO = "__sin_grupo__";
 
+// Estado de la respuesta de una invitación, en una palabra.
+function respuestaDe(i) {
+  const si = i.miembros.filter((m) => m.estado === "confirmado").length;
+  const no = i.miembros.filter((m) => m.estado === "no_asistira").length;
+  const falta = i.miembros.filter((m) => m.estado === "pendiente").length;
+  if (!i.enviado_en && !si && !no) return null;
+  if (!falta) return si ? ["insignia-ok", si === 1 && i.miembros.length === 1 ? "Asiste" : `Asisten ${si}`] : ["insignia-no", "No asiste"];
+  if (si || no) return ["insignia-aviso", `${si} de ${i.miembros.length} van`];
+  return ["insignia-aviso", "Sin responder"];
+}
+
+const REGALO = { sobres: "Sobres", especifico: "Específico", lista: "Lista", enlace: "Enlace" };
+
+// La lista de invitaciones como tabla: se ve todo de un vistazo y al tocar
+// una fila se abre su detalle al lado (antes cada invitación era una tarjeta
+// grande y había que desplegarla para ver o hacer algo).
+function TablaInvitados({ lista, elegida, onElegir }) {
+  return (
+    <div className="tarjeta overflow-hidden">
+      <table className="w-full text-[14px]">
+        <thead className="bg-lienzo text-left text-[11.5px] uppercase tracking-[.1em] text-ink-tenue">
+          <tr>
+            <th className="font-semibold px-4 py-2.5">Invitación</th>
+            <th className="font-semibold px-3 py-2.5 hidden md:table-cell">Grupo</th>
+            <th className="font-semibold px-3 py-2.5 hidden sm:table-cell">Pers.</th>
+            <th className="font-semibold px-3 py-2.5 hidden md:table-cell">Envío</th>
+            <th className="font-semibold px-3 py-2.5">Respuesta</th>
+            <th className="font-semibold px-3 py-2.5 hidden xl:table-cell">Regalo</th>
+          </tr>
+        </thead>
+        <tbody>
+          {lista.map((i) => {
+            const tipo = TIPOS.find((t) => t.key === i.tipo);
+            const resp = respuestaDe(i);
+            const personas = i.tipo === "cupos" ? 1 + (i.cupos || 0) : i.miembros.length;
+            const sel = elegida === i.id;
+            return (
+              <tr
+                key={i.id}
+                onClick={() => onElegir(i)}
+                className={`border-t border-borde cursor-pointer transition-colors ${sel ? "bg-marca-suave" : "hover:bg-lienzo/70"}`}
+              >
+                <td className="px-4 py-2.5">
+                  <button className="text-left" aria-expanded={sel}>
+                    <span className="block font-semibold text-ink">{i.nombre}</span>
+                    <span className="block text-[12.5px] text-ink-suave">{tipo?.label || i.tipo}</span>
+                  </button>
+                </td>
+                <td className="px-3 py-2.5 hidden md:table-cell">
+                  {i.grupo ? <span className="insignia insignia-info">{i.grupo}</span> : <span className="text-ink-tenue">—</span>}
+                </td>
+                <td className="px-3 py-2.5 hidden sm:table-cell tabular-nums">{personas}</td>
+                <td className="px-3 py-2.5 hidden md:table-cell">
+                  {i.enviado_en ? (
+                    <span className="insignia insignia-ok">{fechaLegible(i.enviado_en)}</span>
+                  ) : (
+                    <span className="insignia insignia-neutra">Sin enviar</span>
+                  )}
+                </td>
+                <td className="px-3 py-2.5">{resp ? <span className={`insignia ${resp[0]}`}>{resp[1]}</span> : <span className="text-ink-tenue">—</span>}</td>
+                <td className="px-3 py-2.5 hidden xl:table-cell text-ink-suave">{REGALO[i.regalo_modo] || "—"}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// El detalle de una invitación: al lado de la lista en la computadora (nunca
+// se pierde la lista), y como hoja que sube desde abajo en el celular.
+function PanelDetalle({ onCerrar, children }) {
+  return (
+    <>
+      <div className="lg:hidden fixed inset-0 z-40 bg-ink/40" onClick={onCerrar} />
+      <aside className="fixed lg:sticky inset-x-0 bottom-0 lg:top-4 z-50 lg:z-auto max-h-[85vh] lg:max-h-[calc(100vh-2rem)] overflow-y-auto bg-paper rounded-t-3xl lg:rounded-2xl shadow-flotante lg:shadow-tarjeta lg:border lg:border-[#F2E9DC] p-5">
+        <div className="flex justify-between items-center mb-2">
+          <span className="lg:hidden mx-auto w-10 h-1 rounded-full bg-borde-fuerte" />
+          <button onClick={onCerrar} className="hidden lg:grid place-items-center w-8 h-8 rounded-full hover:bg-lienzo ml-auto text-ink-suave" aria-label="Cerrar el detalle">
+            <Icono nombre="cerrar" className="w-4 h-4" />
+          </button>
+        </div>
+        {children}
+      </aside>
+    </>
+  );
+}
+
 export default function Invitados({ irA }) {
   const toast = useToast();
   const [lista, setLista] = useState([]);
@@ -958,11 +1045,8 @@ export default function Invitados({ irA }) {
   const [grupoVer, setGrupoVer] = useState("");
   const [creando, setCreando] = useState(false);
   const [importando, setImportando] = useState(false);
-  // Envío uno por uno desde el WhatsApp de quien usa el panel (cliente o dueño).
-  const [enFila, setEnFila] = useState(false);
-  // El envío automático sale del número de Sivú: solo lo ve el dueño.
-  const [enviando, setEnviando] = useState(false);
-  const esDueno = !esEventoFijo();
+  // La invitación abierta en el panel lateral (su detalle completo).
+  const [elegida, setElegida] = useState(null);
 
   async function cargar() {
     setCargando(true);
@@ -1070,36 +1154,7 @@ export default function Invitados({ irA }) {
     diasLimite: diasHasta(fechas.fechaLimiteConfirmacion),
   };
 
-  // Mensajes para el envío automático, armados igual que el botón «Enviar por
-  // WhatsApp» de cada tarjeta: misma plantilla, mismo enlace, solo al número
-  // principal.
-  function armarItems(tipo) {
-    const cerrado = plazoCerrado(cuenta.diasLimite);
-    return delGrupo
-      .filter((i) => telefonoValido(i.telefono))
-      .filter((i) =>
-        tipo === "invitacion"
-          ? !i.enviado_en
-          : !cerrado && i.enviado_en && i.miembros.some((m) => m.estado === "pendiente")
-      )
-      .reverse() // la lista va de la más nueva a la más vieja; se envía en el orden en que se crearon
-      .map((i) => ({
-        invitado_id: i.id,
-        nombre: i.nombre,
-        telefono: normalizarTelefono(i.telefono),
-        texto: armarMensaje(tipo === "invitacion" ? plantilla : recordatorio, {
-          nombre: i.familia || i.nombre,
-          enlace: `${SITIO_BASE}?i=${i.codigo}`,
-          cupos: cuposDe(i).total,
-          ...cuenta,
-        }),
-      }));
-  }
-
-  // Refresco silencioso de la lista mientras corre el envío automático.
-  async function cargarLista() {
-    setLista(await api.invitados());
-  }
+  const abierta = lista.find((i) => i.id === elegida) || null;
 
   return (
     <div>
@@ -1113,13 +1168,9 @@ export default function Invitados({ irA }) {
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          {esDueno && (
-            <button onClick={() => setEnviando((v) => !v)} className="boton-secundario">
-              Envío automático
-            </button>
-          )}
-          <button onClick={() => setEnFila((v) => !v)} className="boton-secundario">
-            Enviar uno por uno
+          <button onClick={() => irA?.("envios")} className="boton-secundario">
+            <Icono nombre="envio" className="w-3.5 h-3.5" />
+            Enviar
           </button>
           <button onClick={() => setImportando((v) => !v)} className="boton-secundario">
             Importar desde Excel
@@ -1130,28 +1181,6 @@ export default function Invitados({ irA }) {
           </button>
         </div>
       </div>
-
-      {enviando && (
-        <Suspense fallback={<p className="text-sm text-ink-tenue mb-6">Cargando...</p>}>
-          {grupoVer && (
-            <p className="ayuda mb-2">
-              El envío automático va solo al grupo «{grupoVer === SIN_GRUPO ? "Sin grupo" : grupoVer}».
-            </p>
-          )}
-          <EnvioAutomatico armarItems={armarItems} onCambio={cargarLista} onCerrar={() => setEnviando(false)} />
-        </Suspense>
-      )}
-
-      {enFila && (
-        <Suspense fallback={<p className="text-sm text-ink-tenue mb-6">Cargando...</p>}>
-          {grupoVer && (
-            <p className="ayuda mb-2">
-              Solo el grupo «{grupoVer === SIN_GRUPO ? "Sin grupo" : grupoVer}».
-            </p>
-          )}
-          <EnvioEnFila armarItems={armarItems} onCambio={cargarLista} onCerrar={() => setEnFila(false)} />
-        </Suspense>
-      )}
 
       {importando && (
         <Suspense fallback={<p className="text-sm text-ink-tenue mb-6">Cargando importador...</p>}>
@@ -1227,18 +1256,27 @@ export default function Invitados({ irA }) {
       {cargando ? (
         <p className="text-sm text-ink-tenue">Cargando...</p>
       ) : filtrada.length ? (
-        filtrada.map((inv) => (
-          <Tarjeta
-            key={inv.id}
-            invitacion={inv}
-            plantilla={plantilla}
-            plantillaRecordatorio={recordatorio}
-            cuenta={cuenta}
-            grupos={grupos}
-            onCambio={reemplazar}
-            onBorrar={borrar}
-          />
-        ))
+        <div className={`grid gap-5 items-start ${abierta ? "lg:grid-cols-[minmax(0,1fr)_25rem]" : ""}`}>
+          <TablaInvitados lista={filtrada} elegida={abierta?.id} onElegir={(i) => setElegida(i.id === elegida ? null : i.id)} />
+          {abierta && (
+            <PanelDetalle onCerrar={() => setElegida(null)}>
+              <Tarjeta
+                key={abierta.id}
+                enPanel
+                invitacion={abierta}
+                plantilla={plantilla}
+                plantillaRecordatorio={recordatorio}
+                cuenta={cuenta}
+                grupos={grupos}
+                onCambio={reemplazar}
+                onBorrar={async (id) => {
+                  await borrar(id);
+                  setElegida(null);
+                }}
+              />
+            </PanelDetalle>
+          )}
+        </div>
       ) : (
         <div className="vacio">
           <p className="text-sm text-ink">
@@ -1263,8 +1301,8 @@ export default function Invitados({ irA }) {
       {!cargando && lista.length > 0 && (
         <p className="ayuda mt-5">
           El texto de los WhatsApp se edita en{" "}
-          <button onClick={() => irA?.("mensajes")} className="boton-texto">
-            Invitados → WhatsApp
+          <button onClick={() => irA?.("envios")} className="boton-texto">
+            Envíos
           </button>
           .
         </p>
