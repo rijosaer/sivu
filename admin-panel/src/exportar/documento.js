@@ -36,16 +36,69 @@ export const FORMATOS = [
 ];
 
 export const OPCIONES_INICIALES = {
+  para: "catering",
   formato: "lista",
+  quienes: "confirmado", // confirmado | todos | pendiente | no_asistira
+  grupo: "", // "" = todos los grupos
+  orden: "apellido", // apellido | nombre | invitacion | grupo | respuesta
+  agrupar: "", // "" | grupo (en la lista por persona)
+  columnas: ["restriccion", "observaciones"],
+  estilo: "colores", // colores | sobrio | ahorro
+  letra: "normal", // normal | grande | muy-grande
   portada: true,
-  color: true,
-  restriccion: true,
-  observaciones: true,
-  codigo: true,
-  tamano: "letter",
+  numerar: true,
+  totales: true,
+  fechaCorte: false,
+  tamano: "letter", // letter | a4 | oficio
   orientacion: "portrait",
   notas: "",
 };
+
+// Columnas que se pueden poner o quitar en la lista por persona (el nombre
+// siempre va). El orden del arreglo es el orden en la hoja.
+export const COLUMNAS = [
+  ["estado", "Respuesta"],
+  ["invitacion", "Invitación"],
+  ["grupo", "Grupo"],
+  ["telefono", "Teléfono"],
+  ["restriccion", "Restricción de comida"],
+  ["observaciones", "Observaciones"],
+  ["codigo", "Código"],
+  ["casilla", "Casilla para marcar"],
+];
+
+// Usos listos: se elige para qué es la lista y queda armada; después se puede
+// cambiar cualquier cosa.
+export const USOS = [
+  { key: "catering", label: "Para el catering", para: "Cuántos van y qué no pueden comer", icono: "regalo",
+    opciones: { formato: "lista", quienes: "confirmado", orden: "apellido", agrupar: "", columnas: ["restriccion", "observaciones"], totales: true, letra: "normal", portada: true } },
+  { key: "entrada", label: "Para la entrada", para: "Con casillas para marcar quién llega", icono: "check",
+    opciones: { formato: "lista", quienes: "confirmado", orden: "apellido", agrupar: "", columnas: ["casilla", "invitacion"], totales: false, letra: "grande", portada: false } },
+  { key: "organizadora", label: "Para la organizadora", para: "Por invitación, con teléfonos", icono: "personas",
+    opciones: { formato: "invitaciones", quienes: "todos", orden: "invitacion", agrupar: "", columnas: ["estado", "telefono", "grupo", "restriccion", "observaciones", "codigo"], totales: true, letra: "normal", portada: true } },
+  { key: "mesas", label: "Para las mesas", para: "Agrupada por grupo", icono: "calendario",
+    opciones: { formato: "lista", quienes: "confirmado", orden: "apellido", agrupar: "grupo", columnas: ["invitacion", "restriccion"], totales: true, letra: "normal", portada: false } },
+  { key: "tarjetas", label: "Tarjetas de recepción", para: "Una tarjeta por invitación", icono: "sobre",
+    opciones: { formato: "tarjetas", quienes: "confirmado", orden: "invitacion", agrupar: "", columnas: ["restriccion", "codigo"], totales: false, letra: "normal", portada: false } },
+  { key: "novios", label: "Resumen para los novios", para: "Una página con los números", icono: "respuesta",
+    opciones: { formato: "resumen", quienes: "todos", totales: false, portada: false } },
+];
+
+// De las opciones de la pantalla a las banderas que usan los formatos.
+export function normalizar(o) {
+  const op = { ...OPCIONES_INICIALES, ...o };
+  const col = Array.isArray(op.columnas) ? op.columnas : [];
+  return {
+    ...op,
+    columnas: col,
+    color: op.estilo === "colores",
+    ahorro: op.estilo === "ahorro",
+    codigo: col.includes("codigo"),
+    restriccion: col.includes("restriccion"),
+    observaciones: col.includes("observaciones"),
+    escala: op.letra === "muy-grande" ? 1.4 : op.letra === "grande" ? 1.2 : 1,
+  };
+}
 
 const ESTADOS = {
   confirmado: { etiqueta: "Asiste", tono: "si" },
@@ -118,23 +171,20 @@ function paleta(tema, color) {
 
 function estilos(p, opciones) {
   const alto = opciones.orientacion === "landscape";
-  const medida =
-    opciones.tamano === "a4"
-      ? alto
-        ? { w: "29.7cm", h: "21cm" }
-        : { w: "21cm", h: "29.7cm" }
-      : alto
-        ? { w: "27.9cm", h: "21.6cm" }
-        : { w: "21.6cm", h: "27.9cm" };
+  // Carta, A4 y Oficio (el de Colombia: 21,6 × 33 cm).
+  const base = opciones.tamano === "a4" ? ["21cm", "29.7cm"] : opciones.tamano === "oficio" ? ["21.6cm", "33cm"] : ["21.6cm", "27.9cm"];
+  const medida = alto ? { w: base[1], h: base[0] } : { w: base[0], h: base[1] };
+  const tamPagina = opciones.tamano === "a4" ? "A4" : opciones.tamano === "oficio" ? "21.6cm 33cm" : "letter";
+  const k = opciones.escala || 1;
 
   return `
-    @page { size: ${opciones.tamano === "a4" ? "A4" : "letter"} ${opciones.orientacion}; margin: 14mm; }
+    @page { size: ${tamPagina}${opciones.tamano === "oficio" ? "" : ` ${opciones.orientacion}`}; margin: 14mm; }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       color: ${p.tinta};
-      font-size: 11px;
+      font-size: ${11 * k}px;
       line-height: 1.45;
       /* Sin esto, el navegador quita los fondos al imprimir y las etiquetas de
          estado salen en blanco. */
@@ -153,6 +203,7 @@ function estilos(p, opciones) {
       }
     }
     h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; font-weight: 400; margin: 0; }
+    ${opciones.ahorro ? ".marca, .grupo .tapa, .notas { background: transparent !important; } .portada { padding-top: 10mm; }" : ""}
 
     /* ---------- Portada ---------- */
     .portada { text-align: center; padding: 26mm 0 20mm; page-break-after: always; }
@@ -179,9 +230,16 @@ function estilos(p, opciones) {
     thead { display: table-header-group; }
     th { text-align: left; font-size: 8.5px; letter-spacing: .12em; text-transform: uppercase;
       color: ${p.oroOscuro}; border-bottom: 1px solid ${p.oroClaro}; padding: 0 6px 5px; font-weight: 600; }
-    td { padding: 6px; border-bottom: 1px solid rgba(0,0,0,.07); vertical-align: top; }
+    td { padding: ${6 * k}px 6px; border-bottom: 1px solid rgba(0,0,0,${opciones.ahorro ? ".12" : ".07"}); vertical-align: top; }
     tr { page-break-inside: avoid; }
-    .nombre { font-size: 11.5px; }
+    .nombre { font-size: ${11.5 * k}px; }
+    td.marcar { width: 28px; }
+    td.marcar .casilla { width: ${12 * k}px; height: ${12 * k}px; }
+    .subgrupo td { padding-top: 12px; font-family: Georgia, serif; font-size: ${13 * k}px; color: ${p.oroOscuro}; border-bottom: 1px solid ${p.oroClaro}; }
+    .subgrupo td small { font-family: inherit; font-size: 9px; color: ${p.quiza}; margin-left: 6px; letter-spacing: .06em; }
+    .totales { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+    .totales span { font-size: ${9.5 * k}px; padding: 3px 9px; border-radius: 999px; border: 1px solid ${p.oroClaro};
+      background: ${opciones.color ? "rgba(184,146,74,.08)" : "transparent"}; color: ${p.tinta}; }
     .apagado { color: ${p.quiza}; }
     .num { width: 26px; color: ${p.quiza}; font-variant-numeric: tabular-nums; }
 
@@ -267,46 +325,77 @@ function marca(estado) {
 // ---------------------------------------------------------------- formatos
 
 function cuerpoLista(filas, o, porCodigo) {
-  const cols = ["", "Nombre", "Estado", "Invitación"];
-  if (o.codigo) cols.push("Código");
-  if (o.restriccion) cols.push("Restricción");
-  if (o.observaciones) cols.push("Observaciones");
+  const cols = o.columnas.filter((c) => COLUMNAS.some(([k]) => k === c));
+  const cab = [...(o.numerar ? [""] : []), ...(cols.includes("casilla") ? [""] : []), "Nombre"];
+  for (const c of cols) if (c !== "casilla") cab.push(COLUMNAS.find(([k]) => k === c)[1].replace(" para marcar", ""));
+  const ancho = cab.length;
 
-  const filasHtml = filas
-    .map((f, i) => {
-      // En una individual la persona es la invitación, y en una de pareja el
-      // título ya lleva su nombre: repetirlo no dice nada. Ahí se muestra con
-      // quién viene, que es lo que falta por saber.
-      const grupo = porCodigo?.get(f.codigo);
-      const otros = (grupo?.personas || [])
-        .filter((p) => p.id !== f.id)
-        .map((p) => p.nombre);
-      const contexto = contextoDe(f.nombre, f.invitacion, otros);
+  const fila = (f, i) => {
+    // En una individual la persona es la invitación, y en una de pareja el
+    // título ya lleva su nombre: repetirlo no dice nada. Ahí se muestra con
+    // quién viene, que es lo que falta por saber.
+    const grupo = porCodigo?.get(f.codigo);
+    const otros = (grupo?.personas || []).filter((p) => p.id !== f.id).map((p) => p.nombre);
+    const contexto = contextoDe(f.nombre, f.invitacion, otros);
+    const celdas = [];
+    if (o.numerar) celdas.push(`<td class="num">${i + 1}</td>`);
+    if (cols.includes("casilla")) celdas.push(`<td class="marcar"><span class="casilla"></span></td>`);
+    celdas.push(`<td class="nombre">${esc(f.nombre)}</td>`);
+    for (const c of cols) {
+      if (c === "estado") celdas.push(`<td>${marca(f.estado)}</td>`);
+      if (c === "invitacion") celdas.push(`<td class="apagado">${esc(contexto) || "—"}</td>`);
+      if (c === "grupo") celdas.push(`<td>${esc(f.grupo) || "—"}</td>`);
+      if (c === "telefono") celdas.push(`<td class="apagado">${esc(f.telefono) || "—"}</td>`);
+      if (c === "restriccion") celdas.push(`<td>${esc(f.restriccion) || "—"}</td>`);
+      if (c === "observaciones") celdas.push(`<td class="apagado">${esc(f.comentario) || "—"}</td>`);
+      if (c === "codigo") celdas.push(`<td class="codigo">${esc(f.codigo)}</td>`);
+    }
+    return `<tr>${celdas.join("")}</tr>`;
+  };
 
-      const celdas = [
-        `<td class="num">${i + 1}</td>`,
-        `<td class="nombre">${esc(f.nombre)}</td>`,
-        `<td>${marca(f.estado)}</td>`,
-        `<td class="apagado">${esc(contexto) || "—"}</td>`,
-      ];
-      if (o.codigo) celdas.push(`<td class="codigo">${esc(f.codigo)}</td>`);
-      if (o.restriccion) celdas.push(`<td>${esc(f.restriccion) || "—"}</td>`);
-      if (o.observaciones) celdas.push(`<td class="apagado">${esc(f.comentario) || "—"}</td>`);
-      return `<tr>${celdas.join("")}</tr>`;
-    })
-    .join("");
+  let cuerpo;
+  if (o.agrupar === "grupo") {
+    const porGrupo = new Map();
+    for (const f of filas) {
+      const g = (f.grupo || "").trim() || "Sin grupo";
+      if (!porGrupo.has(g)) porGrupo.set(g, []);
+      porGrupo.get(g).push(f);
+    }
+    let n = 0;
+    cuerpo = [...porGrupo.entries()]
+      .map(([g, lista]) => `<tr class="subgrupo"><td colspan="${ancho}">${esc(g)}<small>${lista.length} ${lista.length === 1 ? "persona" : "personas"}</small></td></tr>` + lista.map((f) => fila(f, n++)).join(""))
+      .join("");
+  } else {
+    cuerpo = filas.map(fila).join("");
+  }
 
-  return `<table><thead><tr>${cols
-    .map((c) => `<th>${esc(c)}</th>`)
-    .join("")}</tr></thead><tbody>${filasHtml}</tbody></table>`;
+  return `<table><thead><tr>${cab.map((c) => `<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>${cuerpo}</tbody></table>`;
+}
+
+// Cuántos y qué hay que saber de la comida, en una línea arriba de la lista.
+function totales(filas) {
+  const n = filas.length;
+  const porRestriccion = new Map();
+  for (const f of filas) {
+    const r = (f.restriccion || "").trim();
+    if (!r) continue;
+    const clave = r.toLowerCase();
+    porRestriccion.set(clave, { texto: r, n: (porRestriccion.get(clave)?.n || 0) + 1 });
+  }
+  const partes = [`${n} ${n === 1 ? "persona" : "personas"}`, ...[...porRestriccion.values()].map((x) => `${x.n} ${x.texto.toLowerCase()}`)];
+  return `<div class="totales">${partes.map((t) => `<span>${esc(t)}</span>`).join("")}</div>`;
 }
 
 function cuerpoInvitaciones(grupos, o) {
   return grupos
     .map((g) => {
+      const extra = [
+        o.columnas?.includes("grupo") && g.grupo ? g.grupo : "",
+        o.columnas?.includes("telefono") && g.telefono ? g.telefono : "",
+      ].filter(Boolean);
       const codigo = `<span class="codigo">${esc(g.tipo)}${
         o.codigo ? ` · ${esc(g.codigo)}` : ""
-      }</span>`;
+      }${extra.length ? ` · ${esc(extra.join(" · "))}` : ""}</span>`;
 
       // Una invitación de una sola persona que además le da nombre se pinta en
       // una línea: el encabezado y su única fila decían lo mismo.
@@ -440,7 +529,8 @@ function cuerpoResumen(datos) {
 
 // ------------------------------------------------------------------ armado
 
-export function construirDocumento({ opciones, filas, grupos, datos, evento, tema, etiquetaFiltro }) {
+export function construirDocumento({ opciones: crudas, filas, grupos, datos, evento, tema, etiquetaFiltro }) {
+  const opciones = normalizar(crudas);
   const p = paleta(tema, opciones.color);
   const formato = FORMATOS.find((f) => f.key === opciones.formato) || FORMATOS[0];
 
@@ -469,11 +559,12 @@ export function construirDocumento({ opciones, filas, grupos, datos, evento, tem
 <div class="hoja">
   ${portada(evento, opciones, formato.label, cuantos)}
   ${cabecera(evento, titulo, cuantos)}
-  ${opciones.notas.trim() ? `<p class="notas">${esc(opciones.notas)}</p>` : ""}
+  ${(opciones.notas || "").trim() ? `<p class="notas">${esc(opciones.notas)}</p>` : ""}
+  ${opciones.totales && opciones.formato !== "resumen" ? totales(filas) : ""}
   ${cuerpo}
   <div class="pie-doc">
     <span>${esc(novios || "Invitación")}</span>
-    <span>${esc(formato.label)} · ${esc(hoyLargo())}</span>
+    <span>${opciones.fechaCorte ? `Respuestas hasta el ${esc(hoyLargo())}` : `${esc(formato.label)} · ${esc(hoyLargo())}`}</span>
   </div>
 </div>
 </body></html>`;

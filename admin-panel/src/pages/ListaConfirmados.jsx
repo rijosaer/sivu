@@ -46,6 +46,9 @@ function aplanar(invitaciones) {
         // distinguir una individual de una pareja a la que el filtro le dejó
         // un solo miembro.
         totalMiembros: (inv.miembros || []).length,
+        // Para la descarga: separar por grupo y poner el teléfono.
+        grupo: (inv.grupo || "").trim(),
+        telefono: inv.telefono || "",
       });
     }
   }
@@ -504,6 +507,9 @@ export default function ListaConfirmados({ abrirExportar = false }) {
           datos={{
             filas: visibles,
             grupos: gruposParaPdf,
+            // La descarga elige por su cuenta quiénes salen: recibe a todos.
+            todas: filas,
+            invitaciones,
             datos: datosResumen,
             evento,
             tema,
