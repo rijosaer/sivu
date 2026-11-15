@@ -22,6 +22,16 @@ const TEXTOS_BASE = {
   textoEspecifico: "",
 };
 
+// Si el mensaje de un tipo de regalo queda vacío, sale este: así la sección
+// nunca se ve seca. El panel los muestra como ejemplo en cada casilla.
+export const MENSAJES_DEFECTO = {
+  textoEspecifico: "Tu presencia es nuestro mejor regalo. Si deseas tener un detalle con nosotros, pensamos en este para ti:",
+  textoLista: "Tu presencia es nuestro mejor regalo. Si deseas tener un detalle con nosotros, elige una de estas opciones y apártala; así nadie más la repite.",
+  textoEnlace: "Tu presencia es nuestro mejor regalo. Si deseas tener un detalle con nosotros, aquí encuentras nuestra lista de regalos.",
+  textoSobres: "Tu presencia es nuestro mejor regalo. Si deseas tener un detalle con nosotros, lo recibimos con cariño en lluvia de sobres.",
+};
+const mensaje = (c, clave) => String(c[clave] || "").trim() || MENSAJES_DEFECTO[clave];
+
 export const esSeccionPorInvitado = (s) => s.tipo === "regalos" && s.contenido?.porInvitado === true;
 
 async function seccionRegalos(invitacionId, db = pool) {
@@ -50,18 +60,23 @@ async function opcionesParaInvitado(invitacionId, invitadoId) {
 export async function regaloDeInvitado(invitacionId, invitado) {
   if (!invitado.regalo_modo) return null;
   const seccion = await seccionRegalos(invitacionId);
-  if (!seccion?.activo || !esSeccionPorInvitado(seccion)) return null;
-  const c = { ...TEXTOS_BASE, ...seccion.contenido };
+  // Si nunca se guardó Regalos, valen los textos por defecto: un regalo
+  // específico o una lista con opciones no necesitan nada más para verse.
+  // Solo se oculta si los regalos por invitado se apagaron a propósito, o si
+  // el evento muestra a todos una sección de regalos general (no por invitado).
+  if (seccion && esSeccionPorInvitado(seccion) && !seccion.activo) return null;
+  if (seccion && !esSeccionPorInvitado(seccion) && seccion.activo) return null;
+  const c = { ...TEXTOS_BASE, ...(seccion && esSeccionPorInvitado(seccion) ? seccion.contenido : {}) };
   if (invitado.regalo_modo === "sobres") {
     if (!c.textoSobres && !c.datosSobres) return null;
-    return { tipo: "sobres", titulo: c.titulo, texto: c.textoSobres, datos: c.datosSobres };
+    return { tipo: "sobres", titulo: c.titulo, texto: mensaje(c, "textoSobres"), datos: c.datosSobres };
   }
   if (invitado.regalo_modo === "especifico") {
     if (!invitado.regalo_detalle) return null;
     return {
       tipo: "especifico",
       titulo: c.titulo,
-      texto: c.textoEspecifico,
+      texto: mensaje(c, "textoEspecifico"),
       regalo: invitado.regalo_detalle,
       url: invitado.regalo_url || "",
     };
@@ -71,14 +86,14 @@ export async function regaloDeInvitado(invitacionId, invitado) {
     return {
       tipo: "enlace",
       titulo: c.titulo,
-      texto: c.textoEnlace,
+      texto: mensaje(c, "textoEnlace"),
       url: c.enlaceUrl,
       etiqueta: c.enlaceEtiqueta || TEXTOS_BASE.enlaceEtiqueta,
     };
   }
   const opciones = await opcionesParaInvitado(invitacionId, invitado.id);
   if (!opciones.length) return null;
-  return { tipo: "lista", titulo: c.titulo, texto: c.textoLista, opciones };
+  return { tipo: "lista", titulo: c.titulo, texto: mensaje(c, "textoLista"), opciones };
 }
 
 // Aparta una opción para el invitado, o la suelta si opcionId es null. Cambiar
@@ -144,6 +159,7 @@ regalosRouter.get(
       // Todos los diseños dibujan el regalo personal (componente común).
       disponible: true,
       config: seccion && esSeccionPorInvitado(seccion) ? { ...TEXTOS_BASE, ...seccion.contenido } : { ...TEXTOS_BASE },
+      porDefecto: MENSAJES_DEFECTO,
       opciones,
     });
   })

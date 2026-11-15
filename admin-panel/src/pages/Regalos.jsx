@@ -11,7 +11,7 @@ const MODOS = [
   ["enlace", "Enlace de compra"],
 ];
 
-function Ajustes({ inicial, onGuardado }) {
+function Ajustes({ inicial, porDefecto = {}, onGuardado }) {
   const toast = useToast();
   const [c, setC] = useState(inicial);
   const [ocupado, setOcupado] = useState(false);
@@ -19,6 +19,8 @@ function Ajustes({ inicial, onGuardado }) {
     value: c[clave] || "",
     onChange: (e) => setC({ ...c, [clave]: e.target.value }),
   });
+  // Casilla de mensaje: vacía muestra el que saldrá por defecto.
+  const mensaje = (clave) => ({ ...campo(clave), rows: 3, placeholder: porDefecto[clave] ? `Si lo dejas vacío sale: «${porDefecto[clave]}»` : "Mensaje para estos invitados" });
 
   async function guardar(e) {
     e.preventDefault();
@@ -44,23 +46,23 @@ function Ajustes({ inicial, onGuardado }) {
         <div className="space-y-2">
           <input className="campo" type="url" placeholder="https://tienda.com/mi-lista" {...campo("enlaceUrl")} />
           <input className="campo" placeholder="Texto del botón, por ejemplo: Ver tienda" {...campo("enlaceEtiqueta")} />
-          <textarea className="campo" rows={2} placeholder="Mensaje para estos invitados (opcional)" {...campo("textoEnlace")} />
+          <textarea className="campo" {...mensaje("textoEnlace")} />
         </div>
       </div>
       <div>
         <p className="text-sm font-medium mb-1">Quienes reciben la lista de opciones</p>
-        <textarea className="campo" rows={2} placeholder="Mensaje para estos invitados (opcional)" {...campo("textoLista")} />
+        <textarea className="campo" {...mensaje("textoLista")} />
       </div>
       <div>
         <p className="text-sm font-medium mb-1">Quienes reciben la lluvia de sobres</p>
         <div className="space-y-2">
-          <textarea className="campo" rows={2} placeholder="Ej. Tu presencia es nuestro regalo; si quieres, puedes darnos tu sobre." {...campo("textoSobres")} />
+          <textarea className="campo" {...mensaje("textoSobres")} />
           <input className="campo" placeholder="Datos para aportar, ej. Nequi 300 123 4567 · María Pérez" {...campo("datosSobres")} />
         </div>
       </div>
       <div>
         <p className="text-sm font-medium mb-1">Quienes reciben un regalo específico</p>
-        <textarea className="campo" rows={2} placeholder="Ej. Pensamos en algo especial para ti (cada uno ve el suyo)" {...campo("textoEspecifico")} />
+        <textarea className="campo" {...mensaje("textoEspecifico")} />
       </div>
       <button className="boton-primario" disabled={ocupado}>Guardar</button>
     </form>
@@ -370,7 +372,7 @@ export default function Regalos() {
           />
         </div>
         <div className="min-w-0">
-          <Ajustes inicial={datos.config} onGuardado={cargar} />
+          <Ajustes inicial={datos.config} porDefecto={datos.porDefecto} onGuardado={cargar} />
           {apartadas > 0 && <p className="ayuda mt-2">{apartadas} {apartadas === 1 ? "opción apartada" : "opciones apartadas"} de la lista.</p>}
         </div>
       </div>
