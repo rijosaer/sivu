@@ -34,7 +34,7 @@ async function seccionRegalos(invitacionId, db = pool) {
 
 async function opcionesParaInvitado(invitacionId, invitadoId) {
   const { rows } = await pool.query(
-    `SELECT id, nombre, detalle, reservado_por FROM regalo_opciones
+    `SELECT id, nombre, detalle, url, reservado_por FROM regalo_opciones
      WHERE invitacion_id = $1 ORDER BY orden, id`,
     [invitacionId]
   );
@@ -135,7 +135,7 @@ regalosRouter.get(
   capturar(async (req, res) => {
     const seccion = await seccionRegalos(req.invitacionId);
     const { rows: opciones } = await pool.query(
-      `SELECT o.id, o.nombre, o.detalle, o.orden, o.reservado_por, o.reservado_en, i.nombre AS invitado
+      `SELECT o.id, o.nombre, o.detalle, o.url, o.orden, o.reservado_por, o.reservado_en, i.nombre AS invitado
        FROM regalo_opciones o LEFT JOIN invitados i ON i.id = o.reservado_por
        WHERE o.invitacion_id = $1 ORDER BY o.orden, o.id`,
       [req.invitacionId]
@@ -192,11 +192,15 @@ regalosRouter.put(
   })
 );
 
+// null si falta el nombre o algo es muy largo; { error } si el enlace no sirve.
 function datosOpcion(body) {
   const nombre = texto(body?.nombre, 200);
   const detalle = texto(body?.detalle, 500);
-  if (!String(nombre ?? "").trim() || detalle === null) return null;
-  return { nombre: String(nombre).trim(), detalle: String(detalle ?? "").trim() };
+  const url = texto(body?.url, 1000);
+  if (!String(nombre ?? "").trim() || detalle === null || url === null) return null;
+  const limpio = String(url ?? "").trim();
+  if (!urlValida(limpio)) return { error: "El enlace debe empezar por https://" };
+  return { nombre: String(nombre).trim(), detalle: String(detalle ?? "").trim(), url: limpio };
 }
 
 regalosRouter.post(
@@ -204,13 +208,30 @@ regalosRouter.post(
   capturar(async (req, res) => {
     const datos = datosOpcion(req.body);
     if (!datos) return res.status(400).json({ error: "Escribe el nombre de la opción" });
+    if (datos.error) return res.status(400).json({ error: datos.error });
     const { rows } = await pool.query(
-      `INSERT INTO regalo_opciones (invitacion_id, nombre, detalle, orden)
-       SELECT $1, $2, $3, COALESCE(MAX(orden), 0) + 1 FROM regalo_opciones WHERE invitacion_id = $1
+      `INSERT INTO regalo_opciones (invitacion_id, nombre, detalle, url, orden)
+       SELECT $1, $2, $3, $4, COALESCE(MAX(orden), 0) + 1 FROM regalo_opciones WHERE invitacion_id = $1
        RETURNING id`,
-      [req.invitacionId, datos.nombre, datos.detalle]
+      [req.invitacionId, datos.nombre, datos.detalle, datos.url]
     );
     res.status(201).json(rows[0]);
+  })
+);
+
+// Editar nombre, detalle o enlace sin tocar quién la apartó.
+regalosRouter.put(
+  "/regalos/opciones/:opcionId",
+  capturar(async (req, res) => {
+    const datos = datosOpcion(req.body);
+    if (!datos) return res.status(400).json({ error: "Escribe el nombre de la opción" });
+    if (datos.error) return res.status(400).json({ error: datos.error });
+    const { rowCount } = await pool.query(
+      "UPDATE regalo_opciones SET nombre = $3, detalle = $4, url = $5 WHERE id = $1 AND invitacion_id = $2",
+      [req.params.opcionId, req.invitacionId, datos.nombre, datos.detalle, datos.url]
+    );
+    if (!rowCount) return res.status(404).json({ error: "Opción no encontrada" });
+    res.json({ ok: true });
   })
 );
 

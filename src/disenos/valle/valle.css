@@ -360,6 +360,7 @@
 .va-opcion .va-btn { flex: none; padding: 10px 16px; }
 .va-opcion-nombre { font: 500 18px/1.25 var(--f-titulo); }
 .va-opcion-detalle { margin-top: 2px; font: 300 14px/1.4 var(--f-texto); }
+.va-opcion-enlace { display: inline-block; margin-top: 4px; font: 400 14px/1.4 var(--f-texto); color: var(--azul); text-decoration: underline; text-underline-offset: 3px; }
 .va-opcion-mia { border-color: var(--azul); }
 .va-opcion-ocupada { opacity: .6; }
 .va-opcion-estado { flex: none; font: 400 13px/1 var(--f-texto); }

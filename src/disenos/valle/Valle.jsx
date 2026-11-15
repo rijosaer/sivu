@@ -293,6 +293,11 @@ function RegaloInvitado({ regalo, slug, codigo, onAviso }) {
               <div>
                 <p className="va-opcion-nombre">{o.nombre}</p>
                 {o.detalle && <p className="va-opcion-detalle">{o.detalle}</p>}
+                {o.url && (o.libre || o.mia) && (
+                  <a className="va-opcion-enlace" href={o.url} target="_blank" rel="noopener noreferrer">
+                    Ver dónde comprarlo ↗
+                  </a>
+                )}
                 {o.mia && <p className="va-opcion-detalle">Apartado por ti</p>}
               </div>
               {o.mia ? (

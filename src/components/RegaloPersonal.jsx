@@ -79,6 +79,11 @@ export function ContenidoRegalo({ regalo, slug, codigo, onAviso = () => {} }) {
               <div>
                 <p className="rp-opcion-nombre">{o.nombre}</p>
                 {o.detalle && <p className="rp-opcion-detalle">{o.detalle}</p>}
+                {o.url && (o.libre || o.mia) && (
+                  <a className="rp-opcion-enlace" href={o.url} target="_blank" rel="noopener noreferrer">
+                    Ver dónde comprarlo ↗
+                  </a>
+                )}
                 {o.mia && <p className="rp-opcion-detalle">Apartado por ti</p>}
               </div>
               {o.mia ? (

@@ -71,22 +71,27 @@ function Opciones({ opciones, onCambio }) {
   const toast = useToast();
   const [nombre, setNombre] = useState("");
   const [detalle, setDetalle] = useState("");
+  const [url, setUrl] = useState("");
+  const [editando, setEditando] = useState(null);
 
   async function hacer(accion) {
     try {
       await accion();
       await onCambio();
+      return true;
     } catch (err) {
       toast(err.message, "error");
+      return false;
     }
   }
 
   async function agregar(e) {
     e.preventDefault();
     await hacer(async () => {
-      await api.crearOpcionRegalo({ nombre, detalle });
+      await api.crearOpcionRegalo({ nombre, detalle, url });
       setNombre("");
       setDetalle("");
+      setUrl("");
     });
   }
 
@@ -95,12 +100,31 @@ function Opciones({ opciones, onCambio }) {
       <p className="text-sm font-medium mb-3">Opciones de la lista</p>
       <ul className="divide-y divide-borde mb-3">
         {opciones.map((o) => (
+          editando === o.id ? (
+            <li key={o.id} className="py-2.5">
+              <EditarOpcion
+                opcion={o}
+                onCancelar={() => setEditando(null)}
+                onGuardar={async (datos) => {
+                  if (await hacer(() => api.editarOpcionRegalo(o.id, datos))) setEditando(null);
+                }}
+              />
+            </li>
+          ) : (
           <li key={o.id} className="py-2.5 flex flex-wrap items-center gap-2">
             <div className="flex-1 min-w-[180px]">
               <p className="text-sm">{o.nombre}</p>
               {o.detalle && <p className="ayuda">{o.detalle}</p>}
+              {o.url && (
+                <a href={o.url} target="_blank" rel="noopener noreferrer" className="ayuda underline break-all">
+                  {o.url}
+                </a>
+              )}
               <p className="ayuda">{o.reservado_por ? `Apartado por ${o.invitado}` : "Libre"}</p>
             </div>
+            <button type="button" className="boton-secundario" onClick={() => setEditando(o.id)}>
+              {o.url ? "Editar" : "Editar / poner enlace"}
+            </button>
             {o.reservado_por && (
               <button type="button" className="boton-secundario" onClick={() => hacer(() => api.liberarOpcionRegalo(o.id))}>
                 Liberar
@@ -116,15 +140,40 @@ function Opciones({ opciones, onCambio }) {
               Quitar
             </button>
           </li>
+          )
         ))}
         {!opciones.length && <li className="ayuda py-2">Todavía no hay opciones.</li>}
       </ul>
       <form onSubmit={agregar} className="flex flex-wrap gap-2">
         <input className="campo flex-1 min-w-[180px]" required placeholder="Opción, por ejemplo: Juego de sábanas" value={nombre} onChange={(e) => setNombre(e.target.value)} />
         <input className="campo flex-1 min-w-[180px]" placeholder="Detalle (opcional)" value={detalle} onChange={(e) => setDetalle(e.target.value)} />
+        <input className="campo flex-1 min-w-[220px]" type="url" placeholder="Dónde comprarlo (opcional): https://..." value={url} onChange={(e) => setUrl(e.target.value)} />
         <button className="boton-secundario">Agregar</button>
       </form>
     </div>
+  );
+}
+
+function EditarOpcion({ opcion, onGuardar, onCancelar }) {
+  const [nombre, setNombre] = useState(opcion.nombre);
+  const [detalle, setDetalle] = useState(opcion.detalle || "");
+  const [url, setUrl] = useState(opcion.url || "");
+  return (
+    <form
+      className="flex flex-wrap gap-2"
+      onSubmit={(e) => {
+        e.preventDefault();
+        onGuardar({ nombre, detalle, url });
+      }}
+    >
+      <input className="campo flex-1 min-w-[180px]" required aria-label="Opción" value={nombre} onChange={(e) => setNombre(e.target.value)} />
+      <input className="campo flex-1 min-w-[180px]" aria-label="Detalle" placeholder="Detalle (opcional)" value={detalle} onChange={(e) => setDetalle(e.target.value)} />
+      <input className="campo flex-1 min-w-[220px]" type="url" aria-label="Enlace" placeholder="Dónde comprarlo (opcional): https://..." value={url} onChange={(e) => setUrl(e.target.value)} />
+      <button className="boton-primario">Guardar</button>
+      <button type="button" className="boton-secundario" onClick={onCancelar}>
+        Cancelar
+      </button>
+    </form>
   );
 }
 

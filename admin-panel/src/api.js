@@ -300,6 +300,8 @@ export const api = {
     request(scoped("/regalos/config"), { method: "PUT", body: JSON.stringify(datos) }),
   crearOpcionRegalo: (datos) =>
     request(scoped("/regalos/opciones"), { method: "POST", body: JSON.stringify(datos) }),
+  editarOpcionRegalo: (id, datos) =>
+    request(scoped(`/regalos/opciones/${id}`), { method: "PUT", body: JSON.stringify(datos) }),
   liberarOpcionRegalo: (id) => request(scoped(`/regalos/opciones/${id}/liberar`), { method: "POST" }),
   borrarOpcionRegalo: (id) => request(scoped(`/regalos/opciones/${id}`), { method: "DELETE" }),
 
