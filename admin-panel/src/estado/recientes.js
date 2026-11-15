@@ -20,6 +20,7 @@ export function recordarEvento(evento, extra = {}) {
   const nuevo = {
     id: String(evento.id),
     nombre: evento.nombre,
+    slug: evento.slug || leerRecientes().find((e) => String(e.id) === String(evento.id))?.slug || null,
     fecha: extra.fecha ?? evento.fecha_evento ?? null,
     etapa: extra.etapa ?? null,
     colores: extra.colores ?? leerRecientes().find((e) => String(e.id) === String(evento.id))?.colores ?? null,

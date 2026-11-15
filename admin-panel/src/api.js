@@ -48,16 +48,22 @@ localStorage.removeItem("admin_token");
 // nombre (para mostrarlo sin pedirlo de nuevo al servidor).
 export function setInvitacionActual(inv) {
   localStorage.setItem("invitacion_id", inv.id);
-  localStorage.setItem("invitacion_slug", inv.slug);
+  localStorage.setItem("invitacion_slug", inv.slug || "");
   localStorage.setItem("invitacion_nombre", inv.nombre);
   localStorage.setItem("invitacion_tipo", inv.tipo_evento || "");
+}
+// Un slug guardado como «undefined» (bug del menú de recientes, 2026-11)
+// cuenta como vacío: así el panel lo vuelve a pedir y se arregla solo.
+function slugGuardado() {
+  const s = localStorage.getItem("invitacion_slug") || "";
+  return s === "undefined" || s === "null" ? "" : s;
 }
 export function getInvitacionActual() {
   const id = localStorage.getItem("invitacion_id");
   if (!id) return null;
   return {
     id,
-    slug: localStorage.getItem("invitacion_slug") || "",
+    slug: slugGuardado(),
     nombre: localStorage.getItem("invitacion_nombre") || "",
     tipo_evento: localStorage.getItem("invitacion_tipo") || "",
   };

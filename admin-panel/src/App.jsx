@@ -267,7 +267,8 @@ export default function App() {
 
   // Entrar por enlace (o recargar) a un evento distinto del guardado.
   useEffect(() => {
-    if (!logueado || !idRuta || String(evento?.id) === idRuta) return;
+    // También si falta el slug: sin él los enlaces saldrían como /undefined.
+    if (!logueado || !idRuta || (String(evento?.id) === idRuta && evento?.slug)) return;
     let vivo = true;
     setErrorEvento("");
     api
@@ -282,7 +283,7 @@ export default function App() {
     return () => {
       vivo = false;
     };
-  }, [logueado, idRuta]);
+  }, [logueado, idRuta, evento?.slug]);
 
   // Direcciones viejas o vacías: a donde corresponde según quién entra.
   useEffect(() => {
@@ -297,9 +298,12 @@ export default function App() {
     }
   }, [logueado, tramos.join("/")]);
 
-  function elegirEvento(inv) {
+  function elegirEvento(inv0) {
+    const inv = !inv0.slug && String(evento?.id) === String(inv0.id) ? { ...inv0, slug: evento.slug } : inv0;
     setInvitacionActual(inv);
-    actualizarSitioBase(inv.slug);
+    // Sin slug (p. ej. un reciente viejo) se pide el evento completo al
+    // llegar a su dirección; mientras, los enlaces no se arman con «undefined».
+    actualizarSitioBase(inv.slug || null);
     setEvento({ id: String(inv.id), slug: inv.slug, nombre: inv.nombre, tipo_evento: inv.tipo_evento });
     ir(`/evento/${inv.id}/inicio`);
   }
