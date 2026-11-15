@@ -8,6 +8,7 @@ import { soloDueno } from "../auth.js";
 import { RITMO } from "../envioMasivo.js";
 import { estadoWhatsapp } from "../whatsappWeb.js";
 import { AUDIOS, IMAGENES, leerDataUrl, urlMedio } from "../archivos.js";
+import { limpiarArticulos } from "./regalos.js";
 import { CLAVE_RE, esIdValido, validarParam } from "../seguridad.js";
 import { tokenVista } from "../middlewareInvitacion.js";
 
@@ -521,12 +522,14 @@ function datosExtra(body) {
       return { error: "El enlace del regalo debe empezar por https://" };
     }
   }
-  return { grupo, regalo_modo: body.regalo_modo, regalo_detalle, regalo_url };
+  const regalo_articulos = limpiarArticulos(body.regalo_articulos);
+  if (regalo_articulos?.error) return { error: regalo_articulos.error };
+  return { grupo, regalo_modo: body.regalo_modo, regalo_detalle, regalo_url, regalo_articulos };
 }
 
 async function invitadoConMiembros(invitacionId, id) {
   const { rows } = await pool.query(
-    `SELECT id, codigo, tipo, nombre, familia, mensaje, telefono, telefono_aux, cupos, grupo, regalo_modo, regalo_detalle, regalo_url, enviado_en, creado_en
+    `SELECT id, codigo, tipo, nombre, familia, mensaje, telefono, telefono_aux, cupos, grupo, regalo_modo, regalo_detalle, regalo_url, regalo_articulos, enviado_en, creado_en
      FROM invitados WHERE id = $1 AND invitacion_id = $2`,
     [id, invitacionId]
   );
@@ -544,7 +547,7 @@ recursosRouter.get(
   capturar(async (req, res) => {
     const { rows } = await pool.query(
       `SELECT i.id, i.codigo, i.tipo, i.nombre, i.familia, i.mensaje,
-              i.telefono, i.telefono_aux, i.cupos, i.grupo, i.regalo_modo, i.regalo_detalle, i.regalo_url, i.enviado_en, i.abierto_en, i.ultima_apertura, i.aperturas, i.creado_en,
+              i.telefono, i.telefono_aux, i.cupos, i.grupo, i.regalo_modo, i.regalo_detalle, i.regalo_url, i.regalo_articulos, i.enviado_en, i.abierto_en, i.ultima_apertura, i.aperturas, i.creado_en,
               COALESCE(json_agg(
                 json_build_object('id', m.id, 'nombre', m.nombre, 'orden', m.orden,
                                   'estado', m.estado, 'restriccion', m.restriccion,
@@ -622,12 +625,13 @@ recursosRouter.post(
       await client.query("BEGIN");
       const { rows } = await client.query(
         `INSERT INTO invitados (invitacion_id, codigo, nombre, familia, mensaje, tipo, telefono, telefono_aux, cupos,
-                                grupo, regalo_modo, regalo_detalle, regalo_url)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`,
+                                grupo, regalo_modo, regalo_detalle, regalo_url, regalo_articulos)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id`,
         [
           req.invitacionId, codigo, nombre.trim(), familia || "", mensaje || "", tipo,
           (telefono || "").trim(), (telefono_aux || "").trim(), numeroCupos,
           extra.grupo || "", extra.regalo_modo || "", extra.regalo_detalle || "", extra.regalo_url || "",
+          JSON.stringify(extra.regalo_articulos || []),
         ]
       );
       const id = rows[0].id;
@@ -695,6 +699,7 @@ recursosRouter.put(
          grupo = COALESCE($11, grupo),
          regalo_detalle = COALESCE($12, regalo_detalle),
          regalo_url = COALESCE($13, regalo_url),
+         regalo_articulos = COALESCE($14::jsonb, regalo_articulos),
          enviado_en = ${marcaEnvio}
        WHERE id = $1 AND invitacion_id = $2 RETURNING id`,
       [
@@ -704,6 +709,7 @@ recursosRouter.put(
         extra.grupo ?? null,
         extra.regalo_detalle ?? null,
         extra.regalo_url ?? null,
+        extra.regalo_articulos === undefined ? null : JSON.stringify(extra.regalo_articulos),
       ]
     );
     if (!rows.length) return res.status(404).json({ error: "Invitación no encontrada" });

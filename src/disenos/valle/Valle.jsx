@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import "./valle.css";
 import RSVP from "../../components/RSVP";
 import { API_URL, reservarRegalo } from "../../api/site";
-import { ContenidoRegalo } from "../../components/RegaloPersonal";
+import { ContenidoRegalo, ListaArticulos } from "../../components/RegaloPersonal";
 import {
   partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer, enlaceCalendario,
 } from "../comun";
@@ -293,6 +293,7 @@ function RegaloInvitado({ regalo, slug, codigo, onAviso }) {
               <div>
                 <p className="va-opcion-nombre">{o.nombre}</p>
                 {o.detalle && <p className="va-opcion-detalle">{o.detalle}</p>}
+                <ListaArticulos articulos={o.articulos} clase="va" conEnlaces={o.libre || o.mia} />
                 {o.url && (o.libre || o.mia) && (
                   <a className="va-opcion-enlace" href={o.url} target="_blank" rel="noopener noreferrer">
                     Ver dónde comprarlo ↗

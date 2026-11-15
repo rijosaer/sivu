@@ -13,6 +13,42 @@ import { reservarRegalo } from "../api/site";
 // llevan dentro de la página lo ponen con su propio título; los demás lo
 // muestran desde el botón flotante (RegaloFlotante).
 
+// «https://www.mercadolibre.com.co/...» → «Mercado Libre».
+const TIENDAS = {
+  mercadolibre: "Mercado Libre", falabella: "Falabella", exito: "Éxito", amazon: "Amazon",
+  homecenter: "Homecenter", alkosto: "Alkosto", ktronix: "Ktronix", jumbo: "Jumbo",
+  tiendasjumbo: "Jumbo", olimpica: "Olímpica", temu: "Temu", shein: "Shein", ikea: "IKEA",
+};
+export function nombreTienda(url) {
+  try {
+    const raiz = new URL(url).hostname.replace(/^www\./, "").split(".")[0];
+    return TIENDAS[raiz] || raiz.charAt(0).toUpperCase() + raiz.slice(1);
+  } catch {
+    return "la tienda";
+  }
+}
+
+// Las cosas de un regalo, cada una con su cantidad y dónde comprarla.
+// `clase` es el prefijo del diseño ("rp" común, "va" Valle).
+export function ListaArticulos({ articulos, clase = "rp", conEnlaces = true }) {
+  if (!articulos?.length) return null;
+  return (
+    <ul className={`${clase}-articulos`}>
+      {articulos.map((a, i) => (
+        <li key={i}>
+          <span className={`${clase}-articulo-cant`}>{a.cantidad}</span>
+          <span className={`${clase}-articulo-nombre`}>{a.nombre}</span>
+          {conEnlaces && a.url && (
+            <a className={`${clase}-articulo-enlace`} href={a.url} target="_blank" rel="noopener noreferrer">
+              Ver en {nombreTienda(a.url)} ↗
+            </a>
+          )}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function ContenidoRegalo({ regalo, slug, codigo, onAviso = () => {} }) {
   const [opciones, setOpciones] = useState(regalo.opciones || []);
   const [ocupado, setOcupado] = useState(false);
@@ -55,7 +91,8 @@ export function ContenidoRegalo({ regalo, slug, codigo, onAviso = () => {} }) {
       {regalo.tipo === "especifico" && (
         <div className="rp-especifico">
           <p className="rp-etiqueta">Tu regalo</p>
-          <p className="rp-regalo">{regalo.regalo}</p>
+          {regalo.regalo && <p className="rp-regalo">{regalo.regalo}</p>}
+          <ListaArticulos articulos={regalo.articulos} />
           {regalo.url && (
             <a className="rp-btn rp-btn-lleno" href={regalo.url} target="_blank" rel="noopener noreferrer">
               Ver dónde comprarlo
@@ -79,6 +116,7 @@ export function ContenidoRegalo({ regalo, slug, codigo, onAviso = () => {} }) {
               <div>
                 <p className="rp-opcion-nombre">{o.nombre}</p>
                 {o.detalle && <p className="rp-opcion-detalle">{o.detalle}</p>}
+                <ListaArticulos articulos={o.articulos} conEnlaces={o.libre || o.mia} />
                 {o.url && (o.libre || o.mia) && (
                   <a className="rp-opcion-enlace" href={o.url} target="_blank" rel="noopener noreferrer">
                     Ver dónde comprarlo ↗

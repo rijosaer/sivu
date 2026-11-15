@@ -361,6 +361,11 @@
 .va-opcion-nombre { font: 500 18px/1.25 var(--f-titulo); }
 .va-opcion-detalle { margin-top: 2px; font: 300 14px/1.4 var(--f-texto); }
 .va-opcion-enlace { display: inline-block; margin-top: 4px; font: 400 14px/1.4 var(--f-texto); color: var(--azul); text-decoration: underline; text-underline-offset: 3px; }
+.va-articulos { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 6px; }
+.va-articulos li { display: grid; grid-template-columns: auto 1fr; column-gap: 8px; align-items: baseline; }
+.va-articulo-cant { font: 500 16px/1.3 var(--f-titulo); color: var(--azul); min-width: 1.4em; text-align: right; }
+.va-articulo-nombre { font: 300 14.5px/1.4 var(--f-texto); }
+.va-articulo-enlace { grid-column: 2; font: 400 13.5px/1.4 var(--f-texto); color: var(--azul); text-decoration: underline; text-underline-offset: 3px; }
 .va-opcion-mia { border-color: var(--azul); }
 .va-opcion-ocupada { opacity: .6; }
 .va-opcion-estado { flex: none; font: 400 13px/1 var(--f-texto); }
