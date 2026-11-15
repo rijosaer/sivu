@@ -299,6 +299,7 @@ function RegaloInvitado({ regalo, slug, codigo, onAviso }) {
                     Ver dónde comprarlo ↗
                   </a>
                 )}
+                {o.personas > 1 && o.libre && !o.mia && <p className="va-opcion-detalle">Quedan {o.quedan} de {o.personas}</p>}
                 {o.mia && <p className="va-opcion-detalle">Apartado por ti</p>}
               </div>
               {o.mia ? (

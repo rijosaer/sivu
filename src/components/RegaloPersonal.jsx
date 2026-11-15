@@ -122,6 +122,7 @@ export function ContenidoRegalo({ regalo, slug, codigo, onAviso = () => {} }) {
                     Ver dónde comprarlo ↗
                   </a>
                 )}
+                {o.personas > 1 && o.libre && !o.mia && <p className="rp-opcion-detalle">Quedan {o.quedan} de {o.personas}</p>}
                 {o.mia && <p className="rp-opcion-detalle">Apartado por ti</p>}
               </div>
               {o.mia ? (

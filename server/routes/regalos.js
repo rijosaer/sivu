@@ -66,15 +66,19 @@ async function seccionRegalos(invitacionId, db = pool) {
 
 async function opcionesParaInvitado(invitacionId, invitadoId) {
   const { rows } = await pool.query(
-    `SELECT id, nombre, detalle, url, articulos, reservado_por FROM regalo_opciones
-     WHERE invitacion_id = $1 ORDER BY orden, id`,
-    [invitacionId]
+    `SELECT o.id, o.nombre, o.detalle, o.url, o.articulos, o.personas,
+            count(r.id)::int AS apartadas,
+            COALESCE(bool_or(r.invitado_id = $2), false) AS mia
+     FROM regalo_opciones o LEFT JOIN regalo_reservas r ON r.opcion_id = o.id
+     WHERE o.invitacion_id = $1
+     GROUP BY o.id ORDER BY o.orden, o.id`,
+    [invitacionId, invitadoId]
   );
-  // Nunca se manda quién apartó: solo si está libre o si es la suya.
-  return rows.map(({ reservado_por, ...o }) => ({
+  // Nunca se manda quién apartó: solo cuántos cupos quedan y si uno es suyo.
+  return rows.map(({ apartadas, ...o }) => ({
     ...o,
-    libre: reservado_por === null,
-    mia: reservado_por === invitadoId,
+    quedan: Math.max(0, o.personas - apartadas),
+    libre: apartadas < o.personas,
   }));
 }
 
@@ -120,26 +124,41 @@ export async function regaloDeInvitado(invitacionId, invitado) {
   return { tipo: "lista", titulo: c.titulo, texto: mensaje(c, "textoLista"), opciones };
 }
 
-// Aparta una opción para el invitado, o la suelta si opcionId es null. Cambiar
-// de opción es atómico: si la nueva ya la tomó otro, conserva la que tenía.
+// Aparta una opción para el invitado, o la suelta si opcionId es null. Cada
+// invitado tiene a lo sumo UNA opción; una opción admite tantas personas como
+// diga «personas». Cambiar de opción es atómico: si la nueva ya se llenó,
+// conserva la que tenía. La fila de la opción se bloquea (FOR UPDATE) para que
+// dos invitados no se lleven el último cupo a la vez.
 export async function reservarOpcion(invitacionId, invitadoId, opcionId) {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
-    await client.query(
-      "UPDATE regalo_opciones SET reservado_por = NULL, reservado_en = NULL WHERE invitacion_id = $1 AND reservado_por = $2",
-      [invitacionId, invitadoId]
-    );
     if (opcionId !== null) {
-      const { rowCount } = await client.query(
-        `UPDATE regalo_opciones SET reservado_por = $3, reservado_en = now()
-         WHERE id = $1 AND invitacion_id = $2 AND reservado_por IS NULL`,
-        [opcionId, invitacionId, invitadoId]
+      const { rows } = await client.query(
+        "SELECT personas FROM regalo_opciones WHERE id = $1 AND invitacion_id = $2 FOR UPDATE",
+        [opcionId, invitacionId]
       );
-      if (!rowCount) {
+      if (!rows.length) {
         await client.query("ROLLBACK");
         return false;
       }
+      const { rows: ya } = await client.query(
+        `SELECT count(*)::int AS apartadas, COALESCE(bool_or(invitado_id = $2), false) AS mia
+         FROM regalo_reservas WHERE opcion_id = $1`,
+        [opcionId, invitadoId]
+      );
+      if (ya[0].mia) {
+        await client.query("COMMIT");
+        return true;
+      }
+      if (ya[0].apartadas >= rows[0].personas) {
+        await client.query("ROLLBACK");
+        return false;
+      }
+    }
+    await client.query("DELETE FROM regalo_reservas WHERE invitado_id = $1", [invitadoId]);
+    if (opcionId !== null) {
+      await client.query("INSERT INTO regalo_reservas (opcion_id, invitado_id) VALUES ($1, $2)", [opcionId, invitadoId]);
     }
     await client.query("COMMIT");
     return true;
@@ -174,9 +193,14 @@ regalosRouter.get(
   capturar(async (req, res) => {
     const seccion = await seccionRegalos(req.invitacionId);
     const { rows: opciones } = await pool.query(
-      `SELECT o.id, o.nombre, o.detalle, o.url, o.articulos, o.orden, o.reservado_por, o.reservado_en, i.nombre AS invitado
-       FROM regalo_opciones o LEFT JOIN invitados i ON i.id = o.reservado_por
-       WHERE o.invitacion_id = $1 ORDER BY o.orden, o.id`,
+      `SELECT o.id, o.nombre, o.detalle, o.url, o.articulos, o.personas, o.orden,
+              COALESCE(json_agg(json_build_object('id', i.id, 'nombre', i.nombre) ORDER BY r.creado_en)
+                FILTER (WHERE r.id IS NOT NULL), '[]') AS apartados
+       FROM regalo_opciones o
+       LEFT JOIN regalo_reservas r ON r.opcion_id = o.id
+       LEFT JOIN invitados i ON i.id = r.invitado_id
+       WHERE o.invitacion_id = $1
+       GROUP BY o.id ORDER BY o.orden, o.id`,
       [req.invitacionId]
     );
     res.json({
@@ -242,7 +266,11 @@ function datosOpcion(body) {
   if (!urlValida(limpio)) return { error: "El enlace debe empezar por https://" };
   const articulos = limpiarArticulos(body?.articulos ?? []);
   if (articulos.error) return { error: articulos.error };
-  return { nombre: String(nombre).trim(), detalle: String(detalle ?? "").trim(), url: limpio, articulos };
+  const personas = body?.personas === undefined || body?.personas === "" ? 1 : Number(body.personas);
+  if (!Number.isInteger(personas) || personas < 1 || personas > 99) {
+    return { error: "Las personas que pueden apartarla deben ser de 1 a 99" };
+  }
+  return { nombre: String(nombre).trim(), detalle: String(detalle ?? "").trim(), url: limpio, articulos, personas };
 }
 
 regalosRouter.post(
@@ -252,10 +280,10 @@ regalosRouter.post(
     if (!datos) return res.status(400).json({ error: "Escribe el nombre de la opción" });
     if (datos.error) return res.status(400).json({ error: datos.error });
     const { rows } = await pool.query(
-      `INSERT INTO regalo_opciones (invitacion_id, nombre, detalle, url, articulos, orden)
-       SELECT $1, $2, $3, $4, $5, COALESCE(MAX(orden), 0) + 1 FROM regalo_opciones WHERE invitacion_id = $1
+      `INSERT INTO regalo_opciones (invitacion_id, nombre, detalle, url, articulos, personas, orden)
+       SELECT $1, $2, $3, $4, $5, $6, COALESCE(MAX(orden), 0) + 1 FROM regalo_opciones WHERE invitacion_id = $1
        RETURNING id`,
-      [req.invitacionId, datos.nombre, datos.detalle, datos.url, JSON.stringify(datos.articulos)]
+      [req.invitacionId, datos.nombre, datos.detalle, datos.url, JSON.stringify(datos.articulos), datos.personas]
     );
     res.status(201).json(rows[0]);
   })
@@ -268,11 +296,23 @@ regalosRouter.put(
     const datos = datosOpcion(req.body);
     if (!datos) return res.status(400).json({ error: "Escribe el nombre de la opción" });
     if (datos.error) return res.status(400).json({ error: datos.error });
-    const { rowCount } = await pool.query(
-      "UPDATE regalo_opciones SET nombre = $3, detalle = $4, url = $5, articulos = $6 WHERE id = $1 AND invitacion_id = $2",
-      [req.params.opcionId, req.invitacionId, datos.nombre, datos.detalle, datos.url, JSON.stringify(datos.articulos)]
+    const { rows: ya } = await pool.query(
+      `SELECT count(r.id)::int AS apartadas FROM regalo_opciones o
+       LEFT JOIN regalo_reservas r ON r.opcion_id = o.id
+       WHERE o.id = $1 AND o.invitacion_id = $2 GROUP BY o.id`,
+      [req.params.opcionId, req.invitacionId]
     );
-    if (!rowCount) return res.status(404).json({ error: "Opción no encontrada" });
+    if (!ya.length) return res.status(404).json({ error: "Opción no encontrada" });
+    if (datos.personas < ya[0].apartadas) {
+      return res.status(400).json({
+        error: `Ya la apartaron ${ya[0].apartadas} personas: no puede quedar en menos. Libera a alguien primero.`,
+      });
+    }
+    await pool.query(
+      `UPDATE regalo_opciones SET nombre = $3, detalle = $4, url = $5, articulos = $6, personas = $7
+       WHERE id = $1 AND invitacion_id = $2`,
+      [req.params.opcionId, req.invitacionId, datos.nombre, datos.detalle, datos.url, JSON.stringify(datos.articulos), datos.personas]
+    );
     res.json({ ok: true });
   })
 );
@@ -280,11 +320,18 @@ regalosRouter.put(
 regalosRouter.post(
   "/regalos/opciones/:opcionId/liberar",
   capturar(async (req, res) => {
-    const { rowCount } = await pool.query(
-      "UPDATE regalo_opciones SET reservado_por = NULL, reservado_en = NULL WHERE id = $1 AND invitacion_id = $2",
-      [req.params.opcionId, req.invitacionId]
-    );
+    // Con invitadoId suelta solo a esa persona; sin él, a todas las de la opción.
+    const invitadoId = req.body?.invitadoId;
+    if (invitadoId !== undefined && !esIdValido(invitadoId)) return res.status(400).json({ error: "Invitado no válido" });
+    const { rowCount } = await pool.query("SELECT 1 FROM regalo_opciones WHERE id = $1 AND invitacion_id = $2", [
+      req.params.opcionId,
+      req.invitacionId,
+    ]);
     if (!rowCount) return res.status(404).json({ error: "Opción no encontrada" });
+    await pool.query("DELETE FROM regalo_reservas WHERE opcion_id = $1 AND ($2::int IS NULL OR invitado_id = $2)", [
+      req.params.opcionId,
+      invitadoId === undefined ? null : Number(invitadoId),
+    ]);
     res.json({ ok: true });
   })
 );

@@ -174,7 +174,10 @@ function Opciones({ opciones, onCambio }) {
           ) : (
             <li key={o.id} className="py-2.5 flex flex-wrap items-center gap-2">
               <div className="flex-1 min-w-[180px]">
-                <p className="text-sm">{o.nombre}</p>
+                <p className="text-sm">
+                  {o.nombre}
+                  {o.personas > 1 && <span className="ayuda"> · para {o.personas} personas</span>}
+                </p>
                 {o.detalle && <p className="ayuda">{o.detalle}</p>}
                 {(o.articulos || []).length > 0 && <p className="ayuda">Incluye: {resumenArticulos(o.articulos)}</p>}
                 {o.url && (
@@ -182,16 +185,38 @@ function Opciones({ opciones, onCambio }) {
                     {o.url}
                   </a>
                 )}
-                <p className="ayuda">{o.reservado_por ? `Apartado por ${o.invitado}` : "Libre"}</p>
+                <p className="ayuda">
+                  {!(o.apartados || []).length
+                    ? "Libre"
+                    : o.personas > 1
+                      ? `${o.apartados.length} de ${o.personas} apartados:`
+                      : "Apartado por:"}
+                </p>
+                {(o.apartados || []).length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-1">
+                    {o.apartados.map((a) => (
+                      <span key={a.id} className="inline-flex items-center gap-1.5 rounded-full bg-lienzo px-2.5 py-1 text-xs">
+                        {a.nombre}
+                        <button
+                          type="button"
+                          className="underline text-ink-tenue hover:text-ink"
+                          title={`Liberar lo que apartó ${a.nombre}`}
+                          onClick={() => {
+                            if (confirm(`¿Liberar lo que apartó ${a.nombre}? Esa persona podrá elegir otra vez.`)) {
+                              hacer(() => api.liberarOpcionRegalo(o.id, a.id));
+                            }
+                          }}
+                        >
+                          liberar
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
               <button type="button" className="boton-secundario" onClick={() => setEditando(o.id)}>
                 Editar
               </button>
-              {o.reservado_por && (
-                <button type="button" className="boton-secundario" onClick={() => hacer(() => api.liberarOpcionRegalo(o.id))}>
-                  Liberar
-                </button>
-              )}
               <button
                 type="button"
                 className="boton-peligro"
@@ -227,12 +252,19 @@ function FormOpcion({ inicial = {}, boton, onGuardar, onCancelar }) {
   const [url, setUrl] = useState(inicial.url || "");
   const [articulos, setArticulos] = useState(inicial.articulos || []);
   const [conVarias, setConVarias] = useState((inicial.articulos || []).length > 0);
+  const [personas, setPersonas] = useState(inicial.personas || 1);
   return (
     <form
       className="space-y-2"
       onSubmit={(e) => {
         e.preventDefault();
-        onGuardar({ nombre, detalle, url: conVarias ? "" : url, articulos: conVarias ? articulosLimpios(articulos) : [] });
+        onGuardar({
+          nombre,
+          detalle,
+          url: conVarias ? "" : url,
+          articulos: conVarias ? articulosLimpios(articulos) : [],
+          personas: Number(personas) || 1,
+        });
       }}
     >
       <div className="flex flex-wrap gap-2">
@@ -242,6 +274,20 @@ function FormOpcion({ inicial = {}, boton, onGuardar, onCancelar }) {
           <input className="campo flex-1 min-w-[220px]" type="url" aria-label="Enlace" placeholder="Dónde comprarlo (opcional): https://..." value={url} onChange={(e) => setUrl(e.target.value)} />
         )}
       </div>
+      <label className="flex flex-wrap items-center gap-2 text-sm">
+        ¿Cuántas personas pueden apartarla?
+        <input
+          className="campo-sm w-20"
+          type="number"
+          min={1}
+          max={99}
+          required
+          aria-label="Personas que pueden apartarla"
+          value={personas}
+          onChange={(e) => setPersonas(e.target.value)}
+        />
+        <span className="ayuda">Ej. 2 si quieren dos escritorios.</span>
+      </label>
       {conVarias ? (
         <EditorArticulos valor={articulos} onChange={setArticulos} />
       ) : (
@@ -444,7 +490,7 @@ export default function Regalos() {
   if (!datos) return null;
 
   const cuenta = (modo) => invitados.filter((i) => (i.regalo_modo || "") === modo).length;
-  const apartadas = (datos.opciones || []).filter((o) => o.reservado_por).length;
+  const apartadas = (datos.opciones || []).reduce((n, o) => n + (o.apartados || []).length, 0);
 
   return (
     <div className="flex flex-col gap-5">
@@ -481,7 +527,7 @@ export default function Regalos() {
         </div>
         <div className="min-w-0">
           <Ajustes inicial={datos.config} porDefecto={datos.porDefecto} onGuardado={cargar} />
-          {apartadas > 0 && <p className="ayuda mt-2">{apartadas} {apartadas === 1 ? "opción apartada" : "opciones apartadas"} de la lista.</p>}
+          {apartadas > 0 && <p className="ayuda mt-2">{apartadas} {apartadas === 1 ? "invitado ya apartó" : "invitados ya apartaron"} algo de la lista.</p>}
         </div>
       </div>
     </div>

@@ -715,10 +715,7 @@ recursosRouter.put(
     if (!rows.length) return res.status(404).json({ error: "Invitación no encontrada" });
     // Quien deja de tener lista suelta lo que había apartado.
     if (regalo_modo !== undefined && regalo_modo !== "lista") {
-      await pool.query(
-        "UPDATE regalo_opciones SET reservado_por = NULL, reservado_en = NULL WHERE reservado_por = $1 AND invitacion_id = $2",
-        [rows[0].id, req.invitacionId]
-      );
+      await pool.query("DELETE FROM regalo_reservas WHERE invitado_id = $1", [rows[0].id]);
     }
     res.json(await invitadoConMiembros(req.invitacionId, rows[0].id));
   })

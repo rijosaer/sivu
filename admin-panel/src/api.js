@@ -308,7 +308,11 @@ export const api = {
     request(scoped("/regalos/opciones"), { method: "POST", body: JSON.stringify(datos) }),
   editarOpcionRegalo: (id, datos) =>
     request(scoped(`/regalos/opciones/${id}`), { method: "PUT", body: JSON.stringify(datos) }),
-  liberarOpcionRegalo: (id) => request(scoped(`/regalos/opciones/${id}/liberar`), { method: "POST" }),
+  liberarOpcionRegalo: (id, invitadoId) =>
+    request(scoped(`/regalos/opciones/${id}/liberar`), {
+      method: "POST",
+      body: JSON.stringify(invitadoId === undefined ? {} : { invitadoId }),
+    }),
   borrarOpcionRegalo: (id) => request(scoped(`/regalos/opciones/${id}`), { method: "DELETE" }),
 
   // Envío automático por el WhatsApp de Sivú (solo el dueño)
