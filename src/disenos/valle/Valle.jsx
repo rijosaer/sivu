@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import "./valle.css";
 import RSVP from "../../components/RSVP";
 import { API_URL, reservarRegalo } from "../../api/site";
-import { ContenidoRegalo, ListaArticulos } from "../../components/RegaloPersonal";
+import { ContenidoRegalo, ListaOpciones } from "../../components/RegaloPersonal";
 import {
   partesFecha, limiteLegible, useCuentaRegresiva, pasesDe, useFuentes, useAparecer, enlaceCalendario,
 } from "../comun";
@@ -287,31 +287,9 @@ function RegaloInvitado({ regalo, slug, codigo, onAviso }) {
           <a className="va-btn va-btn-lleno" href={regalo.url} target="_blank" rel="noopener noreferrer">{regalo.etiqueta}</a>
         </p>
       ) : (
-        <ul className="va-opciones va-entra" style={{ "--d": "500ms" }}>
-          {opciones.map((o) => (
-            <li key={o.id} className={`va-opcion ${o.mia ? "va-opcion-mia" : ""} ${!o.libre && !o.mia ? "va-opcion-ocupada" : ""}`}>
-              <div>
-                <p className="va-opcion-nombre">{o.nombre}</p>
-                {o.detalle && <p className="va-opcion-detalle">{o.detalle}</p>}
-                <ListaArticulos articulos={o.articulos} clase="va" conEnlaces={o.libre || o.mia} />
-                {o.url && (o.libre || o.mia) && (
-                  <a className="va-opcion-enlace" href={o.url} target="_blank" rel="noopener noreferrer">
-                    Ver dónde comprarlo ↗
-                  </a>
-                )}
-                {o.personas > 1 && o.libre && !o.mia && <p className="va-opcion-detalle">Quedan {o.quedan} de {o.personas}</p>}
-                {o.mia && <p className="va-opcion-detalle">Apartado por ti</p>}
-              </div>
-              {o.mia ? (
-                <button className="va-btn" type="button" disabled={ocupado} onClick={() => elegir(null)}>Quitar</button>
-              ) : o.libre ? (
-                <button className="va-btn" type="button" disabled={ocupado} onClick={() => elegir(o.id)}>Apartar</button>
-              ) : (
-                <span className="va-opcion-estado">Apartado</span>
-              )}
-            </li>
-          ))}
-        </ul>
+        <div className="va-entra" style={{ "--d": "500ms" }}>
+          <ListaOpciones opciones={opciones} ocupado={ocupado} elegir={elegir} clase="va" />
+        </div>
       )}
     </section>
   );
@@ -524,7 +502,7 @@ export default function ValleDeLuna({ site, contenidoDe, invitacion, enEditor, o
                 </ol>
               </section>
             )}
-            {info.cronogramaModo !== "detallado" && info.cronogramaMensaje && (
+            {info.cronogramaModo === "mensaje" && info.cronogramaMensaje && (
               <section className="va-bloque" data-arma>
                 <Titulo>{info.tituloItinerario || "Itinerario"}</Titulo>
                 <p className="va-texto va-entra">{info.cronogramaMensaje}</p>

@@ -49,6 +49,112 @@ export function ListaArticulos({ articulos, clase = "rp", conEnlaces = true }) {
   );
 }
 
+// Lista de opciones para apartar, pensada para listas largas:
+// - si el invitado ya eligió, ve SU regalo destacado y el resto queda detrás
+//   de «Cambiar mi elección»;
+// - si no, ve las primeras opciones libres y «Ver las N opciones»;
+// - lo que ya apartaron otros no ocupa tarjetas: va en una línea discreta.
+// `clase` es el prefijo del diseño ("rp" común, "va" Valle): mismas piezas,
+// distinta ropa.
+export function ListaOpciones({ opciones, ocupado, elegir, clase = "rp", visibles = 4 }) {
+  const [verTodas, setVerTodas] = useState(false);
+  const [cambiando, setCambiando] = useState(false);
+  const mia = opciones.find((o) => o.mia);
+  const libres = opciones.filter((o) => o.libre && !o.mia);
+  const ocupadas = opciones.filter((o) => !o.libre && !o.mia);
+  const c = (n) => `${clase}-${n}`;
+
+  async function apartar(id) {
+    await elegir(id);
+    setCambiando(false);
+    setVerTodas(false);
+  }
+
+  const tarjeta = (o) => (
+    <li key={o.id} className={`${c("opcion")} ${o.mia ? c("opcion-mia") : ""}`}>
+      <div className={c("opcion-cabeza")}>
+        <div>
+          <p className={c("opcion-nombre")}>{o.nombre}</p>
+          {o.mia ? (
+            <p className={c("opcion-cupos")}>Apartado por ti</p>
+          ) : (
+            o.personas > 1 && <p className={c("opcion-cupos")}>Quedan {o.quedan} de {o.personas}</p>
+          )}
+        </div>
+        {o.mia ? (
+          <button className={c("btn")} type="button" disabled={ocupado} onClick={() => elegir(null)}>
+            Quitar
+          </button>
+        ) : (
+          <button className={`${c("btn")} ${c("btn-lleno")}`} type="button" disabled={ocupado} onClick={() => apartar(o.id)}>
+            Apartar
+          </button>
+        )}
+      </div>
+      {o.detalle && <p className={c("opcion-detalle")}>{o.detalle}</p>}
+      <ListaArticulos articulos={o.articulos} clase={clase} />
+      {o.url && (
+        <a className={c("opcion-enlace")} href={o.url} target="_blank" rel="noopener noreferrer">
+          Ver dónde comprarlo ↗
+        </a>
+      )}
+    </li>
+  );
+
+  const ocupadasLinea = ocupadas.length > 0 && (
+    <p className={c("elige-ocupadas")}>
+      Ya apartados: {ocupadas.map((o) => o.nombre).join(", ")}.
+    </p>
+  );
+
+  if (mia && !cambiando) {
+    return (
+      <div className={c("elige")}>
+        <p className={c("elige-etiqueta")}>Tu regalo elegido</p>
+        <ul className={c("opciones")}>{tarjeta(mia)}</ul>
+        {libres.length > 0 && (
+          <button type="button" className={c("elige-mas")} onClick={() => setCambiando(true)}>
+            Cambiar mi elección
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  const mostrar = verTodas ? libres : libres.slice(0, visibles);
+  return (
+    <div className={c("elige")}>
+      {mia && (
+        <>
+          <p className={c("elige-etiqueta")}>Tu regalo elegido</p>
+          <ul className={c("opciones")}>{tarjeta(mia)}</ul>
+        </>
+      )}
+      <p className={c("elige-etiqueta")}>
+        {libres.length === 0
+          ? "Todas las opciones ya fueron apartadas"
+          : mia
+            ? "Elige otra opción"
+            : libres.length === 1
+              ? "1 opción disponible"
+              : `${libres.length} opciones disponibles`}
+      </p>
+      {mostrar.length > 0 && <ul className={c("opciones")}>{mostrar.map(tarjeta)}</ul>}
+      {libres.length > visibles && (
+        <button type="button" className={c("elige-mas")} onClick={() => setVerTodas(!verTodas)}>
+          {verTodas ? "Ver menos" : `Ver las ${libres.length} opciones`}
+        </button>
+      )}
+      {mia && (
+        <button type="button" className={c("elige-mas")} onClick={() => setCambiando(false)}>
+          Dejar mi elección como está
+        </button>
+      )}
+      {ocupadasLinea}
+    </div>
+  );
+}
+
 export function ContenidoRegalo({ regalo, slug, codigo, onAviso = () => {} }) {
   const [opciones, setOpciones] = useState(regalo.opciones || []);
   const [ocupado, setOcupado] = useState(false);
@@ -109,37 +215,7 @@ export function ContenidoRegalo({ regalo, slug, codigo, onAviso = () => {} }) {
         </p>
       )}
 
-      {regalo.tipo === "lista" && (
-        <ul className="rp-opciones">
-          {opciones.map((o) => (
-            <li key={o.id} className={`rp-opcion ${o.mia ? "rp-opcion-mia" : ""} ${!o.libre && !o.mia ? "rp-opcion-ocupada" : ""}`}>
-              <div>
-                <p className="rp-opcion-nombre">{o.nombre}</p>
-                {o.detalle && <p className="rp-opcion-detalle">{o.detalle}</p>}
-                <ListaArticulos articulos={o.articulos} conEnlaces={o.libre || o.mia} />
-                {o.url && (o.libre || o.mia) && (
-                  <a className="rp-opcion-enlace" href={o.url} target="_blank" rel="noopener noreferrer">
-                    Ver dónde comprarlo ↗
-                  </a>
-                )}
-                {o.personas > 1 && o.libre && !o.mia && <p className="rp-opcion-detalle">Quedan {o.quedan} de {o.personas}</p>}
-                {o.mia && <p className="rp-opcion-detalle">Apartado por ti</p>}
-              </div>
-              {o.mia ? (
-                <button className="rp-btn" type="button" disabled={ocupado} onClick={() => elegir(null)}>
-                  Quitar
-                </button>
-              ) : o.libre ? (
-                <button className="rp-btn" type="button" disabled={ocupado} onClick={() => elegir(o.id)}>
-                  Apartar
-                </button>
-              ) : (
-                <span className="rp-opcion-estado">Ya lo apartaron</span>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
+      {regalo.tipo === "lista" && <ListaOpciones opciones={opciones} ocupado={ocupado} elegir={elegir} />}
     </div>
   );
 }

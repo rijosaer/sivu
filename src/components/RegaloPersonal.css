@@ -45,20 +45,19 @@
 .rp-btn-lleno { background: var(--rp-oro); border-color: var(--rp-oro); color: #fff; }
 .rp-opciones { list-style: none; margin: 0 auto; padding: 0; display: grid; gap: 10px; width: 100%; max-width: 380px; text-align: left; }
 .rp-opcion {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: 14px;
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 16px;
   background: color-mix(in srgb, var(--rp-blanco) 82%, var(--rp-papel));
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--rp-oro) 35%, transparent);
 }
-.rp-opcion .rp-btn { flex: none; min-height: 40px; padding: 8px 16px; }
-.rp-opcion-nombre { font: 400 17px/1.3 var(--rp-titulos); }
-.rp-opcion-detalle { margin-top: 2px; font-size: 14px; line-height: 1.4; opacity: .8; }
-.rp-opcion-mia { box-shadow: inset 0 0 0 2px var(--rp-oro); }
-.rp-opcion-ocupada { opacity: .55; }
+.rp-opcion-cabeza { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.rp-opcion .rp-btn { flex: none; min-height: 40px; padding: 8px 18px; }
+.rp-opcion-nombre { font: 400 18px/1.25 var(--rp-titulos); }
+.rp-opcion-cupos { margin-top: 2px; font-size: 13px; letter-spacing: .02em; color: var(--rp-oro-oscuro); }
+.rp-opcion-detalle { font-size: 14px; line-height: 1.4; opacity: .8; }
+.rp-opcion-mia { box-shadow: inset 0 0 0 2px var(--rp-oro); background: color-mix(in srgb, var(--rp-oro) 9%, var(--rp-blanco)); }
 .rp-opcion-estado { flex: none; font-size: 13px; opacity: .85; }
 
 /* Botón flotante y hoja (diseños que no lo llevan dentro de la página). */
@@ -148,3 +147,9 @@
 .rp-articulo-nombre { font-size: 15.5px; line-height: 1.35; }
 .rp-articulo-enlace { grid-column: 2; font-size: 14px; color: var(--rp-oro-oscuro); text-decoration: underline; text-underline-offset: 3px; }
 .rp-opcion .rp-articulos { margin-top: 6px; }
+
+/* Listas largas: etiquetas, «Ver las N opciones» y lo ya apartado en una línea. */
+.rp-elige { display: grid; justify-items: center; gap: 10px; width: 100%; }
+.rp-elige-etiqueta { margin-top: 6px; font: 700 11.5px/1.3 var(--rp-cuerpo); letter-spacing: .18em; text-transform: uppercase; color: var(--rp-oro-oscuro); }
+.rp-elige-mas { border: 0; background: none; padding: 6px 4px; font: 600 14.5px/1.3 var(--rp-cuerpo); color: var(--rp-oro-oscuro); text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+.rp-elige-ocupadas { max-width: 340px; font-size: 13px; line-height: 1.5; opacity: .65; text-wrap: balance; }
