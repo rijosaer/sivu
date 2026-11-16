@@ -140,7 +140,7 @@
    portada empieza antes y es más densa. */
 .va-v-claro .va-portada::after { background: linear-gradient(to bottom, transparent 20%, color-mix(in srgb, var(--profundo) 85%, transparent) 58%, var(--profundo) 92%); }
 .va-v-claro .va-portada .va-claro, .va-v-claro .va-toca { color: #F3E3BF; }
-/* Portada con foto: la pareja enmarcada en un arco con filete dorado y abajo
+/* Portada con foto: la pareja recortada en arco (sin marco) y abajo
    el azul donde van los textos. Antes la foto iba de borde a borde y en el
    celular las caras quedaban enormes y cortadas. */
 .va-portada-foto { background: radial-gradient(70% 60% at 50% 34%, color-mix(in srgb, var(--azul) 70%, black), var(--profundo)); }
@@ -150,11 +150,10 @@
   --w: min(82vw, 330px, calc((100svh - 330px) * .75));
   top: max(calc(env(safe-area-inset-top) + 20px), calc((100svh - 255px - var(--w) * 4 / 3) / 2));
   width: var(--w); aspect-ratio: 3 / 4;
-  padding: 6px; border-radius: 999px 999px 16px 16px; overflow: hidden;
-  background: color-mix(in srgb, var(--papel) 14%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--oro) 80%, transparent), 0 26px 50px -24px rgba(0, 0, 0, .6);
+  border-radius: 999px 999px 12px 12px; overflow: hidden;
+  box-shadow: 0 26px 50px -24px rgba(0, 0, 0, .6);
 }
-.va-portada-img img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; display: block; border-radius: 999px 999px 11px 11px; animation: va-acerca 9s ease-out both; }
+.va-portada-img img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; display: block; animation: va-acerca 9s ease-out both; }
 .va .va-portada.va-portada-foto::after { z-index: 0; background: linear-gradient(to bottom, transparent 60%, color-mix(in srgb, var(--profundo) 70%, transparent) 75%, var(--profundo) 92%); }
 .va-portada-foto .va-portada-rama { z-index: 2; }
 @media (min-width: 520px) {
