@@ -94,7 +94,8 @@ export async function regaloDeInvitado(invitacionId, invitado) {
   if (seccion && !esSeccionPorInvitado(seccion) && seccion.activo) return null;
   const c = { ...TEXTOS_BASE, ...(seccion && esSeccionPorInvitado(seccion) ? seccion.contenido : {}) };
   if (invitado.regalo_modo === "sobres") {
-    if (!c.textoSobres && !c.datosSobres) return null;
+    // Sin texto propio vale el mensaje por defecto; los datos (cuenta, Nequi…)
+    // son opcionales. Antes, sin ninguno de los dos, el invitado no veía nada.
     return { tipo: "sobres", titulo: c.titulo, texto: mensaje(c, "textoSobres"), datos: c.datosSobres };
   }
   if (invitado.regalo_modo === "especifico") {
