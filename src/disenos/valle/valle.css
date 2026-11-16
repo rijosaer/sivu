@@ -352,6 +352,17 @@
 .va-grupo + .va-grupo { margin-top: 18px; }
 .va-fotos { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
 .va-fotos img { width: 31%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 999px 999px 6px 6px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--oro) 40%, transparent); }
+/* Galería «Memorias»: una foto va grande en arco; dos, lado a lado; tres o
+   más, en una tira que se desliza con el dedo. */
+.va-galeria .va-guion { margin-top: -10px; }
+.va-galeria-fotos { margin-top: 22px; }
+.va-galeria-foto { margin: 0; border-radius: 999px 999px 10px 10px; overflow: hidden; padding: 6px; background: color-mix(in srgb, var(--papel) 70%, white); box-shadow: 0 0 0 1px color-mix(in srgb, var(--oro) 55%, transparent), 0 18px 34px -22px rgba(20, 30, 50, .45); }
+.va-galeria-foto img { display: block; width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 999px 999px 6px 6px; }
+.va-galeria-una .va-galeria-foto { width: min(78%, 300px); margin: 0 auto; }
+.va-galeria-dos { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.va-galeria-varias { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; margin-inline: -30px; padding: 4px 30px 12px; scrollbar-width: none; }
+.va-galeria-varias::-webkit-scrollbar { display: none; }
+.va-galeria-varias .va-galeria-foto { flex: 0 0 62%; scroll-snap-align: center; }
 .va-regalo-ico { display: block; width: 34px; margin: 0 auto 14px; color: var(--oro); }
 .va-regalo .va-botones { margin-top: 18px; }
 .va-transferir { margin: 18px auto 0; max-width: 320px; padding: 16px; border: 1px dashed color-mix(in srgb, var(--oro) 60%, transparent); border-radius: 14px; font: 300 14px/1.6 var(--f-texto); white-space: pre-line; }

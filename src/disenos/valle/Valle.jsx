@@ -323,7 +323,12 @@ export default function ValleDeLuna({ site, contenidoDe, invitacion, enEditor, o
   const limite = limiteLegible(info.fechaLimiteConfirmacion || site.fechaLimiteConfirmacion);
   const nombres = [welcome.novioEl, welcome.novioElla].filter(Boolean);
   const audioSrc = site.audioUrl || musica.src;
-  const fotos = site.fotosSubidas || [];
+  const galeria = contenidoDe("fotos");
+  // Las fotos subidas en el panel y las que se pegaron por enlace.
+  const fotos = [...(site.fotosSubidas || []), ...(galeria.urls || []).filter(Boolean)];
+  // La galería «Memorias» va como bloque propio; antes las fotos solo salían
+  // dentro de «Nuestra historia», y si esa sección estaba oculta no se veían.
+  const conGaleria = activo("fotos") && fotos.length > 0;
   const cronograma = info.cronogramaModo === "detallado" ? (info.cronograma || []).filter((c) => c && (c.hora || c.titulo)) : [];
   const padresElla = [welcome.padreEllaPadre, welcome.padreEllaMadre].filter(Boolean);
   const padresEl = [welcome.padreElPadre, welcome.padreElMadre].filter(Boolean);
@@ -550,11 +555,25 @@ export default function ValleDeLuna({ site, contenidoDe, invitacion, enEditor, o
               </section>
             )}
 
+            {conGaleria && (
+              <section className="va-bloque va-galeria" data-arma aria-labelledby="va-galeria">
+                <Titulo id="va-galeria">{galeria.titulo || "Nuestras fotos"}</Titulo>
+                {galeria.subtitulo && <p className="va-guion va-escribe" style={{ "--d": "300ms" }}>{galeria.subtitulo}</p>}
+                <div className={`va-galeria-fotos va-entra ${fotos.length === 1 ? "va-galeria-una" : fotos.length === 2 ? "va-galeria-dos" : "va-galeria-varias"}`} style={{ "--d": "500ms" }}>
+                  {fotos.map((f, i) => (
+                    <figure key={f} className="va-galeria-foto">
+                      <img src={f} alt={`Foto ${i + 1} de ${nombres.join(" y ")}`} loading="lazy" decoding="async" />
+                    </figure>
+                  ))}
+                </div>
+              </section>
+            )}
+
             {activo("historia") && historia.texto && (
               <section className="va-bloque va-historia" data-arma aria-labelledby="va-historia">
                 <Titulo id="va-historia">{historia.titulo || "Nuestra historia"}</Titulo>
                 <p className="va-texto va-entra" style={{ "--d": "300ms" }}>{historia.texto}</p>
-                {fotos.length > 0 && (
+                {!conGaleria && fotos.length > 0 && (
                   <div className="va-fotos va-entra" style={{ "--d": "500ms" }}>
                     {fotos.slice(0, 3).map((f, i) => <img key={f} src={f} alt={`Foto ${i + 1} de ${nombres.join(" y ")}`} loading="lazy" />)}
                   </div>
