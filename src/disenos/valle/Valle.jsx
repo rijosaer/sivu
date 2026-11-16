@@ -170,7 +170,11 @@ function Valle({ src, className = "" }) {
 
 function Portada({ arte, welcome, nombres, invitacion, onAbrir }) {
   // Opcional por invitación: una foto de los novios en lugar del cielo pintado.
-  const foto = welcome.fotoPortada?.startsWith("/") ? `${API_URL}${welcome.fotoPortada}` : welcome.fotoPortada;
+  const fotoPedida = welcome.fotoPortada?.startsWith("/") ? `${API_URL}${welcome.fotoPortada}` : welcome.fotoPortada;
+  // Si la foto no carga (se borró, o la portada apunta a otro tipo de archivo),
+  // vuelve el cielo pintado: la portada nunca debe quedar en blanco.
+  const [fotoRota, setFotoRota] = useState(false);
+  const foto = fotoRota ? "" : fotoPedida;
   const [abriendo, setAbriendo] = useState(false);
   const pases = pasesDe(invitacion);
   const iniciales = nombres.map((n) => n.trim().charAt(0).toUpperCase());
@@ -183,7 +187,7 @@ function Portada({ arte, welcome, nombres, invitacion, onAbrir }) {
   return (
     <section className={`va-portada ${foto ? "va-portada-foto" : ""} ${abriendo ? "va-abriendo" : ""}`} aria-labelledby="va-portada-titulo">
       {foto ? (
-        <div className="va-portada-img"><img src={foto} alt="" fetchPriority="high" /></div>
+        <div className="va-portada-img"><img src={foto} alt="" fetchPriority="high" onError={() => setFotoRota(true)} /></div>
       ) : (
         <Valle src={arte.noche} />
       )}
