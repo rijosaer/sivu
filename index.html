@@ -16,6 +16,13 @@
     <!-- La API va en otro dominio: abrir la conexión desde el HTML ahorra el
          DNS y el TLS que si no se pagarían al pedir los datos. -->
     <link rel="preconnect" href="%VITE_API_URL%" crossorigin />
+    <!-- Pide los datos de la invitación y su foto de portada sin esperar a que
+         baje el programa del sitio (ver public/precarga.js). -->
+    <meta name="sivu-api" content="%VITE_API_URL%" />
+    <script src="/precarga.js?v=1"></script>
+    <!-- Los diseños usan letras de Google Fonts: abrir la conexión de una vez. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
     <!-- Tarjeta que se ve al compartir cualquier enlace del dominio (landing,
          plantillas e invitaciones) por WhatsApp u otras apps. Es la marca

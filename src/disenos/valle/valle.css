@@ -225,12 +225,13 @@
 
 /* Cinta diagonal bajo los nombres: se desenrolla de izquierda a derecha. */
 .va-cruce { position: relative; z-index: 1; margin-top: 0; pointer-events: none; }
-.va-cruce svg { display: block; width: 100%; height: calc(var(--ancho) * .575); overflow: visible; clip-path: inset(-20% 100% -20% 0); transition: clip-path 1.6s var(--curva); }
+.va-cruce svg { display: block; width: 100%; height: calc(var(--ancho) * .42); overflow: visible; clip-path: inset(-20% 100% -20% 0); transition: clip-path 1.6s var(--curva); }
 .va-cruce.va-armado svg { clip-path: inset(-20% 0 -20% 0); }
 .va-cruce-cinta { fill: var(--azul); filter: drop-shadow(0 3px 4px rgba(20, 30, 50, .18)); }
 .va-cruce-claro { fill: color-mix(in srgb, var(--empolvado) 70%, var(--papel)); }
-.va-cruce .va-trazo { stroke-width: 1.4; }
-.va-bloque { position: relative; padding: 46px 32px; text-align: center; }
+.va-cruce .va-trazo { stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+/* 34px arriba y abajo (antes 46): en el celular sobraba aire entre bloque y bloque. */
+.va-bloque { position: relative; padding: 34px 30px; text-align: center; }
 .va-rama { position: absolute; z-index: -1; width: 112px; top: -10px; transition: clip-path 1.6s var(--curva) .2s; clip-path: inset(100% 0 0 0); }
 .va-rama-der { right: -50px; transform: scaleX(-1) rotate(8deg); }
 .va-rama-izq { left: -50px; transform: rotate(-6deg); }

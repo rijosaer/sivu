@@ -13,6 +13,17 @@ function base(slug) {
   return `${API_URL}/api/public/invitaciones/${encodeURIComponent(slug)}`;
 }
 
+// Respuesta que public/precarga.js ya pidió mientras bajaba el sitio, si es
+// exactamente la misma dirección. Se usa una sola vez: el cuerpo de una
+// respuesta no se puede leer dos veces y las recargas deben pedir datos nuevos.
+function precargada(url) {
+  const guardadas = window.__sivuPrecarga;
+  const respuesta = guardadas?.[url];
+  if (!respuesta) return null;
+  delete guardadas[url];
+  return respuesta;
+}
+
 // Un evento «solo con enlace personal» únicamente se abre con el código del
 // invitado (?i=) o, en la vista previa del panel, con su token (?vista=).
 export async function getSite(slug, { codigo = "", vista = "" } = {}) {
@@ -20,7 +31,8 @@ export async function getSite(slug, { codigo = "", vista = "" } = {}) {
   if (codigo) params.set("i", codigo);
   if (vista) params.set("vista", vista);
   const qs = params.toString();
-  const res = await fetch(`${base(slug)}/site${qs ? `?${qs}` : ""}`);
+  const url = `${base(slug)}/site${qs ? `?${qs}` : ""}`;
+  const res = await (precargada(url) || fetch(url));
   if (res.status === 404) throw new Error("Invitación no encontrada");
   if (!res.ok) throw new Error("No se pudo cargar el sitio");
   const site = await res.json();
@@ -37,7 +49,8 @@ export async function getSite(slug, { codigo = "", vista = "" } = {}) {
 }
 
 export async function getInvitado(slug, codigo) {
-  const res = await fetch(`${base(slug)}/invitado/${encodeURIComponent(codigo)}`);
+  const url = `${base(slug)}/invitado/${encodeURIComponent(codigo)}`;
+  const res = await (precargada(url) || fetch(url));
   if (res.status === 404) return null;
   if (!res.ok) throw new Error("No se pudo cargar la invitación");
   return res.json();

@@ -414,7 +414,7 @@ export default function ValleDeLuna({ site, contenidoDe, invitacion, enEditor, o
             {/* Cinta que cruza en diagonal bajo los nombres, como en el boceto:
                 papel arriba, cinta azul con filetes dorados y una capa clara. */}
             <div className="va-cruce" data-arma aria-hidden="true">
-              <svg viewBox="0 0 400 230">
+              <svg viewBox="0 0 400 230" preserveAspectRatio="none">
                 <path className="va-cruce-claro" d="M0 -10 C10 52 78 88 156 110 C244 134 330 178 400 232 L400 252 C330 204 246 158 160 134 C84 112 14 76 0 14 Z" />
                 <path className="va-cruce-cinta" d="M0 -40 C8 30 70 62 150 84 C240 108 330 150 400 200 L400 232 C330 178 244 134 156 110 C78 88 10 52 0 -10 Z" />
                 <path className="va-trazo" pathLength="1" d="M0 -40 C8 30 70 62 150 84 C240 108 330 150 400 200" />
