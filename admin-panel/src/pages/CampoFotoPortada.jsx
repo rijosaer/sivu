@@ -9,7 +9,13 @@ import { comprimirImagen } from "../archivos";
 // sube una nueva aquí mismo.
 const RUTA = /^\/api\/public\/medio\/(\d+)/;
 
-export default function CampoFotoPortada({ valor, onChange }) {
+export default function CampoFotoPortada({
+  valor,
+  onChange,
+  ayuda = "Toca la foto que quieres en la portada (la pantalla del sello). Después pulsa «Publicar cambios».",
+  marca = "En portada",
+  quitar = "Quitar la foto (usar el dibujo del diseño)",
+}) {
   const [fotos, setFotos] = useState(null);
   const [subiendo, setSubiendo] = useState(false);
   const [error, setError] = useState("");
@@ -50,11 +56,11 @@ export default function CampoFotoPortada({ valor, onChange }) {
   return (
     <div className="space-y-2">
       <p className="ayuda">
-        Toca la foto que quieres en la portada (la pantalla del sello). Después pulsa «Publicar cambios».
+        {ayuda}
       </p>
       {rota && (
         <p className="text-xs text-red-700">
-          La portada actual apunta a un archivo que no es una de tus fotos, así que se ve vacía. Elige una foto.
+          Ahora apunta a un archivo que no es una de tus fotos, así que no se ve. Elige una foto.
         </p>
       )}
       {externa && <p className="ayuda break-all">Ahora usa una foto por enlace: {externa}</p>}
@@ -79,7 +85,7 @@ export default function CampoFotoPortada({ valor, onChange }) {
                 <img src={urlMedia(f.url)} alt="" className="w-full h-full object-cover" loading="lazy" />
                 {elegida && (
                   <span className="absolute bottom-1 left-1 right-1 text-[10px] font-medium bg-marca text-white rounded px-1 py-0.5">
-                    En portada
+                    {marca}
                   </span>
                 )}
               </button>
@@ -103,7 +109,7 @@ export default function CampoFotoPortada({ valor, onChange }) {
 
       {valor && (
         <button type="button" onClick={() => onChange("")} className="boton-texto text-xs">
-          Quitar la foto (usar el dibujo del diseño)
+          {quitar}
         </button>
       )}
       {error && <p className="text-xs text-red-700">{error}</p>}

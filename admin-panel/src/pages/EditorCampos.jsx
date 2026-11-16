@@ -60,6 +60,7 @@ const ETIQUETAS = {
   url: "Enlace",
   datosTransferencia: "Datos para transferencia (opcional)",
   fotoPortada: "Foto de portada",
+  imagenLugar: "Dibujo del lugar",
 };
 
 export function etiquetaDe(clave) {
@@ -441,6 +442,17 @@ export default function CampoValor({ clave, valor, onChange }) {
   if (clave === "fecha") return <CampoFechaHora valor={valor} onChange={onChange} />;
 
   if (clave === "fotoPortada") return <CampoFotoPortada valor={valor} onChange={onChange} />;
+
+  if (clave === "imagenLugar")
+    return (
+      <CampoFotoPortada
+        valor={valor}
+        onChange={onChange}
+        ayuda="El dibujo que sale junto al nombre del lugar (en el diseño Valle). Sube uno con fondo transparente o blanco. Después pulsa «Publicar cambios»."
+        marca="Del lugar"
+        quitar="Quitar (usar el dibujo del diseño)"
+      />
+    );
 
   if (clave === "cronogramaModo") return <CampoModoCronograma valor={valor} onChange={onChange} />;
 

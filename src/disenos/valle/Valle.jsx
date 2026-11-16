@@ -168,6 +168,19 @@ function Valle({ src, className = "" }) {
   );
 }
 
+// El dibujo junto al nombre del lugar: la hacienda del diseño, o uno propio del
+// evento (informacion_boda.imagenLugar, una foto subida en el panel). Si el
+// propio no carga, vuelve la hacienda.
+function DibujoLugar({ propio, deFabrica }) {
+  const [roto, setRoto] = useState(false);
+  const src = propio && !roto ? (propio.startsWith("/") ? `${API_URL}${propio}` : propio) : deFabrica;
+  return (
+    <div className="va-hacienda">
+      <img src={src} alt="" aria-hidden="true" decoding="async" onError={() => propio && setRoto(true)} />
+    </div>
+  );
+}
+
 function Portada({ arte, welcome, nombres, invitacion, onAbrir }) {
   // Opcional por invitación: una foto de los novios en lugar del cielo pintado.
   const fotoPedida = welcome.fotoPortada?.startsWith("/") ? `${API_URL}${welcome.fotoPortada}` : welcome.fotoPortada;
@@ -329,10 +342,11 @@ export default function ValleDeLuna({ site, contenidoDe, invitacion, enEditor, o
   const audioSrc = site.audioUrl || musica.src;
   const galeria = contenidoDe("fotos");
   // Las fotos subidas en el panel y las que se pegaron por enlace.
-  // La de la portada no se repite abajo.
-  const idPortada = String(welcome.fotoPortada || "").match(/\/medio\/(\d+)/)?.[1];
+  // Las fotos que ya se usan en la portada o como dibujo del lugar no se repiten abajo.
+  const idMedio = (u) => String(u || "").match(/\/medio\/(\d+)/)?.[1];
+  const usadas = new Set([idMedio(welcome.fotoPortada), idMedio(info.imagenLugar)].filter(Boolean));
   const fotos = [...(site.fotosSubidas || []), ...(galeria.urls || []).filter(Boolean)].filter(
-    (f) => !idPortada || f.match(/\/medio\/(\d+)/)?.[1] !== idPortada
+    (f) => !usadas.has(idMedio(f))
   );
   // La galería «Memorias» va como bloque propio; antes las fotos solo salían
   // dentro de «Nuestra historia», y si esa sección estaba oculta no se veían.
@@ -489,7 +503,7 @@ export default function ValleDeLuna({ site, contenidoDe, invitacion, enEditor, o
 
             {(info.lugar || info.direccion) && (
               <section className="va-bloque va-lugar" data-arma aria-labelledby="va-lugar">
-                <div className="va-hacienda"><Arte src={arte.hacienda} /></div>
+                <DibujoLugar propio={info.imagenLugar} deFabrica={arte.hacienda} />
                 {info.lugar && <h2 className="va-lugar-nombre" id="va-lugar"><Letras texto={info.lugar} retraso={1200} paso={28} /></h2>}
                 {info.direccion && <p className="va-lugar-dir va-entra" style={{ "--d": "1600ms" }}>{info.direccion}</p>}
                 <p className="va-botones va-entra" style={{ "--d": "1800ms" }}>
