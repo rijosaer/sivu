@@ -140,25 +140,17 @@
    portada empieza antes y es más densa. */
 .va-v-claro .va-portada::after { background: linear-gradient(to bottom, transparent 20%, color-mix(in srgb, var(--profundo) 85%, transparent) 58%, var(--profundo) 92%); }
 .va-v-claro .va-portada .va-claro, .va-v-claro .va-toca { color: #F3E3BF; }
-/* Portada con foto: la pareja recortada en arco (sin marco) y abajo
-   el azul donde van los textos. Antes la foto iba de borde a borde y en el
-   celular las caras quedaban enormes y cortadas. */
-.va-portada-foto { background: radial-gradient(70% 60% at 50% 34%, color-mix(in srgb, var(--azul) 70%, black), var(--profundo)); }
-.va-portada-img {
-  position: absolute; z-index: 1; left: 50%; translate: -50% 0;
-  /* Centrado en el espacio que dejan libre los textos de abajo (~255 px). */
-  --w: min(82vw, 330px, calc((100svh - 330px) * .75));
-  top: max(calc(env(safe-area-inset-top) + 20px), calc((100svh - 255px - var(--w) * 4 / 3) / 2));
-  width: var(--w); aspect-ratio: 3 / 4;
-  border-radius: 999px 999px 12px 12px; overflow: hidden;
-  box-shadow: 0 26px 50px -24px rgba(0, 0, 0, .6);
-}
-.va-portada-img img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; display: block; animation: va-acerca 9s ease-out both; }
-.va .va-portada.va-portada-foto::after { z-index: 0; background: linear-gradient(to bottom, transparent 60%, color-mix(in srgb, var(--profundo) 70%, transparent) 75%, var(--profundo) 92%); }
+/* Portada con foto: arriba la pareja y abajo el azul donde van los textos. */
+.va-portada-foto { background: var(--profundo); }
+.va-portada-img { position: absolute; z-index: 1; inset: 0 0 auto 0; height: 66svh; overflow: hidden; }
+.va-portada-img img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 6%; display: block; animation: va-acerca 9s ease-out both; }
+/* Difuminado largo y suave: la foto se funde en el azul de los textos. */
+.va .va-portada.va-portada-foto::after { z-index: 1; background: linear-gradient(to bottom, transparent 36%, color-mix(in srgb, var(--profundo) 25%, transparent) 46%, color-mix(in srgb, var(--profundo) 62%, transparent) 54%, color-mix(in srgb, var(--profundo) 90%, transparent) 61%, var(--profundo) 67%); }
 .va-portada-foto .va-portada-rama { z-index: 2; }
 @media (min-width: 520px) {
   .va-portada-foto { background: radial-gradient(70% 60% at 50% 40%, color-mix(in srgb, var(--azul) 70%, black), var(--profundo)); }
-  .va-portada-img { --w: min(340px, calc((100svh - 330px) * .75)); }
+  .va-portada-img { left: 50%; right: auto; top: 24px; width: 460px; height: calc(66svh - 24px); translate: -50% 0; border-radius: 230px 230px 0 0; }
+  .va .va-portada.va-portada-foto::after { background: linear-gradient(to bottom, transparent 40%, color-mix(in srgb, var(--profundo) 70%, transparent) 54%, var(--profundo) 64%); }
 }
 .va-abriendo { opacity: 0; transform: scale(1.06); pointer-events: none; }
 .va-abriendo .va-sello { animation: none; transform: scale(.85); transition: transform .4s ease; }
