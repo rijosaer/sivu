@@ -325,7 +325,11 @@ export default function ValleDeLuna({ site, contenidoDe, invitacion, enEditor, o
   const audioSrc = site.audioUrl || musica.src;
   const galeria = contenidoDe("fotos");
   // Las fotos subidas en el panel y las que se pegaron por enlace.
-  const fotos = [...(site.fotosSubidas || []), ...(galeria.urls || []).filter(Boolean)];
+  // La de la portada no se repite abajo.
+  const idPortada = String(welcome.fotoPortada || "").match(/\/medio\/(\d+)/)?.[1];
+  const fotos = [...(site.fotosSubidas || []), ...(galeria.urls || []).filter(Boolean)].filter(
+    (f) => !idPortada || f.match(/\/medio\/(\d+)/)?.[1] !== idPortada
+  );
   // La galería «Memorias» va como bloque propio; antes las fotos solo salían
   // dentro de «Nuestra historia», y si esa sección estaba oculta no se veían.
   const conGaleria = activo("fotos") && fotos.length > 0;

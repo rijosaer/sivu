@@ -1,4 +1,5 @@
 import { useId } from "react";
+import CampoFotoPortada from "./CampoFotoPortada";
 
 // Nombres legibles para las claves que vienen del JSON de cada sección.
 const ETIQUETAS = {
@@ -58,6 +59,7 @@ const ETIQUETAS = {
   tienda: "Tienda",
   url: "Enlace",
   datosTransferencia: "Datos para transferencia (opcional)",
+  fotoPortada: "Foto de portada",
 };
 
 export function etiquetaDe(clave) {
@@ -437,6 +439,8 @@ export default function CampoValor({ clave, valor, onChange }) {
   const id = useId();
 
   if (clave === "fecha") return <CampoFechaHora valor={valor} onChange={onChange} />;
+
+  if (clave === "fotoPortada") return <CampoFotoPortada valor={valor} onChange={onChange} />;
 
   if (clave === "cronogramaModo") return <CampoModoCronograma valor={valor} onChange={onChange} />;
 
