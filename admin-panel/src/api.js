@@ -317,10 +317,12 @@ export const api = {
 
   // Envío automático por el WhatsApp de Sivú (solo el dueño)
   envioAutomatico: () => request(scoped("/envio-automatico")),
-  iniciarEnvioAutomatico: (tipo, items) =>
-    request(scoped("/envio-automatico"), { method: "POST", body: JSON.stringify({ tipo, items }) }),
+  iniciarEnvioAutomatico: (tipo, items, horario = {}) =>
+    request(scoped("/envio-automatico"), { method: "POST", body: JSON.stringify({ tipo, items, ...horario }) }),
   accionEnvioAutomatico: (accion) =>
     request(scoped(`/envio-automatico/${accion}`), { method: "POST" }),
+  horarioEnvioAutomatico: (horaDesde, horaHasta) =>
+    request(scoped("/envio-automatico/horario"), { method: "POST", body: JSON.stringify({ horaDesde, horaHasta }) }),
 
   // "acompanante" solo aplica a las invitaciones por cupos: ocupa uno de los
   // cupos y entra como confirmado (lo agregamos cuando nos avisan por fuera,

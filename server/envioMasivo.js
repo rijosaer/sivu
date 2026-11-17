@@ -7,8 +7,9 @@ import { ordenarChatInvitado } from "./waOrden.js";
 //
 // Ritmo «moderado» (lo eligió el dueño, sabiendo el riesgo): entre un mensaje
 // y otro pasa un tiempo al azar de 20 a 45 segundos, y cada 20 mensajes hay un
-// descanso de 5 a 10 minutos. Solo se envía de 8 a. m. a 8 p. m. (hora de
-// Colombia); fuera de esa franja la cola espera al día siguiente. Nunca hay
+// descanso de 5 a 10 minutos. Solo se envía dentro de la franja del envío
+// (por defecto 8 a. m. a 8 p. m., hora de Colombia; el dueño la puede cambiar);
+// fuera de ella la cola espera a la próxima apertura. Nunca hay
 // dos envíos a la vez, aunque sean de eventos distintos: el número es uno.
 //
 // Se detiene solo si el WhatsApp se desvincula o si fallan 3 seguidos por
@@ -32,18 +33,30 @@ const azar = (min, max) => Math.round(min + Math.random() * (max - min));
 // detener la cola.
 const ERROR_DEL_NUMERO = /no tiene WhatsApp/i;
 
-// Próximas 8 a. m. de Colombia (UTC-5 todo el año) como fecha absoluta.
-function proximaApertura() {
+// Cada envío tiene su franja (hora_desde / hora_hasta, 24 = medianoche); los
+// envíos viejos sin ella usan la de RITMO.
+const franja = (envio) => ({
+  desde: Number.isInteger(envio?.hora_desde) ? envio.hora_desde : RITMO.desde,
+  hasta: Number.isInteger(envio?.hora_hasta) ? envio.hora_hasta : RITMO.hasta,
+});
+
+// Próxima apertura de la franja en Colombia (UTC-5 todo el año) como fecha absoluta.
+function proximaApertura(envio) {
+  const { desde } = franja(envio);
   const { fecha, hora } = ahoraEnBogota();
-  const dia = new Date(`${fecha}T${String(RITMO.desde).padStart(2, "0")}:00:00-05:00`);
-  if (hora >= RITMO.desde) dia.setUTCDate(dia.getUTCDate() + 1);
+  const dia = new Date(`${fecha}T${String(desde).padStart(2, "0")}:00:00-05:00`);
+  if (hora >= desde) dia.setUTCDate(dia.getUTCDate() + 1);
   return dia;
 }
 
-const enHorario = () => {
+export const enHorario = (envio) => {
+  const { desde, hasta } = franja(envio);
   const { hora } = ahoraEnBogota();
-  return hora >= RITMO.desde && hora < RITMO.hasta;
+  return hora >= desde && hora < hasta;
 };
+
+export const horaLegible = (h) =>
+  h === 0 || h === 24 ? "12 a. m." : h === 12 ? "12 p. m." : h < 12 ? `${h} a. m.` : `${h - 12} p. m.`;
 
 async function actualizar(id, campos) {
   const claves = Object.keys(campos);
@@ -73,11 +86,11 @@ async function paso() {
       });
       return;
     }
-    if (!enHorario()) {
+    if (!enHorario(envio)) {
       await actualizar(envio.id, {
-        siguiente_en: proximaApertura(),
+        siguiente_en: proximaApertura(envio),
         en_tanda: 0,
-        detalle: `Fuera de horario: sigue a las ${RITMO.desde} a. m.`,
+        detalle: `Fuera de horario: sigue a las ${horaLegible(franja(envio).desde)}`,
       });
       return;
     }

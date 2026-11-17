@@ -5,7 +5,7 @@ import { capturar } from "../errores.js";
 import { temaDeDiseno } from "../plantillas.js";
 import { resolverDiseno } from "../disenos.js";
 import { soloDueno } from "../auth.js";
-import { RITMO } from "../envioMasivo.js";
+import { RITMO, enHorario } from "../envioMasivo.js";
 import { estadoWhatsapp } from "../whatsappWeb.js";
 import { AUDIOS, IMAGENES, leerDataUrl, urlMedio } from "../archivos.js";
 import { limpiarArticulos } from "./regalos.js";
@@ -966,6 +966,17 @@ recursosRouter.get(
 // mensaje con la misma plantilla de «Mensajes» y aquí solo se encola; el ritmo
 // lo pone envioMasivo.js.
 
+// Franja de horas del envío: { desde, hasta } (24 = medianoche) o { error }.
+// Sin datos, la de siempre (RITMO).
+function leerFranja(body) {
+  const desde = body.horaDesde === undefined ? RITMO.desde : Number(body.horaDesde);
+  const hasta = body.horaHasta === undefined ? RITMO.hasta : Number(body.horaHasta);
+  if (!Number.isInteger(desde) || !Number.isInteger(hasta) || desde < 0 || hasta > 24 || desde >= hasta) {
+    return { error: "Horario no válido: la hora de inicio debe ser antes que la de fin" };
+  }
+  return { desde, hasta };
+}
+
 async function envioActual(invitacionId) {
   const { rows: [envio] } = await pool.query(
     "SELECT * FROM envios_masivos WHERE invitacion_id = $1 ORDER BY id DESC LIMIT 1",
@@ -984,6 +995,8 @@ async function envioActual(invitacionId) {
     estado: envio.estado,
     detalle: envio.detalle,
     siguienteEn: envio.siguiente_en,
+    horaDesde: envio.hora_desde,
+    horaHasta: envio.hora_hasta,
     creadoEn: envio.creado_en,
     total: items.length,
     enviados: cuenta("enviado"),
@@ -1006,6 +1019,8 @@ recursosRouter.post(
   soloDueno,
   capturar(async (req, res) => {
     const tipo = req.body.tipo === "recordatorio" ? "recordatorio" : "invitacion";
+    const franjaPedida = leerFranja(req.body);
+    if (franjaPedida.error) return res.status(400).json({ error: franjaPedida.error });
     const items = Array.isArray(req.body.items) ? req.body.items : [];
     if (!items.length) return res.status(400).json({ error: "No hay mensajes para enviar" });
     if (items.length > 2000) return res.status(400).json({ error: "Demasiados mensajes en un solo envío" });
@@ -1040,8 +1055,8 @@ recursosRouter.post(
     try {
       await client.query("BEGIN");
       const { rows: [envio] } = await client.query(
-        "INSERT INTO envios_masivos (invitacion_id, tipo) VALUES ($1, $2) RETURNING id",
-        [req.invitacionId, tipo]
+        "INSERT INTO envios_masivos (invitacion_id, tipo, hora_desde, hora_hasta) VALUES ($1, $2, $3, $4) RETURNING id",
+        [req.invitacionId, tipo, franjaPedida.desde, franjaPedida.hasta]
       );
       for (const [orden, i] of validos.entries()) {
         await client.query(
@@ -1058,6 +1073,33 @@ recursosRouter.post(
       client.release();
     }
     res.status(201).json({ envio: await envioActual(req.invitacionId) });
+  })
+);
+
+// Cambia la franja del envío activo. Si con la nueva ya se puede enviar y la
+// cola estaba esperando por horario, sigue en unos segundos.
+recursosRouter.post(
+  "/envio-automatico/horario",
+  soloDueno,
+  capturar(async (req, res) => {
+    const f = leerFranja(req.body);
+    if (f.error) return res.status(400).json({ error: f.error });
+    const { rows: [envio] } = await pool.query(
+      `SELECT * FROM envios_masivos WHERE invitacion_id = $1 AND estado IN ('en_curso', 'pausado', 'detenido')
+       ORDER BY id DESC LIMIT 1`,
+      [req.invitacionId]
+    );
+    if (!envio) return res.status(404).json({ error: "No hay un envío activo" });
+    const ya = enHorario({ hora_desde: f.desde, hora_hasta: f.hasta });
+    await pool.query(
+      `UPDATE envios_masivos SET hora_desde = $2, hora_hasta = $3,
+         siguiente_en = CASE WHEN $4 AND detalle LIKE 'Fuera de horario%' THEN now() + interval '5 seconds' ELSE siguiente_en END,
+         detalle = CASE WHEN $4 AND detalle LIKE 'Fuera de horario%' THEN '' ELSE detalle END,
+         actualizado_en = now()
+       WHERE id = $1`,
+      [envio.id, f.desde, f.hasta, ya]
+    );
+    res.json({ envio: await envioActual(req.invitacionId) });
   })
 );
 

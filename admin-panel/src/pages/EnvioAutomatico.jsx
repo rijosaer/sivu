@@ -5,8 +5,9 @@ import { useToast } from "../ui/Toast";
 // Envío automático de invitaciones (o recordatorios) por el WhatsApp de Sivú.
 // El panel arma cada mensaje con la plantilla de «Mensajes» y el servidor los
 // manda uno por uno con el ritmo moderado (pausas al azar, tandas con
-// descanso y horario de 8 a. m. a 8 p. m.). Aquí se arranca, se sigue el
-// avance y se pausa o cancela.
+// descanso y una franja de horas que se elige aquí: por defecto 8 a. m. a
+// 8 p. m.). Aquí se arranca, se sigue el avance, se cambia el horario y se
+// pausa o cancela.
 
 const ESTADOS = {
   en_curso: { texto: "Enviando", clase: "text-emerald-700" },
@@ -43,6 +44,31 @@ function duracionEstimada(n, ritmo) {
   return `aprox. ${h} h${m ? ` ${m} min` : ""}`;
 }
 
+// 24 = medianoche.
+const horaLegible = (h) =>
+  h === 0 || h === 24 ? "12 a. m." : h === 12 ? "12 p. m." : h < 12 ? `${h} a. m.` : `${h - 12} p. m.`;
+
+// «Enviar entre [8 a. m.] y [8 p. m.]»: la cola solo manda dentro de esa franja.
+function Franja({ desde, hasta, onCambio, disabled }) {
+  const clase = "campo !w-auto !py-1 !text-sm";
+  return (
+    <span className="inline-flex flex-wrap items-center gap-1.5 text-sm text-ink">
+      Enviar entre
+      <select className={clase} value={desde} disabled={disabled} onChange={(e) => onCambio(Number(e.target.value), hasta)}>
+        {Array.from({ length: 24 }, (_, h) => h).filter((h) => h < hasta).map((h) => (
+          <option key={h} value={h}>{horaLegible(h)}</option>
+        ))}
+      </select>
+      y
+      <select className={clase} value={hasta} disabled={disabled} onChange={(e) => onCambio(desde, Number(e.target.value))}>
+        {Array.from({ length: 24 }, (_, h) => h + 1).filter((h) => h > desde).map((h) => (
+          <option key={h} value={h}>{h === 24 ? "12 a. m. (medianoche)" : horaLegible(h)}</option>
+        ))}
+      </select>
+    </span>
+  );
+}
+
 const hora = (iso) =>
   new Date(iso).toLocaleTimeString("es-CO", { hour: "numeric", minute: "2-digit", timeZone: "America/Bogota" });
 
@@ -52,6 +78,8 @@ export default function EnvioAutomatico({ armarItems, onCambio, onCerrar, tipoIn
   const [tipo, setTipo] = useState(tipoInicial);
   const [ocupado, setOcupado] = useState(false);
   const [error, setError] = useState("");
+  // Franja elegida para un envío nuevo (la de un envío en marcha viene de él).
+  const [franja, setFranja] = useState(null);
 
   async function cargar() {
     try {
@@ -80,12 +108,33 @@ export default function EnvioAutomatico({ armarItems, onCambio, onCerrar, tipoIn
 
   const items = armarItems(tipo);
   const conectado = info?.whatsapp === "conectado";
+  const desde = franja?.desde ?? (activo ? envio.horaDesde : null) ?? info?.ritmo?.desde ?? 8;
+  const hasta = franja?.hasta ?? (activo ? envio.horaHasta : null) ?? info?.ritmo?.hasta ?? 20;
+  const franjaCambiada = activo && franja && (franja.desde !== envio.horaDesde || franja.hasta !== envio.horaHasta);
+  const ahoraBogota = Number(new Date().toLocaleString("en-US", { hour: "numeric", hour12: false, timeZone: "America/Bogota" })) % 24;
+  const fueraDeFranja = !(ahoraBogota >= desde && ahoraBogota < hasta);
+
+  async function guardarFranja() {
+    setOcupado(true);
+    setError("");
+    try {
+      const r = await api.horarioEnvioAutomatico(franja.desde, franja.hasta);
+      setInfo((prev) => ({ ...prev, envio: r.envio }));
+      setFranja(null);
+      toast("Horario del envío actualizado");
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setOcupado(false);
+    }
+  }
 
   async function iniciar() {
     const n = items.length;
     const ok = window.confirm(
       `¿Enviar ${n} ${tipo === "invitacion" ? "invitaciones" : "recordatorios"} desde el WhatsApp de Sivú?\n\n` +
-        `Salen uno por uno, con pausas de 20 a 45 segundos y un descanso cada ${info.ritmo.tanda}. ` +
+        `Salen uno por uno, con pausas de 20 a 45 segundos y un descanso cada ${info.ritmo.tanda}, ` +
+        `solo entre ${horaLegible(desde)} y ${horaLegible(hasta)}. ` +
         `Tiempo estimado: ${duracionEstimada(n, info.ritmo)}. Puedes pausar o cancelar en cualquier momento.`
     );
     if (!ok) return;
@@ -94,8 +143,10 @@ export default function EnvioAutomatico({ armarItems, onCambio, onCerrar, tipoIn
     try {
       const r = await api.iniciarEnvioAutomatico(
         tipo,
-        items.map((i) => ({ ...i, texto: variarSaludo(i.texto) }))
+        items.map((i) => ({ ...i, texto: variarSaludo(i.texto) })),
+        { horaDesde: desde, horaHasta: hasta }
       );
+      setFranja(null);
       setInfo((prev) => ({ ...prev, envio: r.envio }));
       toast("Envío automático en marcha");
     } catch (e) {
@@ -127,8 +178,8 @@ export default function EnvioAutomatico({ armarItems, onCambio, onCerrar, tipoIn
           <h3 className="bloque-titulo">Envío automático por WhatsApp</h3>
           <p className="ayuda mt-0.5 max-w-prose">
             Sale del número de Sivú vinculado, uno por uno: 20 a 45 segundos entre mensajes, un
-            descanso de 5 a 10 minutos cada 20, y solo de 8 a. m. a 8 p. m. El servidor sigue
-            enviando aunque cierres el panel.
+            descanso de 5 a 10 minutos cada 20, y solo dentro del horario que elijas aquí. El
+            servidor sigue enviando aunque cierres el panel.
           </p>
         </div>
         <button onClick={onCerrar} className="boton-texto">
@@ -172,6 +223,14 @@ export default function EnvioAutomatico({ armarItems, onCambio, onCerrar, tipoIn
                   )})`
                 : "")}
           </p>
+          <div className="flex flex-wrap items-center gap-2 mt-3">
+            <Franja desde={desde} hasta={hasta} disabled={ocupado} onCambio={(d, h) => setFranja({ desde: d, hasta: h })} />
+            {franjaCambiada && (
+              <button onClick={guardarFranja} disabled={ocupado} className="boton-primario !py-1">
+                Guardar horario
+              </button>
+            )}
+          </div>
           <div className="flex flex-wrap gap-2 mt-3">
             {envio.estado === "en_curso" && (
               <button onClick={() => accion("pausar")} disabled={ocupado} className="boton-secundario">
@@ -226,6 +285,15 @@ export default function EnvioAutomatico({ armarItems, onCambio, onCerrar, tipoIn
               "No hay invitaciones enviadas esperando respuesta (o el plazo ya cerró)."
             )}
           </p>
+          <div className="mt-3">
+            <Franja desde={desde} hasta={hasta} disabled={ocupado} onCambio={(d, h) => setFranja({ desde: d, hasta: h })} />
+            {fueraDeFranja && items.length > 0 && (
+              <p className="text-xs text-amber-700 mt-1">
+                Ahora mismo está fuera de ese horario: la cola esperará hasta las {horaLegible(desde)}. Si quieres
+                que salgan ya, amplía el horario.
+              </p>
+            )}
+          </div>
           <button
             onClick={iniciar}
             disabled={ocupado || !conectado || !items.length}
